@@ -47,11 +47,41 @@
       font-weight: bold;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
+
+    .logo {
+      margin-bottom: 20px;
+    }
+
+    .button-container {
+      margin-top: 20px;
+    }
+
+    .upgrade-btn {
+      background-color: var(--muted-gold);
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+      color: var(--midnight-teal);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .upgrade-btn:hover {
+      background-color: var(--warm-terracotta);
+    }
   </style>
 </head>
 <body>
+  <div class="logo">
+    <img src="https://github.com/GinOmAhee/Loop-Catcher-Web/blob/main/LOGO%20TINY%20(1).jpg" alt="Ginomind Logo" width="200" />
+  </div>
   <h1>Ginomind Loop Catcher</h1>
   <p>A grounded tool for capturing your cycles, breakthroughs, and transformations—seamlessly and soulfully.</p>
   <div class="coming-soon">Coming Soon ✨</div>
+
+  <div class="button-container">
+    <button class="upgrade-btn" onclick="window.location.href='https://your-upgrade-link.com'">Upgrade for Premium Version</button>
+  </div>
 </body>
 </html>
