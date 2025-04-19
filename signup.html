@@ -82,35 +82,43 @@
 
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwfupWWVphegFvvpC5fCDtFOPkCuJ-FZpwybvc05w2l4eZeylCjPFoYwHMPljvYo1vhfw/exec";
 
-    signUpForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(signUpForm);
-      formData.append('action', 'signup');
+   signUpForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(signUpForm);
 
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          body: formData,
-        });
+  const urlParams = new URLSearchParams();
+  for (const [key, value] of formData.entries()) {
+    urlParams.append(key, value);
+  }
+  urlParams.append('action', 'signup');
 
-        if (!res.ok) throw new Error("Failed fetch");
-
-        const result = await res.json();
-
-        if (result.success) {
-          window.location.href = 'confirmation.html';
-        } else {
-          messageBox.textContent = result.message;
-          messageBox.style.color = 'red';
-        }
-
-        signUpForm.reset();
-      } catch (error) {
-        console.error(error);
-        messageBox.textContent = "Network error.";
-        messageBox.style.color = 'red';
-      }
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: urlParams.toString()
     });
+
+    if (!res.ok) throw new Error("Failed fetch");
+
+    const result = await res.json();
+
+    if (result.status === 'success') {
+      window.location.href = 'confirmation.html';
+    } else {
+      messageBox.textContent = result.message;
+      messageBox.style.color = 'red';
+    }
+
+    signUpForm.reset();
+  } catch (error) {
+    console.error(error);
+    messageBox.textContent = "Network error.";
+    messageBox.style.color = 'red';
+  }
+});
   </script>
 </body>
 </html>
