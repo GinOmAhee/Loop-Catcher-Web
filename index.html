@@ -126,10 +126,15 @@
       e.preventDefault();
 
       const formData = new FormData(signUpForm);
-      fetch('https://script.google.com/macros/s/AKfycbwfKDqyi4b4-3nHvHaRscn7g_PP5xUGsJFwRuomquzj5lXw0Z8BaZ9dOdhFQBPvTHaEmg/exec', {
-        method: 'POST',
-        body: formData
-      })
+      fetch('https://script.google.com/macros/s/AKfycbxUv-cu4iUDtnDpinFZKjlfpgZYzatEE5_Qojlm2Y7MBBeweNEFzbH1VjLn2p4SO2i2OQ/exec', {
+  method: 'POST',
+  body: new URLSearchParams({
+    action: 'signup', // or 'signin'
+    name: 'Gin Om Ahee',
+    email: 'you@email.com',
+    password: 'yourpass'
+  })
+})
       .then(res => res.text())
       .then(data => {
         alert("Sign Up Success: " + data);
