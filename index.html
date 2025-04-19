@@ -1,4 +1,3 @@
-<!-- UPDATED index.html for Ginomind Loop Catcher -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,178 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ginomind Loop Catcher</title>
   <style>
-    :root {
-      --natural-beige: #f5f1e8;
-      --soft-plum: #774C64;
-      --muted-green: #6B8F71;
-    }
-
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--natural-beige);
-      color: var(--soft-plum);
+      background-color: #f5f1e8;
+      color: #774C64;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
-
-    header {
-      background-color: var(--soft-plum);
+.logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  object-fit: cover;
+}
+    }
+    h1 {
+      margin: 0;
+    }
+    h2 {
+      margin-top: 5px;
+      font-weight: normal;
+    }
+    .buttons {
+      margin-top: 30px;
+    }
+    .buttons button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      background-color: #6B8F71;
       color: white;
-      text-align: center;
-      padding: 1.5rem;
-    }
-
-    .subheader {
-      background-color: var(--muted-green);
-      color: white;
-      text-align: center;
-      padding: 0.75rem;
-    }
-
-    .container {
-      max-width: 500px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    input, button {
-      width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
+      border: none;
       border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-
-    button {
-      background-color: var(--muted-green);
-      color: white;
-      border: none;
       cursor: pointer;
     }
-
-    button:hover {
+    .buttons button:hover {
       background-color: #587c5f;
-    }
-
-    .toggle {
-      text-align: center;
-      margin-top: 1rem;
-    }
-
-    .toggle button {
-      background: none;
-      color: var(--soft-plum);
-      border: none;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .message {
-      margin-top: 1rem;
-      font-weight: bold;
-      text-align: center;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Ginomind Loop Catcher</h1>
-  </header>
-
-  <div class="subheader">
-    <h2>Join the Loop — Catch your thoughts</h2>
+  <img src="logo.png" alt="Ginomahee Logo" class="logo" />
+  <h1>Ginomahee</h1>
+  <h2>Transcend</h2>
+  <h3>Ginomind Loop Catcher</h3>
+  <div class="buttons">
+    <button onclick="location.href='signup.html'">Sign Up</button>
+    <button onclick="location.href='signin.html'">Sign In</button>
   </div>
-
-  <div class="container">
-    <form id="signUpForm">
-      <h3>Sign Up</h3>
-      <input type="text" name="name" placeholder="Name" required />
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Sign Up</button>
-    </form>
-
-    <form id="signInForm" style="display:none;">
-      <h3>Sign In</h3>
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Sign In</button>
-    </form>
-
-    <div class="toggle">
-      <p id="toggleText">Already have an account? <button onclick="toggleForms()">Sign In</button></p>
-    </div>
-
-    <div class="message" id="messageBox"></div>
-  </div>
-
-  <script>
-    const signUpForm = document.getElementById('signUpForm');
-    const signInForm = document.getElementById('signInForm');
-    const toggleText = document.getElementById('toggleText');
-    const messageBox = document.getElementById('messageBox');
-
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxpd4AQSw3PCIwLC9bReGN1fzbI3Yyh1Y3Vc6W8Uw_7HSPTQRX-5F9A8jcI5NTX1lZN/exec
-";
-
-    function toggleForms() {
-      if (signUpForm.style.display === "none") {
-        signUpForm.style.display = "block";
-        signInForm.style.display = "none";
-        toggleText.innerHTML = `Already have an account? <button onclick="toggleForms()">Sign In</button>`;
-      } else {
-        signUpForm.style.display = "none";
-        signInForm.style.display = "block";
-        toggleText.innerHTML = `Don't have an account? <button onclick="toggleForms()">Sign Up</button>`;
-      }
-    }
-
-    async function sendForm(form, action) {
-      const formData = new FormData(form);
-      formData.append('action', action);
-
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!res.ok) throw new Error("Failed fetch");
-
-        const result = await res.json();
-
-        if (result.success && action === "signup") {
-          messageBox.innerHTML = `🎉 Congratulations, you've signed up successfully.<br>Kindly <a href='https://mail.google.com' target='_blank'>confirm your email address</a> to start using Loop Catcher.`;
-          messageBox.style.color = 'green';
-        } else if (result.success && action === "signin") {
-          messageBox.textContent = "Sign in successful! Redirecting...";
-          messageBox.style.color = 'green';
-          setTimeout(() => window.location.href = "main.html", 1500);
-        } else {
-          messageBox.textContent = result.message;
-          messageBox.style.color = 'red';
-        }
-
-        form.reset();
-      } catch (error) {
-        console.error(error);
-        messageBox.textContent = "Network error.";
-        messageBox.style.color = 'red';
-      }
-    }
-
-    signUpForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      sendForm(signUpForm, "signup");
-    });
-
-    signInForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      sendForm(signInForm, "signin");
-    });
-  </script>
 </body>
 </html>
