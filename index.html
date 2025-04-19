@@ -1,3 +1,4 @@
+<!-- UPDATED index.html for Ginomind Loop Catcher -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -119,7 +120,8 @@
     const toggleText = document.getElementById('toggleText');
     const messageBox = document.getElementById('messageBox');
 
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz4FdmAH7kVekvtmYM298S9ABrBznlsUv7zV1l7oIk7DUy9fd4rkvoz6cIS4hUAET7P/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyRhAkTrlhZZ-WlQw-LSaMbru3JZ_y1ryg5OCdnEu0oohaZ_npgMd67Dkw1PNkv2g0J3Q/exec
+";
 
     function toggleForms() {
       if (signUpForm.style.display === "none") {
@@ -134,43 +136,48 @@
     }
 
     async function sendForm(form, action) {
-  const formData = new FormData(form);
-  formData.append('action', action);
+      const formData = new FormData(form);
+      formData.append('action', action);
 
-  try {
-    const res = await fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: formData,
-    });
+      try {
+        const res = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          body: formData,
+        });
 
-    if (!res.ok) throw new Error("Failed fetch");
+        if (!res.ok) throw new Error("Failed fetch");
 
-    const result = await res.json();
+        const result = await res.json();
 
-    if (result.success && action === "signup") {
-      messageBox.textContent = "Registration successful. Please check your email to confirm.";
-      messageBox.style.color = 'green';
+        if (result.success && action === "signup") {
+          messageBox.innerHTML = `🎉 Congratulations, you've signed up successfully.<br>Kindly <a href='https://mail.google.com' target='_blank'>confirm your email address</a> to start using Loop Catcher.`;
+          messageBox.style.color = 'green';
+        } else if (result.success && action === "signin") {
+          messageBox.textContent = "Sign in successful! Redirecting...";
+          messageBox.style.color = 'green';
+          setTimeout(() => window.location.href = "main.html", 1500);
+        } else {
+          messageBox.textContent = result.message;
+          messageBox.style.color = 'red';
+        }
 
-      // 👇 Simulate email confirmation for now
-      setTimeout(() => {
-        messageBox.textContent = "Email confirmed! Redirecting to your dashboard...";
-        // Replace this with your actual main page URL
-        setTimeout(() => window.location.href = "main.html", 1500);
-      }, 2000);
-    } else if (result.success && action === "signin") {
-      messageBox.textContent = "Sign in successful! Redirecting...";
-      messageBox.style.color = 'green';
-      setTimeout(() => window.location.href = "main.html", 1500);
-    } else {
-      messageBox.textContent = result.message;
-      messageBox.style.color = 'red';
+        form.reset();
+      } catch (error) {
+        console.error(error);
+        messageBox.textContent = "Network error.";
+        messageBox.style.color = 'red';
+      }
     }
 
-    form.reset();
-  } catch (error) {
-    console.error(error);
-    messageBox.textContent = "Network error.";
-    messageBox.style.color = 'red';
-  }
-}
-  
+    signUpForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      sendForm(signUpForm, "signup");
+    });
+
+    signInForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      sendForm(signInForm, "signin");
+    });
+  </script>
+</body>
+</html>
