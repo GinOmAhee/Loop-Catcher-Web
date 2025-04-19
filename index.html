@@ -134,22 +134,45 @@
     }
 
     async function sendForm(form, action) {
-      const formData = new FormData(form);
-      formData.append('action', action);
+  const formData = new FormData(form);
+  formData.append('action', action);
 
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          body: formData
-        });
-        const result = await res.json();
-        messageBox.textContent = result.message;
-        messageBox.style.color = result.success ? 'green' : 'red';
-        form.reset();
-      } catch (error) {
-        messageBox.textContent = "Network error.";
-        messageBox.style.color = 'red';
-      }
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error("Failed fetch");
+
+    const result = await res.json();
+
+    if (result.success && action === "signup") {
+      messageBox.textContent = "Registration successful. Please check your email to confirm.";
+      messageBox.style.color = 'green';
+
+      // 👇 Simulate email confirmation for now
+      setTimeout(() => {
+        messageBox.textContent = "Email confirmed! Redirecting to your dashboard...";
+        // Replace this with your actual main page URL
+        setTimeout(() => window.location.href = "main.html", 1500);
+      }, 2000);
+    } else if (result.success && action === "signin") {
+      messageBox.textContent = "Sign in successful! Redirecting...";
+      messageBox.style.color = 'green';
+      setTimeout(() => window.location.href = "main.html", 1500);
+    } else {
+      messageBox.textContent = result.message;
+      messageBox.style.color = 'red';
+    }
+
+    form.reset();
+  } catch (error) {
+    console.error(error);
+    messageBox.textContent = "Network error.";
+    messageBox.style.color = 'red';
+  }
+}
     }
 
     signUpForm.addEventListener('submit', (e) => {
