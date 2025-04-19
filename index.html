@@ -110,6 +110,8 @@
     const signInForm = document.getElementById('signInForm');
     const toggleText = document.getElementById('toggleText');
 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwktnklgRH8ozQWplyilXfEw_4ejazpsIc45aOzGWb-sR7zt8dKDE2ZKxtZWBTiPEBi/exec";
+
     function toggleForms() {
       if (signUpForm.style.display === "none") {
         signUpForm.style.display = "block";
@@ -122,28 +124,41 @@
       }
     }
 
-    signUpForm.addEventListener('submit', e => {
+    signUpForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const formData = new FormData(signUpForm);
-      fetch('https://script.google.com/macros/s/AKfycbxUv-cu4iUDtnDpinFZKjlfpgZYzatEE5_Qojlm2Y7MBBeweNEFzbH1VjLn2p4SO2i2OQ/exec', {
-  method: 'POST',
-  body: new URLSearchParams({
-    action: 'signup', // or 'signin'
-    name: 'Gin Om Ahee',
-    email: 'you@email.com',
-    password: 'yourpass'
-  })
-})
-      .then(res => res.text())
-      .then(data => {
+      formData.append('action', 'signup');
+
+      try {
+        const res = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.text();
         alert("Sign Up Success: " + data);
         signUpForm.reset();
-      })
-      .catch(error => alert("Error: " + error.message));
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
     });
 
-    // We'll hook up the Sign In later
+    signInForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(signInForm);
+      formData.append('action', 'signin');
+
+      try {
+        const res = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.text();
+        alert("Sign In: " + data);
+        signInForm.reset();
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    });
   </script>
 </body>
 </html>
