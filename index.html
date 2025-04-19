@@ -4,10 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ginomind Loop Catcher</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Lora&family=Montserrat:wght@500&family=Playfair+Display:wght@600&family=Rock+Salt&display=swap" rel="stylesheet">
+  
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Lora', serif;
       background-color: #f5f1e8;
       color: #774C64;
       display: flex;
@@ -15,25 +19,46 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      text-align: center;
     }
-.logo {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin-bottom: 20px;
-  object-fit: cover;
-}
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      background-color: #774C64;
+      border-radius: 50%;
+      margin-bottom: 10px;
     }
-    h1 {
+
+    .brand-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .brand-name {
+      font-family: 'Rock Salt', cursive;
+      font-size: 32px;
       margin: 0;
     }
-    h2 {
-      margin-top: 5px;
-      font-weight: normal;
+
+    .tagline {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      margin-top: 2px;
     }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      margin: 20px 0;
+    }
+
     .buttons {
       margin-top: 30px;
     }
+
     .buttons button {
       margin: 0 10px;
       padding: 10px 20px;
@@ -42,17 +67,24 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
     }
+
     .buttons button:hover {
       background-color: #587c5f;
     }
   </style>
 </head>
 <body>
-  <img src="https://raw.githubusercontent.com/GinOmAhee/Loop-Catcher-Web/refs/heads/main/ChatGPT%20Image%20Apr%2018%2C%202025%2C%2011_36_14%20PM.png" alt="Ginomahee Logo" class="logo" />
-  <h1>Ginomahee</h1>
-  <h2>Transcend</h2>
-  <h3>Ginomind Loop Catcher</h3>
+  <div class="logo"></div>
+
+  <div class="brand-container">
+    <p class="brand-name">Ginomahee</p>
+    <p class="tagline">Transcend</p>
+  </div>
+
+  <h1>Ginomind Loop Catcher</h1>
+
   <div class="buttons">
     <button onclick="location.href='signup.html'">Sign Up</button>
     <button onclick="location.href='signin.html'">Sign In</button>
