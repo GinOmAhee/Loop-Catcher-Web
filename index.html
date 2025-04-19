@@ -73,6 +73,12 @@
       cursor: pointer;
       text-decoration: underline;
     }
+
+    .message {
+      margin-top: 1rem;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -103,14 +109,17 @@
     <div class="toggle">
       <p id="toggleText">Already have an account? <button onclick="toggleForms()">Sign In</button></p>
     </div>
+
+    <div class="message" id="messageBox"></div>
   </div>
 
   <script>
     const signUpForm = document.getElementById('signUpForm');
     const signInForm = document.getElementById('signInForm');
     const toggleText = document.getElementById('toggleText');
+    const messageBox = document.getElementById('messageBox');
 
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwktnklgRH8ozQWplyilXfEw_4ejazpsIc45aOzGWb-sR7zt8dKDE2ZKxtZWBTiPEBi/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzAiVacR09iUcRVxlIQHJQqAreW1NyJB3uL4NmtPnlNvXyJuI_PJsGMdOoeL17faYbm/exec";
 
     function toggleForms() {
       if (signUpForm.style.display === "none") {
@@ -124,40 +133,33 @@
       }
     }
 
-    signUpForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(signUpForm);
-      formData.append('action', 'signup');
+    async function sendForm(form, action) {
+      const formData = new FormData(form);
+      formData.append('action', action);
 
       try {
         const res = await fetch(WEB_APP_URL, {
           method: 'POST',
           body: formData
         });
-        const data = await res.text();
-        alert("Sign Up Success: " + data);
-        signUpForm.reset();
+        const result = await res.json();
+        messageBox.textContent = result.message;
+        messageBox.style.color = result.success ? 'green' : 'red';
+        form.reset();
       } catch (error) {
-        alert("Error: " + error.message);
+        messageBox.textContent = "Network error.";
+        messageBox.style.color = 'red';
       }
+    }
+
+    signUpForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      sendForm(signUpForm, 'signup');
     });
 
-    signInForm.addEventListener('submit', async (e) => {
+    signInForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const formData = new FormData(signInForm);
-      formData.append('action', 'signin');
-
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          body: formData
-        });
-        const data = await res.text();
-        alert("Sign In: " + data);
-        signInForm.reset();
-      } catch (error) {
-        alert("Error: " + error.message);
-      }
+      sendForm(signInForm, 'signin');
     });
   </script>
 </body>
