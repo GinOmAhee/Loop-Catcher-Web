@@ -113,54 +113,57 @@
     <div class="message" id="messageBox"></div>
   </div>
 
-  <script>
-    const signUpForm = document.getElementById('signUpForm');
-    const signInForm = document.getElementById('signInForm');
-    const toggleText = document.getElementById('toggleText');
-    const messageBox = document.getElementById('messageBox');
+  <!-- Keep all your previous styles and structure -->
 
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzAiVacR09iUcRVxlIQHJQqAreW1NyJB3uL4NmtPnlNvXyJuI_PJsGMdOoeL17faYbm/exec";
+<script>
+  const signUpForm = document.getElementById('signUpForm');
+  const signInForm = document.getElementById('signInForm');
+  const toggleText = document.getElementById('toggleText');
 
-    function toggleForms() {
-      if (signUpForm.style.display === "none") {
-        signUpForm.style.display = "block";
-        signInForm.style.display = "none";
-        toggleText.innerHTML = `Already have an account? <button onclick="toggleForms()">Sign In</button>`;
-      } else {
-        signUpForm.style.display = "none";
-        signInForm.style.display = "block";
-        toggleText.innerHTML = `Don't have an account? <button onclick="toggleForms()">Sign Up</button>`;
-      }
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwktnklgRH8ozQWplyilXfEw_4ejazpsIc45aOzGWb-sR7zt8dKDE2ZKxtZWBTiPEBi/exec";
+
+  function toggleForms() {
+    const isSigningUp = signUpForm.style.display === "none";
+    signUpForm.style.display = isSigningUp ? "block" : "none";
+    signInForm.style.display = isSigningUp ? "none" : "block";
+    toggleText.innerHTML = isSigningUp
+      ? `Already have an account? <button onclick="toggleForms()">Sign In</button>`
+      : `Don't have an account? <button onclick="toggleForms()">Sign Up</button>`;
+  }
+
+  signUpForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(signUpForm);
+    formData.append('action', 'signup');
+
+    try {
+      const res = await fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.text();
+      alert(data);
+      signUpForm.reset();
+    } catch (error) {
+      alert("Error: " + error.message);
     }
+  });
 
-    async function sendForm(form, action) {
-      const formData = new FormData(form);
-      formData.append('action', action);
+  signInForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(signInForm);
+    formData.append('action', 'signin');
 
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          body: formData
-        });
-        const result = await res.json();
-        messageBox.textContent = result.message;
-        messageBox.style.color = result.success ? 'green' : 'red';
-        form.reset();
-      } catch (error) {
-        messageBox.textContent = "Network error.";
-        messageBox.style.color = 'red';
-      }
+    try {
+      const res = await fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.text();
+      alert(data);
+      signInForm.reset();
+    } catch (error) {
+      alert("Error: " + error.message);
     }
-
-    signUpForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      sendForm(signUpForm, 'signup');
-    });
-
-    signInForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      sendForm(signInForm, 'signin');
-    });
-  </script>
-</body>
-</html>
+  });
+</script>
