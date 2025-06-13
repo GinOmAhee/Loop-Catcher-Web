@@ -3,91 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ginomind Loop Catcher</title>
-  
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Lora&family=Montserrat:wght@500&family=Playfair+Display:wght@600&family=Rock+Salt&display=swap" rel="stylesheet">
-  
+  <title>Sign Up - Ginomind Loop Catcher</title>
   <style>
+    :root {
+      --natural-beige: #f5f1e8;
+      --soft-plum: #774C64;
+      --muted-green: #6B8F71;
+    }
+
     body {
       margin: 0;
-      font-family: 'Lora', serif;
-      background-color: #f5f1e8;
-      color: #774C64;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--natural-beige);
+      color: var(--soft-plum);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    h2 {
       text-align: center;
+      margin-bottom: 1rem;
     }
 
-    .logo {
-      width: 100px;
-      height: 100px;
-      background-color: #774C64;
-      border-radius: 50%;
-      margin-bottom: 10px;
+    input, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
     }
 
-    .brand-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .brand-name {
-      font-family: 'Rock Salt', cursive;
-      font-size: 22px;
-      margin: -2px; /* added 'px' to fix CSS warning */
-    }
-
-    .tagline {
-      font-family: 'Playfair Display', serif;
-      font-size: 16px;
-      margin-top: -5px;
-    }
-
-    h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 50px;
-      margin: 20px 0;
-    }
-
-    .buttons {
-      margin-top: 30px;
-    }
-
-    .buttons button {
-      margin: 0 10px;
-      padding: 10px 20px;
-      background-color: #6B8F71;
+    button {
+      background-color: var(--muted-green);
       color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
-      font-family: 'Montserrat', sans-serif;
     }
 
-    .buttons button:hover {
+    button:hover {
       background-color: #587c5f;
+    }
+
+    .message {
+      margin-top: 1rem;
+      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <img src="https://raw.githubusercontent.com/GinOmAhee/Loop-Catcher-Web/refs/heads/main/ChatGPT%20Image%20Apr%2018%2C%202025%2C%2011_36_14%20PM.png" alt="Ginomahee Logo" class="logo" />
-
-  <div class="brand-container">
-    <p class="brand-name">Ginomahee</p>
-    <p class="tagline">Transcend</p>
+  <div class="container">
+    <h2>Sign Up</h2>
+    <form id="signUpForm">
+      <input type="text" name="name" placeholder="Name" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Sign Up</button>
+    </form>
+    <div class="message" id="messageBox"></div>
   </div>
 
-  <h1>Ginomind Loop Catcher</h1>
+  <script>
+    const signUpForm = document.getElementById('signUpForm');
+    const messageBox = document.getElementById('messageBox');
 
-  <div class="buttons">
-    <button onclick="location.href='signup.html'">Sign Up</button>
-    <button onclick="location.href='signin.html'">Sign In</button>
-  </div>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzn5pRj3jra7iFWKSe2VOs_2hjFLI7AQ86sj65V4g_5gePc2ApQE6T7R1VLf3e5ejCXZQ/exec";
+
+    signUpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(signUpForm);
+
+      const urlParams = new URLSearchParams();
+      for (const [key, value] of formData.entries()) {
+        urlParams.append(key, value);
+      }
+      urlParams.append('action', 'signup');
+
+      try {
+        const res = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: urlParams.toString()
+        });
+
+        if (!res.ok) throw new Error("Failed fetch");
+
+        const result = await res.json();
+
+        if (result.status === 'success') {
+          window.location.href = 'confirmation.html';
+        } else {
+          messageBox.textContent = result.message;
+          messageBox.style.color = 'red';
+        }
+
+        signUpForm.reset();
+      } catch (error) {
+        console.error(error);
+        messageBox.textContent = "Network error.";
+        messageBox.style.color = 'red';
+      }
+    });
+  </script>
 </body>
 </html>
