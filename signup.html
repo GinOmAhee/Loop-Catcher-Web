@@ -77,48 +77,49 @@
   </div>
 
   <script>
-    const signUpForm = document.getElementById('signUpForm');
-    const messageBox = document.getElementById('messageBox');
+  const signUpForm = document.getElementById('signUpForm');
+  const messageBox = document.getElementById('messageBox');
 
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzn5pRj3jra7iFWKSe2VOs_2hjFLI7AQ86sj65V4g_5gePc2ApQE6T7R1VLf3e5ejCXZQ/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzn5pRj3jra7iFWKSe2VOs_2hjFLI7AQ86sj65V4g_5gePc2ApQE6T7R1VLf3e5ejCXZQ/exec";
 
-    signUpForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(signUpForm);
+  signUpForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(signUpForm);
 
-      const urlParams = new URLSearchParams();
-      for (const [key, value] of formData.entries()) {
-        urlParams.append(key, value);
-      }
-      urlParams.append('action', 'signup');
+    const urlParams = new URLSearchParams();
+    for (const [key, value] of formData.entries()) {
+      urlParams.append(key, value);
+    }
+    urlParams.append('action', 'signup');
 
-      try {
-        const res = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: urlParams.toString()
-        });
+    try {
+      const res = await fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: urlParams.toString()
+      });
 
-        if (!res.ok) throw new Error("Failed fetch");
+      if (!res.ok) throw new Error("Failed fetch");
 
-        const result = await res.json();
+      const result = await res.json();
 
-        if (result.status === 'success') {
-          window.location.href = 'confirmation.html';
-        } else {
-          messageBox.textContent = result.message;
-          messageBox.style.color = 'red';
-        }
-
-        signUpForm.reset();
-      } catch (error) {
-        console.error(error);
-        messageBox.textContent = "Network error.";
+      if (result.status === 'success') {
+        localStorage.setItem('signupEmail', formData.get('email')); // 👈 SAVE EMAIL HERE
+        window.location.href = 'confirmation.html';
+      } else {
+        messageBox.textContent = result.message;
         messageBox.style.color = 'red';
       }
-    });
-  </script>
+
+      signUpForm.reset();
+    } catch (error) {
+      console.error(error);
+      messageBox.textContent = "Network error.";
+      messageBox.style.color = 'red';
+    }
+  });
+</script>
 </body>
 </html>
