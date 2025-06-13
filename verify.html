@@ -24,26 +24,49 @@
   </style>
 </head>
 <body>
-  <div class="box" id="message">Verifying...</div>
+  <div class="box" id="status">Verifying...</div>
 
-  <script>
-    const token = new URLSearchParams(window.location.search).get('token');
-    const messageBox = document.getElementById('message');
+<script>
+  const token = new URLSearchParams(window.location.search).get('token');
+  const statusDiv = document.getElementById('status');
 
-    fetch("https://script.google.com/macros/s/AKfycbxBtXEQippuWOB45hNBjSOx6xCyuHzVwG67Ygm6HrRzSXTtz8vwlBv37vzizpheNB-rNg/exec", {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `action=verify&token=${encodeURIComponent(token)}`
-    })
-
-    .then(res => res.json())
-    .then(result => {
-      messageBox.textContent = result.message;
-    })
-    .catch(err => {
-      console.error(err);
-      messageBox.textContent = "Something went wrong during verification.";
-    });
-  </script>
+  fetch("https://script.google.com/macros/s/AKfycbxBtXEQippuWOB45hNBjSOx6xCyuHzVwG67Ygm6HrRzSXTtz8vwlBv37vzizpheNB-rNg/exec", {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `action=verify&token=${encodeURIComponent(token)}`
+  })
+  .then(res => res.json())
+  .then(result => {
+    if (result.status === 'success') {
+      statusDiv.innerHTML = `
+        <div style="text-align:center;">
+          <div style="font-size:60px; color:#4CAF50;">✅</div>
+          <p style="font-size:18px;">${result.message}</p>
+          <a href="index.html" id="goDashboardBtn"
+             style="display:inline-block; padding:12px 24px; background:#4CAF50;
+                    color:#fff; text-decoration:none; border-radius:5px;
+                    opacity:0; transform:translateY(20px); transition: all 0.8s;">
+            Go to Dashboard
+          </a>
+          <p style="font-size:smaller; color:#777; margin-top:10px;">Redirecting in 5 seconds...</p>
+        </div>
+      `;
+      setTimeout(() => {
+        const btn = document.getElementById('goDashboardBtn');
+        btn.style.opacity = 1;
+        btn.style.transform = 'translateY(0)';
+      }, 400);
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 5000);
+    } else {
+      statusDiv.innerHTML = `<p style="color:#d32f2f;">${result.message}</p>`;
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    statusDiv.innerHTML = `<p style="color:#d32f2f;">Something went wrong during verification.</p>`;
+  });
+</script>
 </body>
 </html>
