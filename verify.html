@@ -30,7 +30,7 @@
     const token = new URLSearchParams(window.location.search).get('token');
     const messageBox = document.getElementById('message');
 
-    fetch("https://script.google.com/macros/s/AKfycb.../exec", {
+    fetch("https://script.google.com/macros/s/AKfycby_3uz0edwwFIinXXiqCgmHwHyqc0ZpktCgSiMXFqrG3EAiPWyT8AeNDGpeH1hx6H2Tkg/exec", {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `action=verify&token=${encodeURIComponent(token)}`
