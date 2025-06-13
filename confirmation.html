@@ -1,25 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Confirmation - Ginomind Loop Catcher</title>
+  <meta charset="UTF-8">
+  <title>You're Almost There! ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora&family=Montserrat:wght@500&family=Playfair+Display:wght@600&family=Rock+Salt&display=swap" rel="stylesheet">
   <style>
     :root {
-      --natural-beige: #f5f1e8;
-      --soft-plum: #774C64;
+      --beige: #f5f1e8;
+      --plum: #774C64;
+      --green: #6B8F71;
     }
 
     body {
+      background-color: var(--beige);
+      color: var(--plum);
+      font-family: 'Lora', serif;
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--natural-beige);
-      color: var(--soft-plum);
+      padding: 0;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
-      text
-::contentReference[oaicite:0]{index=0}
- 
+      text-align: center;
+    }
+
+    .container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+    }
+
+    .brand-name {
+      font-family: 'Rock Salt', cursive;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .tagline {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1rem;
+      margin: 0.5rem 0;
+    }
+
+    .btn {
+      margin-top: 1.5rem;
+      background-color: var(--green);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background-color: #587c5f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img class="logo" src="https://raw.githubusercontent.com/GinOmAhee/Loop-Catcher-Web/refs/heads/main/ChatGPT%20Image%20Apr%2018%2C%202025%2C%2011_36_14%20PM.png" alt="Ginomahee Logo">
+    <p class="brand-name">Ginomahee</p>
+    <p class="tagline">Transcend</p>
+
+    <h1>🎉 Congratulations!</h1>
+    <p>You’re *this* close to catching your first loop.</p>
+    <p>We’ve sent a verification link to your email.</p>
+    <p><strong>Just one more step:</strong> verify your email address to activate your account.</p>
+
+    <a class="btn" id="emailBtn" href="#" target="_blank">Open My Email</a>
+
+    <p style="margin-top: 1rem; font-size: 0.9rem; color: gray;">
+      Didn’t get the email? Check your spam folder or try signing up again.
+    </p>
+  </div>
+
+  <script>
+    // Function to detect user's email provider based on their email from localStorage
+    const getEmailProviderUrl = (email) => {
+      if (!email) return null;
+      const domain = email.split('@')[1].toLowerCase();
+      if (domain.includes('gmail')) return 'https://mail.google.com';
+      if (domain.includes('yahoo')) return 'https://mail.yahoo.com';
+      if (domain.includes('outlook') || domain.includes('hotmail') || domain.includes('live')) return 'https://outlook.live.com';
+      if (domain.includes('icloud') || domain.includes('me.com')) return 'https://www.icloud.com/mail';
+      return 'https://' + domain;
+    };
+
+    const email = localStorage.getItem('signupEmail');
+    const emailLink = document.getElementById('emailBtn');
+    const providerUrl = getEmailProviderUrl(email);
+    if (providerUrl) emailLink.href = providerUrl;
+  </script>
+</body>
+</html>
