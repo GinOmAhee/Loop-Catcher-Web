@@ -106,7 +106,10 @@
         const result = await res.json();
 
         if (result.status === 'success') {
+          // Save email to localStorage
+          localStorage.setItem('signupEmail', formData.get('email'));
           window.location.href = 'confirmation.html';
+        }
         } else {
           messageBox.textContent = result.message;
           messageBox.style.color = 'red';
