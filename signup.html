@@ -3,39 +3,91 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign Up - Ginomind Loop Catcher</title>
+  <title>Ginomind Loop Catcher</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Lora&family=Montserrat:wght@500&family=Playfair+Display:wght@600&family=Rock+Salt&display=swap" rel="stylesheet">
+  
   <style>
-    :root {
-      --natural-beige: #f5f1e8;
-      --soft-plum: #774C64;
-      --muted-green: #6B8F71;
-    }
-
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--natural-beige);
-      color: var(--soft-plum);
+      font-family: 'Lora', serif;
+      background-color: #f5f1e8;
+      color: #774C64;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-    }
-
-    .container {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 400px;
-    }
-
-    h2 {
       text-align: center;
-      margin-bottom: 1rem;
     }
 
-    input, button {
-      width:
+    .logo {
+      width: 100px;
+      height: 100px;
+      background-color: #774C64;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    .brand-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .brand-name {
+      font-family: 'Rock Salt', cursive;
+      font-size: 22px;
+      margin: -2px; /* added 'px' to fix CSS warning */
+    }
+
+    .tagline {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      margin-top: -5px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 50px;
+      margin: 20px 0;
+    }
+
+    .buttons {
+      margin-top: 30px;
+    }
+
+    .buttons button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      background-color: #6B8F71;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .buttons button:hover {
+      background-color: #587c5f;
+    }
+  </style>
+</head>
+<body>
+  <img src="https://raw.githubusercontent.com/GinOmAhee/Loop-Catcher-Web/refs/heads/main/ChatGPT%20Image%20Apr%2018%2C%202025%2C%2011_36_14%20PM.png" alt="Ginomahee Logo" class="logo" />
+
+  <div class="brand-container">
+    <p class="brand-name">Ginomahee</p>
+    <p class="tagline">Transcend</p>
+  </div>
+
+  <h1>Ginomind Loop Catcher</h1>
+
+  <div class="buttons">
+    <button onclick="location.href='signup.html'">Sign Up</button>
+    <button onclick="location.href='signin.html'">Sign In</button>
+  </div>
+</body>
+</html>
