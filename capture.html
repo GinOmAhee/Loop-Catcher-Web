@@ -1,1 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🪄 New Thought</title>
+  <style>
+    :root {
+      --natural-beige: #f5f1e8;
+      --soft-plum: #774C64;
+      --muted-green: #6B8F71;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--natural-beige);
+      color: var(--soft-plum);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .nudge {
+      font-style: italic;
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 500px;
+      height: 140px;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      resize: vertical;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      background: var(--muted-green);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    button:hover {
+      background: #5c7e63;
+    }
+  </style>
+</head>
+<body>
+  <h2>+ New Thought</h2>
+  <p class="nudge">💡 Sudden spark? Jot it here — we got you.</p>
+
+  <textarea id="thoughtInput" placeholder="Type your thought…"></textarea>
+  <button onclick="saveThought()">Capture Thought</button>
+
+  <script>
+    function saveThought() {
+      const entry = document.getElementById('thoughtInput').value.trim();
+      if (!entry) return;
+
+      let thoughts = JSON.parse(localStorage.getItem('rawThoughts')) || [];
+      thoughts.push(entry);
+      localStorage.setItem('rawThoughts', JSON.stringify(thoughts));
+      window.location.href = 'uncategorized.html';
+    }
+  </script>
+</body>
+</html>
 
