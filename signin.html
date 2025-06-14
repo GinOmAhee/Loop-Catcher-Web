@@ -5,7 +5,26 @@
   <title>Sign In — Loop Catcher</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Styles -->
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBk3ywC-eRHXbridFRS5WY84F4S3_GJo18",
+      authDomain: "loop-catcher-firebase.firebaseapp.com",
+      projectId: "loop-catcher-firebase",
+      storageBucket: "loop-catcher-firebase.appspot.com",
+      messagingSenderId: "1061069234561",
+      appId: "1:1061069234561:web:dea799c96bc67901888880",
+      measurementId: "G-RRQMSC0PVV"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    window.auth = firebase.auth();
+    console.log("Auth object:", auth);
+  </script>
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -74,26 +93,6 @@
       margin-top: 2rem;
     }
   </style>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-auth-compat.js"></script>
-
-  <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBk3ywC-eRHXbridFRS5WY84F4S3_GJo18",
-    authDomain: "loop-catcher-firebase.firebaseapp.com",
-    projectId: "loop-catcher-firebase",
-    storageBucket: "loop-catcher-firebase.appspot.com",
-    messagingSenderId: "1061069234561",
-    appId: "1:1061069234561:web:dea799c96bc67901888880",
-    measurementId: "G-RRQMSC0PVV"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  window.auth = firebase.auth();
-  console.log("Auth object:", auth);
-</script>
 </head>
 <body>
   <div class="signin-box">
@@ -115,7 +114,7 @@
 
       try {
         await auth.signInWithEmailAndPassword(email, password);
-        window.location.href = "mood.html"; // Or any page you prefer
+        window.location.href = "mood.html";
       } catch (error) {
         alert("Login failed: " + error.message);
       }
