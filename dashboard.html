@@ -1,287 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Loop Catcher Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  /* 🌿 Mood-based dashboard themes */
-  .theme-calm {
-    background-color: #f3f7f4;
-    color: #4C5B52;
-  }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet" />
 
-  .theme-strategic {
-    background-color: #f1f0ed;
-    color: #2E2E2E;
-  }
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-  .theme-reflective {
-    background-color: #fffefc;
-    color: #3e3e3e;
-  }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-  .theme-bold {
-    background-color: #fef6ec;
-    color: #5C2F00;
-  }
+    /* 🌿 Mood-based Themes */
+    .theme-calm    { background-color: #f3f7f4; color: #4C5B52; }
+    .theme-strategic { background-color: #f1f0ed; color: #2E2E2E; }
+    .theme-reflective { background-color: #fffefc; color: #3e3e3e; }
+    .theme-bold    { background-color: #fef6ec; color: #5C2F00; }
+    .theme-playful { background-color: #fff0f7; color: #64204f; }
 
-  .theme-playful {
-    background-color: #fff0f7;
-    color: #64204f;
-  }
+    header {
+      background: #4CAF50;
+      color: #fff;
+      padding: 1rem 2rem;
+    }
 
-  /* 🎨 Mood-based tagline & content styling */
-  .theme-calm .mindset-tagline {
-    background: #eaf5f1;
-    border-left-color: #6B8F71;
-    color: #3a5548;
-  }
+    h1 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
 
-  .theme-strategic .mindset-tagline {
-    background: #e8e7e4;
-    border-left-color: #6a6a6a;
-    color: #2c2c2c;
-  }
+    .mindset-tagline {
+      padding: 1rem;
+      margin: 1rem 2rem;
+      font-style: italic;
+      border-left: 4px solid #4CAF50;
+      background: #e0f7e9;
+      color: #333;
+      transition: all 0.3s ease;
+    }
 
-  .theme-reflective .mindset-tagline {
-    background: #f9f7f3;
-    border-left-color: #b49e86;
-    color: #574f47;
-  }
+    /* ✨ Dashboard Grid */
+    .zone-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+    }
 
-  .theme-bold .mindset-tagline {
-    background: #fff4dd;
-    border-left-color: #e67300;
-    color: #5a3100;
-  }
+    .zone {
+      background: #ffffff;
+      border-left: 6px solid #6B8F71;
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
 
-  .theme-playful .mindset-tagline {
-    background: #ffe0ed;
-    border-left-color: #c6539d;
-    color: #622851;
-  }
+    .zone:hover {
+      transform: translateY(-4px);
+    }
 
-  .theme-calm .section-box {
-    background: #ffffff;
-    border-left: 5px solid #6B8F71;
-  }
+    .zone h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-  .theme-strategic .section-box {
-    background: #fefefe;
-    border-left: 5px solid #4d4d4d;
-  }
+    .zone p {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
 
-  .theme-reflective .section-box {
-    background: #fffdf8;
-    border-left: 5px solid #b49e86;
-  }
+    .count-badge {
+      background-color: #6B8F71;
+      color: white;
+      border-radius: 999px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.8rem;
+    }
 
-  .theme-bold .section-box {
-    background: #fff5e9;
-    border-left: 5px solid #d86f00;
-  }
+    .floating-cta {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.9rem 1.3rem;
+      font-size: 1rem;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      cursor: pointer;
+      z-index: 10;
+    }
 
-  .theme-playful .section-box {
-    background: #fff6fb;
-    border-left: 5px solid #c6539d;
-  }
-
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    padding: 0;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  header {
-    background: #4CAF50;
-    color: #fff;
-    padding: 1rem 2rem;
-  }
-
-  h1 {
-    margin: 0;
-  }
-
-  nav {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 1rem;
-    background: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-
-  nav a {
-    margin: 0.5rem 1rem 0.5rem 0;
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-  }
-
-  .content {
-    padding: 2rem;
-  }
-
-  .mindset-tagline {
-    background: #e0f7e9;
-    border-left: 4px solid #4CAF50;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    font-style: italic;
-    color: #333;
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-  }
-
-  .toggle-wrapper {
-    margin: 1rem 0;
-  }
-
-  .toggle-wrapper label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  textarea,
-  select,
-  input[type="text"] {
-    width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-
-  .section-box {
-    background: #fff;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-
-  footer {
-    text-align: center;
-    padding: 1rem;
-    font-size: small;
-    color: #aaa;
-    background: #fafafa;
-  }
-</style>
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: #aaa;
+      background: #fafafa;
+      margin-top: 2rem;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <h1 id="profileHeader">👋 Hi there</h1>
-</header>
+  <header>
+    <h1 id="profileHeader">👋 Welcome back</h1>
+  </header>
 
-<nav>
-  <a href="#">📁 Profile</a>
-  <a href="#">⚙️ Settings</a>
-  <a href="#">📘 Learn</a>
-  <a href="#">🔍 Search</a>
-  <a href="#">👀 Recently Viewed</a>
-  <a href="#">🔔 Nudges</a>
-  <a href="#">💾 Backup</a>
-</nav>
+  <div class="mindset-tagline" id="tagline">“Loading your mood...”</div>
 
-<div class="content">
+  <div class="zone-grid">
 
-  <div class="mindset-tagline" id="tagline">
-  “Loading your mood...”
-  </div>
-
-  <div class="section-box">
-    <h2>🛸 Holding Bay</h2>
-
-    <div class="toggle-wrapper">
-      <label>
-        <input type="checkbox" id="modeToggle">
-        Unstructured Mode
-      </label>
+    <div class="zone" onclick="location.href='holdingbay.html'">
+      <h2>🔄 Holding Bay <span class="count-badge">3</span></h2>
+      <p>For sparks and snippets you’re still shaping.</p>
     </div>
 
-    <div id="structuredForm">
-      <textarea placeholder="What's the thought?"></textarea>
-      <select>
-        <option>Relevant to current task/project</option>
-        <option>Just a spark of interest</option>
-        <option>Foundational—too important to ignore</option>
-        <option>Random curiosity</option>
-      </select>
-      <select>
-        <option>Be clear</option>
-        <option>Refine knowledge</option>
-        <option>Store potential insight</option>
-      </select>
-      <button>Submit</button>
+    <div class="zone" onclick="location.href='actnow.html'">
+      <h2>🚀 Act Now <span class="count-badge">1</span></h2>
+      <p>Your high-priority thoughts, ready to deploy.</p>
     </div>
 
-    <div id="unstructuredForm" style="display: none;">
-      <textarea placeholder="Drop your thoughts... anything goes."></textarea>
-      <button>Capture Freely</button>
+    <div class="zone" onclick="location.href='momentum.html'">
+      <h2>🌿 Build Momentum <span class="count-badge">2</span></h2>
+      <p>Mid-tier thoughts gaining traction.</p>
     </div>
+
+    <div class="zone" onclick="location.href='later.html'">
+      <h2>⏳ Worth It Later <span class="count-badge">4</span></h2>
+      <p>Ideas to come back to when the time’s right.</p>
+    </div>
+
+    <div class="zone" onclick="location.href='parked.html'">
+      <h2>📦 Parked Potential <span class="count-badge">8</span></h2>
+      <p>Concepts that still deserve a corner.</p>
+    </div>
+
   </div>
 
-  <div class="section-box">
-    <h2>🚀 Act Now</h2>
-    <p>No high-priority thoughts yet.</p>
-  </div>
+  <button class="floating-cta" onclick="location.href='capture.html'">+ New Thought</button>
 
-  <div class="section-box">
-    <h2>🌿 Build Momentum</h2>
-    <p>No medium-priority thoughts yet.</p>
-  </div>
+  <footer>© 2025 Ginomind · Loop Catcher by Ronette</footer>
 
-  <div class="section-box">
-    <h2>⏳ Later, But Worth It</h2>
-    <p>No queued thoughts yet.</p>
-  </div>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const emoji = localStorage.getItem('vibeEmoji') || '🌿';
+      const label = (localStorage.getItem('vibeLabel') || '').trim();
+      const tagline = localStorage.getItem('vibeTagline') || 'Let’s start from where you are.';
 
-  <div class="section-box">
-    <h2>📦 Parked Potential</h2>
-    <p>All your playground thoughts are here.</p>
-  </div>
+      document.getElementById('profileHeader').textContent = `${emoji} ${label} Mode Activated`;
+      document.getElementById('tagline').textContent = `“${tagline}”`;
 
-</div>
+      const dashboard = document.body;
+      const moodThemeMap = {
+        "Calm & Clear": "theme-calm",
+        "Focused & Strategic": "theme-strategic",
+        "Open & Reflective": "theme-reflective",
+        "Driven & Bold": "theme-bold",
+        "Playful & Inventive": "theme-playful"
+      };
 
-<footer>
-  © 2025 Ginomind · Loop Catcher by Ronette
-</footer>
-
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const emoji = localStorage.getItem('vibeEmoji') || '🌿';
-    const label = (localStorage.getItem('vibeLabel') || '').trim();
-    const tagline = localStorage.getItem('vibeTagline') || 'Let’s start from where you are.';
-
-    document.getElementById('profileHeader').textContent = `${emoji} ${label} Mode Activated`;
-    document.getElementById('tagline').textContent = `“${tagline}”`;
-
-    const dashboard = document.body;
-    const moodThemeMap = {
-      "Calm & Clear": "theme-calm",
-      "Focused & Strategic": "theme-strategic",
-      "Open & Reflective": "theme-reflective",
-      "Driven & Bold": "theme-bold",
-      "Playful & Inventive": "theme-playful"
-    };
-
-    const themeClass = moodThemeMap[label];
-    if (themeClass) {
-      console.log('🎨 Applying theme class →', themeClass);
-      dashboard.classList.add(themeClass);
-    } else {
-      console.warn('⚠️ No matching theme for:', label);
-    }
-  });
-</script>
+      const themeClass = moodThemeMap[label];
+      if (themeClass) {
+        dashboard.classList.add(themeClass);
+      } else {
+        console.warn('⚠️ No matching theme for:', label);
+      }
+    });
+  </script>
 </body>
 </html>
-
