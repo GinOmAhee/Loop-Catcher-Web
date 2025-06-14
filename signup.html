@@ -4,6 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign Up - Ginomind Loop Catcher</title>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBk3ywC-eRHXbridFRS5WY84F4S3_GJo18",
+      authDomain: "loop-catcher-firebase.firebaseapp.com",
+      projectId: "loop-catcher-firebase",
+      storageBucket: "loop-catcher-firebase.appspot.com",
+      messagingSenderId: "1061069234561",
+      appId: "1:1061069234561:web:dea799c96bc67901888880",
+      measurementId: "G-RRQMSC0PVV"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+  </script>
+
   <style>
     :root {
       --natural-beige: #f5f1e8;
@@ -13,7 +33,7 @@
 
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background-color: var(--natural-beige);
       color: var(--soft-plum);
       display: flex;
@@ -68,66 +88,42 @@
   <div class="container">
     <h2>Sign Up</h2>
     <form id="signUpForm">
-      <input type="text" name="nickname" placeholder="What should we call you?" required />
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password" required />
+      <input type="text" id="nickname" placeholder="What should we call you?" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
       <button type="submit">Sign Up</button>
     </form>
     <div class="message" id="messageBox"></div>
   </div>
 
   <script>
-  const signUpForm = document.getElementById('signUpForm');
-  const messageBox = document.getElementById('messageBox');
+    const signUpForm = document.getElementById('signUpForm');
+    const messageBox = document.getElementById('messageBox');
 
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzdncwpYJ1TJ-sMuav0NIIGlGy5gcPuBiL_a21vPFx1m7EoO_kz12RI1Bdfrd7GXjH7ew/exec";
+    signUpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-signUpForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
+      const nickname = document.getElementById("nickname").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
 
-  const nicknameInput = document.querySelector('input[name="nickname"]');
-  const emailInput = document.querySelector('input[name="email"]');
-  const passwordInput = document.querySelector('input[name="password"]');
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
 
-  console.log("Nickname input value:", nicknameInput.value);
+        await user.updateProfile({ displayName: nickname });
 
-  const data = new URLSearchParams();
-  data.append('nickname', nicknameInput.value);
-  data.append('email', emailInput.value);
-  data.append('password', passwordInput.value);
-  data.append('action', 'signup');
+        localStorage.setItem('signupEmail', email);
+        localStorage.setItem('nickname', nickname);
+        window.location.href = 'confirmation.html';
 
-  try {
-    const res = await fetch(WEB_APP_URL, {
-      method: 'POST',
-      // Optional: test with or without headers
-      // headers: {
-      //   'Content-Type': 'application/x-www-form-urlencoded'
-      // },
-      body: data
+      } catch (error) {
+        messageBox.textContent = error.message;
+        messageBox.style.color = 'red';
+      }
+
+      signUpForm.reset();
     });
-
-    if (!res.ok) throw new Error("Failed fetch");
-
-    const result = await res.json();
-
-    if (result.status === 'success') {
-      localStorage.setItem('signupEmail', emailInput.value);
-      localStorage.setItem('nickname', nicknameInput.value);
-      window.location.href = 'confirmation.html';
-    } else {
-      messageBox.textContent = result.message;
-      messageBox.style.color = 'red';
-    }
-
-    signUpForm.reset();
-  } catch (error) {
-    console.error(error);
-    messageBox.textContent = "Network error.";
-    messageBox.style.color = 'red';
-  }
-});
-
-</script>
+  </script>
 </body>
 </html>
