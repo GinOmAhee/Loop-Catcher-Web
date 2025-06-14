@@ -129,25 +129,30 @@
   © 2025 Ginomind · Loop Catcher by Ronette
 </footer>
 
-<script>
-  const toggle = document.getElementById('modeToggle');
-  const structuredForm = document.getElementById('structuredForm');
-  const unstructuredForm = document.getElementById('unstructuredForm');
+// 🧠 Inject vibe from localStorage
+window.addEventListener('DOMContentLoaded', () => {
+  const emoji = localStorage.getItem('vibeEmoji') || '🌿';
+  const label = localStorage.getItem('vibeLabel') || 'Explorer';
+  const tagline = localStorage.getItem('vibeTagline') || 'Let’s start from where you are.';
 
-  toggle.addEventListener('change', () => {
-    structuredForm.style.display = toggle.checked ? 'none' : 'block';
-    unstructuredForm.style.display = toggle.checked ? 'block' : 'none';
-  });
+  document.getElementById('profileHeader').textContent = `${emoji} ${label} Mode Activated`;
+  document.getElementById('tagline').textContent = `“${tagline}”`;
 
-  // 🧠 Inject vibe from localStorage
-  window.addEventListener('DOMContentLoaded', () => {
-    const emoji = localStorage.getItem('vibeEmoji') || '🌿';
-    const label = localStorage.getItem('vibeLabel') || 'Explorer';
-    const tagline = localStorage.getItem('vibeTagline') || 'Let’s start from where you are.';
+  // 🎨 Apply mood-based dashboard theme
+  const dashboard = document.body;
+  const moodThemeMap = {
+    "Calm & Clear": "theme-calm",
+    "Focused & Strategic": "theme-strategic",
+    "Open & Reflective": "theme-reflective",
+    "Driven & Bold": "theme-bold",
+    "Playful & Inventive": "theme-playful"
+  };
 
-    document.getElementById('profileHeader').textContent = `${emoji} ${label} Mode Activated`;
-    document.getElementById('tagline').textContent = `“${tagline}”`;
-  });
+  if (label && moodThemeMap[label]) {
+    dashboard.classList.add(moodThemeMap[label]);
+  }
+});
+
 </script>
 
 </body>
