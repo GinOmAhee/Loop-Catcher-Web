@@ -99,25 +99,50 @@
     .skip:hover {
       color: #4c6b57;
     }
+
+    .nudge {
+      font-style: italic;
+      font-size: 0.95rem;
+      color: #555;
+      margin-top: 1.5rem;
+      z-index: 1;
+    }
+
+    .floating-cta {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.9rem 1.3rem;
+      font-size: 1rem;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      cursor: pointer;
+      z-index: 10;
+    }
   </style>
 </head>
 <body>
   <div class="background-emoji">✨</div>
 
-  <!-- ✨ Updated mood.html snippet -->
-<h2 id="greeting">Hi, <span id="nicknameDisplay">friend</span> 👋</h2>
-<p id="prompt">Where’s your head at today? Let’s sync 🤝</p>
-<p><strong>Choose your vibe</strong> 🌀</p>
+  <h2 id="greeting">Hi, <span id="nicknameDisplay">friend</span> 👋</h2>
+  <p id="prompt">Where’s your head at today? Let’s sync 🤝</p>
+  <p><strong>Choose your vibe</strong> 🌀</p>
 
-<div class="mood-options">
-  <button onclick="selectMood('😌','Calm & Clear','Slower pace. Sharper mind.')">😌<br/>Calm & Clear</button>
-  <button onclick="selectMood('🧠','Focused & Strategic','Bringing structure to the swirl.')">🧠<br/>Focused & Strategic</button>
-  <button onclick="selectMood('💭','Open & Reflective','Let’s follow the quiet threads.')">💭<br/>Open & Reflective</button>
-  <button onclick="selectMood('🚀','Driven & Bold','Clarity + momentum. Let’s fly.')">🚀<br/>Driven & Bold</button>
-  <button onclick="selectMood('🎨','Playful & Inventive','Time to remix, wonder, and build.')">🎨<br/>Playful & Inventive</button>
-</div>
+  <div class="mood-options">
+    <button onclick="selectMood('😌','Calm & Clear','Slower pace. Sharper mind.')">😌<br/>Calm & Clear</button>
+    <button onclick="selectMood('🧠','Focused & Strategic','Bringing structure to the swirl.')">🧠<br/>Focused & Strategic</button>
+    <button onclick="selectMood('💭','Open & Reflective','Let’s follow the quiet threads.')">💭<br/>Open & Reflective</button>
+    <button onclick="selectMood('🚀','Driven & Bold','Clarity + momentum. Let’s fly.')">🚀<br/>Driven & Bold</button>
+    <button onclick="selectMood('🎨','Playful & Inventive','Time to remix, wonder, and build.')">🎨<br/>Playful & Inventive</button>
+  </div>
+
+  <p class="nudge">💡 Sudden spark? Jot it here — we got you.</p>
 
   <button class="skip" onclick="skipMood()">Skip for now →</button>
+  <button class="floating-cta" onclick="location.href='capture.html'">+ New Thought</button>
 
   <script>
     const nickname = localStorage.getItem('nickname') || 'friend';
