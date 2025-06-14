@@ -85,8 +85,11 @@
   signUpForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(signUpForm);
-    formData.append('action', 'signup'); // ✅ This is the only extra line you need
+    const data = new URLSearchParams();
+    data.append('nickname', signUpForm.nickname.value);
+    data.append('email', signUpForm.email.value);
+    data.append('password', signUpForm.password.value);
+    data.append('action', 'signup');
 
     try {
       const res = await fetch(WEB_APP_URL, {
