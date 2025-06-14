@@ -122,6 +122,21 @@
       cursor: pointer;
       z-index: 9999;
     }
+
+    .floating-nudge {
+      position: fixed;
+      bottom: 5.5rem;
+      right: 2rem;
+      font-size: 0.85rem;
+      color: #555;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      z-index: 9998;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+      pointer-events: none;
+    }
+
   </style>
 </head>
 <body>
@@ -142,6 +157,7 @@
   <p class="nudge">💡 Sudden spark? Jot it here — we got you.</p>
 
   <button class="skip" onclick="skipMood()">Skip for now →</button>
+  <p class="nudge floating-nudge">💡 Sudden spark? Jot it here — we got you.</p>
   <button class="floating-cta" onclick="location.href='capture.html'">+ New Thought</button>
 
   <script>
