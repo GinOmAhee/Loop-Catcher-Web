@@ -4,50 +4,176 @@
   <meta charset="UTF-8">
   <title>Loop Catcher Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * { box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background: #f2f2f2; }
-    header { background: #4CAF50; color: #fff; padding: 1rem 2rem; }
-    h1 { margin: 0; }
-    nav { display: flex; flex-wrap: wrap; padding: 1rem; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    nav a { margin: 0.5rem 1rem 0.5rem 0; text-decoration: none; color: #333; font-weight: 500; }
-    .content { padding: 2rem; }
+<style>
+  /* 🌿 Mood-based dashboard themes */
+  .theme-calm {
+    background-color: #f3f7f4;
+    color: #4C5B52;
+  }
 
-    .mindset-tagline {
-      background: #e0f7e9;
-      border-left: 4px solid #4CAF50;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      font-style: italic;
-      color: #333;
-    }
+  .theme-strategic {
+    background-color: #f1f0ed;
+    color: #2E2E2E;
+  }
 
-    .toggle-wrapper { margin: 1rem 0; }
-    .toggle-wrapper label { display: flex; align-items: center; gap: 0.5rem; }
-    textarea, select, input[type="text"] {
-      width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
+  .theme-reflective {
+    background-color: #fffefc;
+    color: #3e3e3e;
+  }
 
-    .section-box {
-      background: #fff;
-      padding: 1rem 1.5rem;
-      border-radius: 8px;
-      margin-bottom: 2rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
+  .theme-bold {
+    background-color: #fef6ec;
+    color: #5C2F00;
+  }
 
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: small;
-      color: #aaa;
-      background: #fafafa;
-    }
-  </style>
+  .theme-playful {
+    background-color: #fff0f7;
+    color: #64204f;
+  }
+
+  /* 🎨 Mood-based tagline & content styling */
+  .theme-calm .mindset-tagline {
+    background: #eaf5f1;
+    border-left-color: #6B8F71;
+    color: #3a5548;
+  }
+
+  .theme-strategic .mindset-tagline {
+    background: #e8e7e4;
+    border-left-color: #6a6a6a;
+    color: #2c2c2c;
+  }
+
+  .theme-reflective .mindset-tagline {
+    background: #f9f7f3;
+    border-left-color: #b49e86;
+    color: #574f47;
+  }
+
+  .theme-bold .mindset-tagline {
+    background: #fff4dd;
+    border-left-color: #e67300;
+    color: #5a3100;
+  }
+
+  .theme-playful .mindset-tagline {
+    background: #ffe0ed;
+    border-left-color: #c6539d;
+    color: #622851;
+  }
+
+  .theme-calm .section-box {
+    background: #ffffff;
+    border-left: 5px solid #6B8F71;
+  }
+
+  .theme-strategic .section-box {
+    background: #fefefe;
+    border-left: 5px solid #4d4d4d;
+  }
+
+  .theme-reflective .section-box {
+    background: #fffdf8;
+    border-left: 5px solid #b49e86;
+  }
+
+  .theme-bold .section-box {
+    background: #fff5e9;
+    border-left: 5px solid #d86f00;
+  }
+
+  .theme-playful .section-box {
+    background: #fff6fb;
+    border-left: 5px solid #c6539d;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  header {
+    background: #4CAF50;
+    color: #fff;
+    padding: 1rem 2rem;
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 1rem;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  nav a {
+    margin: 0.5rem 1rem 0.5rem 0;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+  }
+
+  .content {
+    padding: 2rem;
+  }
+
+  .mindset-tagline {
+    background: #e0f7e9;
+    border-left: 4px solid #4CAF50;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+    color: #333;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+
+  .toggle-wrapper {
+    margin: 1rem 0;
+  }
+
+  .toggle-wrapper label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  textarea,
+  select,
+  input[type="text"] {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .section-box {
+    background: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  footer {
+    text-align: center;
+    padding: 1rem;
+    font-size: small;
+    color: #aaa;
+    background: #fafafa;
+  }
+</style>
 </head>
 <body>
 
