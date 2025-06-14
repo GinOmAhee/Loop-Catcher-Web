@@ -104,23 +104,24 @@
 <body>
   <div class="background-emoji">✨</div>
 
-  <h2 id="greeting">Hi 👋</h2>
-  <p id="prompt">Where’s your head at today? Let’s sync 🤝</p>
-  <p>What kind of energy are you bringing?</p>
+  <!-- ✨ Updated mood.html snippet -->
+<h2 id="greeting">Hi, <span id="nicknameDisplay">friend</span> 👋</h2>
+<p id="prompt">Where’s your head at today? Let’s sync 🤝</p>
+<p><strong>Choose your vibe</strong> 🌀</p>
 
-  <div class="mood-options">
-    <button onclick="selectMood('😌','Calm & Curious','Slowing down. Seeing clearly.')">😌<br/>Calm & Curious</button>
-    <button onclick="selectMood('🧠','Sharp & Strategic','Systems thinking, activated.')">🧠<br/>Sharp & Strategic</button>
-    <button onclick="selectMood('💭','Reflective & Open','Let’s hear the quiet stuff today.')">💭<br/>Reflective & Open</button>
-    <button onclick="selectMood('🚀','Bold & Focused','You’re locked in. Let’s go.')">🚀<br/>Bold & Focused</button>
-    <button onclick="selectMood('🎨','Playful & Inventive','Time to play, explore, remix.')">🎨<br/>Playful & Inventive</button>
-  </div>
+<div class="mood-options">
+  <button onclick="selectMood('😌','Calm & Clear','Slower pace. Sharper mind.')">😌<br/>Calm & Clear</button>
+  <button onclick="selectMood('🧠','Focused & Strategic','Bringing structure to the swirl.')">🧠<br/>Focused & Strategic</button>
+  <button onclick="selectMood('💭','Open & Reflective','Let’s follow the quiet threads.')">💭<br/>Open & Reflective</button>
+  <button onclick="selectMood('🚀','Driven & Bold','Clarity + momentum. Let’s fly.')">🚀<br/>Driven & Bold</button>
+  <button onclick="selectMood('🎨','Playful & Inventive','Time to remix, wonder, and build.')">🎨<br/>Playful & Inventive</button>
+</div>
 
   <button class="skip" onclick="skipMood()">Skip for now →</button>
 
   <script>
-    const nickname = localStorage.getItem('nickname') || 'there';
-    document.getElementById('greeting').textContent = `Hi, ${nickname} 👋`;
+    const nickname = localStorage.getItem('nickname') || 'friend';
+    document.getElementById('nicknameDisplay').textContent = nickname;
 
     function selectMood(emoji, label, tagline) {
       localStorage.setItem('vibeEmoji', emoji);
