@@ -98,25 +98,33 @@ signUpForm.addEventListener('submit', async (e) => {
   data.append('action', 'signup');
 
   try {
+  const res = await fetch(WEB_APP_URL, {
+    method: 'POST',
+    // Commented out for test:
+    // headers: {
+    //   'Content-Type': 'application/x-www-form-urlencoded'
+    // },
+    body: data
+  });
 
-    if (!res.ok) throw new Error("Failed fetch");
+  if (!res.ok) throw new Error("Failed fetch");
 
-    const result = await res.json();
+  const result = await res.json();
 
-    if (result.status === 'success') {
-      localStorage.setItem('signupEmail', emailInput.value);
-      window.location.href = 'confirmation.html';
-    } else {
-      messageBox.textContent = result.message;
-      messageBox.style.color = 'red';
-    }
-
-    signUpForm.reset();
-  } catch (error) {
-    console.error(error);
-    messageBox.textContent = "Network error.";
+  if (result.status === 'success') {
+    localStorage.setItem('signupEmail', emailInput.value);
+    window.location.href = 'confirmation.html';
+  } else {
+    messageBox.textContent = result.message;
     messageBox.style.color = 'red';
   }
+
+  signUpForm.reset();
+} catch (error) {
+  console.error(error);
+  messageBox.textContent = "Network error.";
+  messageBox.style.color = 'red';
+}
 });
 
 </script>
