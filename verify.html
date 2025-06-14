@@ -74,17 +74,34 @@ setTimeout(() => {
   btn.style.opacity = 1;
   btn.style.transform = 'translateY(0)';
 }, 400);
-      setTimeout(() => {
-        const btn = document.getElementById('goDashboardBtn');
-        btn.style.opacity = 1;
-        btn.style.transform = 'translateY(0)';
-      }, 400);
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 5000);
     } else {
-      statusDiv.innerHTML = `<p style="color:#d32f2f;">${result.message}</p>`;
-    }
+  if (result.message === 'This verification link has expired.') {
+    statusDiv.innerHTML = `
+      <p style="color:#d32f2f;">${result.message}</p>
+      <button id="resendBtn" style="margin-top:20px; padding:10px 18px; background:#1976D2; color:white; border:none; border-radius:5px; cursor:pointer;">
+        Resend Verification Email
+      </button>
+    `;
+
+    document.getElementById('resendBtn').addEventListener('click', () => {
+      fetch("https://script.google.com/macros/s/AKfycbxBtXEQippuWOB45hNBjSOx6xCyuHzVwG67Ygm6HrRzSXTtz8vwlBv37vzizpheNB-rNg/exec", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=resend&token=${encodeURIComponent(token)}`
+      })
+      .then(res => res.json())
+      .then(data => {
+        statusDiv.innerHTML = `<p style="color:#4CAF50;">${data.message}</p>`;
+      })
+      .catch(err => {
+        console.error(err);
+        statusDiv.innerHTML = `<p style="color:#d32f2f;">Failed to resend verification. Please try again later.</p>`;
+      });
+    });
+  } else {
+    statusDiv.innerHTML = `<p style="color:#d32f2f;">${result.message}</p>`;
+  }
+}
   })
   .catch(err => {
     console.error(err);
