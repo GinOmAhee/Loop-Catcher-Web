@@ -86,11 +86,8 @@
     e.preventDefault();
     const formData = new FormData(signUpForm);
 
-    const urlParams = new URLSearchParams();
-    for (const [key, value] of formData.entries()) {
-      urlParams.append(key, value);
-    }
-    urlParams.append('action', 'signup');
+    const formData = new FormData(signUpForm);
+    formData.append('action', 'signup'); // ✅ This is the only extra line you need
 
     try {
       const res = await fetch(WEB_APP_URL, {
