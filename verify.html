@@ -30,7 +30,7 @@
   const token = new URLSearchParams(window.location.search).get('token');
   const statusDiv = document.getElementById('status');
 
-  fetch("https://script.google.com/macros/s/AKfycbxBtXEQippuWOB45hNBjSOx6xCyuHzVwG67Ygm6HrRzSXTtz8vwlBv37vzizpheNB-rNg/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbzdncwpYJ1TJ-sMuav0NIIGlGy5gcPuBiL_a21vPFx1m7EoO_kz12RI1Bdfrd7GXjH7ew/exec", {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: `action=verify&token=${encodeURIComponent(token)}`
