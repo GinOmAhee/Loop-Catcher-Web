@@ -52,7 +52,7 @@
 <body>
 
 <header>
-  <h1>👋 Hi, Ronette • 🌿 Explorer Mode Activated</h1>
+  <h1 id="profileHeader">👋 Hi there</h1>
 </header>
 
 <nav>
@@ -67,8 +67,8 @@
 
 <div class="content">
 
-  <div class="mindset-tagline">
-    “You’re channeling momentum today 🌿—let’s turn sparks into roots.”
+  <div class="mindset-tagline" id="tagline">
+  “Loading your mood...”
   </div>
 
   <div class="section-box">
@@ -135,13 +135,18 @@
   const unstructuredForm = document.getElementById('unstructuredForm');
 
   toggle.addEventListener('change', () => {
-    if (toggle.checked) {
-      structuredForm.style.display = 'none';
-      unstructuredForm.style.display = 'block';
-    } else {
-      structuredForm.style.display = 'block';
-      unstructuredForm.style.display = 'none';
-    }
+    structuredForm.style.display = toggle.checked ? 'none' : 'block';
+    unstructuredForm.style.display = toggle.checked ? 'block' : 'none';
+  });
+
+  // 🧠 Inject vibe from localStorage
+  window.addEventListener('DOMContentLoaded', () => {
+    const emoji = localStorage.getItem('vibeEmoji') || '🌿';
+    const label = localStorage.getItem('vibeLabel') || 'Explorer';
+    const tagline = localStorage.getItem('vibeTagline') || 'Let’s start from where you are.';
+
+    document.getElementById('profileHeader').textContent = `${emoji} ${label} Mode Activated`;
+    document.getElementById('tagline').textContent = `“${tagline}”`;
   });
 </script>
 
