@@ -98,13 +98,6 @@ signUpForm.addEventListener('submit', async (e) => {
   data.append('action', 'signup');
 
   try {
-    const res = await fetch(WEB_APP_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: data
-    });
 
     if (!res.ok) throw new Error("Failed fetch");
 
