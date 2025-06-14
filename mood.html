@@ -3,62 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Choose Your Vibe</title>
+  <title>Your Vibe Today</title>
   <style>
+    :root {
+      --natural-beige: #f5f1e8;
+      --soft-plum: #774C64;
+      --muted-green: #6B8F71;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: #f5f5f5;
+      background-color: var(--natural-beige);
+      color: var(--soft-plum);
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      padding: 2rem;
       height: 100vh;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    h1 {
+    .background-emoji {
+      position: absolute;
+      font-size: 120px;
+      opacity: 0.06;
+      animation: float 20s ease-in-out infinite alternate;
+      pointer-events: none;
+      transform: rotate(15deg);
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(15deg); }
+      100% { transform: translateY(-60px) rotate(20deg); }
+    }
+
+    h2 {
       font-size: 1.8rem;
-      color: #333;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
+      z-index: 1;
     }
 
     p {
-      color: #666;
-      margin-bottom: 2rem;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      color: #444;
+      z-index: 1;
     }
 
     .mood-options {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 1rem;
-      width: 100%;
       max-width: 600px;
-      padding: 0 1rem;
+      width: 100%;
+      z-index: 1;
     }
 
     button {
       background: white;
-      border: 2px solid #ddd;
+      border: 2px solid #ccc;
       border-radius: 10px;
       padding: 1rem;
       font-size: 1.1rem;
       cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     button:hover {
-      border-color: #4CAF50;
+      border-color: var(--muted-green);
       transform: translateY(-3px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    button:active {
+      transform: scale(0.95);
+      background: #eef5ed;
+    }
+
+    .skip {
+      margin-top: 2rem;
+      background: none;
+      border: none;
+      color: var(--muted-green);
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.95rem;
+      z-index: 1;
+    }
+
+    .skip:hover {
+      color: #4c6b57;
     }
   </style>
 </head>
 <body>
+  <div class="background-emoji">✨</div>
 
-  <h1>Where’s your head at? Let’s sync.</h1>
-  <p>What kind of energy are you bringing today?</p>
+  <h2 id="greeting">Hi 👋</h2>
+  <p id="prompt">Where’s your head at today? Let’s sync 🤝</p>
+  <p>What kind of energy are you bringing?</p>
 
   <div class="mood-options">
     <button onclick="selectMood('😌','Calm & Curious','Slowing down. Seeing clearly.')">😌<br/>Calm & Curious</button>
@@ -68,18 +116,25 @@
     <button onclick="selectMood('🎨','Playful & Inventive','Time to play, explore, remix.')">🎨<br/>Playful & Inventive</button>
   </div>
 
+  <button class="skip" onclick="skipMood()">Skip for now →</button>
+
   <script>
+    const nickname = localStorage.getItem('nickname') || 'there';
+    document.getElementById('greeting').textContent = `Hi, ${nickname} 👋`;
+
     function selectMood(emoji, label, tagline) {
       localStorage.setItem('vibeEmoji', emoji);
       localStorage.setItem('vibeLabel', label);
       localStorage.setItem('vibeTagline', tagline);
+      window.location.href = 'dashboard.html';
+    }
 
-      // You can animate this or show feedback before redirecting
-      setTimeout(() => {
-        window.location.href = 'dashboard.html';
-      }, 600);
+    function skipMood() {
+      localStorage.setItem('vibeEmoji', '🌿');
+      localStorage.setItem('vibeLabel', 'Explorer');
+      localStorage.setItem('vibeTagline', 'Let’s start from where you are.');
+      window.location.href = 'dashboard.html';
     }
   </script>
-
 </body>
 </html>
