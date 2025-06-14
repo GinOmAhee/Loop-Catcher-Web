@@ -109,33 +109,30 @@
     }
 
     .floating-cta {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      padding: 0.9rem 1.3rem;
-      font-size: 1rem;
-      border-radius: 999px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      cursor: pointer;
-      z-index: 9999;
+      position: static;
     }
 
     .floating-nudge {
-      position: fixed;
-      bottom: 5.5rem;
-      right: 2rem;
+      position: static;
       font-size: 0.85rem;
-      color: #555;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       padding: 0.4rem 0.8rem;
       border-radius: 8px;
-      z-index: 9998;
+      color: #555;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
       pointer-events: none;
     }
+
+   .floating-stack {
+     position: fixed;
+     bottom: 2rem;
+     right: 2rem;
+     display: flex;
+     flex-direction: column;
+     align-items: flex-end;
+     gap: 0.5rem;
+     z-index: 10000;
+   }
 
   </style>
 </head>
@@ -155,8 +152,10 @@
   </div>
 
   <button class="skip" onclick="skipMood()">Skip for now →</button>
-  <p class="nudge floating-nudge">💡 Sudden spark? Jot it here — we got you.</p>
+  <div class="floating-stack">
+  <p class="floating-nudge">💡 Sudden spark? Jot it here — we got you.</p>
   <button class="floating-cta" onclick="location.href='capture.html'">+ New Thought</button>
+  </div>
 
   <script>
     const nickname = localStorage.getItem('nickname') || 'friend';
