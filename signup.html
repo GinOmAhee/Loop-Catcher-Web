@@ -82,14 +82,28 @@
 
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxBtXEQippuWOB45hNBjSOx6xCyuHzVwG67Ygm6HrRzSXTtz8vwlBv37vzizpheNB-rNg/exec";
 
-  signUpForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+ signUpForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-    const data = new URLSearchParams();
-    data.append('nickname', signUpForm.nickname.value);
-    data.append('email', signUpForm.email.value);
-    data.append('password', signUpForm.password.value);
-    data.append('action', 'signup');
+  const nicknameInput = document.querySelector('input[name="nickname"]');
+  const emailInput = document.querySelector('input[name="email"]');
+  const passwordInput = document.querySelector('input[name="password"]');
+
+  console.log("Nickname input value:", nicknameInput.value); // 👈 Insert this
+
+  const data = new URLSearchParams();
+  data.append('nickname', nicknameInput.value);
+  data.append('email', emailInput.value);
+  data.append('password', passwordInput.value);
+  data.append('action', 'signup');
+
+  const res = await fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: data
+  });
 
     try {
       const res = await fetch(WEB_APP_URL, {
