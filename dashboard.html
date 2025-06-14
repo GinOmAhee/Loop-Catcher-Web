@@ -256,31 +256,32 @@
 </footer>
 
 <script>
-window.addEventListener('DOMContentLoaded', () => {
-  const emoji = localStorage.getItem('vibeEmoji') || '🌿';
-  const label = localStorage.getItem('vibeLabel') || 'Explorer';
-  const tagline = localStorage.getItem('vibeTagline') || 'Let’s start from where you are.';
+  window.addEventListener('DOMContentLoaded', () => {
+    const emoji = localStorage.getItem('vibeEmoji') || '🌿';
+    const label = (localStorage.getItem('vibeLabel') || '').trim();
+    const tagline = localStorage.getItem('vibeTagline') || 'Let’s start from where you are.';
 
-  document.getElementById('profileHeader').textContent = `${emoji} ${label} Mode Activated`;
-  document.getElementById('tagline').textContent = `“${tagline}”`;
+    document.getElementById('profileHeader').textContent = `${emoji} ${label} Mode Activated`;
+    document.getElementById('tagline').textContent = `“${tagline}”`;
 
-  // 🎨 Apply mood-based dashboard theme
-  const dashboard = document.body;
-  const moodThemeMap = {
-    "Calm & Clear": "theme-calm",
-    "Focused & Strategic": "theme-strategic",
-    "Open & Reflective": "theme-reflective",
-    "Driven & Bold": "theme-bold",
-    "Playful & Inventive": "theme-playful"
-  };
+    const dashboard = document.body;
+    const moodThemeMap = {
+      "Calm & Clear": "theme-calm",
+      "Focused & Strategic": "theme-strategic",
+      "Open & Reflective": "theme-reflective",
+      "Driven & Bold": "theme-bold",
+      "Playful & Inventive": "theme-playful"
+    };
 
-  if (label && moodThemeMap[label]) {
-    dashboard.classList.add(moodThemeMap[label]);
-  }
-});
-
+    const themeClass = moodThemeMap[label];
+    if (themeClass) {
+      console.log('🎨 Applying theme class →', themeClass);
+      dashboard.classList.add(themeClass);
+    } else {
+      console.warn('⚠️ No matching theme for:', label);
+    }
+  });
 </script>
-
 </body>
 </html>
 
