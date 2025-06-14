@@ -68,6 +68,7 @@
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -81,6 +82,7 @@
     };
 
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
     async function saveThought() {
@@ -88,16 +90,26 @@
       if (!entry) return;
 
       try {
+        const user = auth.currentUser;
+        if (!user) {
+          alert("You must be signed in to save thoughts.");
+          return;
+        }
+
         await db.collection('catchpad').add({
           content: entry,
+          owner: user.uid,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+
         window.location.href = 'catchpad.html';
+
       } catch (error) {
         console.error("Error saving thought:", error);
         alert("Oops! Couldn’t save your thought. Try again.");
       }
     }
+
   </script>
 </head>
 <body>
