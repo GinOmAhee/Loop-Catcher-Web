@@ -65,6 +65,40 @@
       background: #5c7e63;
     }
   </style>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"></script>
+
+  <script>
+    const firebaseConfig = {
+       apiKey: "AIzaSyBk3ywC-eRHXbridFRS5WY84F4S3_GJo18",
+       authDomain: "loop-catcher-firebase.firebaseapp.com",
+       projectId: "loop-catcher-firebase",
+       storageBucket: "loop-catcher-firebase.firebasestorage.app",
+       messagingSenderId: "1061069234561",
+       appId: "1:1061069234561:web:dea799c96bc67901888880",
+       measurementId: "G-RRQMSC0PVV"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function saveThought() {
+      const entry = document.getElementById('thoughtInput').value.trim();
+      if (!entry) return;
+
+      try {
+        await db.collection('catchpad').add({
+          content: entry,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        window.location.href = 'catchpad.html';
+      } catch (error) {
+        console.error("Error saving thought:", error);
+        alert("Oops! Couldn’t save your thought. Try again.");
+      }
+    }
+  </script>
 </head>
 <body>
   <h2>+ New Thought</h2>
@@ -73,17 +107,6 @@
   <textarea id="thoughtInput" placeholder="Type your thought…"></textarea>
   <button onclick="saveThought()">Capture Thought</button>
 
-  <script>
-    function saveThought() {
-      const entry = document.getElementById('thoughtInput').value.trim();
-      if (!entry) return;
-
-      let thoughts = JSON.parse(localStorage.getItem('rawThoughts')) || [];
-      thoughts.push(entry);
-      localStorage.setItem('rawThoughts', JSON.stringify(thoughts));
-      window.location.href = 'uncategorized.html';
-    }
-  </script>
 </body>
 </html>
 
