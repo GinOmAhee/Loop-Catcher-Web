@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>Sign In — Loop Catcher</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Styles -->
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -39,7 +41,7 @@
       color: #666;
     }
 
-    input[type="text"],
+    input[type="email"],
     input[type="password"] {
       width: 100%;
       padding: 0.75rem;
@@ -72,17 +74,50 @@
       margin-top: 2rem;
     }
   </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBk3ywC-eRHXbridFRS5WY84F4S3_GJo18",
+      authDomain: "loop-catcher-firebase.firebaseapp.com",
+      projectId: "loop-catcher-firebase",
+      storageBucket: "loop-catcher-firebase.firebasestorage.app",
+      messagingSenderId: "1061069234561",
+      appId: "1:1061069234561:web:dea799c96bc67901888880",
+      measurementId: "G-RRQMSC0PVV"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+  </script>
 </head>
 <body>
   <div class="signin-box">
     <h1>Welcome Back</h1>
     <div class="tagline">Loop in, focus up.</div>
-    <form action="mood.html" method="GET">
-      <input type="text" placeholder="Username or Email" required />
-      <input type="password" placeholder="Password" required />
+    <form onsubmit="signIn(event)">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
       <button type="submit">Enter Dashboard</button>
     </form>
     <div class="footer">© 2025 Ginomind · Loop Catcher</div>
   </div>
+
+  <script>
+    async function signIn(event) {
+      event.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        window.location.href = "mood.html"; // Or any page you prefer
+      } catch (error) {
+        alert("Login failed: " + error.message);
+      }
+    }
+  </script>
 </body>
 </html>
