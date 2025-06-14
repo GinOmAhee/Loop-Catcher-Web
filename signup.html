@@ -84,7 +84,6 @@
 
   signUpForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const formData = new FormData(signUpForm);
 
     const formData = new FormData(signUpForm);
     formData.append('action', 'signup'); // ✅ This is the only extra line you need
