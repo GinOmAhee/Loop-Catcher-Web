@@ -82,14 +82,14 @@
 
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxBtXEQippuWOB45hNBjSOx6xCyuHzVwG67Ygm6HrRzSXTtz8vwlBv37vzizpheNB-rNg/exec";
 
- signUpForm.addEventListener('submit', async (e) => {
+signUpForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const nicknameInput = document.querySelector('input[name="nickname"]');
   const emailInput = document.querySelector('input[name="email"]');
   const passwordInput = document.querySelector('input[name="password"]');
 
-  console.log("Nickname input value:", nicknameInput.value); // 👈 Insert this
+  console.log("Nickname input value:", nicknameInput.value);
 
   const data = new URLSearchParams();
   data.append('nickname', nicknameInput.value);
@@ -97,39 +97,35 @@
   data.append('password', passwordInput.value);
   data.append('action', 'signup');
 
-  const res = await fetch(WEB_APP_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: data
-  });
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: data
+    });
 
-    try {
-      const res = await fetch(WEB_APP_URL, {
-        method: 'POST',
-        body: formData
-      });
+    if (!res.ok) throw new Error("Failed fetch");
 
-      if (!res.ok) throw new Error("Failed fetch");
+    const result = await res.json();
 
-      const result = await res.json();
-
-      if (result.status === 'success') {
-        localStorage.setItem('signupEmail', formData.get('email')); // 👈 SAVE EMAIL HERE
-        window.location.href = 'confirmation.html';
-      } else {
-        messageBox.textContent = result.message;
-        messageBox.style.color = 'red';
-      }
-
-      signUpForm.reset();
-    } catch (error) {
-      console.error(error);
-      messageBox.textContent = "Network error.";
+    if (result.status === 'success') {
+      localStorage.setItem('signupEmail', emailInput.value);
+      window.location.href = 'confirmation.html';
+    } else {
+      messageBox.textContent = result.message;
       messageBox.style.color = 'red';
     }
-  });
+
+    signUpForm.reset();
+  } catch (error) {
+    console.error(error);
+    messageBox.textContent = "Network error.";
+    messageBox.style.color = 'red';
+  }
+});
+
 </script>
 </body>
 </html>
