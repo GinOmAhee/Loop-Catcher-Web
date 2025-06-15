@@ -19,7 +19,7 @@
   async function initializeFirebase() {
     const apiKey = await fetchAPIKey();
     const firebaseConfig = {
-      apiKey: apiKey, // 🔒 Securely fetched
+      apiKey: apiKey,
       authDomain: "loop-catcher-firebase.firebaseapp.com",
       projectId: "loop-catcher-firebase",
       storageBucket: "loop-catcher-firebase.appspot.com",
@@ -29,10 +29,14 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    return firebase.auth(); // ✅ Returns the initialized auth object
   }
 
-  initializeFirebase(); // 🔄 Call this at the start
+  // Ensure auth is available before using it in signup
+  let auth;
+  initializeFirebase().then((firebaseAuth) => {
+    auth = firebaseAuth;
+  });
 </script>
 
   <style>
