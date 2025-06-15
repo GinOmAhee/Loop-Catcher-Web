@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Reset Password — Loop Catcher</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -55,6 +54,7 @@
     #status {
       margin-top: 1rem;
       font-size: 0.95rem;
+      color: #d32f2f;
     }
 
     .success {
@@ -112,72 +112,42 @@
         const auth = getAuth(app);
 
         verifyPasswordResetCode(auth, oobCode)
-  .then(() => {
-    formEl.style.display = "block";
+          .then(() => {
+            formEl.style.display = "block";
 
-    formEl.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const newPassword = document.getElementById("new-password").value;
-      const confirmPassword = document.getElementById("confirm-password").value;
+            formEl.addEventListener("submit", (e) => {
+              e.preventDefault();
+              const newPassword = document.getElementById("new-password").value;
+              const confirmPassword = document.getElementById("confirm-password").value;
 
-      if (newPassword !== confirmPassword) {
-        statusEl.textContent = "❌ Passwords do not match.";
-        return;
-      }
+              if (newPassword !== confirmPassword) {
+                statusEl.textContent = "❌ Passwords do not match.";
+                return;
+              }
 
-      confirmPasswordReset(auth, oobCode, newPassword)
-        .then(() => {
-          formEl.style.display = "none";
-          boxEl.innerHTML = `
-            <div class="success">
-              <div style="font-size: 48px;">🔒✅</div>
-              <h2>Password Reset!</h2>
-              <p style="margin: 1rem 0;">You can now log in with your new password.</p>
-              <p style="font-size: small; color: #777;">Redirecting to sign in...</p>
-            </div>
-          `;
-          setTimeout(() => {
-            window.location.href = "signin.html";
-          }, 3000);
-        })
-        .catch((err) => {
-          statusEl.textContent = `❌ Reset failed: ${err.message}`;
-        });
-    });
-  })
-  .catch((err) => {
-    statusEl.textContent = `❌ Verification failed: ${err.message}`;
-  });
-
-        formEl.addEventListener("submit", (e) => {
-          e.preventDefault();
-          const newPassword = document.getElementById("new-password").value;
-          const confirmPassword = document.getElementById("confirm-password").value;
-
-          if (newPassword !== confirmPassword) {
-            statusEl.textContent = "❌ Passwords do not match.";
-            return;
-          }
-
-          confirmPasswordReset(auth, oobCode, newPassword)
-            .then(() => {
-              formEl.style.display = "none";
-              boxEl.innerHTML = `
-                <div class="success">
-                  <div style="font-size: 48px;">🔒✅</div>
-                  <h2>Password Reset!</h2>
-                  <p style="margin: 1rem 0;">You can now log in with your new password.</p>
-                  <p style="font-size: small; color: #777;">Redirecting to sign in...</p>
-                </div>
-              `;
-              setTimeout(() => {
-                window.location.href = "signin.html";
-              }, 3000);
-            })
-            .catch((err) => {
-              statusEl.textContent = `❌ Reset failed: ${err.message}`;
+              confirmPasswordReset(auth, oobCode, newPassword)
+                .then(() => {
+                  formEl.style.display = "none";
+                  boxEl.innerHTML = `
+                    <div class="success">
+                      <div style="font-size: 48px;">🔒✅</div>
+                      <h2>Password Reset!</h2>
+                      <p style="margin: 1rem 0;">You can now log in with your new password.</p>
+                      <p style="font-size: small; color: #777;">Redirecting to sign in...</p>
+                    </div>
+                  `;
+                  setTimeout(() => {
+                    window.location.href = "signin.html";
+                  }, 3000);
+                })
+                .catch((err) => {
+                  statusEl.textContent = `❌ Reset failed: ${err.message}`;
+                });
             });
-        });
+          })
+          .catch((err) => {
+            statusEl.textContent = `❌ Verification failed: ${err.message}`;
+          });
       });
     }
   </script>
