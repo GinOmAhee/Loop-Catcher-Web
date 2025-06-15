@@ -144,9 +144,8 @@
         const user = userCredential.user;
 
         await user.updateProfile({ displayName: nickname });
-        await user.sendEmailVerification({
-          url: 'https://ginomahee.github.io/Loop-Catcher-Web/verify.html?email=' + encodeURIComponent(user.email)
-        });
+        await user.sendEmailVerification(); // ✅ No options here
+
 
         localStorage.setItem('signupEmail', email);
         localStorage.setItem('nickname', nickname);
