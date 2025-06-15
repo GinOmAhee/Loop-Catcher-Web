@@ -35,54 +35,71 @@
     const params = new URLSearchParams(window.location.search);
     const mode = params.get('mode');
     const oobCode = params.get('oobCode');
-    const token = params.get('token'); // your custom token for Sheets
+    const token = params.get('token'); // custom token for Google Sheets
 
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY_HERE",
-      authDomain: "loop-catcher-firebase.firebaseapp.com",
-      projectId: "loop-catcher-firebase"
-    };
+    async function fetchAPIKey() {
+      try {
+        const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+        const data = await res.json();
+        return data.apiKey;
+      } catch (error) {
+        throw new Error("Failed to fetch Firebase API key.");
+      }
+    }
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    async function initializeFirebase() {
+      const apiKey = await fetchAPIKey();
+      const config = {
+        apiKey,
+        authDomain: "loop-catcher-firebase.firebaseapp.com",
+        projectId: "loop-catcher-firebase"
+      };
+      firebase.initializeApp(config);
+      return firebase.auth();
+    }
 
-    async function verifyEmailWithFirebase() {
-      if (mode === 'verifyEmail' && oobCode) {
-        try {
-          await auth.applyActionCode(oobCode); // ✅ Firebase confirms email
-          statusDiv.innerHTML = "Email verified! Logging you in...";
+    async function verifyUserEmail() {
+      try {
+        const auth = await initializeFirebase();
 
-          // Optional: Sign in anonymously to get currentUser
-          await auth.signInAnonymously();
+        if (mode !== 'verifyEmail' || !oobCode) {
+          statusDiv.textContent = "Invalid or missing verification link.";
+          return;
+        }
 
-          // ✅ Now send token to your Google Sheet backend
-          await fetch("https://script.google.com/macros/s/AKfycbzdncwpYJ1TJ-sMuav0NIIGlGy5gcPuBiL_a21vPFx1m7EoO_kz12RI1Bdfrd7GXjH7ew/exec", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `action=verify&token=${encodeURIComponent(token)}`
-          });
+        // ✅ Confirm email with Firebase
+        await auth.applyActionCode(oobCode);
 
+        statusDiv.innerHTML = "Email verified! Logging you in...";
+
+        // Optional: sign in anonymously to use auth context
+        await auth.signInAnonymously();
+
+        // ✅ Send to your Google Sheet via Apps Script
+        await fetch("https://script.google.com/macros/s/AKfycbzdncwpYJ1TJ-sMuav0NIIGlGy5gcPuBiL_a21vPFx1m7EoO_kz12RI1Bdfrd7GXjH7ew/exec", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `action=verify&token=${encodeURIComponent(token)}`
+        });
+
+        // ✅ Success feedback
+        statusDiv.innerHTML = `
+          <div style="text-align:center;">
+            <div style="font-size:60px; color:#4CAF50;">✅</div>
+            <p style="font-size:18px;">Your email has been verified!</p>
+            <p style="font-size:smaller; color:#777;">Redirecting to your dashboard...</p>
+          </div>
+        `;
+
+        setTimeout(() => {
+          window.location.href = "mood.html";
+        }, 2000);
+
+      } catch (err) {
+        console.error(err);
+        if (err.code === 'auth/invalid-action-code') {
           statusDiv.innerHTML = `
-            <div style="text-align:center;">
-              <div style="font-size:60px; color:#4CAF50;">✅</div>
-              <p style="font-size:18px;">Your email has been verified!</p>
-              <p style="font-size:smaller; color:#777;">Redirecting to your dashboard...</p>
-            </div>
-          `;
-
-          setTimeout(() => {
-            window.location.href = "mood.html";
-          }, 2000);
-        } catch (error) {
-          console.error("Firebase verification error:", error);
-          let msg = "Something went wrong during verification.";
-
-          if (error.code === 'auth/invalid-action-code') {
-            msg = "This verification link is invalid or has expired.";
-          }
-
-          statusDiv.innerHTML = `
-            <p style="color:#d32f2f;">${msg}</p>
+            <p style="color:#d32f2f;">This verification link is invalid or has expired.</p>
             <button id="resendBtn" style="margin-top:20px; padding:10px 18px; background:#1976D2; color:white; border:none; border-radius:5px; cursor:pointer;">
               Resend Verification Email
             </button>
@@ -94,22 +111,22 @@
               headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
               body: `action=resend&token=${encodeURIComponent(token)}`
             })
-            .then(res => res.json())
-            .then(data => {
-              statusDiv.innerHTML = `<p style="color:#4CAF50;">${data.message}</p>`;
-            })
-            .catch(err => {
-              console.error(err);
-              statusDiv.innerHTML = `<p style="color:#d32f2f;">Failed to resend verification. Please try again later.</p>`;
-            });
+              .then(res => res.json())
+              .then(data => {
+                statusDiv.innerHTML = `<p style="color:#4CAF50;">${data.message}</p>`;
+              })
+              .catch(err => {
+                console.error(err);
+                statusDiv.innerHTML = `<p style="color:#d32f2f;">Failed to resend verification. Please try again later.</p>`;
+              });
           });
+        } else {
+          statusDiv.innerHTML = `<p style="color:#d32f2f;">Something went wrong: ${err.message}</p>`;
         }
-      } else {
-        statusDiv.textContent = "Invalid verification link.";
       }
     }
 
-    verifyEmailWithFirebase();
+    verifyUserEmail();
   </script>
 </body>
 </html>
