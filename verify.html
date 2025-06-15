@@ -30,24 +30,66 @@
     <p style="font-size: smaller; color: #777;">Redirecting you to your dashboard...</p>
   </div>
 
-  <script>
-    const email = new URLSearchParams(window.location.search).get('email');
-    
-    // 🔄 OPTIONAL: Record verified email to Google Sheets
-    if (email) {
-      fetch("https://script.google.com/macros/s/AKfycbzdncwpYJ1TJ-sMuav0NIIGlGy5gcPuBiL_a21vPFx1m7EoO_kz12RI1Bdfrd7GXjH7ew/exec", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `action=verify&email=${encodeURIComponent(email)}`
-      }).catch(err => {
-        console.error("Failed to record verified email:", err);
-      });
-    }
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+  import { getAuth, applyActionCode } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 
-    // ⏳ Redirect after 2s
-    setTimeout(() => {
-      window.location.href = 'mood.html';
-    }, 2000);
-  </script>
+  async function getApiKey() {
+    const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+    const data = await res.json();
+    return data.apiKey;
+  }
+
+  getApiKey().then((secureApiKey) => {
+    const firebaseConfig = {
+      apiKey: secureApiKey,
+      authDomain: "loop-catcher-firebase.firebaseapp.com",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const oobCode = urlParams.get("oobCode");
+    const email = urlParams.get("email");
+
+    if (oobCode) {
+      applyActionCode(auth, oobCode)
+        .then(() => {
+          // Optional: Record to Google Sheets
+          if (email) {
+            fetch("https://script.google.com/macros/s/AKfycbzdncwpYJ1TJ-sMuav0NIIGlGy5gcPuBiL_a21vPFx1m7EoO_kz12RI1Bdfrd7GXjH7ew/exec", {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: `action=verify&email=${encodeURIComponent(email)}`
+            }).catch(err => {
+              console.error("Failed to record verified email:", err);
+            });
+          }
+
+          // Wait 2s then redirect
+          setTimeout(() => {
+            window.location.href = 'mood.html';
+          }, 2000);
+        })
+        .catch((error) => {
+          document.getElementById("status").innerHTML = `
+            <div style="font-size: 48px;">❌</div>
+            <p style="font-size: 18px; margin: 1rem 0;">Verification failed: ${error.message}</p>
+          `;
+        });
+    } else {
+      document.getElementById("status").innerHTML = `
+        <div style="font-size: 48px;">❌</div>
+        <p style="font-size: 18px; margin: 1rem 0;">Invalid or missing verification code.</p>
+      `;
+    }
+  }).catch(err => {
+    document.getElementById("status").innerHTML = `
+      <div style="font-size: 48px;">❌</div>
+      <p style="font-size: 18px; margin: 1rem 0;">Failed to load API key: ${err.message}</p>
+    `;
+  });
+</script>
 </body>
 </html>
