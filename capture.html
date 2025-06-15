@@ -65,60 +65,67 @@
       background: #5c7e63;
     }
   </style>
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js"></script>
-
-  <script>
-    const firebaseConfig = {
-       apiKey: "AIzaSyBk3ywC-eRHXbridFRS5WY84F4S3_GJo18",
-       authDomain: "loop-catcher-firebase.firebaseapp.com",
-       projectId: "loop-catcher-firebase",
-       storageBucket: "loop-catcher-firebase.firebasestorage.app",
-       messagingSenderId: "1061069234561",
-       appId: "1:1061069234561:web:dea799c96bc67901888880",
-       measurementId: "G-RRQMSC0PVV"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    async function saveThought() {
-      const entry = document.getElementById('thoughtInput').value.trim();
-      if (!entry) return;
-
-      try {
-        const user = auth.currentUser;
-        if (!user) {
-          alert("You must be signed in to save thoughts.");
-          return;
-        }
-
-        await db.collection('catchpad').add({
-          content: entry,
-          owner: user.uid,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        window.location.href = 'catchpad.html';
-
-      } catch (error) {
-        console.error("Error saving thought:", error);
-        alert("Oops! Couldn’t save your thought. Try again.");
-      }
-    }
-
-  </script>
 </head>
 <body>
   <h2>+ New Thought</h2>
   <p class="nudge">💡 Sudden spark? Jot it here — we got you.</p>
 
   <textarea id="thoughtInput" placeholder="Type your thought…"></textarea>
-  <button onclick="saveThought()">Capture Thought</button>
+  <button id="captureBtn">Capture Thought</button>
 
+  <!-- FIREBASE SETUP SCRIPT -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBk3ywC-eRHXbridFRS5WY84F4S3_GJo18",
+      authDomain: "loop-catcher-firebase.firebaseapp.com",
+      projectId: "loop-catcher-firebase",
+      storageBucket: "loop-catcher-firebase.appspot.com",
+      messagingSenderId: "1061069234561",
+      appId: "1:1061069234561:web:dea799c96bc67901888880",
+      measurementId: "G-RRQMSC0PVV"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const captureBtn = document.getElementById("captureBtn");
+
+    captureBtn.addEventListener("click", async () => {
+      const entry = document.getElementById("thoughtInput").value.trim();
+      if (!entry) return;
+
+      const user = auth.currentUser;
+      if (!user) {
+        alert("You must be signed in to save thoughts.");
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "catchpad"), {
+          content: entry,
+          owner: user.uid,
+          createdAt: serverTimestamp()
+        });
+
+        window.location.href = "catchpad.html";
+      } catch (error) {
+        console.error("Error saving thought:", error);
+        alert("Oops! Couldn’t save your thought. Try again.");
+      }
+    });
+
+    // Optional: redirect to login if user is not signed in
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        alert("You need to be signed in.");
+        window.location.href = "signin.html";
+      }
+    });
+  </script>
 </body>
 </html>
-
