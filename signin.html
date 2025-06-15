@@ -126,106 +126,108 @@
   </div>
 
   <script>
-    async function fetchAPIKey() {
-      const response = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
-      const data = await response.json();
-      return data.apiKey;
-    }
+  async function fetchAPIKey() {
+    const response = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+    const data = await response.json();
+    return data.apiKey;
+  }
 
-    async function initializeFirebase() {
-      const apiKey = await fetchAPIKey();
-      const firebaseConfig = {
-        apiKey: apiKey,
-        authDomain: "loop-catcher-firebase.firebaseapp.com",
-        projectId: "loop-catcher-firebase",
-        storageBucket: "loop-catcher-firebase.appspot.com",
-        messagingSenderId: "1061069234561",
-        appId: "1:1061069234561:web:dea799c96bc67901888880",
-        measurementId: "G-RRQMSC0PVV"
-      };
+  async function initializeFirebase() {
+    const apiKey = await fetchAPIKey();
+    const firebaseConfig = {
+      apiKey: apiKey,
+      authDomain: "loop-catcher-firebase.firebaseapp.com",
+      projectId: "loop-catcher-firebase",
+      storageBucket: "loop-catcher-firebase.appspot.com",
+      messagingSenderId: "1061069234561",
+      appId: "1:1061069234561:web:dea799c96bc67901888880",
+      measurementId: "G-RRQMSC0PVV"
+    };
 
-      firebase.initializeApp(firebaseConfig);
-      return firebase.auth();
-    }
+    firebase.initializeApp(firebaseConfig);
+    return firebase.auth();
+  }
 
-    let auth;
-    const signInForm = document.getElementById("signInForm");
-    const loginBtn = document.getElementById("loginBtn");
-    const googleSignInBtn = document.getElementById("googleSignInBtn");
-    const forgotPasswordLink = document.getElementById("forgotPasswordLink");
-    const errorBox = document.getElementById("errorBox");
+  let auth;
+  const signInForm = document.getElementById("signInForm");
+  const loginBtn = document.getElementById("loginBtn");
+  const googleSignInBtn = document.getElementById("googleSignInBtn");
+  const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+  const errorBox = document.getElementById("errorBox");
 
-    document.addEventListener("DOMContentLoaded", () => {
-      initializeFirebase().then((firebaseAuth) => {
-        auth = firebaseAuth;
-        loginBtn.disabled = false;
-      }).catch((err) => {
-        errorBox.textContent = "Firebase failed to load. Try again later.";
-        console.error("Firebase init failed:", err);
-      });
+  document.addEventListener("DOMContentLoaded", () => {
+    initializeFirebase().then((firebaseAuth) => {
+      auth = firebaseAuth;
+      loginBtn.disabled = false;
+    }).catch((err) => {
+      errorBox.textContent = "Firebase failed to load. Try again later.";
+      console.error("Firebase init failed:", err);
     });
+  });
 
-    signInForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+  signInForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-      if (!auth) {
-        errorBox.textContent = "Still connecting to Firebase...";
+    if (!auth) {
+      errorBox.textContent = "Still connecting to Firebase...";
+      return;
+    }
+
+    try {
+      const result = await auth.signInWithEmailAndPassword(email, password);
+      const user = result.user;
+
+      await user.reload(); // 🔄 Force refresh of user data
+      console.log("User email verified?", user.emailVerified); // 🪵 Log the verified status
+
+      if (!user.emailVerified) {
+        await auth.signOut();
+        errorBox.textContent = "Please verify your email before signing in.";
         return;
       }
 
-      try {
-        const result = await auth.signInWithEmailAndPassword(email, password);
-        const user = result.user;
+      window.location.href = "mood.html";
+    } catch (error) {
+      console.error("Login failed:", error);
+      errorBox.textContent = error.message;
+    }
+  });
 
-        // 🔁 Refresh user's verification status
-        await user.reload();
+  forgotPasswordLink.addEventListener("click", async () => {
+    const email = document.getElementById("email").value.trim();
+    if (!email) {
+      errorBox.textContent = "Please enter your email above first.";
+      return;
+    }
 
-        if (!user.emailVerified) {
-          await auth.signOut();
-          errorBox.textContent = "Please verify your email before signing in.";
-          return;
-        }
+    try {
+      await auth.sendPasswordResetEmail(email);
+      errorBox.style.color = "green";
+      errorBox.textContent = "Reset link sent! Check your inbox.";
+    } catch (err) {
+      errorBox.style.color = "red";
+      errorBox.textContent = err.message;
+    }
+  });
 
-        window.location.href = "mood.html";
-      } catch (error) {
-        console.error("Login failed:", error);
-        errorBox.textContent = error.message;
-      }
-    });
+  googleSignInBtn.addEventListener("click", async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
 
-    forgotPasswordLink.addEventListener("click", async () => {
-      const email = document.getElementById("email").value.trim();
-      if (!email) {
-        errorBox.textContent = "Please enter your email above first.";
-        return;
-      }
+    try {
+      const result = await auth.signInWithPopup(provider);
+      const user = result.user;
 
-      try {
-        await auth.sendPasswordResetEmail(email);
-        errorBox.style.color = "green";
-        errorBox.textContent = "Reset link sent! Check your inbox.";
-      } catch (err) {
-        errorBox.style.color = "red";
-        errorBox.textContent = err.message;
-      }
-    });
+      await user.reload(); // 🔄 Just in case
+      console.log("Google login: Email verified?", user.emailVerified); // 🪵 Log verified status
 
-    googleSignInBtn.addEventListener("click", async () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-
-      try {
-        const result = await auth.signInWithPopup(provider);
-        const user = result.user;
-
-        // Optional: Check for Gmail domain or other logic
-        window.location.href = "mood.html";
-      } catch (error) {
-        console.error("Google sign-in error:", error);
-        errorBox.textContent = error.message;
-      }
-    });
-  </script>
+      window.location.href = "mood.html";
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+      errorBox.textContent = error.message;
+    }
+  });
+</script>
 </body>
 </html>
