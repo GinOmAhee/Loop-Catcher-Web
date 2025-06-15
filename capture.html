@@ -100,36 +100,38 @@
     const auth = getAuth(app);
 
     onAuthStateChanged(auth, (user) => {
-      const loadingMessage = document.getElementById("loadingMessage");
-      const mainContent = document.getElementById("mainContent");
+  const loadingMessage = document.getElementById("loadingMessage");
+  const mainContent = document.getElementById("mainContent");
+  const captureBtn = document.getElementById("captureBtn");
 
-      if (!user) {
-        window.location.href = "signin.html";
-      } else {
-        loadingMessage.style.display = "none";
-        mainContent.style.display = "block";
+  if (!user) {
+    window.location.href = "signin.html";
+    return;
+  }
 
-        const captureBtn = document.getElementById("captureBtn");
+  // ✅ User is logged in
+  loadingMessage.style.display = "none";
+  mainContent.style.display = "block";
 
-        captureBtn.addEventListener("click", async () => {
-          const entry = document.getElementById("thoughtInput").value.trim();
-          if (!entry) return;
+  // Move the click listener outside the onAuthStateChanged to prevent multiple bindings
+  captureBtn.addEventListener("click", async () => {
+    const entry = document.getElementById("thoughtInput").value.trim();
+    if (!entry) return;
 
-          try {
-            await addDoc(collection(db, "catchpad"), {
-              content: entry,
-              owner: user.uid,
-              createdAt: serverTimestamp()
-            });
+    try {
+      await addDoc(collection(db, "catchpad"), {
+        content: entry,
+        owner: user.uid,
+        createdAt: serverTimestamp()
+      });
 
-            window.location.href = "catchpad.html";
-          } catch (error) {
-            console.error("Error saving thought:", error);
-            alert("Oops! Couldn’t save your thought. Try again.");
-          }
-        });
-      }
-    });
+      window.location.href = "catchpad.html";
+    } catch (error) {
+      console.error("Error saving thought:", error);
+      alert("Oops! Couldn’t save your thought. Try again.");
+    }
+  }, { once: true }); // ⚠️ optional safeguard: only attach once
+});
   };
 
   init();
