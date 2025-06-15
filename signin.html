@@ -9,22 +9,6 @@
   <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.9.1/firebase-auth-compat.js"></script>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBk3ywC-eRHXbridFRS5WY84F4S3_GJo18",
-      authDomain: "loop-catcher-firebase.firebaseapp.com",
-      projectId: "loop-catcher-firebase",
-      storageBucket: "loop-catcher-firebase.appspot.com",
-      messagingSenderId: "1061069234561",
-      appId: "1:1061069234561:web:dea799c96bc67901888880",
-      measurementId: "G-RRQMSC0PVV"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    window.auth = firebase.auth();
-    console.log("Auth object:", auth);
-  </script>
-
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -87,10 +71,39 @@
       background: #45a147;
     }
 
+    .google-btn {
+      background: #ffffff;
+      color: #333;
+      border: 1px solid #ccc;
+      margin-top: 1rem;
+    }
+
+    .google-btn:hover {
+      background: #f2f2f2;
+    }
+
     .footer {
       font-size: 0.85rem;
       color: #aaa;
       margin-top: 2rem;
+    }
+
+    .error-msg {
+      color: red;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .link {
+      color: #4CAF50;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -98,27 +111,121 @@
   <div class="signin-box">
     <h1>Welcome Back</h1>
     <div class="tagline">Loop in, focus up.</div>
-    <form onsubmit="signIn(event)">
+
+    <form id="signInForm">
       <input type="email" id="email" placeholder="Email" required />
       <input type="password" id="password" placeholder="Password" required />
-      <button type="submit">Enter Dashboard</button>
+      <button type="submit" id="loginBtn" disabled>Enter Dashboard</button>
     </form>
+
+    <div class="link" id="forgotPasswordLink">Forgot password?</div>
+    <button class="google-btn" id="googleSignInBtn">Continue with Google</button>
+
+    <div class="error-msg" id="errorBox"></div>
     <div class="footer">© 2025 Ginomind · Loop Catcher</div>
   </div>
 
   <script>
-    async function signIn(event) {
-      event.preventDefault();
+    async function fetchAPIKey() {
+      const response = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+      const data = await response.json();
+      return data.apiKey;
+    }
+
+    async function initializeFirebase() {
+      const apiKey = await fetchAPIKey();
+      const firebaseConfig = {
+        apiKey: apiKey,
+        authDomain: "loop-catcher-firebase.firebaseapp.com",
+        projectId: "loop-catcher-firebase",
+        storageBucket: "loop-catcher-firebase.appspot.com",
+        messagingSenderId: "1061069234561",
+        appId: "1:1061069234561:web:dea799c96bc67901888880",
+        measurementId: "G-RRQMSC0PVV"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      return firebase.auth();
+    }
+
+    let auth;
+    const signInForm = document.getElementById("signInForm");
+    const loginBtn = document.getElementById("loginBtn");
+    const googleSignInBtn = document.getElementById("googleSignInBtn");
+    const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+    const errorBox = document.getElementById("errorBox");
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initializeFirebase().then((firebaseAuth) => {
+        auth = firebaseAuth;
+        loginBtn.disabled = false;
+      }).catch((err) => {
+        errorBox.textContent = "Firebase failed to load. Try again later.";
+        console.error("Firebase init failed:", err);
+      });
+    });
+
+    signInForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
 
+      if (!auth) {
+        errorBox.textContent = "Still connecting to Firebase...";
+        return;
+      }
+
       try {
-        await auth.signInWithEmailAndPassword(email, password);
+        const result = await auth.signInWithEmailAndPassword(email, password);
+        const user = result.user;
+
+        if (!user.emailVerified) {
+          errorBox.textContent = "Please verify your email before signing in.";
+          return;
+        }
+
         window.location.href = "mood.html";
       } catch (error) {
-        alert("Login failed: " + error.message);
+        console.error("Login failed:", error);
+        errorBox.textContent = error.message;
       }
-    }
+    });
+
+    forgotPasswordLink.addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      if (!email) {
+        errorBox.textContent = "Please enter your email above first.";
+        return;
+      }
+
+      try {
+        await auth.sendPasswordResetEmail(email);
+        errorBox.style.color = "green";
+        errorBox.textContent = "Reset link sent! Check your inbox.";
+      } catch (err) {
+        errorBox.style.color = "red";
+        errorBox.textContent = err.message;
+      }
+    });
+
+    googleSignInBtn.addEventListener("click", async () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+
+      try {
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+
+        if (!user.emailVerified && !user.email.includes("@gmail.com")) {
+          errorBox.textContent = "Google account not verified.";
+          return;
+        }
+
+        window.location.href = "mood.html";
+      } catch (error) {
+        console.error("Google sign-in error:", error);
+        errorBox.textContent = error.message;
+      }
+    });
   </script>
 </body>
 </html>
