@@ -144,10 +144,12 @@
         const user = userCredential.user;
 
         await user.updateProfile({ displayName: nickname });
+        await user.sendEmailVerification(); // 🔐 Send verification email
 
         localStorage.setItem('signupEmail', email);
         localStorage.setItem('nickname', nickname);
         window.location.href = 'confirmation.html';
+
       } catch (error) {
         messageBox.textContent = error.message;
         messageBox.style.color = 'red';
