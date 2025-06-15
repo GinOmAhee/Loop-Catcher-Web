@@ -78,20 +78,23 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+  const fetchFirebaseConfig = async () => {
+    try {
+      const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+      const config = await res.json();
+      return config;
+    } catch (err) {
+      console.error("Failed to fetch Firebase config:", err);
+      alert("Could not load app config. Try again later.");
+    }
+  };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBk3ywC-eRHXbridFRS5WY84F4S3_GJo18",
-      authDomain: "loop-catcher-firebase.firebaseapp.com",
-      projectId: "loop-catcher-firebase",
-      storageBucket: "loop-catcher-firebase.appspot.com",
-      messagingSenderId: "1061069234561",
-      appId: "1:1061069234561:web:dea799c96bc67901888880",
-      measurementId: "G-RRQMSC0PVV"
-    };
+  const init = async () => {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
+    const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
+    const { getAuth, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
 
+    const firebaseConfig = await fetchFirebaseConfig();
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
@@ -103,7 +106,6 @@
       if (!user) {
         window.location.href = "signin.html";
       } else {
-        // ✅ Hide loading, show content
         loadingMessage.style.display = "none";
         mainContent.style.display = "block";
 
@@ -128,6 +130,9 @@
         });
       }
     });
-  </script>
+  };
+
+  init();
+</script>
 </body>
 </html>
