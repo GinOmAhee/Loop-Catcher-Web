@@ -4,45 +4,57 @@
 <head>
   <title>Reset Password</title>
 </head>
+<!-- reset.html -->
 <body>
-  <h2>Reset Your Password</h2>
-  <input type="password" id="newPassword" placeholder="Enter new password" />
-  <button id="submitBtn">Reset Password</button>
-  <p id="status"></p>
+  <form id="reset-form" style="display:none;">
+    <input type="password" id="new-password" placeholder="New Password" required />
+    <button type="submit">Reset Password</button>
+  </form>
+
+  <div id="status"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-    import { getAuth, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+    import { getAuth, verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 
-    const getApiKey = async () => {
-      const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
-      const data = await res.json();
-      return data.apiKey;
-    };
+    const urlParams = new URLSearchParams(window.location.search);
+    const oobCode = urlParams.get("oobCode");
 
-    getApiKey().then(apiKey => {
-      const app = initializeApp({
-        apiKey,
-        authDomain: "loop-catcher-firebase.firebaseapp.com"
-      });
-
-      const auth = getAuth(app);
-      const urlParams = new URLSearchParams(window.location.search);
-      const oobCode = urlParams.get("oobCode");
-
-      document.getElementById("submitBtn").addEventListener("click", async () => {
-        const newPassword = document.getElementById("newPassword").value;
-        try {
-          await confirmPasswordReset(auth, oobCode, newPassword);
-          document.getElementById("status").textContent = "✅ Password reset successful. Redirecting...";
-          setTimeout(() => {
-            window.location.href = "signin.html";
-          }, 2000);
-        } catch (error) {
-          document.getElementById("status").textContent = "❌ " + error.message;
-        }
-      });
+    const app = initializeApp({
+      apiKey: "YOUR_REAL_API_KEY", // or use your getAPIKey endpoint here
+      authDomain: "your-project.firebaseapp.com"
     });
+
+    const auth = getAuth(app);
+    const statusEl = document.getElementById("status");
+    const formEl = document.getElementById("reset-form");
+
+    if (!oobCode) {
+      statusEl.textContent = "Missing reset code.";
+    } else {
+      // Step 1: Verify the code
+      verifyPasswordResetCode(auth, oobCode).then(email => {
+        formEl.style.display = "block"; // Show the form
+
+        formEl.addEventListener("submit", e => {
+          e.preventDefault();
+          const newPassword = document.getElementById("new-password").value;
+
+          // Step 2: Confirm password reset
+          confirmPasswordReset(auth, oobCode, newPassword).then(() => {
+            statusEl.innerHTML = "✅ Password has been reset. Redirecting to login...";
+            setTimeout(() => {
+              window.location.href = "signin.html";
+            }, 2000);
+          }).catch(err => {
+            statusEl.textContent = `❌ Reset failed: ${err.message}`;
+          });
+        });
+
+      }).catch(err => {
+        statusEl.textContent = `❌ Verification failed: ${err.message}`;
+      });
+    }
   </script>
 </body>
 </html>
