@@ -116,29 +116,34 @@
     const messageBox = document.getElementById('messageBox');
 
     signUpForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  e.preventDefault();
 
-      const nickname = document.getElementById("nickname").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+  if (!auth) {
+    messageBox.textContent = "Firebase is still initializing. Please wait...";
+    messageBox.style.color = 'orange';
+    return;
+  }
 
-      try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
+  const nickname = document.getElementById("nickname").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-        await user.updateProfile({ displayName: nickname });
+  try {
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    const user = userCredential.user;
 
-        localStorage.setItem('signupEmail', email);
-        localStorage.setItem('nickname', nickname);
-        window.location.href = 'confirmation.html';
+    await user.updateProfile({ displayName: nickname });
 
-      } catch (error) {
-        messageBox.textContent = error.message;
-        messageBox.style.color = 'red';
-      }
+    localStorage.setItem('signupEmail', email);
+    localStorage.setItem('nickname', nickname);
+    window.location.href = 'confirmation.html';
+  } catch (error) {
+    messageBox.textContent = error.message;
+    messageBox.style.color = 'red';
+  }
 
-      signUpForm.reset();
-    });
+  signUpForm.reset();
+});
   </script>
 </body>
 </html>
