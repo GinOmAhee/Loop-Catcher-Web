@@ -121,11 +121,19 @@
 
     // Optional: redirect to login if user is not signed in
     onAuthStateChanged(auth, (user) => {
-      if (!user) {
+  if (user) {
+    // Logged in — you’re good
+    console.log("User is logged in:", user.email);
+  } else {
+    // Wait a little to avoid false logout before auth is ready
+    setTimeout(() => {
+      if (!auth.currentUser) {
         alert("You need to be signed in.");
         window.location.href = "signin.html";
       }
-    });
+    }, 500); // 0.5s buffer
+  }
+});
   </script>
 </body>
 </html>
