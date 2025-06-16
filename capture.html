@@ -100,6 +100,7 @@
 
     <textarea id="thoughtInput" placeholder="Type your thought…"></textarea>
     <button id="captureBtn">Capture Thought</button>
+    <button id="speakBtn">🎙️ Speak Thought</button>
   </div>
 
   <script type="module">
@@ -159,6 +160,43 @@
      const auth = getAuth(app);
 
      console.log("Current user before auth state change:", auth.currentUser);
+
+     // 🎙️ VOICE TO TEXT: Setup
+     const speakBtn = document.getElementById("speakBtn");
+
+     if (!('webkitSpeechRecognition' in window)) {
+       speakBtn.style.display = "none"; // Hide if not supported
+       console.warn("SpeechRecognition not supported on this browser");
+     } else {
+       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+       const recognition = new SpeechRecognition();
+       recognition.lang = 'en-US';
+       recognition.interimResults = false; // Set to true if you want live text
+       recognition.maxAlternatives = 1;
+
+       speakBtn.addEventListener("click", () => {
+         recognition.start();
+         speakBtn.textContent = "🎙️ Listening...";
+       });
+
+       recognition.onresult = (event) => {
+         const transcript = event.results[0][0].transcript;
+         thoughtInput.value += (thoughtInput.value ? " " : "") + transcript;
+         speakBtn.textContent = "🎙️ Speak Thought";
+         // Optionally: auto-trigger save
+         thoughtInput.dispatchEvent(new Event("input"));
+       };
+
+    recognition.onerror = (event) => {
+       console.error("Speech recognition error:", event.error);
+       alert("Speech error: " + event.error);
+       speakBtn.textContent = "🎙️ Speak Thought";
+    };
+
+    recognition.onend = () => {
+       speakBtn.textContent = "🎙️ Speak Thought";
+    };
+  }
 
      auth.onAuthStateChanged(async (user) => {
        console.log("User state before reload:", user);
