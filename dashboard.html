@@ -36,6 +36,7 @@
       border-left: 4px solid #4CAF50;
       background: #e0f7e9;
       color: #333;
+      transition: all 0.3s ease;
     }
 
     nav.top-nav {
@@ -47,38 +48,47 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
-    nav.top-nav a, #logoutBtn {
+    nav.top-nav a {
       text-decoration: none;
       color: #333;
       font-weight: 500;
       font-size: 0.95rem;
-      cursor: pointer;
-      border: none;
-      background: none;
+      transition: color 0.2s ease;
     }
 
-    nav.top-nav a:hover, #logoutBtn:hover { color: #4CAF50; }
+    nav.top-nav a:hover { color: #4CAF50; }
 
     .zone-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
     }
 
     .zone {
-      width: 160px;
-      min-height: 80px;
-      padding: 0.8rem;
+      background: #ffffff;
       border-left: 6px solid #6B8F71;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: transform 0.2s ease;
     }
 
+    .zone:hover { transform: translateY(-4px); }
+
     .zone h2 {
+      margin: 0;
+      font-size: 1.2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .zone p {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #555;
     }
 
     .count-badge {
@@ -87,10 +97,7 @@
       border-radius: 999px;
       padding: 0.25rem 0.75rem;
       font-size: 0.8rem;
-      margin-left: auto; /* Moves badge further right */
     }
-
-    .zone:hover { transform: translateY(-4px); }
 
     .floating-cta {
       position: fixed;
@@ -104,6 +111,7 @@
       border-radius: 999px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       cursor: pointer;
+      z-index: 10;
     }
 
     footer {
@@ -129,7 +137,6 @@
     <a href="search.html">🔍 Search</a>
     <a href="history.html">👀 Recently Viewed</a>
     <a href="nudges.html">🔔 Nudges</a>
-    <button id="logoutBtn">🚪 Log Out</button>
   </nav>
 
   <div class="mindset-tagline" id="tagline">“Loading your mood...”</div>
@@ -165,56 +172,29 @@
 
   <footer>© 2025 Ginomind · Loop Catcher by Ronette</footer>
 
-  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
-
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      try {
-        const response = await fetch("https://YOUR_CLOUD_FUNCTION_URL/getAPIKey");
-        const data = await response.json();
+    window.addEventListener("DOMContentLoaded", () => {
+      const emoji = localStorage.getItem("vibeEmoji") || "🌿";
+      const label = (localStorage.getItem("vibeLabel") || "").trim();
+      const tagline = localStorage.getItem("vibeTagline") || "Let’s start from where you are.";
 
-        if (!data.apiKey) {
-          console.error("⚠️ API Key not received!");
-          return;
-        }
+      document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
+      document.getElementById("tagline").textContent = `“${tagline}”`;
 
-        const firebaseConfig = {
-          apiKey: data.apiKey,
-          authDomain: data.authDomain,
-          projectId: data.projectId,
-          storageBucket: data.storageBucket,
-          messagingSenderId: data.messagingSenderId,
-          appId: data.appId,
-        };
+      const dashboard = document.body;
+      const moodThemeMap = {
+        "Calm & Clear": "theme-calm",
+        "Focused & Strategic": "theme-strategic",
+        "Open & Reflective": "theme-reflective",
+        "Driven & Bold": "theme-bold",
+        "Playful & Inventive": "theme-playful"
+      };
 
-        firebase.initializeApp(firebaseConfig);
-
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-          firebase.auth().signOut().then(() => {
-            alert("Logged out successfully!");
-            window.location.href = "signin.html";
-          }).catch((error) => {
-            console.error("Logout Error:", error);
-          });
-        });
-
-        // ✅ Apply Mood-Based Theme
-        const label = (localStorage.getItem("vibeLabel") || "").trim();
-        const moodThemeMap = {
-          "Calm & Clear": "theme-calm",
-          "Focused & Strategic": "theme-strategic",
-          "Open & Reflective": "theme-reflective",
-          "Driven & Bold": "theme-bold",
-          "Playful & Inventive": "theme-playful"
-        };
-
-        const themeClass = moodThemeMap[label];
-        if (themeClass) {
-          document.body.classList.add(themeClass);
-        }
-      } catch (error) {
-        console.error("⚠️ Error fetching API Key:", error);
+      const themeClass = moodThemeMap[label];
+      if (themeClass) {
+        dashboard.classList.add(themeClass);
+      } else {
+        console.warn("⚠️ No matching theme for:", label);
       }
     });
   </script>
