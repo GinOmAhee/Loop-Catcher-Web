@@ -79,71 +79,83 @@
 
   <script type="module">
   const fetchFirebaseConfig = async () => {
-  try {
-    const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
-    const config = await res.json();
+    try {
+      const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+      const config = await res.json();
 
-    if (!config.projectId) {
-      throw new Error("Missing projectId in Firebase config.");
+      if (!config.projectId) {
+        throw new Error("Missing projectId in Firebase config.");
+      }
+      return config;
+    } catch (err) {
+      console.error("Failed to fetch Firebase config:", err);
+      alert("Could not load app config. Try again later.");
+      return null; // Prevents Firebase initialization with incomplete data
     }
-
-    return config;
-  } catch (err) {
-    console.error("Failed to fetch Firebase config:", err);
-    alert("Could not load app config. Try again later.");
-    return null; // Prevents Firebase initialization with incomplete data
-  }
-};
+  };
 
   const init = async () => {
-  const firebaseConfig = await fetchFirebaseConfig();
-  
-  if (!firebaseConfig) {
-    console.error("Firebase initialization aborted due to missing config.");
-    return;
-  }
+    const firebaseConfig = await fetchFirebaseConfig();
+    console.log("Firebase Config Loaded:", firebaseConfig);
 
-  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
-  const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
-  const { getAuth, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
-
-  onAuthStateChanged(auth, (user) => {
-    const loadingMessage = document.getElementById("loadingMessage");
-    const mainContent = document.getElementById("mainContent");
-    const captureBtn = document.getElementById("captureBtn");
-
-    if (!user) {
-      window.location.href = "signin.html";
+    if (!firebaseConfig) {
+      console.error("Firebase initialization aborted due to missing config.");
       return;
     }
 
-    // ✅ User is logged in
-    loadingMessage.style.display = "none";
-    mainContent.style.display = "block";
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
+    const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
+    const { getAuth, onAuthStateChanged, signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
 
-    captureBtn.addEventListener("click", async () => {
-      const entry = document.getElementById("thoughtInput").value.trim();
-      if (!entry) return;
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-      try {
-        await addDoc(collection(db, "catchpad"), {
-          content: entry,
-          owner: user.uid,
-          createdAt: serverTimestamp()
-        });
+    console.log("Current user before auth state change:", auth.currentUser);
 
-        window.location.href = "catchpad.html";
-      } catch (error) {
-        console.error("Error saving thought:", error);
-        alert("Oops! Couldn’t save your thought. Try again.");
+    auth.onAuthStateChanged(async (user) => {
+      console.log("User state before reload:", user);
+      if (user) {
+        await user.reload();
+        console.log("User after reload:", user);
+      } else {
+        window.location.href = "signin.html"; // ✅ Fix: Move inside auth state listener
+        return;
       }
-    }, { once: true });
-  });
-};
+
+      // ✅ User is logged in
+      const loadingMessage = document.getElementById("loadingMessage");
+      const mainContent = document.getElementById("mainContent");
+      const captureBtn = document.getElementById("captureBtn");
+
+      loadingMessage.style.display = "none";
+      mainContent.style.display = "block";
+
+      captureBtn.addEventListener("click", async () => {
+        const entry = document.getElementById("thoughtInput").value.trim();
+        if (!entry) return;
+
+        try {
+          await addDoc(collection(db, "catchpad"), {
+            content: entry,
+            owner: user.uid,
+            createdAt: serverTimestamp()
+          });
+
+          window.location.href = "catchpad.html";
+        } catch (error) {
+          console.error("Error saving thought:", error);
+          alert("Oops! Couldn’t save your thought. Try again.");
+        }
+      }, { once: true });
+    });
+
+    // ✅ Fix: Test sign-in correctly inside init()
+    signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
+      .then((userCredential) => console.log("Login successful:", userCredential.user))
+      .catch((error) => console.error("Login failed:", error));
+  };
+
   init();
 </script>
 </body>
