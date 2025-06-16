@@ -60,34 +60,35 @@
     nav.top-nav a:hover, #logoutBtn:hover { color: #4CAF50; }
 
     .zone-grid {
-      display: flex; /* If original layout was using flexbox */
+      display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      gap: 1rem; /* Reduce spacing */
-      padding: 2rem; /* Restore original padding */
+      gap: 1rem;
+      padding: 1.5rem;
     }
 
     .zone {
-      width: 180px; /* Adjust width */
-      min-height: 100px; /* Adjust height */
-      padding: 1rem; /* Compact padding */
+      width: 160px;
+      min-height: 80px;
+      padding: 0.8rem;
       border-left: 6px solid #6B8F71;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-     }
-     .zone h2 {
-       display: flex;
-       justify-content: space-between;
-       align-items: center;
-     }
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
 
-     .count-badge {
-       background-color: #6B8F71;
-       color: white;
-       border-radius: 999px;
-       padding: 0.25rem 0.75rem;
-       font-size: 0.8rem;
-       margin-left: auto; /* Move badge away */
-     }
+    .zone h2 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .count-badge {
+      background-color: #6B8F71;
+      color: white;
+      border-radius: 999px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.8rem;
+      margin-left: auto; /* Moves badge further right */
+    }
 
     .zone:hover { transform: translateY(-4px); }
 
@@ -189,13 +190,7 @@
 
         firebase.initializeApp(firebaseConfig);
 
-        const logoutBtn = document.getElementById("logoutBtn");
-        if (!logoutBtn) {
-          console.warn("⚠️ Logout button not found.");
-          return;
-        }
-
-        logoutBtn.addEventListener("click", () => {
+        document.getElementById("logoutBtn").addEventListener("click", () => {
           firebase.auth().signOut().then(() => {
             alert("Logged out successfully!");
             window.location.href = "signin.html";
@@ -204,14 +199,8 @@
           });
         });
 
-        const emoji = localStorage.getItem("vibeEmoji") || "🌿";
+        // ✅ Apply Mood-Based Theme
         const label = (localStorage.getItem("vibeLabel") || "").trim();
-        const tagline = localStorage.getItem("vibeTagline") || "Let’s start from where you are.";
-
-        document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
-        document.getElementById("tagline").textContent = `“${tagline}”`;
-
-        const dashboard = document.body;
         const moodThemeMap = {
           "Calm & Clear": "theme-calm",
           "Focused & Strategic": "theme-strategic",
@@ -220,13 +209,10 @@
           "Playful & Inventive": "theme-playful"
         };
 
-       const themeClass = moodThemeMap[label];
-       if (themeClass) {
-       dashboard.classList.add(themeClass);
-       } else {
-       console.warn("⚠️ No matching theme for:", label);
-       }
-
+        const themeClass = moodThemeMap[label];
+        if (themeClass) {
+          document.body.classList.add(themeClass);
+        }
       } catch (error) {
         console.error("⚠️ Error fetching API Key:", error);
       }
