@@ -54,15 +54,18 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
-    nav.top-nav a {
+    nav.top-nav a, #logoutBtn {
       text-decoration: none;
       color: #333;
       font-weight: 500;
       font-size: 0.95rem;
       transition: color 0.2s ease;
+      cursor: pointer;
+      border: none;
+      background: none;
     }
 
-    nav.top-nav a:hover {
+    nav.top-nav a:hover, #logoutBtn:hover {
       color: #4CAF50;
     }
 
@@ -85,28 +88,6 @@
 
     .zone:hover {
       transform: translateY(-4px);
-    }
-
-    .zone h2 {
-      margin: 0;
-      font-size: 1.2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .zone p {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: #555;
-    }
-
-    .count-badge {
-      background-color: #6B8F71;
-      color: white;
-      border-radius: 999px;
-      padding: 0.25rem 0.75rem;
-      font-size: 0.8rem;
     }
 
     .floating-cta {
@@ -152,85 +133,66 @@
 
   <div class="mindset-tagline" id="tagline">“Loading your mood...”</div>
 
-  <div class="zone-grid">
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
 
-    <div class="zone" onclick="location.href='holdingbay.html'">
-      <h2>🔄 Holding Bay <span class="count-badge">3</span></h2>
-      <p>For sparks and snippets you’re still shaping.</p>
-    </div>
+  <script>
+    // ✅ Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+    };
+    firebase.initializeApp(firebaseConfig);
 
-    <div class="zone" onclick="location.href='actnow.html'">
-      <h2>🚀 Act Now <span class="count-badge">1</span></h2>
-      <p>Your high-priority thoughts, ready to deploy.</p>
-    </div>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!firebase.apps.length) {
+        console.error("⚠️ Firebase is not initialized!");
+        return;
+      }
 
-    <div class="zone" onclick="location.href='momentum.html'">
-      <h2>🌿 Build Momentum <span class="count-badge">2</span></h2>
-      <p>Mid-tier thoughts gaining traction.</p>
-    </div>
+      // ✅ Ensure Logout Button Exists
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (!logoutBtn) {
+        console.warn("⚠️ Logout button not found.");
+        return;
+      }
 
-    <div class="zone" onclick="location.href='later.html'">
-      <h2>⏳ Worth It Later <span class="count-badge">4</span></h2>
-      <p>Ideas to come back to when the time’s right.</p>
-    </div>
+      // ✅ Attach Logout Function
+      logoutBtn.addEventListener("click", () => {
+        firebase.auth().signOut().then(() => {
+          alert("Logged out successfully!");
+          window.location.href = "signin.html";
+        }).catch((error) => {
+          console.error("Logout Error:", error);
+        });
+      });
 
-    <div class="zone" onclick="location.href='parked.html'">
-      <h2>📦 Parked Potential <span class="count-badge">8</span></h2>
-      <p>Concepts that still deserve a corner.</p>
-    </div>
+      // ✅ Apply Mood-Based Theme
+      const emoji = localStorage.getItem("vibeEmoji") || "🌿";
+      const label = (localStorage.getItem("vibeLabel") || "").trim();
+      const tagline = localStorage.getItem("vibeTagline") || "Let’s start from where you are.";
 
-  </div>
+      document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
+      document.getElementById("tagline").textContent = `“${tagline}”`;
 
-  <button class="floating-cta" onclick="location.href='capture.html'">+ New Thought</button>
+      const dashboard = document.body;
+      const moodThemeMap = {
+        "Calm & Clear": "theme-calm",
+        "Focused & Strategic": "theme-strategic",
+        "Open & Reflective": "theme-reflective",
+        "Driven & Bold": "theme-bold",
+        "Playful & Inventive": "theme-playful"
+      };
 
-  <footer>© 2025 Ginomind · Loop Catcher by Ronette</footer>
-
-<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
-<script>
-  // ✅ Initialize Firebase (Update with your actual config)
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-  };
-  firebase.initializeApp(firebaseConfig);
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const emoji = localStorage.getItem("vibeEmoji") || "🌿";
-    const label = (localStorage.getItem("vibeLabel") || "").trim();
-    const tagline = localStorage.getItem("vibeTagline") || "Let’s start from where you are.";
-
-    document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
-    document.getElementById("tagline").textContent = `“${tagline}”`;
-
-    const dashboard = document.body;
-    const moodThemeMap = {
-      "Calm & Clear": "theme-calm",
-      "Focused & Strategic": "theme-strategic",
-      "Open & Reflective": "theme-reflective",
-      "Driven & Bold": "theme-bold",
-      "Playful & Inventive": "theme-playful"
-     };
-
-    const themeClass = moodThemeMap[label];
-    if (themeClass) {
-      dashboard.classList.add(themeClass);
-    } else {
-      console.warn("⚠️ No matching theme for:", label);
-    }
-
-   // ✅ Attach Logout Function
-   document.getElementById("logoutBtn").addEventListener("click", () => {
-    firebase.auth().signOut().then(() => {
-      alert("Logged out successfully!");
-      window.location.href = "signin.html";
-    }).catch((error) => {
-      console.error("Logout Error:", error);
+      const themeClass = moodThemeMap[label];
+      if (themeClass) {
+        dashboard.classList.add(themeClass);
+      } else {
+        console.warn("⚠️ No matching theme for:", label);
+      }
     });
-  });
-});
-</script>
+  </script>
 
 </body>
 </html>
