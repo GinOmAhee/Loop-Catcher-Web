@@ -167,9 +167,14 @@
 </head>
 <body>
 
-  <header>
-    <h1 id="profileHeader">👋 Welcome back</h1>
-  </header>
+  <header style="position: relative;">
+  <h1 id="profileHeader">👋 Welcome back</h1>
+  <div style="position: absolute; top: 1rem; right: 2rem;">
+    <button onclick="logout()" style="background: transparent; border: none; color: #fff; font-weight: bold; cursor: pointer;">
+      🚪 Log Out
+    </button>
+  </div>
+</header>
 
   <nav class="top-nav">
     <a href="profile.html">👤 Profile</a>
