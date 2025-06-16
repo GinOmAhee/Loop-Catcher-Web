@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Loop Catcher Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
@@ -18,11 +15,11 @@
     }
 
     /* 🌿 Mood-based Themes */
-    .theme-calm         { background-color: #f3f7f4; color: #4C5B52; }
-    .theme-strategic    { background-color: #f1f0ed; color: #2E2E2E; }
-    .theme-reflective   { background-color: #fffefc; color: #3e3e3e; }
-    .theme-bold         { background-color: #fef6ec; color: #5C2F00; }
-    .theme-playful      { background-color: #fff0f7; color: #64204f; }
+    .theme-calm { background-color: #f3f7f4; color: #4C5B52; }
+    .theme-strategic { background-color: #f1f0ed; color: #2E2E2E; }
+    .theme-reflective { background-color: #fffefc; color: #3e3e3e; }
+    .theme-bold { background-color: #fef6ec; color: #5C2F00; }
+    .theme-playful { background-color: #fff0f7; color: #64204f; }
 
     header {
       background: #4CAF50;
@@ -30,11 +27,7 @@
       padding: 1rem 2rem;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 1.6rem;
-    }
-
+    h1 { margin: 0; font-size: 1.6rem; }
     .mindset-tagline {
       padding: 1rem;
       margin: 1rem 2rem;
@@ -42,7 +35,6 @@
       border-left: 4px solid #4CAF50;
       background: #e0f7e9;
       color: #333;
-      transition: all 0.3s ease;
     }
 
     nav.top-nav {
@@ -59,15 +51,12 @@
       color: #333;
       font-weight: 500;
       font-size: 0.95rem;
-      transition: color 0.2s ease;
       cursor: pointer;
       border: none;
       background: none;
     }
 
-    nav.top-nav a:hover, #logoutBtn:hover {
-      color: #4CAF50;
-    }
+    nav.top-nav a:hover, #logoutBtn:hover { color: #4CAF50; }
 
     .zone-grid {
       display: grid;
@@ -83,12 +72,9 @@
       padding: 1.5rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
       cursor: pointer;
-      transition: transform 0.2s ease;
     }
 
-    .zone:hover {
-      transform: translateY(-4px);
-    }
+    .zone:hover { transform: translateY(-4px); }
 
     .floating-cta {
       position: fixed;
@@ -102,7 +88,6 @@
       border-radius: 999px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       cursor: pointer;
-      z-index: 10;
     }
 
     footer {
@@ -140,7 +125,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         // ✅ Fetch API Key from Firebase Cloud Function
-        const response = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+        const response = await fetch("https://YOUR_CLOUD_FUNCTION_URL/getAPIKey");
         const data = await response.json();
 
         if (!data.apiKey) {
@@ -148,7 +133,7 @@
           return;
         }
 
-        // ✅ Initialize Firebase with Retrieved API Key
+        // ✅ Initialize Firebase
         const firebaseConfig = {
           apiKey: data.apiKey,
           authDomain: data.authDomain,
