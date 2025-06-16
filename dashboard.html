@@ -21,6 +21,26 @@
     .theme-bold { background-color: #fef6ec; color: #5C2F00; }
     .theme-playful { background-color: #fff0f7; color: #64204f; }
 
+    /* Mood-based Header + Tagline Themes */
+    .theme-calm header { background: #6B8F71; }
+    .theme-calm .mindset-tagline { background: #e0f7e9; border-left-color: #6B8F71; }
+
+    .theme-strategic header { background: #5D5C61; }
+    .theme-strategic .mindset-tagline { background: #eaeaea; border-left-color: #5D5C61; }
+
+    .theme-reflective header { background: #8D8741; }
+    .theme-reflective .mindset-tagline { background: #fffef0; border-left-color: #8D8741; }
+
+    .theme-bold header { background: #D79922; }
+    .theme-bold .mindset-tagline { background: #fff3df; border-left-color: #D79922; }
+
+    .theme-playful header { background: #FF3CAC; }
+    .theme-playful .mindset-tagline { background: #ffe0f0; border-left-color: #FF3CAC; }
+
+    header, .mindset-tagline {
+      transition: background-color 0.4s ease, border-left-color 0.4s ease;
+    }
+
     header {
       background: #4CAF50;
       color: #fff;
