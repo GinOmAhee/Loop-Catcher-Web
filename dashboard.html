@@ -28,6 +28,7 @@
     }
 
     h1 { margin: 0; font-size: 1.6rem; }
+
     .mindset-tagline {
       padding: 1rem;
       margin: 1rem 2rem;
@@ -118,13 +119,43 @@
 
   <div class="mindset-tagline" id="tagline">“Loading your mood...”</div>
 
+  <div class="zone-grid">
+    <div class="zone" onclick="location.href='holdingbay.html'">
+      <h2>🔄 Holding Bay <span class="count-badge">3</span></h2>
+      <p>For sparks and snippets you’re still shaping.</p>
+    </div>
+
+    <div class="zone" onclick="location.href='actnow.html'">
+      <h2>🚀 Act Now <span class="count-badge">1</span></h2>
+      <p>Your high-priority thoughts, ready to deploy.</p>
+    </div>
+
+    <div class="zone" onclick="location.href='momentum.html'">
+      <h2>🌿 Build Momentum <span class="count-badge">2</span></h2>
+      <p>Mid-tier thoughts gaining traction.</p>
+    </div>
+
+    <div class="zone" onclick="location.href='later.html'">
+      <h2>⏳ Worth It Later <span class="count-badge">4</span></h2>
+      <p>Ideas to come back to when the time’s right.</p>
+    </div>
+
+    <div class="zone" onclick="location.href='parked.html'">
+      <h2>📦 Parked Potential <span class="count-badge">8</span></h2>
+      <p>Concepts that still deserve a corner.</p>
+    </div>
+  </div>
+
+  <button class="floating-cta" onclick="location.href='capture.html'">+ New Thought</button>
+
+  <footer>© 2025 Ginomind · Loop Catcher by Ronette</footer>
+
   <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       try {
-        // ✅ Fetch API Key from Firebase Cloud Function
         const response = await fetch("https://YOUR_CLOUD_FUNCTION_URL/getAPIKey");
         const data = await response.json();
 
@@ -133,7 +164,6 @@
           return;
         }
 
-        // ✅ Initialize Firebase
         const firebaseConfig = {
           apiKey: data.apiKey,
           authDomain: data.authDomain,
@@ -145,7 +175,6 @@
 
         firebase.initializeApp(firebaseConfig);
 
-        // ✅ Attach Logout Function
         const logoutBtn = document.getElementById("logoutBtn");
         if (!logoutBtn) {
           console.warn("⚠️ Logout button not found.");
@@ -161,29 +190,12 @@
           });
         });
 
-        // ✅ Apply Mood-Based Theme
         const emoji = localStorage.getItem("vibeEmoji") || "🌿";
         const label = (localStorage.getItem("vibeLabel") || "").trim();
         const tagline = localStorage.getItem("vibeTagline") || "Let’s start from where you are.";
 
         document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
         document.getElementById("tagline").textContent = `“${tagline}”`;
-
-        const dashboard = document.body;
-        const moodThemeMap = {
-          "Calm & Clear": "theme-calm",
-          "Focused & Strategic": "theme-strategic",
-          "Open & Reflective": "theme-reflective",
-          "Driven & Bold": "theme-bold",
-          "Playful & Inventive": "theme-playful"
-        };
-
-        const themeClass = moodThemeMap[label];
-        if (themeClass) {
-          dashboard.classList.add(themeClass);
-        } else {
-          console.warn("⚠️ No matching theme for:", label);
-        }
       } catch (error) {
         console.error("⚠️ Error fetching API Key:", error);
       }
