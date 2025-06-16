@@ -15,55 +15,21 @@
     }
 
     /* 🌿 Mood-based Themes */
-    .theme-calm { background-color: #f3f7f4; color: #4C5B52; }
-    .theme-strategic { background-color: #f1f0ed; color: #2E2E2E; }
-    .theme-reflective { background-color: #fffefc; color: #3e3e3e; }
-    .theme-bold { background-color: #fef6ec; color: #5C2F00; }
-    .theme-playful { background-color: #fff0f7; color: #64204f; }
-
-    .theme-calm {
-      --header-bg: #6B8F71;
-      --nav-hover-color: #6B8F71;
-      --tagline-border: #6B8F71;
-      --tagline-bg: #edf7f0;
-     }
-
-     .theme-strategic {
-       --header-bg: #5D5C61;
-       --nav-hover-color: #5D5C61;
-       --tagline-border: #5D5C61;
-       --tagline-bg: #f2f1f0;
-     }
-
-     .theme-reflective {
-       --header-bg: #8D8741;
-       --nav-hover-color: #8D8741;
-       --tagline-border: #8D8741;
-       --tagline-bg: #fdfaf0;
-     }
-
-     .theme-bold {
-       --header-bg: #D79922;
-       --nav-hover-color: #D79922;
-       --tagline-border: #D79922;
-       --tagline-bg: #fdf1e3;
-     }
-
-     .theme-playful {
-       --header-bg: #FF3CAC;
-       --nav-hover-color: #FF3CAC;
-       --tagline-border: #FF3CAC;
-       --tagline-bg: #ffe4f1;
-     }
+    .theme-calm { background-color: #f3f7f4; color: #4C5B52; --header-bg: #6B8F71; --nav-hover-color: #6B8F71; --tagline-border: #6B8F71; --tagline-bg: #edf7f0; }
+    .theme-strategic { background-color: #f1f0ed; color: #2E2E2E; --header-bg: #5D5C61; --nav-hover-color: #5D5C61; --tagline-border: #5D5C61; --tagline-bg: #f2f1f0; }
+    .theme-reflective { background-color: #fffefc; color: #3e3e3e; --header-bg: #8D8741; --nav-hover-color: #8D8741; --tagline-border: #8D8741; --tagline-bg: #fdfaf0; }
+    .theme-bold { background-color: #fef6ec; color: #5C2F00; --header-bg: #D79922; --nav-hover-color: #D79922; --tagline-border: #D79922; --tagline-bg: #fdf1e3; }
+    .theme-playful { background-color: #fff0f7; color: #64204f; --header-bg: #FF3CAC; --nav-hover-color: #FF3CAC; --tagline-border: #FF3CAC; --tagline-bg: #ffe4f1; }
 
     header, .mindset-tagline {
       transition: background-color 0.4s ease, border-left-color 0.4s ease;
     }
 
     header {
-      background: var(--header-bg, #4CAF50); /* fallback if theme fails */
+      background: var(--header-bg, #4CAF50);
       color: #fff;
       padding: 1rem 2rem;
+      position: relative;
     }
 
     h1 { margin: 0; font-size: 1.6rem; }
@@ -76,7 +42,7 @@
       background: var(--tagline-bg, #e0f7e9);
       color: #333;
       transition: all 0.3s ease;
-     }
+    }
 
     nav.top-nav {
       display: flex;
@@ -96,7 +62,7 @@
     }
 
     nav.top-nav a:hover {
-      color: var(--nav-hover-color, #4CAF50); /* default fallback to green */
+      color: var(--nav-hover-color, #4CAF50);
     }
 
     .zone-grid {
@@ -155,16 +121,6 @@
       z-index: 10;
     }
 
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.85rem;
-      color: #aaa;
-      background: #fafafa;
-      margin-top: 2rem;
-    }
-
-    /* 👇 Paste this at the bottom of your existing styles */
     .logout-btn {
       background: transparent;
       border: none;
@@ -178,16 +134,24 @@
       opacity: 0.7;
     }
 
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: #aaa;
+      background: #fafafa;
+      margin-top: 2rem;
+    }
   </style>
 </head>
 <body>
 
-  <header style="position: relative;">
-  <h1 id="profileHeader">👋 Welcome back</h1>
-  <div style="position: absolute; top: 1rem; right: 2rem;">
-    <button onclick="logout()" class="logout-btn">🚪 Log Out</button>
-  </div>
-</header>
+  <header>
+    <h1 id="profileHeader">👋 Welcome back</h1>
+    <div style="position: absolute; top: 1rem; right: 2rem;">
+      <button class="logout-btn" onclick="logout()">🚪 Log Out</button>
+    </div>
+  </header>
 
   <nav class="top-nav">
     <a href="profile.html">👤 Profile</a>
@@ -205,22 +169,18 @@
       <h2>🔄 Holding Bay <span class="count-badge">3</span></h2>
       <p>For sparks and snippets you’re still shaping.</p>
     </div>
-
     <div class="zone" onclick="location.href='actnow.html'">
       <h2>🚀 Act Now <span class="count-badge">1</span></h2>
       <p>Your high-priority thoughts, ready to deploy.</p>
     </div>
-
     <div class="zone" onclick="location.href='momentum.html'">
       <h2>🌿 Build Momentum <span class="count-badge">2</span></h2>
       <p>Mid-tier thoughts gaining traction.</p>
     </div>
-
     <div class="zone" onclick="location.href='later.html'">
       <h2>⏳ Worth It Later <span class="count-badge">4</span></h2>
       <p>Ideas to come back to when the time’s right.</p>
     </div>
-
     <div class="zone" onclick="location.href='parked.html'">
       <h2>📦 Parked Potential <span class="count-badge">8</span></h2>
       <p>Concepts that still deserve a corner.</p>
@@ -255,13 +215,13 @@
       } else {
         console.warn("⚠️ No matching theme for:", label);
       }
-        document.querySelector(".logout-btn").addEventListener("click", logout);
-      }
-      function logout() {
-        console.log("🚨 Logout function called");
-        localStorage.clear();
-        window.location.href = "signin.html"; // 🔁 Change to your actual login page
-      }
+    });
+
+    function logout() {
+      console.log("🚨 Logout function called");
+      localStorage.clear();
+      window.location.href = "signin.html"; // redirect to your sign-in page
+    }
   </script>
 </body>
 </html>
