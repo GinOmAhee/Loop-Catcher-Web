@@ -140,17 +140,16 @@
    } else {
      console.warn("No matching mood theme found:", label);
    }
-  };
 
-  const init = async () => {
+    const init = async () => {
     const firebaseConfig = await fetchFirebaseConfig();
     console.log("Firebase Config Loaded:", firebaseConfig);
-
+   
     if (!firebaseConfig) {
       console.error("Firebase initialization aborted due to missing config.");
       return;
     }
-
+  
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
     const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
     const { getAuth, onAuthStateChanged, signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
