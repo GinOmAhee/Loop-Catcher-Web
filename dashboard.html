@@ -60,19 +60,19 @@
     nav.top-nav a:hover, #logoutBtn:hover { color: #4CAF50; }
 
     .zone-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-      padding: 2rem;
+      display: flex; /* If original layout was using flexbox */
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem; /* Reduce spacing */
+      padding: 2rem; /* Restore original padding */
     }
 
     .zone {
-      background: #ffffff;
-      border-left: 6px solid #6B8F71;
-      border-radius: 10px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-      cursor: pointer;
+      width: 200px; /* Adjust width */
+      min-height: 110px; /* Adjust height */
+      border-left: 6px solid #6B8F71; /* Restore original border thickness */
+      padding: 1.2rem; /* Restore padding */
+      box-shadow: 0 3px 6px rgba(0,0,0,0.08); /* Increase depth */
     }
 
     .zone:hover { transform: translateY(-4px); }
