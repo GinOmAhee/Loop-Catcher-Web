@@ -56,7 +56,9 @@
       transition: color 0.2s ease;
     }
 
-    nav.top-nav a:hover { color: #4CAF50; }
+    nav.top-nav a:hover {
+     color: var(--nav-hover-color, #4CAF50); /* Fallback to green if no theme is set */
+    }
 
     .zone-grid {
       display: grid;
@@ -181,7 +183,6 @@
       document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
       document.getElementById("tagline").textContent = `“${tagline}”`;
 
-      const dashboard = document.body;
       const moodThemeMap = {
         "Calm & Clear": "theme-calm",
         "Focused & Strategic": "theme-strategic",
@@ -196,9 +197,6 @@
       } else {
         console.warn("⚠️ No matching theme for:", label);
       }
-      document.addEventListener("DOMContentLoaded", () => {
-      const label = (localStorage.getItem("vibeLabel") || "").trim();
-      const dashboard = document.body;
 
       // 🌿 Dynamic Hover Colors for Themes
      const hoverColors = {
@@ -208,23 +206,6 @@
        "Driven & Bold": "#5C2F00",
        "Playful & Inventive": "#64204f"
       };
-
-      // 🌿 Mood-Based Themes
-      const moodThemeMap = {
-       "Calm & Clear": "theme-calm",
-       "Focused & Strategic": "theme-strategic",
-       "Open & Reflective": "theme-reflective",
-       "Driven & Bold": "theme-bold",
-       "Playful & Inventive": "theme-playful"
-      };
-
-      // ✅ Apply Theme Class to Body
-      const themeClass = moodThemeMap[label];
-      if (themeClass) {
-      dashboard.classList.add(themeClass);
-      } else {
-      console.warn("⚠️ No matching theme for:", label);
-      }
 
       // ✅ Apply Dynamic Hover Color
       const hoverColor = hoverColors[label];
