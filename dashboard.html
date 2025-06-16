@@ -21,28 +21,43 @@
     .theme-bold { background-color: #fef6ec; color: #5C2F00; }
     .theme-playful { background-color: #fff0f7; color: #64204f; }
 
-    /* Mood-based Header + Tagline Themes */
-    .theme-calm header { background: #6B8F71; }
-    .theme-calm .mindset-tagline { background: #e0f7e9; border-left-color: #6B8F71; }
-
-    .theme-strategic header { background: #5D5C61; }
-    .theme-strategic .mindset-tagline { background: #eaeaea; border-left-color: #5D5C61; }
-
-    .theme-reflective header { background: #8D8741; }
-    .theme-reflective .mindset-tagline { background: #fffef0; border-left-color: #8D8741; }
-
-    .theme-bold header { background: #D79922; }
-    .theme-bold .mindset-tagline { background: #fff3df; border-left-color: #D79922; }
-
-    .theme-playful header { background: #FF3CAC; }
-    .theme-playful .mindset-tagline { background: #ffe0f0; border-left-color: #FF3CAC; }
+    .theme-calm {
+      background-color: #f3f7f4;
+      color: #4C5B52;
+      --header-bg: #6B8F71;
+      --nav-hover-color: #6B8F71;
+    }
+    .theme-strategic {
+      background-color: #f1f0ed;
+      color: #2E2E2E;
+      --header-bg: #5D5C61;
+      --nav-hover-color: #5D5C61;
+    }
+    .theme-reflective {
+      background-color: #fffefc;
+      color: #3e3e3e;
+      --header-bg: #8D8741;
+      --nav-hover-color: #8D8741;
+    }
+    .theme-bold {
+      background-color: #fef6ec;
+      color: #5C2F00;
+      --header-bg: #D79922;
+      --nav-hover-color: #D79922;
+    }
+    .theme-playful {
+      background-color: #fff0f7;
+      color: #64204f;
+      --header-bg: #FF3CAC;
+      --nav-hover-color: #FF3CAC;
+    }
 
     header, .mindset-tagline {
       transition: background-color 0.4s ease, border-left-color 0.4s ease;
     }
 
     header {
-      background: #4CAF50;
+      background: var(--header-bg, #4CAF50); /* fallback if theme fails */
       color: #fff;
       padding: 1rem 2rem;
     }
@@ -76,7 +91,9 @@
       transition: color 0.2s ease;
     }
 
-    nav.top-nav a:hover { color: #4CAF50; }
+    nav.top-nav a:hover {
+      color: var(--nav-hover-color, #4CAF50); /* default fallback to green */
+    }
 
     .zone-grid {
       display: grid;
