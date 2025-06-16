@@ -148,7 +148,7 @@
       if (!firebaseConfig) {
         console.error("Firebase initialization aborted due to missing config.");
         return;
-     }
+      }
 
      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
      const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
@@ -204,7 +204,6 @@
    // ✅ Move this line inside the DOMContentLoaded listener
    init();
  });
-
 </script>
 </body>
 </html>
