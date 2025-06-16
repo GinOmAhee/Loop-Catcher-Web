@@ -348,22 +348,23 @@
   }
 
   // 🖱 Manual capture button
-  captureBtn.addEventListener("click", async () => {
-    const entry = thoughtInput.value.trim();
-    if (!entry) return;
+  captureBtn.addEventListener("click", async function handleCaptureClick() {
+  const entry = thoughtInput.value.trim();
+  if (!entry) return;
 
-    try {
-      await addDoc(collection(db, "catchpad"), {
-        content: entry,
-        owner: user.uid,
-        createdAt: serverTimestamp()
-      });
-      window.location.href = "catchpad.html";
-    } catch (error) {
-      console.error("Error saving thought:", error);
-      alert("Oops! Couldn’t save your thought. Try again.");
-    }
-  }, { once: true });
+  try {
+    await addDoc(collection(db, "catchpad"), {
+      content: entry,
+      owner: user.uid,
+      createdAt: serverTimestamp()
+    });
+    window.location.href = "catchpad.html";
+  } catch (error) {
+    console.error("Error saving thought:", error);
+    alert("Oops! Couldn’t save your thought. Try again.");
+  }
+
+  captureBtn.removeEventListener("click", handleCaptureClick);
 });
 
      signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
