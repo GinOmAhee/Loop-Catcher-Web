@@ -175,43 +175,45 @@
   <footer>© 2025 Ginomind · Loop Catcher by Ronette</footer>
 
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const emoji = localStorage.getItem("vibeEmoji") || "🌿";
-      const label = (localStorage.getItem("vibeLabel") || "").trim();
-      const tagline = localStorage.getItem("vibeTagline") || "Let’s start from where you are.";
+  window.addEventListener("DOMContentLoaded", () => {
+    const emoji = localStorage.getItem("vibeEmoji") || "🌿";
+    const label = (localStorage.getItem("vibeLabel") || "").trim();
+    const tagline = localStorage.getItem("vibeTagline") || "Let’s start from where you are.";
+    const dashboard = document.body;
 
-      document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
-      document.getElementById("tagline").textContent = `“${tagline}”`;
+    document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
+    document.getElementById("tagline").textContent = `“${tagline}”`;
 
-      const moodThemeMap = {
-        "Calm & Clear": "theme-calm",
-        "Focused & Strategic": "theme-strategic",
-        "Open & Reflective": "theme-reflective",
-        "Driven & Bold": "theme-bold",
-        "Playful & Inventive": "theme-playful"
-      };
+    // 🌿 Mood-Based Themes
+    const moodThemeMap = {
+      "Calm & Clear": "theme-calm",
+      "Focused & Strategic": "theme-strategic",
+      "Open & Reflective": "theme-reflective",
+      "Driven & Bold": "theme-bold",
+      "Playful & Inventive": "theme-playful"
+    };
 
-      const themeClass = moodThemeMap[label];
-      if (themeClass) {
-        dashboard.classList.add(themeClass);
-      } else {
-        console.warn("⚠️ No matching theme for:", label);
-      }
+    const themeClass = moodThemeMap[label];
+    if (themeClass) {
+      dashboard.classList.add(themeClass);
+    } else {
+      console.warn("⚠️ No matching theme for:", label);
+    }
 
-      // 🌿 Dynamic Hover Colors for Themes
-     const hoverColors = {
-       "Calm & Clear": "#4C5B52",
-       "Focused & Strategic": "#2E2E2E",
-       "Open & Reflective": "#3e3e3e",
-       "Driven & Bold": "#5C2F00",
-       "Playful & Inventive": "#64204f"
-      };
+    // 🌿 Dynamic Hover Colors for Themes
+    const hoverColors = {
+      "Calm & Clear": "#4C5B52",
+      "Focused & Strategic": "#2E2E2E",
+      "Open & Reflective": "#3e3e3e",
+      "Driven & Bold": "#5C2F00",
+      "Playful & Inventive": "#64204f"
+    };
 
-      // ✅ Apply Dynamic Hover Color
-      const hoverColor = hoverColors[label];
-      if (hoverColor) {
-       document.documentElement.style.setProperty("--nav-hover-color", hoverColor);
-     }
+    // ✅ Apply Dynamic Hover Color
+    const hoverColor = hoverColors[label];
+    if (hoverColor) {
+      document.documentElement.style.setProperty("--nav-hover-color", hoverColor);
+    }
   });
 </script>
 </body>
