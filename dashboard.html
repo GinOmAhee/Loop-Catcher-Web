@@ -147,6 +147,7 @@
     <a href="search.html">🔍 Search</a>
     <a href="history.html">👀 Recently Viewed</a>
     <a href="nudges.html">🔔 Nudges</a>
+    <button id="logoutBtn">🚪 Log Out</button>
   </nav>
 
   <div class="mindset-tagline" id="tagline">“Loading your mood...”</div>
@@ -184,32 +185,52 @@
 
   <footer>© 2025 Ginomind · Loop Catcher by Ronette</footer>
 
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const emoji = localStorage.getItem('vibeEmoji') || '🌿';
-      const label = (localStorage.getItem('vibeLabel') || '').trim();
-      const tagline = localStorage.getItem('vibeTagline') || 'Let’s start from where you are.';
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
+<script>
+  // ✅ Initialize Firebase (Update with your actual config)
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+  };
+  firebase.initializeApp(firebaseConfig);
 
-      document.getElementById('profileHeader').textContent = `${emoji} ${label} Mode Activated`;
-      document.getElementById('tagline').textContent = `“${tagline}”`;
+  document.addEventListener("DOMContentLoaded", () => {
+    const emoji = localStorage.getItem("vibeEmoji") || "🌿";
+    const label = (localStorage.getItem("vibeLabel") || "").trim();
+    const tagline = localStorage.getItem("vibeTagline") || "Let’s start from where you are.";
 
-      const dashboard = document.body;
-      const moodThemeMap = {
-        "Calm & Clear": "theme-calm",
-        "Focused & Strategic": "theme-strategic",
-        "Open & Reflective": "theme-reflective",
-        "Driven & Bold": "theme-bold",
-        "Playful & Inventive": "theme-playful"
-      };
+    document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
+    document.getElementById("tagline").textContent = `“${tagline}”`;
 
-      const themeClass = moodThemeMap[label];
-      if (themeClass) {
-        dashboard.classList.add(themeClass);
-      } else {
-        console.warn('⚠️ No matching theme for:', label);
-      }
+    const dashboard = document.body;
+    const moodThemeMap = {
+      "Calm & Clear": "theme-calm",
+      "Focused & Strategic": "theme-strategic",
+      "Open & Reflective": "theme-reflective",
+      "Driven & Bold": "theme-bold",
+      "Playful & Inventive": "theme-playful"
+     };
+
+    const themeClass = moodThemeMap[label];
+    if (themeClass) {
+      dashboard.classList.add(themeClass);
+    } else {
+      console.warn("⚠️ No matching theme for:", label);
+    }
+
+   // ✅ Attach Logout Function
+   document.getElementById("logoutBtn").addEventListener("click", () => {
+    firebase.auth().signOut().then(() => {
+      alert("Logged out successfully!");
+      window.location.href = "signin.html";
+    }).catch((error) => {
+      console.error("Logout Error:", error);
     });
-  </script>
+  });
+});
+</script>
 
 </body>
 </html>
