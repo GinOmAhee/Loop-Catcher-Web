@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet" />
   <style>
-    /* your CSS remains unchanged — clean and beautiful */
+    /* (your CSS here - no changes needed) */
   </style>
 </head>
 <body>
@@ -29,39 +29,33 @@
 
   <script type="module">
     const fetchFirebaseConfig = async () => {
-      try {
-        const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
-        if (!res.ok) throw new Error("Network response was not ok");
-        const config = await res.json();
-        if (!config.projectId) config.projectId = "loop-catcher-firebase";
-        return config;
-      } catch (err) {
-        console.error("Failed to fetch Firebase config:", err);
-        alert("Could not load app config. Try again later.");
-        throw err;
-      }
+      const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+      const config = await res.json();
+      if (!config.projectId) config.projectId = "loop-catcher-firebase";
+      return config;
     };
 
     const init = async () => {
       const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
-      const { getAuth, onAuthStateChanged, signOut } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
+      const { getAuth, signOut } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
 
-      const firebaseConfig = await fetchFirebaseConfig();
-      const app = initializeApp(firebaseConfig);
+      const config = await fetchFirebaseConfig();
+      const app = initializeApp(config);
       const auth = getAuth(app);
 
+      // 🔐 Logout logic
       const logoutBtn = document.getElementById("logoutBtn");
       logoutBtn.addEventListener("click", async () => {
         try {
           await signOut(auth);
           alert("Logged out successfully!");
           window.location.href = "signin.html";
-        } catch (error) {
-          console.error("Logout Error:", error);
+        } catch (err) {
+          console.error("Logout error:", err);
         }
       });
 
-      // 👇 Mood/theme loading
+      // 🎨 Mood & Theme logic
       const emoji = localStorage.getItem("vibeEmoji") || "🌿";
       const label = (localStorage.getItem("vibeLabel") || "").trim();
       const tagline = localStorage.getItem("vibeTagline") || "Let’s start from where you are.";
@@ -69,7 +63,6 @@
       document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
       document.getElementById("tagline").textContent = `“${tagline}”`;
 
-      const dashboard = document.body;
       const moodThemeMap = {
         "Calm & Clear": "theme-calm",
         "Focused & Strategic": "theme-strategic",
@@ -77,13 +70,8 @@
         "Driven & Bold": "theme-bold",
         "Playful & Inventive": "theme-playful"
       };
-
       const themeClass = moodThemeMap[label];
-      if (themeClass) {
-        dashboard.classList.add(themeClass);
-      } else {
-        console.warn("⚠️ No matching theme for:", label);
-      }
+      if (themeClass) document.body.classList.add(themeClass);
     };
 
     init();
