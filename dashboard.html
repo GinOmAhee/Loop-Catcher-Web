@@ -226,11 +226,7 @@
     window.addEventListener("DOMContentLoaded", () => {
       const emoji = localStorage.getItem("vibeEmoji") || "🌿";
       const label = (localStorage.getItem("vibeLabel") || "").trim();
-      const tagline = localStorage.getItem("vibeTagline") || "Let’s start from where you are.";
-      document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
-      document.getElementById("tagline").textContent = `“${tagline}”`;
-
-      const dashboard = document.body;
+  
       const moodThemeMap = {
         "Calm & Clear": "theme-calm",
         "Focused & Strategic": "theme-strategic",
@@ -239,13 +235,25 @@
         "Playful & Inventive": "theme-playful"
       };
 
+      const moodTaglines = {
+        "Calm & Clear": "Let it be light, and let it flow.",
+        "Focused & Strategic": "Precision fuels progress.",
+        "Open & Reflective": "Answers live where questions are welcome.",
+        "Driven & Bold": "No more waiting. You move the needle.",
+        "Playful & Inventive": "Bounce ideas like a kid with crayons."
+      };
+
+      document.getElementById("profileHeader").textContent = `${emoji} ${label} Mode Activated`;
+      document.getElementById("tagline").textContent = `“${moodTaglines[label] || "Let’s start from where you are."}”`;
+
+      const dashboard = document.body;
       const themeClass = moodThemeMap[label];
       if (themeClass) {
         dashboard.classList.add(themeClass);
       } else {
         console.warn("⚠️ No matching theme for:", label);
-      }
-    });
+     }
+   });
 
     function logout() {
       console.log("✅ Logout clicked");
