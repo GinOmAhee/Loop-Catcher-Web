@@ -34,6 +34,21 @@
       background-color: #fff0f7;
       color: #64204f;
     }
+    
+    .mic-btn.listening {
+      border: 2px solid var(--muted-green);
+      box-shadow: 0 0 12px 4px rgba(107, 143, 113, 0.5);
+      background: #84a48f;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .interim-text {
+      margin-top: 1rem;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: #999;
+      min-height: 1.2rem;
+    }
 
     body {
       margin: 0;
@@ -100,7 +115,8 @@
 
     <textarea id="thoughtInput" placeholder="Type your thought…"></textarea>
     <button id="captureBtn">Capture Thought</button>
-    <button id="speakBtn">🎙️ Speak Thought</button>
+    <button id="speakSaveBtn" class="mic-btn">🎙️ Speak & Save</button>
+    <div id="interimTranscript" class="interim-text"></div>
   </div>
 
   <script type="module">
@@ -162,12 +178,6 @@
      console.log("Current user before auth state change:", auth.currentUser);
 
      // 🎙️ VOICE TO TEXT: Setup
-     const speakBtn = document.getElementById("speakBtn");
-
-     if (!('webkitSpeechRecognition' in window)) {
-       speakBtn.style.display = "none"; // Hide if not supported
-       console.warn("SpeechRecognition not supported on this browser");
-     } else {
        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
        const recognition = new SpeechRecognition();
        recognition.lang = 'en-US';
@@ -196,6 +206,15 @@
     recognition.onend = () => {
        speakBtn.textContent = "🎙️ Speak Thought";
     };
+    // Add this in recognition setup
+    recognition.continuous = false; // Keep off for mobile
+    recognition.stopTimeout = setTimeout(() => recognition.stop(), 6000); // ⏱️ ~6 sec buffer
+
+    recognition.onstart = () => {
+    clearTimeout(recognition.stopTimeout);
+    recognition.stopTimeout = setTimeout(() => recognition.stop(), 6000);
+    };
+
   }
 
      auth.onAuthStateChanged(async (user) => {
@@ -213,6 +232,64 @@
        const mainContent = document.getElementById("mainContent");
        const captureBtn = document.getElementById("captureBtn");
        const thoughtInput = document.getElementById("thoughtInput");
+       const speakSaveBtn = document.getElementById("speakSaveBtn");
+       const interimTranscript = document.getElementById("interimTranscript");
+
+       if (!('webkitSpeechRecognition' in window)) {
+         speakSaveBtn.style.display = "none";
+         console.warn("SpeechRecognition not supported");
+       } else {
+         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+         const recognition = new SpeechRecognition();
+         recognition.lang = 'en-US';
+         recognition.interimResults = true;
+         recognition.maxAlternatives = 1;
+         recognition.continuous = false; // Keep false but use workaround below
+
+         let finalTranscript = "";
+
+         speakSaveBtn.addEventListener("click", () => {
+           finalTranscript = "";
+           interimTranscript.textContent = "";
+           recognition.start();
+           speakSaveBtn.textContent = "🎙️ Listening...";
+           speakSaveBtn.classList.add("listening");
+         });
+
+         recognition.onresult = (event) => {
+           let interim = "";
+           for (let i = event.resultIndex; i < event.results.length; ++i) {
+             const res = event.results[i];
+             if (res.isFinal) {
+               finalTranscript += res[0].transcript + " ";
+             } else {
+               interim += res[0].transcript;
+             }
+         }
+         interimTranscript.textContent = interim;
+       };
+
+       recognition.onend = async () => {
+        speakSaveBtn.textContent = "🎙️ Speak & Save";
+        speakSaveBtn.classList.remove("listening");
+
+        if (finalTranscript.trim()) {
+          thoughtInput.value += (thoughtInput.value ? " " : "") + finalTranscript.trim();
+          updateStatus("💾 Saving...");
+          await saveToFirestore(); // Triggers auto-save
+          interimTranscript.textContent = "";
+        } else {
+          interimTranscript.textContent = "No input detected.";
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        speakSaveBtn.textContent = "🎙️ Speak & Save";
+        speakSaveBtn.classList.remove("listening");
+        interimTranscript.textContent = "⚠️ Error: " + event.error;
+      };
+    }
 
        loadingMessage.style.display = "none";
        mainContent.style.display = "block";
