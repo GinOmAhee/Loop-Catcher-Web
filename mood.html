@@ -61,9 +61,14 @@
       max-width: 600px;
       width: 100%;
       z-index: 1;
+      align-items: stretch;
     }
 
     button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       background: white;
       border: 2px solid #ccc;
       border-radius: 10px;
@@ -72,6 +77,19 @@
       cursor: pointer;
       transition: transform 0.1s ease, box-shadow 0.2s ease;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      height: 100%;
+    }
+
+    button .emoji {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    button .label {
+      font-weight: 500;
+      font-size: 1rem;
+      line-height: 1.2;
+      text-align: center;
     }
 
     button:hover {
@@ -144,17 +162,33 @@
   <p><strong>Choose your vibe</strong> 🌀</p>
 
   <div class="mood-options">
-    <button onclick="selectMood('😌','Calm & Clear','Slower pace. Sharper mind.')">😌<br/>Calm & Clear</button>
-    <button onclick="selectMood('🧠','Focused & Strategic','Bringing structure to the swirl.')">🧠<br/>Focused & Strategic</button>
-    <button onclick="selectMood('💭','Open & Reflective','Let’s follow the quiet threads.')">💭<br/>Open & Reflective</button>
-    <button onclick="selectMood('🚀','Driven & Bold','Clarity + momentum. Let’s fly.')">🚀<br/>Driven & Bold</button>
-    <button onclick="selectMood('🎨','Playful & Inventive','Time to remix, wonder, and build.')">🎨<br/>Playful & Inventive</button>
+    <button onclick="selectMood('😌','Calm & Clear','Slower pace. Sharper mind.')">
+      <div class="emoji">😌</div>
+      <div class="label">Calm & Clear</div>
+    </button>
+    <button onclick="selectMood('🧠','Focused & Strategic','Bringing structure to the swirl.')">
+      <div class="emoji">🧠</div>
+      <div class="label">Focused & Strategic</div>
+    </button>
+    <button onclick="selectMood('💭','Open & Reflective','Let’s follow the quiet threads.')">
+      <div class="emoji">💭</div>
+      <div class="label">Open & Reflective</div>
+    </button>
+    <button onclick="selectMood('🚀','Driven & Bold','Clarity + momentum. Let’s fly.')">
+      <div class="emoji">🚀</div>
+      <div class="label">Driven & Bold</div>
+    </button>
+    <button onclick="selectMood('🎨','Playful & Inventive','Time to remix, wonder, and build.')">
+      <div class="emoji">🎨</div>
+      <div class="label">Playful & Inventive</div>
+    </button>
   </div>
 
   <button class="skip" onclick="skipMood()">Skip for now →</button>
+
   <div class="floating-stack">
-  <p class="floating-nudge">💡 Sudden spark? Jot it here — we got you.</p>
-  <button class="floating-cta" onclick="location.href='capture.html'">+ New Thought</button>
+    <p class="floating-nudge">💡 Sudden spark? Jot it here — we got you.</p>
+    <button class="floating-cta" onclick="location.href='capture.html'">+ New Thought</button>
   </div>
 
   <script>
