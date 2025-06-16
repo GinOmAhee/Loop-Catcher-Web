@@ -255,6 +255,8 @@
       } else {
         console.warn("⚠️ No matching theme for:", label);
       }
+        document.querySelector(".logout-btn").addEventListener("click", logout);
+  });
     });
       function logout() {
         console.log("🚨 Logout function called");
