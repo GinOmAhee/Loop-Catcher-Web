@@ -129,81 +129,82 @@
    };
 
    window.addEventListener("DOMContentLoaded", () => {
-   const label = (localStorage.getItem("vibeLabel") || "").trim();
-   const themeClass = moodThemeMap[label];
+    const label = (localStorage.getItem("vibeLabel") || "").trim();
+    const themeClass = moodThemeMap[label];
 
-   const moodLabelEl = document.getElementById("moodLabel");
-   if (moodLabelEl && label) moodLabelEl.textContent = `${label} Mode`;
+    const moodLabelEl = document.getElementById("moodLabel");
+    if (moodLabelEl && label) moodLabelEl.textContent = `${label} Mode`;
 
-   if (themeClass) {
-     document.body.classList.add(themeClass);
-   } else {
-     console.warn("No matching mood theme found:", label);
-   }
+    if (themeClass) {
+      document.body.classList.add(themeClass);
+    } else {
+      console.warn("No matching mood theme found:", label);
+    }
 
     const init = async () => {
-    const firebaseConfig = await fetchFirebaseConfig();
-    console.log("Firebase Config Loaded:", firebaseConfig);
-   
-    if (!firebaseConfig) {
-      console.error("Firebase initialization aborted due to missing config.");
-      return;
-    }
-  
-    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
-    const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
-    const { getAuth, onAuthStateChanged, signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
+      const firebaseConfig = await fetchFirebaseConfig();
+      console.log("Firebase Config Loaded:", firebaseConfig);
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    console.log("Current user before auth state change:", auth.currentUser);
-
-    auth.onAuthStateChanged(async (user) => {
-      console.log("User state before reload:", user);
-      if (user) {
-        await user.reload();
-        console.log("User after reload:", user);
-      } else {
-        window.location.href = "signin.html"; // ✅ Fix: Move inside auth state listener
+      if (!firebaseConfig) {
+        console.error("Firebase initialization aborted due to missing config.");
         return;
-      }
+     }
 
-      // ✅ User is logged in
-      const loadingMessage = document.getElementById("loadingMessage");
-      const mainContent = document.getElementById("mainContent");
-      const captureBtn = document.getElementById("captureBtn");
+     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
+     const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
+     const { getAuth, onAuthStateChanged, signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
 
-      loadingMessage.style.display = "none";
-      mainContent.style.display = "block";
+     const app = initializeApp(firebaseConfig);
+     const db = getFirestore(app);
+     const auth = getAuth(app);
 
-      captureBtn.addEventListener("click", async () => {
-        const entry = document.getElementById("thoughtInput").value.trim();
-        if (!entry) return;
+     console.log("Current user before auth state change:", auth.currentUser);
 
-        try {
-          await addDoc(collection(db, "catchpad"), {
-            content: entry,
-            owner: user.uid,
-            createdAt: serverTimestamp()
-          });
+     auth.onAuthStateChanged(async (user) => {
+       console.log("User state before reload:", user);
+       if (user) {
+         await user.reload();
+         console.log("User after reload:", user);
+       } else {
+         window.location.href = "signin.html";
+         return;
+       }
 
-          window.location.href = "catchpad.html";
-        } catch (error) {
-          console.error("Error saving thought:", error);
-          alert("Oops! Couldn’t save your thought. Try again.");
-        }
-      }, { once: true });
-    });
+       const loadingMessage = document.getElementById("loadingMessage");
+       const mainContent = document.getElementById("mainContent");
+       const captureBtn = document.getElementById("captureBtn");
 
-    // ✅ Fix: Test sign-in correctly inside init()
-    signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
-      .then((userCredential) => console.log("Login successful:", userCredential.user))
-      .catch((error) => console.error("Login failed:", error));
-  };
+       loadingMessage.style.display = "none";
+       mainContent.style.display = "block";
 
-  init();
+       captureBtn.addEventListener("click", async () => {
+         const entry = document.getElementById("thoughtInput").value.trim();
+         if (!entry) return;
+
+         try {
+           await addDoc(collection(db, "catchpad"), {
+             content: entry,
+             owner: user.uid,
+             createdAt: serverTimestamp()
+           });
+
+           window.location.href = "catchpad.html";
+         } catch (error) {
+           console.error("Error saving thought:", error);
+           alert("Oops! Couldn’t save your thought. Try again.");
+         }
+       }, { once: true });
+     });
+
+     signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
+       .then((userCredential) => console.log("Login successful:", userCredential.user))
+       .catch((error) => console.error("Login failed:", error));
+   };
+
+   // ✅ Move this line inside the DOMContentLoaded listener
+   init();
+ });
+
 </script>
 </body>
 </html>
