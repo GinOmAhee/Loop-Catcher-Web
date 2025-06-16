@@ -196,42 +196,41 @@
       } else {
         console.warn("⚠️ No matching theme for:", label);
       }
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const label = (localStorage.getItem("vibeLabel") || "").trim();
-    const dashboard = document.body;
+      document.addEventListener("DOMContentLoaded", () => {
+      const label = (localStorage.getItem("vibeLabel") || "").trim();
+      const dashboard = document.body;
 
-    // 🌿 Dynamic Hover Colors for Themes
-    const hoverColors = {
-      "Calm & Clear": "#4C5B52",
-      "Focused & Strategic": "#2E2E2E",
-      "Open & Reflective": "#3e3e3e",
-      "Driven & Bold": "#5C2F00",
-      "Playful & Inventive": "#64204f"
-    };
+      // 🌿 Dynamic Hover Colors for Themes
+     const hoverColors = {
+       "Calm & Clear": "#4C5B52",
+       "Focused & Strategic": "#2E2E2E",
+       "Open & Reflective": "#3e3e3e",
+       "Driven & Bold": "#5C2F00",
+       "Playful & Inventive": "#64204f"
+      };
 
-    // 🌿 Mood-Based Themes
-    const moodThemeMap = {
-      "Calm & Clear": "theme-calm",
-      "Focused & Strategic": "theme-strategic",
-      "Open & Reflective": "theme-reflective",
-      "Driven & Bold": "theme-bold",
-      "Playful & Inventive": "theme-playful"
-    };
+      // 🌿 Mood-Based Themes
+      const moodThemeMap = {
+       "Calm & Clear": "theme-calm",
+       "Focused & Strategic": "theme-strategic",
+       "Open & Reflective": "theme-reflective",
+       "Driven & Bold": "theme-bold",
+       "Playful & Inventive": "theme-playful"
+      };
 
-    // ✅ Apply Theme Class to Body
-    const themeClass = moodThemeMap[label];
-    if (themeClass) {
+      // ✅ Apply Theme Class to Body
+      const themeClass = moodThemeMap[label];
+      if (themeClass) {
       dashboard.classList.add(themeClass);
-    } else {
+      } else {
       console.warn("⚠️ No matching theme for:", label);
-    }
+      }
 
-    // ✅ Apply Dynamic Hover Color
-    const hoverColor = hoverColors[label];
-    if (hoverColor) {
-      document.documentElement.style.setProperty("--nav-hover-color", hoverColor);
-    }
+      // ✅ Apply Dynamic Hover Color
+      const hoverColor = hoverColors[label];
+      if (hoverColor) {
+       document.documentElement.style.setProperty("--nav-hover-color", hoverColor);
+     }
   });
 </script>
 </body>
