@@ -373,7 +373,6 @@
      signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
        .then((userCredential) => console.log("Login successful:", userCredential.user))
        .catch((error) => console.error("Login failed:", error));
-   };
 
    // ✅ Move this line inside the DOMContentLoaded listener
    init();
