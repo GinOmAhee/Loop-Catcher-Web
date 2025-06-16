@@ -170,31 +170,86 @@
          return;
        }
 
+       // 👉 SHOW THE MAIN UI
        const loadingMessage = document.getElementById("loadingMessage");
        const mainContent = document.getElementById("mainContent");
        const captureBtn = document.getElementById("captureBtn");
+       const thoughtInput = document.getElementById("thoughtInput");
 
        loadingMessage.style.display = "none";
        mainContent.style.display = "block";
 
-       captureBtn.addEventListener("click", async () => {
-         const entry = document.getElementById("thoughtInput").value.trim();
-         if (!entry) return;
+       // ✅ AUTOSAVE SECTION STARTS HERE
+       const statusEl = document.createElement("div");
+       statusEl.style.fontSize = "0.8rem";
+       statusEl.style.marginTop = "0.5rem";
+       statusEl.style.color = "#888";
+       thoughtInput.insertAdjacentElement("afterend", statusEl);
+
+       const draftKey = `draft-${user.uid}`;
+       let saveTimeout;
+       let lastSavedAt = null;
+
+       const updateStatus = (text) => {
+         statusEl.textContent = text;
+       };
+
+       const saveToFirestore = async () => {
+         const content = thoughtInput.value.trim();
+         if (!content) return;
 
          try {
            await addDoc(collection(db, "catchpad"), {
-             content: entry,
+             content,
              owner: user.uid,
              createdAt: serverTimestamp()
            });
-
-           window.location.href = "catchpad.html";
-         } catch (error) {
-           console.error("Error saving thought:", error);
-           alert("Oops! Couldn’t save your thought. Try again.");
+           const now = new Date();
+           lastSavedAt = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+           updateStatus(`✅ Saved ✓ at ${lastSavedAt}`);
+           localStorage.setItem(draftKey, content);
+         } catch (err) {
+           console.error("Firestore save failed:", err);
+           updateStatus("⚠️ Offline — will retry later");
+           localStorage.setItem(draftKey, content);
          }
-       }, { once: true });
-     });
+      };
+
+  // ⌨️ Auto-save every few keystrokes
+  thoughtInput.addEventListener("input", () => {
+    updateStatus("💾 Saving...");
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(saveToFirestore, 1500);
+  });
+
+  // 🧠 Restore from localStorage if tab reloads
+  const savedDraft = localStorage.getItem(draftKey);
+  if (savedDraft && !thoughtInput.value.trim()) {
+    const restore = confirm("Restore previous unsaved thought?");
+    if (restore) {
+      thoughtInput.value = savedDraft;
+      updateStatus("💡 Restored draft from backup");
+    }
+  }
+
+  // 🖱 Manual capture button
+  captureBtn.addEventListener("click", async () => {
+    const entry = thoughtInput.value.trim();
+    if (!entry) return;
+
+    try {
+      await addDoc(collection(db, "catchpad"), {
+        content: entry,
+        owner: user.uid,
+        createdAt: serverTimestamp()
+      });
+      window.location.href = "catchpad.html";
+    } catch (error) {
+      console.error("Error saving thought:", error);
+      alert("Oops! Couldn’t save your thought. Try again.");
+    }
+  }, { once: true });
+});
 
      signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
        .then((userCredential) => console.log("Login successful:", userCredential.user))
