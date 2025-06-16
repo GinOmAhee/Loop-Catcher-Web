@@ -10,6 +10,30 @@
       --soft-plum: #774C64;
       --muted-green: #6B8F71;
     }
+    .theme-calm {
+      background-color: #f3f7f4;
+      color: #4C5B52;
+    }
+
+    .theme-strategic {
+      background-color: #f1f0ed;
+      color: #2E2E2E;
+    }
+
+    .theme-reflective {
+      background-color: #fffefc;
+      color: #3e3e3e;
+    }
+
+    .theme-bold {
+      background-color: #fef6ec;
+      color: #5C2F00;
+    }
+
+    .theme-playful {
+      background-color: #fff0f7;
+      color: #64204f;
+    }
 
     body {
       margin: 0;
@@ -71,6 +95,7 @@
 
   <div id="mainContent" style="display: none;">
     <h2>+ New Thought</h2>
+    <p id="moodLabel" style="font-size: 0.9rem; margin-bottom: 1.2rem; color: inherit;"></p>
     <p class="nudge">💡 Sudden spark? Jot it here — we got you.</p>
 
     <textarea id="thoughtInput" placeholder="Type your thought…"></textarea>
@@ -93,6 +118,28 @@
       return null; // Prevents Firebase initialization with incomplete data
     }
   };
+
+   // 🌈 Mood Mirror Logic
+   const moodThemeMap = {
+     "Calm & Clear": "theme-calm",
+     "Focused & Strategic": "theme-strategic",
+     "Open & Reflective": "theme-reflective",
+     "Driven & Bold": "theme-bold",
+     "Playful & Inventive": "theme-playful"
+   };
+
+   window.addEventListener("DOMContentLoaded", () => {
+   const label = (localStorage.getItem("vibeLabel") || "").trim();
+   const themeClass = moodThemeMap[label];
+
+   const moodLabelEl = document.getElementById("moodLabel");
+   if (moodLabelEl && label) moodLabelEl.textContent = `${label} Mode`;
+
+   if (themeClass) {
+     document.body.classList.add(themeClass);
+   } else {
+     console.warn("No matching mood theme found:", label);
+   }
 
   const init = async () => {
     const firebaseConfig = await fetchFirebaseConfig();
