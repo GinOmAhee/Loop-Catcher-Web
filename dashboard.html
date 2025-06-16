@@ -163,6 +163,21 @@
       background: #fafafa;
       margin-top: 2rem;
     }
+
+    /* 👇 Paste this at the bottom of your existing styles */
+    .logout-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      opacity: 0.7;
+    }
+
   </style>
 </head>
 <body>
@@ -170,9 +185,7 @@
   <header style="position: relative;">
   <h1 id="profileHeader">👋 Welcome back</h1>
   <div style="position: absolute; top: 1rem; right: 2rem;">
-    <button onclick="logout()" style="background: transparent; border: none; color: #fff; font-weight: bold; cursor: pointer;">
-      🚪 Log Out
-    </button>
+    <button onclick="logout()" class="logout-btn">🚪 Log Out</button>
   </div>
 </header>
 
