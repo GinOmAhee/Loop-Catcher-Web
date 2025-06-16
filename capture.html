@@ -79,61 +79,71 @@
 
   <script type="module">
   const fetchFirebaseConfig = async () => {
-    try {
-      const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
-      const config = await res.json();
-      return config;
-    } catch (err) {
-      console.error("Failed to fetch Firebase config:", err);
-      alert("Could not load app config. Try again later.");
+  try {
+    const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+    const config = await res.json();
+
+    if (!config.projectId) {
+      throw new Error("Missing projectId in Firebase config.");
     }
-  };
+
+    return config;
+  } catch (err) {
+    console.error("Failed to fetch Firebase config:", err);
+    alert("Could not load app config. Try again later.");
+    return null; // Prevents Firebase initialization with incomplete data
+  }
+};
 
   const init = async () => {
-    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
-    const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
-    const { getAuth, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
-
-    const firebaseConfig = await fetchFirebaseConfig();
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    onAuthStateChanged(auth, (user) => {
-  const loadingMessage = document.getElementById("loadingMessage");
-  const mainContent = document.getElementById("mainContent");
-  const captureBtn = document.getElementById("captureBtn");
-
-  if (!user) {
-    window.location.href = "signin.html";
+  const firebaseConfig = await fetchFirebaseConfig();
+  
+  if (!firebaseConfig) {
+    console.error("Firebase initialization aborted due to missing config.");
     return;
   }
 
-  // ✅ User is logged in
-  loadingMessage.style.display = "none";
-  mainContent.style.display = "block";
+  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
+  const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
+  const { getAuth, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
 
-  // Move the click listener outside the onAuthStateChanged to prevent multiple bindings
-  captureBtn.addEventListener("click", async () => {
-    const entry = document.getElementById("thoughtInput").value.trim();
-    if (!entry) return;
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
 
-    try {
-      await addDoc(collection(db, "catchpad"), {
-        content: entry,
-        owner: user.uid,
-        createdAt: serverTimestamp()
-      });
+  onAuthStateChanged(auth, (user) => {
+    const loadingMessage = document.getElementById("loadingMessage");
+    const mainContent = document.getElementById("mainContent");
+    const captureBtn = document.getElementById("captureBtn");
 
-      window.location.href = "catchpad.html";
-    } catch (error) {
-      console.error("Error saving thought:", error);
-      alert("Oops! Couldn’t save your thought. Try again.");
+    if (!user) {
+      window.location.href = "signin.html";
+      return;
     }
-  }, { once: true }); // ⚠️ optional safeguard: only attach once
-});
-  };
 
+    // ✅ User is logged in
+    loadingMessage.style.display = "none";
+    mainContent.style.display = "block";
+
+    captureBtn.addEventListener("click", async () => {
+      const entry = document.getElementById("thoughtInput").value.trim();
+      if (!entry) return;
+
+      try {
+        await addDoc(collection(db, "catchpad"), {
+          content: entry,
+          owner: user.uid,
+          createdAt: serverTimestamp()
+        });
+
+        window.location.href = "catchpad.html";
+      } catch (error) {
+        console.error("Error saving thought:", error);
+        alert("Oops! Couldn’t save your thought. Try again.");
+      }
+    }, { once: true });
+  });
+};
   init();
 </script>
 </body>
