@@ -2,181 +2,207 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catchpad+ Preview</title>
-  <link rel="icon" href="data:,">
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🪄 New Thought</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 2rem;
-      color: #333;
+    :root {
+      --natural-beige: #f5f1e8;
+      --soft-plum: #774C64;
+      --muted-green: #6B8F71;
     }
-    .mood-happy { background-color: #fff7e6; }
-    .mood-sad { background-color: #f0f0ff; }
-    .mood-inspired { background-color: #e6fff2; }
+
+    .theme-calm {
+      background-color: #f3f7f4;
+      color: #4C5B52;
+    }
+
+    .theme-strategic {
+      background-color: #f1f0ed;
+      color: #2E2E2E;
+    }
+
+    .theme-reflective {
+      background-color: #fffefc;
+      color: #3e3e3e;
+    }
+
+    .theme-bold {
+      background-color: #fef6ec;
+      color: #5C2F00;
+    }
+
+    .theme-playful {
+      background-color: #fff0f7;
+      color: #64204f;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--natural-beige);
+      color: var(--soft-plum);
+      padding: 1rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .nudge {
+      font-style: italic;
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+
     textarea {
       width: 100%;
+      height: 140px;
       padding: 1rem;
       font-size: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      resize: vertical;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    button {
+      margin: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      background: var(--muted-green);
+      color: white;
+      border: none;
       border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .filters {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      width: 100%;
+    }
+
+    .filters input[type="search"], .filters select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
       border: 1px solid #ccc;
     }
-    button {
-      margin: 1rem 0.5rem 0 0;
-      padding: 0.6rem 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background-color: #333;
-      color: white;
-    }
-    #previewWrapper {
+
+    .entry-preview {
+      width: 100%;
       background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 12px;
       padding: 1rem;
-      margin-top: 2rem;
+      border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
-  <div id="mainLayout" style="max-width: 800px; margin: auto;">
-    <textarea id="noteArea" placeholder="Start capturing..."></textarea><br>
-    <select id="moodSelector">
-      <option value="">Select Mood</option>
-      <option value="happy">Happy</option>
-      <option value="sad">Sad</option>
-      <option value="inspired">Inspired</option>
-    </select>
-    <button id="saveBtn">Save</button>
-    <button id="voiceBtn">🎙️ Voice</button>
-    <span id="status"></span>
+  <div class="container" id="mainContent">
+    <h2>+ New Thought</h2>
+    <p id="moodLabel" class="nudge"></p>
+    <p class="nudge">💡 Sudden spark? Jot it here — we got you.</p>
 
-    <!-- Smart Preview UI -->
-    <div id="previewWrapper">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-        <input type="text" id="searchBar" placeholder="🔍 Search..." style="flex: 1; padding: 0.6rem; font-size: 1rem;">
-        <select id="groupBySelect" style="padding: 0.6rem;">
-          <option value="date">📅 Group by Date</option>
-          <option value="project">📌 Group by Project</option>
-        </select>
-      </div>
-      <div id="entriesContainer"></div>
+    <textarea id="thoughtInput" placeholder="Type your thought…"></textarea>
+    <div>
+      <button id="captureBtn">Capture Thought</button>
+      <button id="speakBtn">🎙️ Speak Thought</button>
+    </div>
+    <div class="filters">
+      <input type="search" placeholder="🔍 Search thoughts..." />
+      <select>
+        <option selected>📅 Group by: Date</option>
+        <option>📌 Group by: Project</option>
+      </select>
+      <select>
+        <option>🎭 Mood</option>
+        <option>🧠 Mental State</option>
+        <option>🎨 Sketch vs Text</option>
+      </select>
+    </div>
+    <div class="entry-preview">
+      <h3>🗓️ Today</h3>
+      <p>✏️ “Instagram carousel hook idea…”</p>
+      <p>🎨 Sketch: “Self-trust visual map”</p>
     </div>
   </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID"
+  <script type="module">
+    const moodThemeMap = {
+      "Calm & Clear": "theme-calm",
+      "Focused & Strategic": "theme-strategic",
+      "Open & Reflective": "theme-reflective",
+      "Driven & Bold": "theme-bold",
+      "Playful & Inventive": "theme-playful"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
 
-    const noteArea = document.getElementById("noteArea");
-    const saveBtn = document.getElementById("saveBtn");
-    const voiceBtn = document.getElementById("voiceBtn");
-    const status = document.getElementById("status");
-    const moodSelector = document.getElementById("moodSelector");
+    const moodLabel = (localStorage.getItem("vibeLabel") || "").trim();
+    const themeClass = moodThemeMap[moodLabel];
 
-    moodSelector.addEventListener("change", () => {
-      document.body.className = "mood-" + moodSelector.value;
-    });
+    if (themeClass) {
+      document.body.classList.add(themeClass);
+      document.getElementById("moodLabel").textContent = `${moodLabel} Mode`;
+    }
 
-    let recognition;
+    const speakBtn = document.getElementById("speakBtn");
+    const thoughtInput = document.getElementById("thoughtInput");
+
     if ('webkitSpeechRecognition' in window) {
-      recognition = new webkitSpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
       recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
 
-      recognition.onresult = (e) => {
-        noteArea.value += e.results[0][0].transcript + " ";
-      };
-    }
-
-    voiceBtn.onclick = () => recognition && recognition.start();
-
-    saveBtn.onclick = async () => {
-      const content = noteArea.value.trim();
-      if (!content) return;
-      const mood = moodSelector.value;
-      const createdAt = new Date();
-      const owner = auth.currentUser?.uid || "anon";
-
-      await db.collection("catchpad").add({ content, mood, createdAt, owner });
-      status.textContent = "Saved at " + createdAt.toLocaleTimeString();
-      noteArea.value = "";
-    };
-
-    async function fetchEntries(uid) {
-      const q = db.collection("catchpad").where("owner", "==", uid).orderBy("createdAt", "desc");
-      const snapshot = await q.get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt.toDate() }));
-    }
-
-    function groupByDate(entries) {
-      const groups = {};
-      entries.forEach(entry => {
-        const d = entry.createdAt.toDateString();
-        if (!groups[d]) groups[d] = [];
-        groups[d].push(entry);
+      speakBtn.addEventListener("click", () => {
+        recognition.start();
+        speakBtn.textContent = "🎙️ Listening...";
       });
-      return groups;
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        thoughtInput.value += (thoughtInput.value ? " " : "") + transcript;
+        speakBtn.textContent = "🎙️ Speak Thought";
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        alert("Speech error: " + event.error);
+        speakBtn.textContent = "🎙️ Speak Thought";
+      };
+
+      recognition.onend = () => {
+        speakBtn.textContent = "🎙️ Speak Thought";
+      };
+    } else {
+      speakBtn.style.display = "none";
     }
 
-    function renderEntries(grouped) {
-      const container = document.getElementById("entriesContainer");
-      container.innerHTML = "";
-      for (const [date, items] of Object.entries(grouped)) {
-        const sec = document.createElement("div");
-        sec.innerHTML = `<h3>🗓️ ${date}</h3>`;
-        items.forEach(e => {
-          const emoji = e.type === "sketch" ? "🎨" : e.type === "brainstorm" ? "🧠" : "✏️";
-          const div = document.createElement("div");
-          div.style = "padding: 0.5rem 0; border-bottom: 1px solid #ddd;";
-          div.textContent = `- ${emoji} ${e.content.slice(0, 100)}${e.content.length > 100 ? "…" : ""}`;
-          sec.appendChild(div);
-        });
-        container.appendChild(sec);
-      }
-    }
+    // Timestamp + Save simulation
+    const captureBtn = document.getElementById("captureBtn");
+    captureBtn.addEventListener("click", () => {
+      const content = thoughtInput.value.trim();
+      if (!content) return alert("Type something first");
 
-    document.getElementById("groupBySelect").addEventListener("change", async (e) => {
-      if (e.target.value === "project") {
-        alert("Project grouping coming soon");
-      } else {
-        const user = auth.currentUser;
-        if (user) {
-          const entries = await fetchEntries(user.uid);
-          renderEntries(groupByDate(entries));
-        }
-      }
-    });
-
-    document.getElementById("searchBar").addEventListener("input", async (e) => {
-      const query = e.target.value.toLowerCase();
-      const user = auth.currentUser;
-      if (user) {
-        const entries = await fetchEntries(user.uid);
-        const filtered = entries.filter(entry => entry.content.toLowerCase().includes(query));
-        renderEntries(groupByDate(filtered));
-      }
-    });
-
-    auth.onAuthStateChanged(async user => {
-      if (user) {
-        const entries = await fetchEntries(user.uid);
-        renderEntries(groupByDate(entries));
-      }
+      const now = new Date();
+      const timestamp = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      alert(`Thought saved at ${timestamp}`);
     });
   </script>
 </body>
