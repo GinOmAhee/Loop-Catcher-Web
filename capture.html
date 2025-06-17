@@ -103,6 +103,26 @@
       flex-grow: 1;
     }
 
+    .preview-sortbar {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .preview-sortbar label {
+      font-size: 1rem;
+    }
+
+    .preview-sortbar select {
+      font-size: 1rem;
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+
     #previewToggle {
       position: absolute;
       left: 1rem;
@@ -135,31 +155,6 @@
       background: none;
       border: none;
       color: red;
-      cursor: pointer;
-    }
-
-    .preview-sortbar {
-      display: flex;
-      align-items: center;
-      padding: 0;
-      margin: 0;
-      background: none;
-      border: none;
-      font-size: inherit;
-      color: inherit;
-    }
-
-    .preview-sortbar label {
-      font-size: inherit;
-      font-weight: normal;
-      margin-right: 0.5rem;
-    }
-
-    .preview-sortbar select {
-      font-size: inherit;
-      background: none;
-      border: none;
-      color: inherit;
       cursor: pointer;
     }
 
@@ -202,7 +197,7 @@
 
       <div class="preview-content">
         <div class="preview-sortbar">
-          <label for="groupSelector">Group by ▼</label>
+          <label for="groupSelector">Group by</label>
           <select id="groupSelector" onchange="updateGrouping()">
             <option value="date">Date</option>
             <option value="project">Project</option>
@@ -367,32 +362,13 @@
       let html = '';
 
       if (value === 'project') {
-        html = `
-          <div>🗂️ Group by Project
-            <ul>
-              <li>🔁 AI Suggests: Relevant to: Ginomahee</li>
-              <li>✍️ “Does This Resonate? prompt idea”</li>
-              <li>🎨 Wireframe sketch: Self-awareness UI</li>
-            </ul>
-          </div>`;
+        html = `<div>🗂️ Group by Project<ul><li>🔁 AI Suggests: Relevant to: Ginomahee</li><li>✍️ “Does This Resonate? prompt idea”</li><li>🎨 Wireframe sketch: Self-awareness UI</li></ul></div>`;
       } else if (value === 'unresolved') {
         html = `<div>✨ Last 5 unresolved ideas</div>`;
       } else if (value === 'forgotten') {
         html = `<div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>`;
       } else {
-        html = `
-          <div>🗓️ Today
-            <ul>
-              <li>✏️ Instagram carousel hook idea…</li>
-              <li>🎨 Sketch: Self-trust visual map</li>
-            </ul>
-          </div>
-          <div>🗓️ This Week
-            <ul>
-              <li>🤖 How to automate feedback loop…</li>
-              <li>🧠 Brainstorm: Book subtitle variants</li>
-            </ul>
-          </div>`;
+        html = `<div>🗓️ Today<ul><li>✏️ Instagram carousel hook idea…</li><li>🎨 Sketch: Self-trust visual map</li></ul></div><div>🗓️ This Week<ul><li>🤖 How to automate feedback loop…</li><li>🧠 Brainstorm: Book subtitle variants</li></ul></div>`;
       }
 
       groupedNotes.innerHTML = html;
