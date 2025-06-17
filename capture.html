@@ -68,6 +68,7 @@
       display: flex;
       gap: 1rem;
       margin-top: 1rem;
+      align-items: center;
     }
 
     .controls button {
@@ -138,6 +139,18 @@
       left: 1rem;
       top: 1rem;
     }
+
+    #attachedFilesList {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #444;
+      max-width: 60%;
+      word-wrap: break-word;
+    }
+
+    #attachedFilesList ul {
+      padding-left: 1.2rem;
+    }
   </style>
 </head>
 <body>
@@ -186,7 +199,10 @@
       <div class="controls">
         <button onclick="saveText()">💾 Save</button>
         <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
+        <button onclick="document.getElementById('fileInput').click()">📎 Attach File</button>
+        <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileAttachment()" />
       </div>
+      <div id="attachedFilesList"></div>
       <div class="save-time" id="saveStatus"></div>
     </div>
   </div>
@@ -196,6 +212,7 @@
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
     const textarea = document.getElementById('mainText');
+    const attachedFilesList = document.getElementById('attachedFilesList');
     let recognition;
     let isRecording = false;
 
@@ -227,8 +244,10 @@
     function loadSavedText() {
       const saved = localStorage.getItem('capturedText');
       const lastSaved = localStorage.getItem('lastSaved');
+      const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
       if (saved) textarea.value = saved;
       if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+      updateFileDisplay(attached);
     }
 
     function toggleVoiceCapture() {
@@ -283,6 +302,24 @@
       saveStatus.innerText = "🎤 Voice capture stopped.";
     }
 
+    function handleFileAttachment() {
+      const input = document.getElementById('fileInput');
+      const files = Array.from(input.files);
+      const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
+      const updated = stored.concat(files.map(file => file.name));
+      localStorage.setItem('attachedFiles', JSON.stringify(updated));
+      updateFileDisplay(updated);
+      input.value = ''; // reset for re-upload
+    }
+
+    function updateFileDisplay(fileList) {
+      if (fileList.length === 0) {
+        attachedFilesList.innerHTML = '';
+        return;
+      }
+      attachedFilesList.innerHTML = `<strong>📎 Attached Files:</strong><ul>${fileList.map(f => `<li>${f}</li>`).join('')}</ul>`;
+    }
+
     const moodThemeMap = {
       "Calm & Clear": "theme-calm",
       "Focused & Strategic": "theme-strategic",
@@ -302,7 +339,7 @@
     window.onload = function () {
       loadSavedText();
       applyMoodTheme();
-      setInterval(autoSave, 30000); // ← auto save every 30 seconds
+      setInterval(autoSave, 30000);
     };
   </script>
 </body>
