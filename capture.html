@@ -39,18 +39,29 @@
       display: flex;
       gap: 1rem;
       margin-top: 1rem;
+      align-items: center;
     }
-    .controls button {
+    .controls button, .controls label {
       padding: 0.5rem 1rem;
       font-size: 1rem;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      background: #fff;
+      border: 1px solid #ccc;
+    }
+    .controls input[type="file"] {
+      display: none;
     }
     .save-time {
       margin-top: 1rem;
       font-size: 0.9rem;
       color: #666;
+    }
+    .attachment-name {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #444;
     }
     .preview-overlay {
       width: 350px;
@@ -140,13 +151,19 @@
         <a href="settings.html">⚙️ Settings</a>
       </div>
     </div>
+
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <textarea id="mainText" placeholder="Start capturing..."></textarea>
       <div class="controls">
         <button onclick="saveText()">💾 Save</button>
         <button onclick="startVoiceCapture()">🎤 Voice</button>
+
+        <!-- 📎 File Attachment -->
+        <label for="fileInput">📎</label>
+        <input type="file" id="fileInput" onchange="handleFile()" />
       </div>
+      <div class="attachment-name" id="attachedFileName"></div>
       <div class="save-time" id="saveStatus"></div>
     </div>
   </div>
@@ -156,6 +173,7 @@
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
     const textarea = document.getElementById('mainText');
+    const fileNameDisplay = document.getElementById('attachedFileName');
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -208,6 +226,255 @@
         }
         textarea.value += (textarea.value ? '\n' : '') + transcript.trim();
       };
+    }
+
+    function handleFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      if (file) {
+        fileNameDisplay.textContent = `📎 Attached: ${file.name}`;
+      }
+    }
+  </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capture UI</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f0f0;
+      color: #333;
+    }
+    .main-container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .editor-area {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+    }
+    textarea {
+      width: 60%;
+      height: 300px;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: none;
+    }
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      align-items: center;
+    }
+    .controls button, .controls label {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #fff;
+      border: 1px solid #ccc;
+    }
+    .controls input[type="file"] {
+      display: none;
+    }
+    .save-time {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .attachment-name {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #444;
+    }
+    .preview-overlay {
+      width: 350px;
+      background: #fff;
+      border-right: 1px solid #ccc;
+      overflow-y: auto;
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      display: none;
+      flex-direction: column;
+      z-index: 100;
+    }
+    .preview-top, .preview-bottom {
+      padding: 1rem;
+      background: #fafafa;
+      border-bottom: 1px solid #ccc;
+    }
+    .preview-top {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .preview-top a {
+      text-decoration: none;
+    }
+    .preview-content {
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .preview-bottom {
+      border-top: 1px solid #ccc;
+      border-bottom: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .preview-bottom a {
+      text-decoration: none;
+    }
+    #previewToggle {
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container" onclick="maybeClosePreview(event)">
+    <div class="preview-overlay" id="preview">
+      <div class="preview-top">
+        <a href="holdingbay.html">🔄 Holding Bay</a>
+        <a href="actnow.html">🚀 Act Now</a>
+        <a href="buildmomentum.html">🌿 Build Momentum</a>
+        <a href="worthitlater.html">⏳ Worth It Later</a>
+        <a href="parkedpotential.html">📦 Parked Potential</a>
+      </div>
+      <div class="preview-content">
+        <div>🔍 Search   🔽 Group by: [Date ▼]</div>
+        <hr/>
+        <div>🗓️ Today
+          <ul>
+            <li>✏️ Instagram carousel hook idea…</li>
+            <li>🎨 Sketch: Self-trust visual map</li>
+          </ul>
+        </div>
+        <div>🗓️ This Week
+          <ul>
+            <li>🤖 How to automate feedback loop…</li>
+            <li>🧠 Brainstorm: Book subtitle variants</li>
+          </ul>
+        </div>
+        <div>🗂️ Group by: 📌 Project
+          <ul>
+            <li>🔁 AI Suggests: Relevant to: Ginomahee</li>
+            <li>✍️ “Does This Resonate? prompt idea”</li>
+            <li>🎨 Wireframe sketch: Self-awareness UI</li>
+          </ul>
+        </div>
+        <div>✨ Last 5 unresolved ideas</div>
+        <div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>
+      </div>
+      <div class="preview-bottom">
+        <a href="profile.html">👤 Profile</a>
+        <a href="settings.html">⚙️ Settings</a>
+      </div>
+    </div>
+
+    <div class="editor-area">
+      <button id="previewToggle">☰</button>
+      <textarea id="mainText" placeholder="Start capturing..."></textarea>
+      <div class="controls">
+        <button onclick="saveText()">💾 Save</button>
+        <button onclick="startVoiceCapture()">🎤 Voice</button>
+
+        <!-- 📎 File Attachment -->
+        <label for="fileInput">📎</label>
+        <input type="file" id="fileInput" onchange="handleFile()" />
+      </div>
+      <div class="attachment-name" id="attachedFileName"></div>
+      <div class="save-time" id="saveStatus"></div>
+    </div>
+  </div>
+
+  <script>
+    const preview = document.getElementById('preview');
+    const toggleBtn = document.getElementById('previewToggle');
+    const saveStatus = document.getElementById('saveStatus');
+    const textarea = document.getElementById('mainText');
+    const fileNameDisplay = document.getElementById('attachedFileName');
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    function maybeClosePreview(e) {
+      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
+        preview.style.display = 'none';
+      }
+    }
+
+    function saveText() {
+      const now = new Date();
+      localStorage.setItem('capturedText', textarea.value);
+      localStorage.setItem('lastSaved', now.toISOString());
+      saveStatus.innerText = `Saved at ${now.toLocaleTimeString()}`;
+    }
+
+    function autoSave() {
+      const now = new Date();
+      localStorage.setItem('capturedText', textarea.value);
+      localStorage.setItem('lastSaved', now.toISOString());
+      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+    }
+
+    function loadSavedText() {
+      const saved = localStorage.getItem('capturedText');
+      const lastSaved = localStorage.getItem('lastSaved');
+      if (saved) textarea.value = saved;
+      if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+    }
+
+    setInterval(autoSave, 30000);
+    window.onload = loadSavedText;
+
+    function startVoiceCapture() {
+      const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            transcript += event.results[i][0].transcript + '\n';
+          }
+        }
+        textarea.value += (textarea.value ? '\n' : '') + transcript.trim();
+      };
+    }
+
+    function handleFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      if (file) {
+        fileNameDisplay.textContent = `📎 Attached: ${file.name}`;
+      }
     }
   </script>
 </body>
