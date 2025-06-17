@@ -7,7 +7,182 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
-    /* Keep all your existing styles here */
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .theme-calm { background-color: #cfe3d5; color: #2f4633; }
+    .theme-strategic { background-color: #d7d7da; color: #2e2e32; }
+    .theme-reflective { background-color: #e2dfc9; color: #443f1d; }
+    .theme-bold { background-color: #f7ddb4; color: #5d3e0a; }
+    .theme-playful { background-color: #ffd6e8; color: #7e2b4e; }
+
+    .main-container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .editor-area {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+    }
+
+    textarea {
+      width: 60%;
+      height: 300px;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: none;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      align-items: center;
+    }
+
+    .controls button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .save-time {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .preview-overlay {
+      width: 420px;
+      background: #fff;
+      border-right: 1px solid #ccc;
+      overflow-y: auto;
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      display: none;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .preview-top {
+      padding: 1rem;
+      background: #fafafa;
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .preview-top a,
+    .preview-settings a {
+      text-decoration: none;
+      color: inherit;
+      font-size: 1rem;
+    }
+
+    .preview-content {
+      padding: 1rem;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+
+    .preview-sortbar {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .preview-sortbar label {
+      font-size: 1rem;
+    }
+
+    .preview-sortbar select {
+      font-size: 1rem;
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+
+    #previewToggle {
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+    }
+
+    #attachedFilesList {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #444;
+      max-width: 60%;
+      word-wrap: break-word;
+    }
+
+    #attachedFilesList ul {
+      padding-left: 1.2rem;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .file-item span {
+      flex: 1;
+    }
+
+    .file-item button {
+      background: none;
+      border: none;
+      color: red;
+      cursor: pointer;
+    }
+
+    .preview-settings {
+      padding: 1rem;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .preview-bottom {
+      padding: 1rem;
+      border-top: 1px solid #ccc;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .preview-bottom input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.3rem 0.5rem;
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
