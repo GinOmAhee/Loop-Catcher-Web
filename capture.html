@@ -3,36 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🪄 New Thought</title>
+  <title>🪄 Thought Preview</title>
   <style>
     :root {
       --natural-beige: #f5f1e8;
       --soft-plum: #774C64;
       --muted-green: #6B8F71;
-    }
-    .theme-calm {
-      background-color: #f3f7f4;
-      color: #4C5B52;
-    }
-
-    .theme-strategic {
-      background-color: #f1f0ed;
-      color: #2E2E2E;
-    }
-
-    .theme-reflective {
-      background-color: #fffefc;
-      color: #3e3e3e;
-    }
-
-    .theme-bold {
-      background-color: #fef6ec;
-      color: #5C2F00;
-    }
-
-    .theme-playful {
-      background-color: #fff0f7;
-      color: #64204f;
     }
 
     body {
@@ -40,263 +16,137 @@
       font-family: 'Segoe UI', sans-serif;
       background: var(--natural-beige);
       color: var(--soft-plum);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      height: 100vh;
+      padding: 1rem;
+    }
+
+    header, .filters, .group-section, .entry {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
       text-align: center;
+      margin-bottom: 2rem;
     }
 
-    h2 {
-      font-size: 1.6rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .nudge {
-      font-style: italic;
-      font-size: 0.95rem;
-      color: #555;
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 1.5rem;
     }
 
-    textarea {
-      width: 100%;
-      max-width: 500px;
-      height: 140px;
+    .filters input[type="search"], select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .group-section {
+      background: white;
       padding: 1rem;
-      font-size: 1rem;
-      border: 2px solid #ccc;
       border-radius: 10px;
-      resize: vertical;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 1rem;
     }
 
-    button {
+    .group-section h3 {
+      margin-top: 0;
+    }
+
+    .entry {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .entry:last-child {
+      border-bottom: none;
+    }
+
+    .entry .emoji {
+      font-size: 1.2rem;
+    }
+
+    .entry .text {
+      flex-grow: 1;
+    }
+
+    .entry .timestamp {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .project-toggle {
       margin-top: 1rem;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      background: var(--muted-green);
-      color: white;
-      border: none;
-      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--muted-green);
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    button:hover {
-      background: #5c7e63;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <div id="loadingMessage">🔄 Checking login status…</div>
+  <header>
+    <h1>🪄 Thought Preview</h1>
+    <p>Quick peek into your recent thoughts & ideas</p>
+  </header>
 
-  <div id="mainContent" style="display: none;">
-    <h2>+ New Thought</h2>
-    <p id="moodLabel" style="font-size: 0.9rem; margin-bottom: 1.2rem; color: inherit;"></p>
-    <p class="nudge">💡 Sudden spark? Jot it here — we got you.</p>
+  <section class="filters">
+    <input type="search" placeholder="🔍 Search thoughts..." />
+    <select>
+      <option selected>📅 Group by: Date</option>
+      <option>📌 Group by: Project</option>
+    </select>
+    <select>
+      <option>🎭 Mood</option>
+      <option>🧠 Mental State</option>
+      <option>🎨 Sketch vs Text</option>
+    </select>
+  </section>
 
-    <textarea id="thoughtInput" placeholder="Type your thought…"></textarea>
-    <button id="captureBtn">Capture Thought</button>
-    <button id="speakBtn">🎙️ Speak Thought</button>
-  </div>
+  <section class="group-section">
+    <h3>🗓️ Today</h3>
+    <div class="entry">
+      <div class="emoji">✏️</div>
+      <div class="text">“Instagram carousel hook idea…”<div class="timestamp">09:20 AM</div></div>
+    </div>
+    <div class="entry">
+      <div class="emoji">🎨</div>
+      <div class="text">Sketch: “Self-trust visual map”<div class="timestamp">08:45 AM</div></div>
+    </div>
+  </section>
 
-  <script type="module">
-  const fetchFirebaseConfig = async () => {
-    try {
-      const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
-      const config = await res.json();
+  <section class="group-section">
+    <h3>🗓️ This Week</h3>
+    <div class="entry">
+      <div class="emoji">🤖</div>
+      <div class="text">“How to automate feedback loop…”<div class="timestamp">Tue 3:30 PM</div></div>
+    </div>
+    <div class="entry">
+      <div class="emoji">🧠</div>
+      <div class="text">Brainstorm: Book subtitle variants<div class="timestamp">Mon 1:00 PM</div></div>
+    </div>
+  </section>
 
-      if (!config.projectId) {
-        throw new Error("Missing projectId in Firebase config.");
-      }
-      return config;
-    } catch (err) {
-      console.error("Failed to fetch Firebase config:", err);
-      alert("Could not load app config. Try again later.");
-      return null; // Prevents Firebase initialization with incomplete data
-    }
-  };
+  <section class="group-section">
+    <h3>🗂️ Relevant to: Ginomahee</h3>
+    <div class="entry">
+      <div class="emoji">✍️</div>
+      <div class="text">“Does This Resonate? prompt idea”<div class="timestamp">Last Friday</div></div>
+    </div>
+    <div class="entry">
+      <div class="emoji">🎨</div>
+      <div class="text">Wireframe sketch: Self-awareness UI<div class="timestamp">Last Thursday</div></div>
+    </div>
+  </section>
 
-   // 🌈 Mood Mirror Logic
-   const moodThemeMap = {
-     "Calm & Clear": "theme-calm",
-     "Focused & Strategic": "theme-strategic",
-     "Open & Reflective": "theme-reflective",
-     "Driven & Bold": "theme-bold",
-     "Playful & Inventive": "theme-playful"
-   };
-
-   window.addEventListener("DOMContentLoaded", () => {
-    const label = (localStorage.getItem("vibeLabel") || "").trim();
-    const themeClass = moodThemeMap[label];
-
-    const moodLabelEl = document.getElementById("moodLabel");
-    if (moodLabelEl && label) moodLabelEl.textContent = `${label} Mode`;
-
-    if (themeClass) {
-      document.body.classList.add(themeClass);
-    } else {
-      console.warn("No matching mood theme found:", label);
-    }
-
-    const init = async () => {
-      const firebaseConfig = await fetchFirebaseConfig();
-      console.log("Firebase Config Loaded:", firebaseConfig);
-
-      if (!firebaseConfig) {
-        console.error("Firebase initialization aborted due to missing config.");
-        return;
-      }
-
-     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
-     const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
-     const { getAuth, onAuthStateChanged, signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
-
-     const app = initializeApp(firebaseConfig);
-     const db = getFirestore(app);
-     const auth = getAuth(app);
-
-     console.log("Current user before auth state change:", auth.currentUser);
-
-     // 🎙️ VOICE TO TEXT: Setup
-     const speakBtn = document.getElementById("speakBtn");
-
-     if (!('webkitSpeechRecognition' in window)) {
-       speakBtn.style.display = "none"; // Hide if not supported
-       console.warn("SpeechRecognition not supported on this browser");
-     } else {
-       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-       const recognition = new SpeechRecognition();
-       recognition.lang = 'en-US';
-       recognition.interimResults = false; // Set to true if you want live text
-       recognition.maxAlternatives = 1;
-
-       speakBtn.addEventListener("click", () => {
-         recognition.start();
-         speakBtn.textContent = "🎙️ Listening...";
-       });
-
-       recognition.onresult = (event) => {
-         const transcript = event.results[0][0].transcript;
-         thoughtInput.value += (thoughtInput.value ? " " : "") + transcript;
-         speakBtn.textContent = "🎙️ Speak Thought";
-         // Optionally: auto-trigger save
-         thoughtInput.dispatchEvent(new Event("input"));
-       };
-
-    recognition.onerror = (event) => {
-       console.error("Speech recognition error:", event.error);
-       alert("Speech error: " + event.error);
-       speakBtn.textContent = "🎙️ Speak Thought";
-    };
-
-    recognition.onend = () => {
-       speakBtn.textContent = "🎙️ Speak Thought";
-    };
-  }
-
-     auth.onAuthStateChanged(async (user) => {
-       console.log("User state before reload:", user);
-       if (user) {
-         await user.reload();
-         console.log("User after reload:", user);
-       } else {
-         window.location.href = "signin.html";
-         return;
-       }
-
-       // 👉 SHOW THE MAIN UI
-       const loadingMessage = document.getElementById("loadingMessage");
-       const mainContent = document.getElementById("mainContent");
-       const captureBtn = document.getElementById("captureBtn");
-       const thoughtInput = document.getElementById("thoughtInput");
-
-       loadingMessage.style.display = "none";
-       mainContent.style.display = "block";
-
-       // ✅ AUTOSAVE SECTION STARTS HERE
-       const statusEl = document.createElement("div");
-       statusEl.style.fontSize = "0.8rem";
-       statusEl.style.marginTop = "0.5rem";
-       statusEl.style.color = "#888";
-       thoughtInput.insertAdjacentElement("afterend", statusEl);
-
-       const draftKey = `draft-${user.uid}`;
-       let saveTimeout;
-       let lastSavedAt = null;
-
-       const updateStatus = (text) => {
-         statusEl.textContent = text;
-       };
-
-       const saveToFirestore = async () => {
-         const content = thoughtInput.value.trim();
-         if (!content) return;
-
-         try {
-           await addDoc(collection(db, "catchpad"), {
-             content,
-             owner: user.uid,
-             createdAt: serverTimestamp()
-           });
-           const now = new Date();
-           lastSavedAt = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-           updateStatus(`✅ Saved ✓ at ${lastSavedAt}`);
-           localStorage.setItem(draftKey, content);
-         } catch (err) {
-           console.error("Firestore save failed:", err);
-           updateStatus("⚠️ Offline — will retry later");
-           localStorage.setItem(draftKey, content);
-         }
-      };
-
-  // ⌨️ Auto-save every few keystrokes
-  thoughtInput.addEventListener("input", () => {
-    updateStatus("💾 Saving...");
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(saveToFirestore, 1500);
-  });
-
-  // 🧠 Restore from localStorage if tab reloads
-  const savedDraft = localStorage.getItem(draftKey);
-  if (savedDraft && !thoughtInput.value.trim()) {
-    const restore = confirm("Restore previous unsaved thought?");
-    if (restore) {
-      thoughtInput.value = savedDraft;
-      updateStatus("💡 Restored draft from backup");
-    }
-  }
-
-  // 🖱 Manual capture button
-  captureBtn.addEventListener("click", async () => {
-    const entry = thoughtInput.value.trim();
-    if (!entry) return;
-
-    try {
-      await addDoc(collection(db, "catchpad"), {
-        content: entry,
-        owner: user.uid,
-        createdAt: serverTimestamp()
-      });
-      window.location.href = "catchpad.html";
-    } catch (error) {
-      console.error("Error saving thought:", error);
-      alert("Oops! Couldn’t save your thought. Try again.");
-    }
-  }, { once: true });
-});
-
-     signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
-       .then((userCredential) => console.log("Login successful:", userCredential.user))
-       .catch((error) => console.error("Login failed:", error));
-   };
-
-   // ✅ Move this line inside the DOMContentLoaded listener
-   init();
- });
-</script>
+  <div class="project-toggle">✨ Show me my last 5 unresolved ideas</div>
+  <div class="project-toggle">🔁 Resurface forgotten ideas every X days</div>
 </body>
 </html>
