@@ -13,30 +13,11 @@
       color: #333;
     }
 
-    .theme-calm {
-      background-color: #cfe3d5;
-      color: #2f4633;
-    }
-
-    .theme-strategic {
-      background-color: #d7d7da;
-      color: #2e2e32;
-    }
-
-    .theme-reflective {
-      background-color: #e2dfc9;
-      color: #443f1d;
-    }
-
-    .theme-bold {
-      background-color: #f7ddb4;
-      color: #5d3e0a;
-    }
-
-    .theme-playful {
-      background-color: #ffd6e8;
-      color: #7e2b4e;
-    }
+    .theme-calm { background-color: #cfe3d5; color: #2f4633; }
+    .theme-strategic { background-color: #d7d7da; color: #2e2e32; }
+    .theme-reflective { background-color: #e2dfc9; color: #443f1d; }
+    .theme-bold { background-color: #f7ddb4; color: #5d3e0a; }
+    .theme-playful { background-color: #ffd6e8; color: #7e2b4e; }
 
     .main-container {
       display: flex;
@@ -113,25 +94,14 @@
       gap: 0.3rem;
     }
 
-    .preview-top a {
+    .preview-top a,
+    .preview-bottom a {
       text-decoration: none;
     }
 
     .preview-content {
       padding: 1rem;
       overflow-y: auto;
-    }
-
-    .preview-bottom {
-      border-top: 1px solid #ccc;
-      border-bottom: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
-    .preview-bottom a {
-      text-decoration: none;
     }
 
     #previewToggle {
@@ -150,6 +120,23 @@
 
     #attachedFilesList ul {
       padding-left: 1.2rem;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .file-item span {
+      flex: 1;
+    }
+
+    .file-item button {
+      background: none;
+      border: none;
+      color: red;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -312,12 +299,23 @@
       input.value = ''; // reset for re-upload
     }
 
+    function removeFile(fileName) {
+      const files = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
+      const updated = files.filter(f => f !== fileName);
+      localStorage.setItem('attachedFiles', JSON.stringify(updated));
+      updateFileDisplay(updated);
+    }
+
     function updateFileDisplay(fileList) {
       if (fileList.length === 0) {
         attachedFilesList.innerHTML = '';
         return;
       }
-      attachedFilesList.innerHTML = `<strong>📎 Attached Files:</strong><ul>${fileList.map(f => `<li>${f}</li>`).join('')}</ul>`;
+      attachedFilesList.innerHTML = `<strong>📎 Attached Files:</strong><ul>${fileList.map(f => `
+        <li class="file-item">
+          <span>${f}</span>
+          <button onclick="removeFile('${f}')">🗑️</button>
+        </li>`).join('')}</ul>`;
     }
 
     const moodThemeMap = {
