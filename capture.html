@@ -12,11 +12,38 @@
       background: #f0f0f0;
       color: #333;
     }
+
+    .theme-calm {
+      background-color: #6B8F71;
+      color: #fff;
+    }
+
+    .theme-strategic {
+      background-color: #5D5C61;
+      color: #fff;
+    }
+
+    .theme-reflective {
+      background-color: #8D8741;
+      color: #fff;
+    }
+
+    .theme-bold {
+      background-color: #D79922;
+      color: #fff;
+    }
+
+    .theme-playful {
+      background-color: #FF3CAC;
+      color: #fff;
+    }
+
     .main-container {
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
+
     .editor-area {
       flex-grow: 1;
       display: flex;
@@ -26,6 +53,7 @@
       padding: 2rem;
       position: relative;
     }
+
     textarea {
       width: 60%;
       height: 300px;
@@ -35,11 +63,13 @@
       border-radius: 8px;
       resize: none;
     }
+
     .controls {
       display: flex;
       gap: 1rem;
       margin-top: 1rem;
     }
+
     .controls button {
       padding: 0.5rem 1rem;
       font-size: 1rem;
@@ -47,11 +77,13 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
     .save-time {
       margin-top: 1rem;
       font-size: 0.9rem;
       color: #666;
     }
+
     .preview-overlay {
       width: 350px;
       background: #fff;
@@ -66,23 +98,28 @@
       flex-direction: column;
       z-index: 100;
     }
+
     .preview-top, .preview-bottom {
       padding: 1rem;
       background: #fafafa;
       border-bottom: 1px solid #ccc;
     }
+
     .preview-top {
       display: flex;
       flex-direction: column;
       gap: 0.3rem;
     }
+
     .preview-top a {
       text-decoration: none;
     }
+
     .preview-content {
       padding: 1rem;
       overflow-y: auto;
     }
+
     .preview-bottom {
       border-top: 1px solid #ccc;
       border-bottom: none;
@@ -90,9 +127,11 @@
       flex-direction: column;
       gap: 0.3rem;
     }
+
     .preview-bottom a {
       text-decoration: none;
     }
+
     #previewToggle {
       position: absolute;
       left: 1rem;
@@ -115,21 +154,21 @@
         <hr/>
         <div>🗓️ Today
           <ul>
-            <li>✏️ Instagram carousel hook idea…</li>
-            <li>🎨 Sketch: Self-trust visual map</li>
+            <li> Instagram carousel hook idea…</li>
+            <li> Sketch: Self-trust visual map</li>
           </ul>
         </div>
         <div>🗓️ This Week
           <ul>
-            <li>🤖 How to automate feedback loop…</li>
-            <li>🧠 Brainstorm: Book subtitle variants</li>
+            <li> How to automate feedback loop…</li>
+            <li> Brainstorm: Book subtitle variants</li>
           </ul>
         </div>
         <div>🗂️ Group by: 📌 Project
           <ul>
-            <li>🔁 AI Suggests: Relevant to: Ginomahee</li>
-            <li>✍️ “Does This Resonate? prompt idea”</li>
-            <li>🎨 Wireframe sketch: Self-awareness UI</li>
+            <li> AI Suggests: Relevant to: Ginomahee</li>
+            <li> “Does This Resonate? prompt idea”</li>
+            <li> Wireframe sketch: Self-awareness UI</li>
           </ul>
         </div>
         <div>✨ Last 5 unresolved ideas</div>
@@ -189,9 +228,6 @@
       if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
     }
 
-    setInterval(autoSave, 30000);
-    window.onload = loadSavedText;
-
     function startVoiceCapture() {
       const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = 'en-US';
@@ -209,6 +245,27 @@
         textarea.value += (textarea.value ? '\n' : '') + transcript.trim();
       };
     }
+
+    const moodThemeMap = {
+      "Calm & Clear": "theme-calm",
+      "Focused & Strategic": "theme-strategic",
+      "Open & Reflective": "theme-reflective",
+      "Driven & Bold": "theme-bold",
+      "Playful & Inventive": "theme-playful"
+    };
+
+    function applyMoodTheme() {
+      const vibe = localStorage.getItem('vibeLabel');
+      const themeClass = moodThemeMap[vibe];
+      if (themeClass) {
+        document.body.classList.add(themeClass);
+      }
+    }
+
+    window.onload = function () {
+      loadSavedText();
+      applyMoodTheme();
+    };
   </script>
 </body>
 </html>
