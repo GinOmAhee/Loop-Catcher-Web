@@ -297,8 +297,9 @@
           .catch((error) => console.error("Login failed:", error));
       };
 
-      init();
-    });
+      window.addEventListener("DOMContentLoaded", async () => {
+      await init();
+      });
   </script>
 </body>
 </html>
