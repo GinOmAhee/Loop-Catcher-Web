@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" href="data:,">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🪄 New Thought</title>
@@ -15,35 +14,27 @@
       background-color: #f3f7f4;
       color: #4C5B52;
     }
+
     .theme-strategic {
       background-color: #f1f0ed;
       color: #2E2E2E;
     }
+
     .theme-reflective {
       background-color: #fffefc;
       color: #3e3e3e;
     }
+
     .theme-bold {
       background-color: #fef6ec;
       color: #5C2F00;
     }
+
     .theme-playful {
       background-color: #fff0f7;
       color: #64204f;
     }
-    .mic-btn.listening {
-      border: 2px solid var(--muted-green);
-      box-shadow: 0 0 12px 4px rgba(107, 143, 113, 0.5);
-      background: #84a48f;
-      transition: box-shadow 0.3s ease;
-    }
-    .interim-text {
-      margin-top: 1rem;
-      font-style: italic;
-      font-size: 0.9rem;
-      color: #999;
-      min-height: 1.2rem;
-    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -57,16 +48,19 @@
       height: 100vh;
       text-align: center;
     }
+
     h2 {
       font-size: 1.6rem;
       margin-bottom: 0.25rem;
     }
+
     .nudge {
       font-style: italic;
       font-size: 0.95rem;
       color: #555;
       margin-bottom: 1.5rem;
     }
+
     textarea {
       width: 100%;
       max-width: 500px;
@@ -78,6 +72,7 @@
       resize: vertical;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
+
     button {
       margin-top: 1rem;
       padding: 0.8rem 1.5rem;
@@ -89,6 +84,7 @@
       cursor: pointer;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
+
     button:hover {
       background: #5c7e63;
     }
@@ -96,209 +92,211 @@
 </head>
 <body>
   <div id="loadingMessage">🔄 Checking login status…</div>
+
   <div id="mainContent" style="display: none;">
     <h2>+ New Thought</h2>
     <p id="moodLabel" style="font-size: 0.9rem; margin-bottom: 1.2rem; color: inherit;"></p>
     <p class="nudge">💡 Sudden spark? Jot it here — we got you.</p>
+
     <textarea id="thoughtInput" placeholder="Type your thought…"></textarea>
     <button id="captureBtn">Capture Thought</button>
-    <button id="speakSaveBtn" class="mic-btn">🎹 Speak & Save</button>
-    <div id="interimTranscript" class="interim-text"></div>
+    <button id="speakBtn">🎙️ Speak Thought</button>
   </div>
 
   <script type="module">
-    const fetchFirebaseConfig = async () => {
-      try {
-        const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
-        const config = await res.json();
-        if (!config.projectId) throw new Error("Missing projectId in Firebase config.");
-        return config;
-      } catch (err) {
-        console.error("Failed to fetch Firebase config:", err);
-        alert("Could not load app config. Try again later.");
-        return null;
+  const fetchFirebaseConfig = async () => {
+    try {
+      const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+      const config = await res.json();
+
+      if (!config.projectId) {
+        throw new Error("Missing projectId in Firebase config.");
       }
+      return config;
+    } catch (err) {
+      console.error("Failed to fetch Firebase config:", err);
+      alert("Could not load app config. Try again later.");
+      return null; // Prevents Firebase initialization with incomplete data
+    }
+  };
+
+   // 🌈 Mood Mirror Logic
+   const moodThemeMap = {
+     "Calm & Clear": "theme-calm",
+     "Focused & Strategic": "theme-strategic",
+     "Open & Reflective": "theme-reflective",
+     "Driven & Bold": "theme-bold",
+     "Playful & Inventive": "theme-playful"
+   };
+
+   window.addEventListener("DOMContentLoaded", () => {
+    const label = (localStorage.getItem("vibeLabel") || "").trim();
+    const themeClass = moodThemeMap[label];
+
+    const moodLabelEl = document.getElementById("moodLabel");
+    if (moodLabelEl && label) moodLabelEl.textContent = `${label} Mode`;
+
+    if (themeClass) {
+      document.body.classList.add(themeClass);
+    } else {
+      console.warn("No matching mood theme found:", label);
+    }
+
+    const init = async () => {
+      const firebaseConfig = await fetchFirebaseConfig();
+      console.log("Firebase Config Loaded:", firebaseConfig);
+
+      if (!firebaseConfig) {
+        console.error("Firebase initialization aborted due to missing config.");
+        return;
+      }
+
+     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
+     const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
+     const { getAuth, onAuthStateChanged, signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
+
+     const app = initializeApp(firebaseConfig);
+     const db = getFirestore(app);
+     const auth = getAuth(app);
+
+     console.log("Current user before auth state change:", auth.currentUser);
+
+     // 🎙️ VOICE TO TEXT: Setup
+     const speakBtn = document.getElementById("speakBtn");
+
+     if (!('webkitSpeechRecognition' in window)) {
+       speakBtn.style.display = "none"; // Hide if not supported
+       console.warn("SpeechRecognition not supported on this browser");
+     } else {
+       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+       const recognition = new SpeechRecognition();
+       recognition.lang = 'en-US';
+       recognition.interimResults = false; // Set to true if you want live text
+       recognition.maxAlternatives = 1;
+
+       speakBtn.addEventListener("click", () => {
+         recognition.start();
+         speakBtn.textContent = "🎙️ Listening...";
+       });
+
+       recognition.onresult = (event) => {
+         const transcript = event.results[0][0].transcript;
+         thoughtInput.value += (thoughtInput.value ? " " : "") + transcript;
+         speakBtn.textContent = "🎙️ Speak Thought";
+         // Optionally: auto-trigger save
+         thoughtInput.dispatchEvent(new Event("input"));
+       };
+
+    recognition.onerror = (event) => {
+       console.error("Speech recognition error:", event.error);
+       alert("Speech error: " + event.error);
+       speakBtn.textContent = "🎙️ Speak Thought";
     };
 
-    const moodThemeMap = {
-      "Calm & Clear": "theme-calm",
-      "Focused & Strategic": "theme-strategic",
-      "Open & Reflective": "theme-reflective",
-      "Driven & Bold": "theme-bold",
-      "Playful & Inventive": "theme-playful"
+    recognition.onend = () => {
+       speakBtn.textContent = "🎙️ Speak Thought";
     };
+  }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const label = (localStorage.getItem("vibeLabel") || "").trim();
-      const themeClass = moodThemeMap[label];
-      const moodLabelEl = document.getElementById("moodLabel");
-      if (moodLabelEl && label) moodLabelEl.textContent = `${label} Mode`;
-      if (themeClass) document.body.classList.add(themeClass);
+     auth.onAuthStateChanged(async (user) => {
+       console.log("User state before reload:", user);
+       if (user) {
+         await user.reload();
+         console.log("User after reload:", user);
+       } else {
+         window.location.href = "signin.html";
+         return;
+       }
 
-      const init = async () => {
-        const firebaseConfig = await fetchFirebaseConfig();
-        if (!firebaseConfig) return;
+       // 👉 SHOW THE MAIN UI
+       const loadingMessage = document.getElementById("loadingMessage");
+       const mainContent = document.getElementById("mainContent");
+       const captureBtn = document.getElementById("captureBtn");
+       const thoughtInput = document.getElementById("thoughtInput");
 
-        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
-        const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
-        const { getAuth, onAuthStateChanged, signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
+       loadingMessage.style.display = "none";
+       mainContent.style.display = "block";
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+       // ✅ AUTOSAVE SECTION STARTS HERE
+       const statusEl = document.createElement("div");
+       statusEl.style.fontSize = "0.8rem";
+       statusEl.style.marginTop = "0.5rem";
+       statusEl.style.color = "#888";
+       thoughtInput.insertAdjacentElement("afterend", statusEl);
 
-        onAuthStateChanged(auth, async (user) => {
-          if (!user) {
-            window.location.href = "signin.html";
-            return;
-          }
+       const draftKey = `draft-${user.uid}`;
+       let saveTimeout;
+       let lastSavedAt = null;
 
-          await user.reload();
+       const updateStatus = (text) => {
+         statusEl.textContent = text;
+       };
 
-          const loadingMessage = document.getElementById("loadingMessage");
-          const mainContent = document.getElementById("mainContent");
-          const captureBtn = document.getElementById("captureBtn");
-          const thoughtInput = document.getElementById("thoughtInput");
-          const speakSaveBtn = document.getElementById("speakSaveBtn");
-          const interimTranscript = document.getElementById("interimTranscript");
+       const saveToFirestore = async () => {
+         const content = thoughtInput.value.trim();
+         if (!content) return;
 
-          loadingMessage.style.display = "none";
-          mainContent.style.display = "block";
-
-          const statusEl = document.createElement("div");
-          statusEl.style.fontSize = "0.8rem";
-          statusEl.style.marginTop = "0.5rem";
-          statusEl.style.color = "#888";
-          thoughtInput.insertAdjacentElement("afterend", statusEl);
-
-          const draftKey = `draft-${user.uid}`;
-          let saveTimeout;
-          let lastSavedAt = null;
-
-          const updateStatus = (text) => {
-            statusEl.textContent = text;
-          };
-
-          const saveToFirestore = async () => {
-            const content = thoughtInput.value.trim();
-            if (!content) return;
-            try {
-              await addDoc(collection(db, "catchpad"), {
-                content,
-                owner: user.uid,
-                createdAt: serverTimestamp()
-              });
-              const now = new Date();
-              lastSavedAt = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-              updateStatus(`✅ Saved ✓ at ${lastSavedAt}`);
-              localStorage.setItem(draftKey, content);
-            } catch (err) {
-              console.error("Firestore save failed:", err);
-              updateStatus("⚠️ Offline — will retry later");
-              localStorage.setItem(draftKey, content);
-            }
-          };
-
-          thoughtInput.addEventListener("input", () => {
-            updateStatus("🗑️ Saving...");
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(saveToFirestore, 1500);
-          });
-
-          const savedDraft = localStorage.getItem(draftKey);
-          if (savedDraft && !thoughtInput.value.trim()) {
-            const restore = confirm("Restore previous unsaved thought?");
-            if (restore) {
-              thoughtInput.value = savedDraft;
-              updateStatus("💡 Restored draft from backup");
-            }
-          }
-
-          captureBtn.addEventListener("click", () => {
-            const entry = thoughtInput.value.trim();
-            if (!entry) return;
-            addDoc(collection(db, "catchpad"), {
-              content: entry,
-              owner: user.uid,
-              createdAt: serverTimestamp()
-            })
-              .then(() => window.location.href = "catchpad.html")
-              .catch((err) => {
-                console.error("Error saving thought:", err);
-                alert("Oops! Couldn't save your thought. Try again.");
-              });
-          });
-
-          if (!('webkitSpeechRecognition' in window)) {
-            speakSaveBtn.style.display = "none";
-          } else {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-            recognition.continuous = false;
-
-            let finalTranscript = "";
-
-            speakSaveBtn.addEventListener("click", () => {
-              finalTranscript = "";
-              interimTranscript.textContent = "";
-              recognition.start();
-              speakSaveBtn.textContent = "🎙️ Listening...";
-              speakSaveBtn.classList.add("listening");
-            });
-
-            recognition.onresult = (event) => {
-              let interim = "";
-              for (let i = event.resultIndex; i < event.results.length; ++i) {
-                const res = event.results[i];
-                if (res.isFinal) {
-                  finalTranscript += res[0].transcript + " ";
-                } else {
-                  interim += res[0].transcript;
-                }
-              }
-              interimTranscript.textContent = interim;
-            };
-
-            recognition.onend = async () => {
-              speakSaveBtn.textContent = "🎙️ Speak & Save";
-              speakSaveBtn.classList.remove("listening");
-              if (finalTranscript.trim()) {
-                thoughtInput.value += (thoughtInput.value ? " " : "") + finalTranscript.trim();
-                updateStatus("💾 Saving...");
-                await saveToFirestore();
-                interimTranscript.textContent = "";
-              } else {
-                interimTranscript.textContent = "No input detected.";
-              }
-            };
-
-            recognition.onerror = async (event) => {
-              console.error("Speech recognition error:", event.error);
-              speakSaveBtn.textContent = "🎙️ Speak & Save";
-              speakSaveBtn.classList.remove("listening");
-              interimTranscript.textContent = "⚠️ Error: " + event.error;
-              if (finalTranscript.trim()) {
-                thoughtInput.value += (thoughtInput.value ? " " : "") + finalTranscript.trim();
-                updateStatus("💾 Saving...");
-                await saveToFirestore();
-                interimTranscript.textContent = "";
-              } else {
-                interimTranscript.textContent = "No input detected.";
-              }
-            };
-          }
-
-        signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
-          .then((userCredential) => console.log("Login successful:", userCredential.user))
-          .catch((error) => console.error("Login failed:", error));
+         try {
+           await addDoc(collection(db, "catchpad"), {
+             content,
+             owner: user.uid,
+             createdAt: serverTimestamp()
+           });
+           const now = new Date();
+           lastSavedAt = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+           updateStatus(`✅ Saved ✓ at ${lastSavedAt}`);
+           localStorage.setItem(draftKey, content);
+         } catch (err) {
+           console.error("Firestore save failed:", err);
+           updateStatus("⚠️ Offline — will retry later");
+           localStorage.setItem(draftKey, content);
+         }
       };
 
-   init();
+  // ⌨️ Auto-save every few keystrokes
+  thoughtInput.addEventListener("input", () => {
+    updateStatus("💾 Saving...");
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(saveToFirestore, 1500);
   });
 
- </script>
+  // 🧠 Restore from localStorage if tab reloads
+  const savedDraft = localStorage.getItem(draftKey);
+  if (savedDraft && !thoughtInput.value.trim()) {
+    const restore = confirm("Restore previous unsaved thought?");
+    if (restore) {
+      thoughtInput.value = savedDraft;
+      updateStatus("💡 Restored draft from backup");
+    }
+  }
+
+  // 🖱 Manual capture button
+  captureBtn.addEventListener("click", async () => {
+    const entry = thoughtInput.value.trim();
+    if (!entry) return;
+
+    try {
+      await addDoc(collection(db, "catchpad"), {
+        content: entry,
+        owner: user.uid,
+        createdAt: serverTimestamp()
+      });
+      window.location.href = "catchpad.html";
+    } catch (error) {
+      console.error("Error saving thought:", error);
+      alert("Oops! Couldn’t save your thought. Try again.");
+    }
+  }, { once: true });
+});
+
+     signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
+       .then((userCredential) => console.log("Login successful:", userCredential.user))
+       .catch((error) => console.error("Login failed:", error));
+   };
+
+   // ✅ Move this line inside the DOMContentLoaded listener
+   init();
+ });
+</script>
 </body>
 </html>
