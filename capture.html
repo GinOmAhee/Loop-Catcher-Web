@@ -3,164 +3,164 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thought Capture</title>
+  <title>Capture UI</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
       margin: 0;
       padding: 0;
+      background: #f0f0f0;
+      color: #333;
+    }
+    .main-container {
       display: flex;
       height: 100vh;
-      background-color: #f0f0f0;
-      transition: background-color 0.3s;
+      overflow: hidden;
     }
-
-    #main {
-      margin: auto;
-      width: 100%;
-      max-width: 800px;
-      padding: 20px;
+    .editor-area {
+      flex-grow: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
     }
-
     textarea {
-      width: 100%;
+      width: 60%;
       height: 300px;
-      padding: 15px;
-      font-size: 16px;
+      padding: 1rem;
+      font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 8px;
       resize: none;
     }
-
-    #controls {
-      margin-top: 10px;
+    .controls {
       display: flex;
-      gap: 10px;
+      gap: 1rem;
+      margin-top: 1rem;
     }
-
-    button {
-      padding: 10px 15px;
+    .controls button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
-
-    #previewOverlay {
-      position: fixed;
+    .save-time {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .preview-overlay {
+      width: 350px;
+      background: #fff;
+      border-right: 1px solid #ccc;
+      overflow-y: auto;
+      position: absolute;
       left: 0;
       top: 0;
-      height: 100%;
-      width: 350px;
-      background: white;
-      border-right: 2px solid #ccc;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-      overflow-y: auto;
-      padding: 20px;
+      bottom: 0;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
       display: none;
       flex-direction: column;
-      z-index: 999;
+      z-index: 100;
     }
-
+    .preview-header, .preview-footer {
+      padding: 1rem;
+      border-bottom: 1px solid #ccc;
+      background: #fafafa;
+    }
+    .preview-footer {
+      border-top: 1px solid #ccc;
+      border-bottom: none;
+    }
+    .preview-content {
+      padding: 1rem;
+    }
+    .preview-content div {
+      margin-bottom: 1rem;
+    }
     #previewToggle {
       position: absolute;
-      left: 10px;
-      top: 10px;
-      padding: 5px 10px;
-      z-index: 1000;
-    }
-
-    #savedTime {
-      margin-top: 10px;
-      font-size: 14px;
-      color: gray;
-    }
-
-    .mood-happy {
-      background-color: #fffbe6;
-    }
-
-    .mood-sad {
-      background-color: #e6f0ff;
-    }
-
-    .mood-angry {
-      background-color: #ffe6e6;
+      left: 1rem;
+      top: 1rem;
     }
   </style>
 </head>
 <body>
-  <button id="previewToggle">☰ Preview</button>
-  <div id="previewOverlay">
-    <h3>🔍 Search   🔽 Group by: [Date ▼]</h3>
-    <hr>
-    <p>🗓️ <strong>Today</strong></p>
-    <ul>
-      <li>✏️ “Instagram carousel hook idea…”</li>
-      <li>🎨 Sketch: “Self-trust visual map”</li>
-    </ul>
-    <p>🗓️ <strong>This Week</strong></p>
-    <ul>
-      <li>🤖 “How to automate feedback loop…”</li>
-      <li>🧠 Brainstorm: Book subtitle variants</li>
-    </ul>
-    <p>🗂️ <strong>Group by: [📌 Project]</strong></p>
-    <p>🔁 AI Suggests: “Relevant to: Ginomahee”</p>
-    <ul>
-      <li>✍️ “Does This Resonate? prompt idea”</li>
-      <li>🎨 Wireframe sketch: Self-awareness UI</li>
-    </ul>
-    <p>✨ “Show me my last 5 unresolved ideas”</p>
-    <p>🔁 “Resurface forgotten ideas every X days”</p>
-  </div>
-  <div id="main">
-    <textarea id="thoughtBox" placeholder="Write your thoughts here..."></textarea>
-    <div id="controls">
-      <button onclick="saveThought()">💾 Save</button>
-      <button onclick="startVoiceCapture()">🎤 Voice</button>
-      <select id="moodSelect" onchange="changeMood()">
-        <option value="">Select Mood</option>
-        <option value="happy">😊 Happy</option>
-        <option value="sad">😢 Sad</option>
-        <option value="angry">😡 Angry</option>
-      </select>
+  <div class="main-container" onclick="maybeClosePreview(event)">
+    <div class="preview-overlay" id="preview">
+      <div class="preview-header">
+        🔄 Holding Bay | 🚀 Act Now | 🌿 Build Momentum | ⏳ Worth It Later | 📦 Parked Potential
+      </div>
+      <div class="preview-content">
+        <div>🔍 Search   🔽 Group by: [Date ▼]</div>
+        <hr/>
+        <div>🗓️ Today
+          <ul>
+            <li>✏️ Instagram carousel hook idea…</li>
+            <li>🎨 Sketch: Self-trust visual map</li>
+          </ul>
+        </div>
+        <div>🗓️ This Week
+          <ul>
+            <li>🤖 How to automate feedback loop…</li>
+            <li>🧠 Brainstorm: Book subtitle variants</li>
+          </ul>
+        </div>
+        <div>🗂️ Group by: 📌 Project
+          <ul>
+            <li>🔁 AI Suggests: Relevant to: Ginomahee</li>
+            <li>✍️ “Does This Resonate? prompt idea”</li>
+            <li>🎨 Wireframe sketch: Self-awareness UI</li>
+          </ul>
+        </div>
+        <div>✨ Last 5 unresolved ideas</div>
+        <div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>
+      </div>
+      <div class="preview-footer">
+        Profile | Settings
+      </div>
     </div>
-    <div id="savedTime"></div>
+    <div class="editor-area">
+      <button id="previewToggle">☰</button>
+      <textarea id="mainText" placeholder="Start capturing..."></textarea>
+      <div class="controls">
+        <button onclick="saveText()">💾 Save</button>
+        <button onclick="startVoiceCapture()">🎤 Voice</button>
+      </div>
+      <div class="save-time" id="saveStatus"></div>
+    </div>
   </div>
 
   <script>
-    const preview = document.getElementById("previewOverlay");
-    document.getElementById("previewToggle").onclick = () => {
-      preview.style.display = preview.style.display === "flex" ? "none" : "flex";
-    };
+    const preview = document.getElementById('preview');
+    const toggleBtn = document.getElementById('previewToggle');
 
-    function saveThought() {
-      const now = new Date();
-      document.getElementById("savedTime").innerText = `Saved at ${now.toLocaleTimeString()}`;
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    function maybeClosePreview(e) {
+      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
+        preview.style.display = 'none';
+      }
     }
 
-    function changeMood() {
-      const mood = document.getElementById("moodSelect").value;
-      document.body.className = mood ? `mood-${mood}` : '';
+    function saveText() {
+      const now = new Date();
+      document.getElementById('saveStatus').innerText = `Saved at ${now.toLocaleTimeString()}`;
     }
 
     function startVoiceCapture() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = 'en-US';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-
       recognition.start();
-
-      recognition.onresult = function(event) {
+      recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        document.getElementById("thoughtBox").value += transcript + " ";
-      };
-
-      recognition.onerror = function(event) {
-        alert('Voice capture failed: ' + event.error);
+        document.getElementById('mainText').value += (document.getElementById('mainText').value ? '\n' : '') + transcript;
       };
     }
   </script>
