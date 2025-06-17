@@ -155,21 +155,21 @@
         <hr/>
         <div>🗓️ Today
           <ul>
-            <li> Instagram carousel hook idea…</li>
-            <li> Sketch: Self-trust visual map</li>
+            <li>✏️ Instagram carousel hook idea…</li>
+            <li>🎨 Sketch: Self-trust visual map</li>
           </ul>
         </div>
         <div>🗓️ This Week
           <ul>
-            <li> How to automate feedback loop…</li>
-            <li> Brainstorm: Book subtitle variants</li>
+            <li>🤖 How to automate feedback loop…</li>
+            <li>🧠 Brainstorm: Book subtitle variants</li>
           </ul>
         </div>
         <div>🗂️ Group by: 📌 Project
           <ul>
-            <li> AI Suggests: Relevant to: Ginomahee</li>
-            <li> “Does This Resonate? prompt idea”</li>
-            <li> Wireframe sketch: Self-awareness UI</li>
+            <li>🔁 AI Suggests: Relevant to: Ginomahee</li>
+            <li>✍️ “Does This Resonate? prompt idea”</li>
+            <li>🎨 Wireframe sketch: Self-awareness UI</li>
           </ul>
         </div>
         <div>✨ Last 5 unresolved ideas</div>
@@ -185,7 +185,7 @@
       <textarea id="mainText" placeholder="Start capturing..."></textarea>
       <div class="controls">
         <button onclick="saveText()">💾 Save</button>
-        <button onclick="startVoiceCapture()">🎤 Voice</button>
+        <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
       </div>
       <div class="save-time" id="saveStatus"></div>
     </div>
@@ -197,6 +197,7 @@
     const saveStatus = document.getElementById('saveStatus');
     const textarea = document.getElementById('mainText');
     let recognition;
+    let isRecording = false;
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -230,11 +231,11 @@
       if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
     }
 
-    function stopVoiceCapture() {
-      if (recognition) {
-        recognition.stop();
-        recognition = null;
-        saveStatus.innerText = "Voice capture stopped.";
+    function toggleVoiceCapture() {
+      if (isRecording) {
+        stopVoiceCapture();
+      } else {
+        startVoiceCapture();
       }
     }
 
@@ -243,7 +244,11 @@
       recognition.lang = 'en-US';
       recognition.continuous = true;
       recognition.interimResults = false;
+
       recognition.start();
+      isRecording = true;
+      document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
+      saveStatus.innerText = "🎙️ Voice capture started...";
 
       recognition.onresult = (event) => {
         let transcript = '';
@@ -260,6 +265,22 @@
         }
         textarea.value += (textarea.value ? '\n' : '') + transcript.trim();
       };
+
+      recognition.onerror = (e) => {
+        console.error("Speech recognition error:", e.error);
+        stopVoiceCapture();
+      };
+    }
+
+    function stopVoiceCapture() {
+      if (recognition) {
+        recognition.stop();
+        recognition = null;
+      }
+      isRecording = false;
+      document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
+      saveText();
+      saveStatus.innerText = "🎤 Voice capture stopped.";
     }
 
     const moodThemeMap = {
