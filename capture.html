@@ -185,7 +185,7 @@
       <textarea id="mainText" placeholder="Start capturing..."></textarea>
       <div class="controls">
         <button onclick="saveText()">💾 Save</button>
-        <button onclick="toggleVoiceCapture()" id="voiceToggle">🎤 Voice On</button>
+        <button onclick="startVoiceCapture()">🎤 Voice</button>
       </div>
       <div class="save-time" id="saveStatus"></div>
     </div>
@@ -197,7 +197,6 @@
     const saveStatus = document.getElementById('saveStatus');
     const textarea = document.getElementById('mainText');
     let recognition;
-    let isListening = false;
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -231,33 +230,27 @@
       if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
     }
 
-    function toggleVoiceCapture() {
-      if (isListening) {
-        stopVoiceCapture();
-      } else {
-        startVoiceCapture();
+    function stopVoiceCapture() {
+      if (recognition) {
+        recognition.stop();
+        recognition = null;
+        saveStatus.innerText = "Voice capture stopped.";
       }
     }
 
     function startVoiceCapture() {
-      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        alert('Speech recognition not supported in this browser.');
-        return;
-      }
-
       recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = 'en-US';
       recognition.continuous = true;
       recognition.interimResults = false;
-      isListening = true;
-      document.getElementById('voiceToggle').innerText = "🎤 Voice Off";
+      recognition.start();
 
       recognition.onresult = (event) => {
         let transcript = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
-            const text = event.results[i][0].transcript.trim();
-            if (text.toLowerCase() === "stop") {
+            let text = event.results[i][0].transcript.trim();
+            if (text.toLowerCase().includes("stop")) {
               stopVoiceCapture();
               saveText();
               return;
@@ -267,21 +260,6 @@
         }
         textarea.value += (textarea.value ? '\n' : '') + transcript.trim();
       };
-
-      recognition.onend = () => {
-        isListening = false;
-        document.getElementById('voiceToggle').innerText = "🎤 Voice On";
-      };
-
-      recognition.start();
-    }
-
-    function stopVoiceCapture() {
-      if (recognition) {
-        recognition.stop();
-      }
-      isListening = false;
-      document.getElementById('voiceToggle').innerText = "🎤 Voice On";
     }
 
     const moodThemeMap = {
@@ -304,8 +282,6 @@
       loadSavedText();
       applyMoodTheme();
     };
-
-    setInterval(autoSave, 30000);
   </script>
 </body>
 </html>
