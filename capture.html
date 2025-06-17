@@ -11,6 +11,7 @@
       padding: 0;
       background: #f0f0f0;
       color: #333;
+      transition: background 0.3s, color 0.3s;
     }
     .main-container {
       display: flex;
@@ -53,12 +54,7 @@
     .controls input[type="file"] {
       display: none;
     }
-    .save-time {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #666;
-    }
-    .attachment-name {
+    .save-time, .attachment-name {
       margin-top: 0.5rem;
       font-size: 0.85rem;
       color: #444;
@@ -82,27 +78,11 @@
       background: #fafafa;
       border-bottom: 1px solid #ccc;
     }
-    .preview-top {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-    .preview-top a {
+    .preview-top a, .preview-bottom a {
       text-decoration: none;
     }
     .preview-content {
       padding: 1rem;
-      overflow-y: auto;
-    }
-    .preview-bottom {
-      border-top: 1px solid #ccc;
-      border-bottom: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-    .preview-bottom a {
-      text-decoration: none;
     }
     #previewToggle {
       position: absolute;
@@ -110,6 +90,9 @@
       top: 1rem;
     }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div class="main-container" onclick="maybeClosePreview(event)">
@@ -124,25 +107,9 @@
       <div class="preview-content">
         <div>🔍 Search   🔽 Group by: [Date ▼]</div>
         <hr/>
-        <div>🗓️ Today
-          <ul>
-            <li>✏️ Instagram carousel hook idea…</li>
-            <li>🎨 Sketch: Self-trust visual map</li>
-          </ul>
-        </div>
-        <div>🗓️ This Week
-          <ul>
-            <li>🤖 How to automate feedback loop…</li>
-            <li>🧠 Brainstorm: Book subtitle variants</li>
-          </ul>
-        </div>
-        <div>🗂️ Group by: 📌 Project
-          <ul>
-            <li>🔁 AI Suggests: Relevant to: Ginomahee</li>
-            <li>✍️ “Does This Resonate? prompt idea”</li>
-            <li>🎨 Wireframe sketch: Self-awareness UI</li>
-          </ul>
-        </div>
+        <div>🗓️ Today<ul><li>✏️ Instagram carousel hook idea…</li><li>🎨 Sketch: Self-trust visual map</li></ul></div>
+        <div>🗓️ This Week<ul><li>🤖 How to automate feedback loop…</li><li>🧠 Brainstorm: Book subtitle variants</li></ul></div>
+        <div>🗂️ Group by: 📌 Project<ul><li>🔁 AI Suggests: Relevant to: Ginomahee</li><li>✍️ “Does This Resonate? prompt idea”</li><li>🎨 Wireframe sketch: Self-awareness UI</li></ul></div>
         <div>✨ Last 5 unresolved ideas</div>
         <div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>
       </div>
@@ -158,8 +125,6 @@
       <div class="controls">
         <button onclick="saveText()">💾 Save</button>
         <button onclick="startVoiceCapture()">🎤 Voice</button>
-
-        <!-- 📎 File Attachment -->
         <label for="fileInput">📎</label>
         <input type="file" id="fileInput" onchange="handleFile()" />
       </div>
@@ -169,11 +134,41 @@
   </div>
 
   <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // 🔐 Silent login for dev
+    auth.signInWithEmailAndPassword("testuser@example.com", "password123").catch(console.error);
+
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = "signin.html";
+      }
+    });
+
+    // 🌈 Mood → Theme
+    const vibe = localStorage.getItem("vibeLabel");
+    if (vibe) {
+      if (vibe === "calm") document.body.style.background = "#e0f7fa";
+      if (vibe === "bold") document.body.style.background = "#ffebee";
+      if (vibe === "dark") {
+        document.body.style.background = "#222";
+        document.body.style.color = "#f9f9f9";
+      }
+    }
+
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
     const textarea = document.getElementById('mainText');
     const fileNameDisplay = document.getElementById('attachedFileName');
+    let saveTimeout;
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -187,27 +182,37 @@
     }
 
     function saveText() {
+      const text = textarea.value;
+      const user = auth.currentUser;
+      if (!user) return;
+      db.collection("catchpad").add({
+        uid: user.uid,
+        text,
+        timestamp: new Date()
+      });
+      localStorage.setItem('draftText', text);
       const now = new Date();
-      localStorage.setItem('capturedText', textarea.value);
-      localStorage.setItem('lastSaved', now.toISOString());
       saveStatus.innerText = `Saved at ${now.toLocaleTimeString()}`;
     }
 
     function autoSave() {
-      const now = new Date();
-      localStorage.setItem('capturedText', textarea.value);
-      localStorage.setItem('lastSaved', now.toISOString());
-      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => {
+        localStorage.setItem('draftText', textarea.value);
+        const now = new Date();
+        saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+      }, 5000);
     }
+
+    textarea.addEventListener('input', autoSave);
 
     function loadSavedText() {
-      const saved = localStorage.getItem('capturedText');
-      const lastSaved = localStorage.getItem('lastSaved');
-      if (saved) textarea.value = saved;
-      if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+      const draft = localStorage.getItem('draftText');
+      if (draft && confirm("Restore last unsaved draft?")) {
+        textarea.value = draft;
+      }
     }
 
-    setInterval(autoSave, 30000);
     window.onload = loadSavedText;
 
     function startVoiceCapture() {
@@ -216,7 +221,6 @@
       recognition.continuous = true;
       recognition.interimResults = false;
       recognition.start();
-
       recognition.onresult = (event) => {
         let transcript = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
