@@ -316,18 +316,78 @@
       idleTimer = setTimeout(pushToFirestore, 10000);
     }
 
-    // Voice capture remains unchanged
-    function toggleVoiceCapture() { /* … your existing voice logic … */ }
-    function startVoiceCapture() { /* … */ }
-    function stopVoiceCapture() { /* … */ }
+    // Voice capture logic
+    function toggleVoiceCapture() {
+       if (!('webkitSpeechRecognition' in window)) {
+         alert("Voice capture not supported in this browser.");
+         return;
+       }
 
-    function handleFileAttachment() {
-      const files = Array.from(document.getElementById('fileInput').files);
-      const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-      const updated = stored.concat(files.map(f => f.name));
-      localStorage.setItem('attachedFiles', JSON.stringify(updated));
-      updateFileDisplay(updated);
+        if (!recognition) {
+          recognition = new webkitSpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US';
+
+          recognition.onresult = function (event) {
+            let interim = '';
+            let final = '';
+
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              const transcript = event.results[i][0].transcript.trim().toLowerCase();
+
+              // Voice command: stop listening
+              if (event.results[i].isFinal && transcript.includes("stop listening")) {
+                stopVoiceCapture();
+                return;
+              }
+
+              if (event.results[i].isFinal) {
+                final += transcript + ' ';
+              } else {
+                interim += transcript + ' ';
+              }
+            } 
+
+             textarea.value += final;
+             textarea.scrollTop = textarea.scrollHeight;
+           };
+
+            recognition.onerror = function (event) {
+              console.error("Speech recognition error:", event.error);
+              stopVoiceCapture();
+            };
+
+            recognition.onend = function () {
+              if (isRecording) {
+                recognition.start(); // auto-restart if still recording
+              }
+            };
+         }
+
+         if (isRecording) {
+           stopVoiceCapture();
+         } else {
+           startVoiceCapture();
+         }
+       }
+
+       function startVoiceCapture() {
+          if (recognition) {
+            recognition.start();
+            isRecording = true;
+            document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
+          }
+        }
+
+        function stopVoiceCapture() {
+          if (recognition) {
+            recognition.stop();
+            isRecording = false;
+            document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
+        }
     }
+
 
     function removeFile(fileName) {
       const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
