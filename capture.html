@@ -66,20 +66,22 @@
       flex-direction: column;
       z-index: 100;
     }
-    .preview-header, .preview-footer {
+    .preview-top, .preview-bottom {
       padding: 1rem;
-      border-bottom: 1px solid #ccc;
       background: #fafafa;
+      border-bottom: 1px solid #ccc;
     }
-    .preview-footer {
-      border-top: 1px solid #ccc;
-      border-bottom: none;
+    .preview-top a {
+      margin-right: 0.5rem;
+      text-decoration: none;
     }
     .preview-content {
       padding: 1rem;
+      overflow-y: auto;
     }
-    .preview-content div {
-      margin-bottom: 1rem;
+    .preview-bottom {
+      border-top: 1px solid #ccc;
+      border-bottom: none;
     }
     #previewToggle {
       position: absolute;
@@ -91,8 +93,12 @@
 <body>
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="preview-overlay" id="preview">
-      <div class="preview-header">
-        🔄 Holding Bay | 🚀 Act Now | 🌿 Build Momentum | ⏳ Worth It Later | 📦 Parked Potential
+      <div class="preview-top">
+        <a href="holdingbay.html">🔄 Holding Bay</a>
+        <a href="actnow.html">🚀 Act Now</a>
+        <a href="buildmomentum.html">🌿 Build Momentum</a>
+        <a href="worthitlater.html">⏳ Worth It Later</a>
+        <a href="parkedpotential.html">📦 Parked Potential</a>
       </div>
       <div class="preview-content">
         <div>🔍 Search   🔽 Group by: [Date ▼]</div>
@@ -119,8 +125,8 @@
         <div>✨ Last 5 unresolved ideas</div>
         <div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>
       </div>
-      <div class="preview-footer">
-        Profile | Settings
+      <div class="preview-bottom">
+        <a href="profile.html">Profile</a> | <a href="settings.html">Settings</a>
       </div>
     </div>
     <div class="editor-area">
@@ -137,6 +143,8 @@
   <script>
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
+    const saveStatus = document.getElementById('saveStatus');
+    const textarea = document.getElementById('mainText');
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -151,8 +159,27 @@
 
     function saveText() {
       const now = new Date();
-      document.getElementById('saveStatus').innerText = `Saved at ${now.toLocaleTimeString()}`;
+      localStorage.setItem('capturedText', textarea.value);
+      localStorage.setItem('lastSaved', now.toISOString());
+      saveStatus.innerText = `Saved at ${now.toLocaleTimeString()}`;
     }
+
+    function autoSave() {
+      const now = new Date();
+      localStorage.setItem('capturedText', textarea.value);
+      localStorage.setItem('lastSaved', now.toISOString());
+      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+    }
+
+    function loadSavedText() {
+      const saved = localStorage.getItem('capturedText');
+      const lastSaved = localStorage.getItem('lastSaved');
+      if (saved) textarea.value = saved;
+      if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+    }
+
+    setInterval(autoSave, 30000); // auto save every 30 seconds
+    window.onload = loadSavedText;
 
     function startVoiceCapture() {
       const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -160,7 +187,7 @@
       recognition.start();
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        document.getElementById('mainText').value += (document.getElementById('mainText').value ? '\n' : '') + transcript;
+        textarea.value += (textarea.value ? '\n' : '') + transcript;
       };
     }
   </script>
