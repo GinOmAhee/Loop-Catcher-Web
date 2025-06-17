@@ -177,7 +177,6 @@
 
     .preview-bottom input[type="text"] {
       width: 100%;
-      max-width: 100%;
       box-sizing: border-box;
       padding: 0.3rem 0.5rem;
       font-size: 1rem;
@@ -245,6 +244,7 @@
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
+      updateGrouping();
     });
 
     function maybeClosePreview(e) {
@@ -255,25 +255,64 @@
 
     function saveText() {
       const now = new Date();
-      localStorage.setItem('capturedText', textarea.value);
+      const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      notes.push({ text: textarea.value, timestamp: now.toISOString() });
+      localStorage.setItem('savedNotes', JSON.stringify(notes));
       localStorage.setItem('lastSaved', now.toISOString());
       saveStatus.innerText = `Saved at ${now.toLocaleTimeString()}`;
+      updateGrouping();
     }
 
     function autoSave() {
-      const now = new Date();
-      localStorage.setItem('capturedText', textarea.value);
-      localStorage.setItem('lastSaved', now.toISOString());
-      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+      if (!textarea.value.trim()) return;
+      saveText();
     }
 
     function loadSavedText() {
-      const saved = localStorage.getItem('capturedText');
       const lastSaved = localStorage.getItem('lastSaved');
-      const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-      if (saved) textarea.value = saved;
-      if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
-      updateFileDisplay(attached);
+      if (lastSaved) {
+        saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+      }
+      updateFileDisplay(JSON.parse(localStorage.getItem('attachedFiles') || '[]'));
+    }
+
+    function updateGrouping() {
+      const value = document.getElementById('groupSelector').value;
+      const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      let today = [];
+      let thisWeek = [];
+
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+
+      notes.forEach(note => {
+        const noteDate = new Date(note.timestamp);
+        if (noteDate >= startOfToday) {
+          today.push(note);
+        } else if (noteDate >= startOfWeek) {
+          thisWeek.push(note);
+        }
+      });
+
+      let html = '';
+      if (value === 'date') {
+        if (today.length > 0) {
+          html += `<div>🗓️ Today<ul>${today.map(n => `<li>✏️ ${n.text}</li>`).join('')}</ul></div>`;
+        }
+        if (thisWeek.length > 0) {
+          html += `<div>🗓️ This Week<ul>${thisWeek.map(n => `<li>🧠 ${n.text}</li>`).join('')}</ul></div>`;
+        }
+      } else if (value === 'project') {
+        html = `<div>🗂️ Group by Project<ul><li>🔁 AI Suggests: Relevant to: Ginomahee</li><li>✍️ “Does This Resonate? prompt idea”</li><li>🎨 Wireframe sketch: Self-awareness UI</li></ul></div>`;
+      } else if (value === 'unresolved') {
+        html = `<div>✨ Last 5 unresolved ideas</div>`;
+      } else if (value === 'forgotten') {
+        html = `<div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>`;
+      }
+
+      groupedNotes.innerHTML = html;
     }
 
     function toggleVoiceCapture() {
@@ -355,23 +394,6 @@
           <span>${f}</span>
           <button onclick="removeFile('${f}')">🗑️</button>
         </li>`).join('')}</ul>`;
-    }
-
-    function updateGrouping() {
-      const value = document.getElementById('groupSelector').value;
-      let html = '';
-
-      if (value === 'project') {
-        html = `<div>🗂️ Group by Project<ul><li>🔁 AI Suggests: Relevant to: Ginomahee</li><li>✍️ “Does This Resonate? prompt idea”</li><li>🎨 Wireframe sketch: Self-awareness UI</li></ul></div>`;
-      } else if (value === 'unresolved') {
-        html = `<div>✨ Last 5 unresolved ideas</div>`;
-      } else if (value === 'forgotten') {
-        html = `<div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>`;
-      } else {
-        html = `<div>🗓️ Today<ul><li>✏️ Instagram carousel hook idea…</li><li>🎨 Sketch: Self-trust visual map</li></ul></div><div>🗓️ This Week<ul><li>🤖 How to automate feedback loop…</li><li>🧠 Brainstorm: Book subtitle variants</li></ul></div>`;
-      }
-
-      groupedNotes.innerHTML = html;
     }
 
     const moodThemeMap = {
