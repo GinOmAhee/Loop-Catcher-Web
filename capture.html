@@ -302,6 +302,7 @@
     window.onload = function () {
       loadSavedText();
       applyMoodTheme();
+      setInterval(autoSave, 30000); // ← auto save every 30 seconds
     };
   </script>
 </body>
