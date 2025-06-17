@@ -4,224 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Capture UI</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f0f0f0;
-      color: #333;
-    }
-
-    .theme-calm { background-color: #cfe3d5; color: #2f4633; }
-    .theme-strategic { background-color: #d7d7da; color: #2e2e32; }
-    .theme-reflective { background-color: #e2dfc9; color: #443f1d; }
-    .theme-bold { background-color: #f7ddb4; color: #5d3e0a; }
-    .theme-playful { background-color: #ffd6e8; color: #7e2b4e; }
-
-    .main-container {
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .editor-area {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      position: relative;
-    }
-
-    textarea {
-      width: 60%;
-      height: 300px;
-      padding: 1rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      resize: none;
-    }
-
-    .controls {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
-      align-items: center;
-    }
-
-    .controls button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .save-time {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #666;
-    }
-
-    .preview-overlay {
-      width: 420px;
-      background: #fff;
-      border-right: 1px solid #ccc;
-      overflow-y: auto;
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      display: none;
-      flex-direction: column;
-      z-index: 100;
-    }
-
-    .preview-top {
-      padding: 1rem;
-      background: #fafafa;
-      border-bottom: 1px solid #ccc;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
-    .preview-top a,
-    .preview-settings a {
-      text-decoration: none;
-      color: inherit;
-      font-size: 1rem;
-    }
-
-    .preview-content {
-      padding: 1rem;
-      overflow-y: auto;
-      flex-grow: 1;
-    }
-
-    .preview-sortbar {
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1rem;
-    }
-
-    .preview-sortbar label {
-      font-size: 1rem;
-    }
-
-    .preview-sortbar select {
-      font-size: 1rem;
-      background: transparent;
-      border: none;
-      outline: none;
-      cursor: pointer;
-    }
-
-    #previewToggle {
-      position: absolute;
-      left: 1rem;
-      top: 1rem;
-    }
-
-    #attachedFilesList {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #444;
-      max-width: 60%;
-      word-wrap: break-word;
-    }
-
-    #attachedFilesList ul {
-      padding-left: 1.2rem;
-    }
-
-    .file-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .file-item span {
-      flex: 1;
-    }
-
-    .file-item button {
-      background: none;
-      border: none;
-      color: red;
-      cursor: pointer;
-    }
-
-    .preview-settings {
-      padding: 1rem;
-      background: #fafafa;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .preview-bottom {
-      padding: 1rem;
-      border-top: 1px solid #ccc;
-      background: #fafafa;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .preview-bottom input[type="text"] {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 0.3rem 0.5rem;
-      font-size: 1rem;
-    }
+    /* Keep all your existing styles here */
   </style>
 </head>
 <body>
   <div class="main-container" onclick="maybeClosePreview(event)">
-    <div class="preview-overlay" id="preview">
-      <div class="preview-top">
-        <a href="holdingbay.html">🔄 Holding Bay</a>
-        <a href="actnow.html">🚀 Act Now</a>
-        <a href="buildmomentum.html">🌿 Build Momentum</a>
-        <a href="worthitlater.html">⏳ Worth It Later</a>
-        <a href="parkedpotential.html">📦 Parked Potential</a>
-      </div>
-
-      <div class="preview-content">
-        <div class="preview-sortbar">
-          <label for="groupSelector">Group by</label>
-          <select id="groupSelector" onchange="updateGrouping()">
-            <option value="date">Date</option>
-            <option value="project">Project</option>
-            <option value="unresolved">Unresolved Ideas</option>
-            <option value="forgotten">Forgotten Ideas</option>
-          </select>
-        </div>
-        <div id="groupedNotes"></div>
-      </div>
-
-      <div class="preview-bottom">
-        <input type="text" placeholder="🔍 Search">
-      </div>
-
-      <div class="preview-settings">
-        <a href="settings.html">⚙️ Settings</a>
-        <a href="profile.html">👤 Profile</a>
-      </div>
-    </div>
-
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <textarea id="mainText" placeholder="Start capturing..."></textarea>
       <div class="controls">
-        <button onclick="saveText()">💾 Save</button>
+        <button onclick="manualSave()">💾 Save</button>
         <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
         <button onclick="document.getElementById('fileInput').click()">📎 Attach File</button>
         <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileAttachment()" />
@@ -232,87 +27,86 @@
   </div>
 
   <script>
-    const preview = document.getElementById('preview');
-    const toggleBtn = document.getElementById('previewToggle');
-    const saveStatus = document.getElementById('saveStatus');
+    let db;
     const textarea = document.getElementById('mainText');
+    const saveStatus = document.getElementById('saveStatus');
     const attachedFilesList = document.getElementById('attachedFilesList');
-    const groupedNotes = document.getElementById('groupedNotes');
+    let lastSavedText = '';
+    let idleTimer = null;
     let recognition;
     let isRecording = false;
 
-    toggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
-      updateGrouping();
-    });
-
-    function maybeClosePreview(e) {
-      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
-        preview.style.display = 'none';
+    // Step 1: Fetch API config from secure endpoint
+    async function initFirebase() {
+      try {
+        const response = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+        const firebaseConfig = await response.json();
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        onFirebaseReady();
+      } catch (err) {
+        console.error("Failed to fetch Firebase config:", err);
+        saveStatus.innerText = "❌ Failed to initialize Firebase.";
       }
     }
 
-    function saveText() {
-      const now = new Date();
-      const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-      notes.push({ text: textarea.value, timestamp: now.toISOString() });
-      localStorage.setItem('savedNotes', JSON.stringify(notes));
-      localStorage.setItem('lastSaved', now.toISOString());
-      saveStatus.innerText = `Saved at ${now.toLocaleTimeString()}`;
-      updateGrouping();
+    function onFirebaseReady() {
+      loadSavedText();
+      textarea.addEventListener('input', monitorTyping);
+      setInterval(saveToLocal, 5000); // Local autosave every 5s
     }
 
-    function autoSave() {
-      if (!textarea.value.trim()) return;
-      saveText();
+    function saveToLocal() {
+      const text = textarea.value.trim();
+      if (!text || text === lastSavedText) return;
+      localStorage.setItem('autosaveText', text);
+      lastSavedText = text;
+      saveStatus.innerText = "💾 Autosaved locally...";
+    }
+
+    function manualSave() {
+      const text = textarea.value.trim();
+      if (!text) return;
+      saveToLocal();
+      pushToFirestore(text);
+    }
+
+    function pushToFirestore(text) {
+      if (!db) return;
+      db.collection("capturedNotes").add({
+        text: text,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        saveStatus.innerText = "✅ Pushed to Firestore.";
+      }).catch((error) => {
+        console.error("Firestore Error:", error);
+        saveStatus.innerText = "❌ Firestore error.";
+      });
+    }
+
+    function monitorTyping() {
+      saveToLocal();
+      resetIdleTimer();
+    }
+
+    function resetIdleTimer() {
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        const text = textarea.value.trim();
+        if (text && text !== lastSavedText) {
+          pushToFirestore(text);
+          lastSavedText = text;
+        }
+      }, 10000); // 10 seconds idle
     }
 
     function loadSavedText() {
-      const lastSaved = localStorage.getItem('lastSaved');
-      if (lastSaved) {
-        saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+      const saved = localStorage.getItem('autosaveText');
+      if (saved) {
+        textarea.value = saved;
+        lastSavedText = saved;
+        saveStatus.innerText = "📥 Loaded local draft.";
       }
-      updateFileDisplay(JSON.parse(localStorage.getItem('attachedFiles') || '[]'));
-    }
-
-    function updateGrouping() {
-      const value = document.getElementById('groupSelector').value;
-      const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-      let today = [];
-      let thisWeek = [];
-
-      const now = new Date();
-      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const startOfWeek = new Date(now);
-      startOfWeek.setDate(now.getDate() - now.getDay());
-
-      notes.forEach(note => {
-        const noteDate = new Date(note.timestamp);
-        if (noteDate >= startOfToday) {
-          today.push(note);
-        } else if (noteDate >= startOfWeek) {
-          thisWeek.push(note);
-        }
-      });
-
-      let html = '';
-      if (value === 'date') {
-        if (today.length > 0) {
-          html += `<div>🗓️ Today<ul>${today.map(n => `<li>✏️ ${n.text}</li>`).join('')}</ul></div>`;
-        }
-        if (thisWeek.length > 0) {
-          html += `<div>🗓️ This Week<ul>${thisWeek.map(n => `<li>🧠 ${n.text}</li>`).join('')}</ul></div>`;
-        }
-      } else if (value === 'project') {
-        html = `<div>🗂️ Group by Project<ul><li>🔁 AI Suggests: Relevant to: Ginomahee</li><li>✍️ “Does This Resonate? prompt idea”</li><li>🎨 Wireframe sketch: Self-awareness UI</li></ul></div>`;
-      } else if (value === 'unresolved') {
-        html = `<div>✨ Last 5 unresolved ideas</div>`;
-      } else if (value === 'forgotten') {
-        html = `<div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>`;
-      }
-
-      groupedNotes.innerHTML = html;
     }
 
     function toggleVoiceCapture() {
@@ -338,16 +132,11 @@
         let transcript = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
-            let text = event.results[i][0].transcript.trim();
-            if (text.toLowerCase().includes("stop")) {
-              stopVoiceCapture();
-              saveText();
-              return;
-            }
-            transcript += text + '\n';
+            transcript += event.results[i][0].transcript.trim() + '\n';
           }
         }
         textarea.value += (textarea.value ? '\n' : '') + transcript.trim();
+        monitorTyping();
       };
 
       recognition.onerror = (e) => {
@@ -357,14 +146,11 @@
     }
 
     function stopVoiceCapture() {
-      if (recognition) {
-        recognition.stop();
-        recognition = null;
-      }
+      if (recognition) recognition.stop();
+      recognition = null;
       isRecording = false;
       document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
-      saveText();
-      saveStatus.innerText = "🎤 Voice capture stopped.";
+      saveToLocal();
     }
 
     function handleFileAttachment() {
@@ -396,27 +182,16 @@
         </li>`).join('')}</ul>`;
     }
 
-    const moodThemeMap = {
-      "Calm & Clear": "theme-calm",
-      "Focused & Strategic": "theme-strategic",
-      "Open & Reflective": "theme-reflective",
-      "Driven & Bold": "theme-bold",
-      "Playful & Inventive": "theme-playful"
-    };
-
-    function applyMoodTheme() {
-      const vibe = localStorage.getItem('vibeLabel');
-      const themeClass = moodThemeMap[vibe];
-      if (themeClass) {
-        document.body.classList.add(themeClass);
+    window.addEventListener('beforeunload', () => {
+      const text = textarea.value.trim();
+      if (text && text !== lastSavedText) {
+        pushToFirestore(text);
       }
-    }
+    });
 
-    window.onload = function () {
-      loadSavedText();
-      applyMoodTheme();
-      updateGrouping();
-      setInterval(autoSave, 30000);
+    // Initialize on page load
+    window.onload = () => {
+      initFirebase();
     };
   </script>
 </body>
