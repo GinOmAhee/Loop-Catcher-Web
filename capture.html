@@ -37,26 +37,31 @@
     }
     .controls {
       display: flex;
-      gap: 0.5rem;
+      gap: 1rem;
       margin-top: 1rem;
-      flex-wrap: wrap;
-      justify-content: center;
+      align-items: center;
     }
-    .controls button, .controls input[type=file] {
-      padding: 0.5rem;
+    .controls button, .controls label {
+      padding: 0.5rem 1rem;
       font-size: 1rem;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       background: #fff;
+      border: 1px solid #ccc;
     }
-    .controls input[type=file] {
+    .controls input[type="file"] {
       display: none;
     }
     .save-time {
       margin-top: 1rem;
       font-size: 0.9rem;
       color: #666;
+    }
+    .attachment-name {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #444;
     }
     .preview-overlay {
       width: 350px;
@@ -76,58 +81,33 @@
       padding: 1rem;
       background: #fafafa;
       border-bottom: 1px solid #ccc;
+    }
+    .preview-top {
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
+      gap: 0.3rem;
     }
-    .preview-top a, .preview-bottom a {
+    .preview-top a {
       text-decoration: none;
     }
     .preview-content {
       padding: 1rem;
       overflow-y: auto;
     }
+    .preview-bottom {
+      border-top: 1px solid #ccc;
+      border-bottom: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .preview-bottom a {
+      text-decoration: none;
+    }
     #previewToggle {
       position: absolute;
       left: 1rem;
       top: 1rem;
-    }
-    .emoji-picker {
-      display: none;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 1rem;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      position: absolute;
-      bottom: 100px;
-      z-index: 101;
-    }
-    .emoji-picker span {
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    .share-options {
-      position: absolute;
-      bottom: 140px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      display: none;
-      flex-direction: column;
-      z-index: 102;
-    }
-    .share-options button {
-      padding: 0.5rem 1rem;
-      border: none;
-      background: none;
-      cursor: pointer;
-      text-align: left;
-    }
-    .share-options button:hover {
-      background-color: #f0f0f0;
     }
   </style>
 </head>
@@ -171,24 +151,19 @@
         <a href="settings.html">⚙️ Settings</a>
       </div>
     </div>
+
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <textarea id="mainText" placeholder="Start capturing..."></textarea>
       <div class="controls">
-        <button onclick="saveText()">💾</button>
-        <button onclick="startVoiceCapture()">🎤 Voice Capture</button>
-        <label for="attachFile">📎</label>
-        <input type="file" id="attachFile">
-        <button onclick="toggleEmojiPicker()">😊</button>
-        <button onclick="toggleShareOptions()">✈️</button>
-        <button onclick="window.print()">🖨️</button>
-        <button onclick="downloadNote()">📥</button>
+        <button onclick="saveText()">💾 Save</button>
+        <button onclick="startVoiceCapture()">🎤 Voice</button>
+
+        <!-- 📎 File Attachment -->
+        <label for="fileInput">📎</label>
+        <input type="file" id="fileInput" onchange="handleFile()" />
       </div>
-      <div class="emoji-picker" id="emojiPicker"></div>
-      <div class="share-options" id="shareOptions">
-        <button onclick="shareTo('facebook')">Share to Facebook</button>
-        <button onclick="shareTo('twitter')">Share to Twitter</button>
-      </div>
+      <div class="attachment-name" id="attachedFileName"></div>
       <div class="save-time" id="saveStatus"></div>
     </div>
   </div>
@@ -198,8 +173,7 @@
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
     const textarea = document.getElementById('mainText');
-    const emojiPicker = document.getElementById('emojiPicker');
-    const shareOptions = document.getElementById('shareOptions');
+    const fileNameDisplay = document.getElementById('attachedFileName');
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -209,8 +183,6 @@
     function maybeClosePreview(e) {
       if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
         preview.style.display = 'none';
-        emojiPicker.style.display = 'none';
-        shareOptions.style.display = 'none';
       }
     }
 
@@ -235,55 +207,34 @@
       if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
     }
 
+    setInterval(autoSave, 30000);
+    window.onload = loadSavedText;
+
     function startVoiceCapture() {
       const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = 'en-US';
       recognition.continuous = true;
       recognition.interimResults = false;
       recognition.start();
+
       recognition.onresult = (event) => {
-        const transcript = event.results[event.results.length - 1][0].transcript;
-        textarea.value += (textarea.value ? '\n' : '') + transcript;
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            transcript += event.results[i][0].transcript + '\n';
+          }
+        }
+        textarea.value += (textarea.value ? '\n' : '') + transcript.trim();
       };
     }
 
-    function toggleEmojiPicker() {
-      if (emojiPicker.style.display === 'flex') {
-        emojiPicker.style.display = 'none';
-        return;
+    function handleFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      if (file) {
+        fileNameDisplay.textContent = `📎 Attached: ${file.name}`;
       }
-      emojiPicker.innerHTML = '';
-      const emojis = ['😊','🔥','💡','🚀','🎯','💭','📌','📝','🎉'];
-      emojis.forEach(e => {
-        const span = document.createElement('span');
-        span.textContent = e;
-        span.onclick = () => {
-          textarea.value += ' ' + e;
-          emojiPicker.style.display = 'none';
-        };
-        emojiPicker.appendChild(span);
-      });
-      emojiPicker.style.display = 'flex';
     }
-
-    function toggleShareOptions() {
-      shareOptions.style.display = shareOptions.style.display === 'flex' ? 'none' : 'flex';
-    }
-
-    function shareTo(platform) {
-      const note = encodeURIComponent(textarea.value);
-      let url = '';
-      if (platform === 'facebook') {
-        url = `https://www.facebook.com/sharer/sharer.php?u=data:text/plain,${note}`;
-      } else if (platform === 'twitter') {
-        url = `https://twitter.com/intent/tweet?text=${note}`;
-      }
-      window.open(url, '_blank');
-      shareOptions.style.display = 'none';
-    }
-
-    setInterval(autoSave, 30000);
-    window.onload = loadSavedText;
   </script>
 </body>
 </html>
