@@ -2,238 +2,181 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🪄 New Thought</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catchpad+ Preview</title>
+  <link rel="icon" href="data:,">
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <style>
-    :root {
-      --natural-beige: #f5f1e8;
-      --soft-plum: #774C64;
-      --muted-green: #6B8F71;
-    }
-    .theme-calm { background-color: #f3f7f4; color: #4C5B52; }
-    .theme-strategic { background-color: #f1f0ed; color: #2E2E2E; }
-    .theme-reflective { background-color: #fffefc; color: #3e3e3e; }
-    .theme-bold { background-color: #fef6ec; color: #5C2F00; }
-    .theme-playful { background-color: #fff0f7; color: #64204f; }
-
     body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--natural-beige);
-      color: var(--soft-plum);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       padding: 2rem;
-      height: 100vh;
-      text-align: center;
+      color: #333;
     }
-
-    h2 {
-      font-size: 1.6rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .nudge {
-      font-style: italic;
-      font-size: 0.95rem;
-      color: #555;
-      margin-bottom: 1.5rem;
-    }
-
+    .mood-happy { background-color: #fff7e6; }
+    .mood-sad { background-color: #f0f0ff; }
+    .mood-inspired { background-color: #e6fff2; }
     textarea {
       width: 100%;
-      max-width: 500px;
-      height: 140px;
       padding: 1rem;
       font-size: 1rem;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      resize: vertical;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-    button {
-      margin-top: 1rem;
-      margin-right: 0.5rem;
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-      background: var(--muted-green);
-      color: white;
-      border: none;
       border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border: 1px solid #ccc;
     }
-
-    button:hover {
-      background: #5c7e63;
+    button {
+      margin: 1rem 0.5rem 0 0;
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #333;
+      color: white;
+    }
+    #previewWrapper {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-top: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
   </style>
 </head>
 <body>
-  <div id="loadingMessage">🔄 Checking login status…</div>
+  <div id="mainLayout" style="max-width: 800px; margin: auto;">
+    <textarea id="noteArea" placeholder="Start capturing..."></textarea><br>
+    <select id="moodSelector">
+      <option value="">Select Mood</option>
+      <option value="happy">Happy</option>
+      <option value="sad">Sad</option>
+      <option value="inspired">Inspired</option>
+    </select>
+    <button id="saveBtn">Save</button>
+    <button id="voiceBtn">🎙️ Voice</button>
+    <span id="status"></span>
 
-  <div id="mainContent" style="display: none;">
-    <h2>+ New Thought</h2>
-    <p id="moodLabel" style="font-size: 0.9rem; margin-bottom: 1.2rem; color: inherit;"></p>
-    <p class="nudge">💡 Sudden spark? Jot it here — we got you.</p>
-
-    <textarea id="thoughtInput" placeholder="Type your thought…"></textarea>
-    <button id="captureBtn">Capture Thought</button>
-    <button id="speakBtn">🎙️ Speak Thought</button>
+    <!-- Smart Preview UI -->
+    <div id="previewWrapper">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <input type="text" id="searchBar" placeholder="🔍 Search..." style="flex: 1; padding: 0.6rem; font-size: 1rem;">
+        <select id="groupBySelect" style="padding: 0.6rem;">
+          <option value="date">📅 Group by Date</option>
+          <option value="project">📌 Group by Project</option>
+        </select>
+      </div>
+      <div id="entriesContainer"></div>
+    </div>
   </div>
 
-  <script type="module">
-    const fetchFirebaseConfig = async () => {
-      try {
-        const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
-        const config = await res.json();
-        if (!config.projectId) throw new Error("Missing projectId in Firebase config.");
-        return config;
-      } catch (err) {
-        console.error("Failed to fetch Firebase config:", err);
-        alert("Could not load app config. Try again later.");
-        return null;
-      }
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID"
     };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-    const moodThemeMap = {
-      "Calm & Clear": "theme-calm",
-      "Focused & Strategic": "theme-strategic",
-      "Open & Reflective": "theme-reflective",
-      "Driven & Bold": "theme-bold",
-      "Playful & Inventive": "theme-playful"
-    };
+    const noteArea = document.getElementById("noteArea");
+    const saveBtn = document.getElementById("saveBtn");
+    const voiceBtn = document.getElementById("voiceBtn");
+    const status = document.getElementById("status");
+    const moodSelector = document.getElementById("moodSelector");
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const label = (localStorage.getItem("vibeLabel") || "").trim();
-      const themeClass = moodThemeMap[label];
-      const moodLabelEl = document.getElementById("moodLabel");
-      if (moodLabelEl && label) moodLabelEl.textContent = `${label} Mode`;
-      if (themeClass) document.body.classList.add(themeClass);
+    moodSelector.addEventListener("change", () => {
+      document.body.className = "mood-" + moodSelector.value;
+    });
 
-      const init = async () => {
-        const firebaseConfig = await fetchFirebaseConfig();
-        if (!firebaseConfig) return;
+    let recognition;
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
 
-        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js");
-        const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js");
-        const { getAuth, onAuthStateChanged, signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js");
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        const speakBtn = document.getElementById("speakBtn");
-        const captureBtn = document.getElementById("captureBtn");
-        const thoughtInput = document.getElementById("thoughtInput");
-
-        if (!('webkitSpeechRecognition' in window)) {
-          speakBtn.style.display = "none";
-          console.warn("SpeechRecognition not supported");
-        } else {
-          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-          const recognition = new SpeechRecognition();
-          recognition.lang = 'en-US';
-          recognition.interimResults = false;
-          recognition.maxAlternatives = 1;
-
-          speakBtn.addEventListener("click", () => {
-            recognition.start();
-            speakBtn.textContent = "🎙️ Listening...";
-          });
-
-          recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            thoughtInput.value += (thoughtInput.value ? " " : "") + transcript;
-            speakBtn.textContent = "🎙️ Speak Thought";
-            thoughtInput.dispatchEvent(new Event("input"));
-          };
-
-          recognition.onerror = (event) => {
-            alert("Speech error: " + event.error);
-            speakBtn.textContent = "🎙️ Speak Thought";
-          };
-
-          recognition.onend = () => {
-            speakBtn.textContent = "🎙️ Speak Thought";
-          };
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-          if (user) {
-            await user.reload();
-            document.getElementById("loadingMessage").style.display = "none";
-            document.getElementById("mainContent").style.display = "block";
-
-            const statusEl = document.createElement("div");
-            statusEl.style.fontSize = "0.8rem";
-            statusEl.style.marginTop = "0.5rem";
-            statusEl.style.color = "#888";
-            thoughtInput.insertAdjacentElement("afterend", statusEl);
-
-            const draftKey = `draft-${user.uid}`;
-            let saveTimeout;
-            const updateStatus = (text) => statusEl.textContent = text;
-
-            const saveToFirestore = async () => {
-              const content = thoughtInput.value.trim();
-              if (!content) return;
-              try {
-                await addDoc(collection(db, "catchpad"), {
-                  content,
-                  owner: user.uid,
-                  createdAt: serverTimestamp()
-                });
-                updateStatus(`✅ Saved ✓ at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
-                localStorage.setItem(draftKey, content);
-              } catch (err) {
-                updateStatus("⚠️ Offline — will retry later");
-                localStorage.setItem(draftKey, content);
-              }
-            };
-
-            thoughtInput.addEventListener("input", () => {
-              updateStatus("💾 Saving...");
-              clearTimeout(saveTimeout);
-              saveTimeout = setTimeout(saveToFirestore, 1500);
-            });
-
-            const savedDraft = localStorage.getItem(draftKey);
-            if (savedDraft && !thoughtInput.value.trim()) {
-              if (confirm("Restore previous unsaved thought?")) {
-                thoughtInput.value = savedDraft;
-                updateStatus("💡 Restored draft from backup");
-              }
-            }
-
-            captureBtn.addEventListener("click", async () => {
-              const entry = thoughtInput.value.trim();
-              if (!entry) return;
-              try {
-                await addDoc(collection(db, "catchpad"), {
-                  content: entry,
-                  owner: user.uid,
-                  createdAt: serverTimestamp()
-                });
-                window.location.href = "catchpad.html";
-              } catch (error) {
-                alert("Oops! Couldn’t save your thought. Try again.");
-              }
-            });
-          } else {
-            window.location.href = "signin.html";
-          }
-        });
-
-        signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
-          .then((cred) => console.log("Login successful:", cred.user))
-          .catch((err) => console.error("Login failed:", err));
+      recognition.onresult = (e) => {
+        noteArea.value += e.results[0][0].transcript + " ";
       };
+    }
 
-      init();
+    voiceBtn.onclick = () => recognition && recognition.start();
+
+    saveBtn.onclick = async () => {
+      const content = noteArea.value.trim();
+      if (!content) return;
+      const mood = moodSelector.value;
+      const createdAt = new Date();
+      const owner = auth.currentUser?.uid || "anon";
+
+      await db.collection("catchpad").add({ content, mood, createdAt, owner });
+      status.textContent = "Saved at " + createdAt.toLocaleTimeString();
+      noteArea.value = "";
+    };
+
+    async function fetchEntries(uid) {
+      const q = db.collection("catchpad").where("owner", "==", uid).orderBy("createdAt", "desc");
+      const snapshot = await q.get();
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt.toDate() }));
+    }
+
+    function groupByDate(entries) {
+      const groups = {};
+      entries.forEach(entry => {
+        const d = entry.createdAt.toDateString();
+        if (!groups[d]) groups[d] = [];
+        groups[d].push(entry);
+      });
+      return groups;
+    }
+
+    function renderEntries(grouped) {
+      const container = document.getElementById("entriesContainer");
+      container.innerHTML = "";
+      for (const [date, items] of Object.entries(grouped)) {
+        const sec = document.createElement("div");
+        sec.innerHTML = `<h3>🗓️ ${date}</h3>`;
+        items.forEach(e => {
+          const emoji = e.type === "sketch" ? "🎨" : e.type === "brainstorm" ? "🧠" : "✏️";
+          const div = document.createElement("div");
+          div.style = "padding: 0.5rem 0; border-bottom: 1px solid #ddd;";
+          div.textContent = `- ${emoji} ${e.content.slice(0, 100)}${e.content.length > 100 ? "…" : ""}`;
+          sec.appendChild(div);
+        });
+        container.appendChild(sec);
+      }
+    }
+
+    document.getElementById("groupBySelect").addEventListener("change", async (e) => {
+      if (e.target.value === "project") {
+        alert("Project grouping coming soon");
+      } else {
+        const user = auth.currentUser;
+        if (user) {
+          const entries = await fetchEntries(user.uid);
+          renderEntries(groupByDate(entries));
+        }
+      }
+    });
+
+    document.getElementById("searchBar").addEventListener("input", async (e) => {
+      const query = e.target.value.toLowerCase();
+      const user = auth.currentUser;
+      if (user) {
+        const entries = await fetchEntries(user.uid);
+        const filtered = entries.filter(entry => entry.content.toLowerCase().includes(query));
+        renderEntries(groupByDate(filtered));
+      }
+    });
+
+    auth.onAuthStateChanged(async user => {
+      if (user) {
+        const entries = await fetchEntries(user.uid);
+        renderEntries(groupByDate(entries));
+      }
     });
   </script>
 </body>
