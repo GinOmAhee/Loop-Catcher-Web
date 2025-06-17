@@ -76,7 +76,8 @@
       flex-direction: column;
     }
     .preview-top a {
-      margin-bottom: 0.5rem;
+      display: block;
+      margin-bottom: 0.3rem;
       text-decoration: none;
     }
     .preview-content {
@@ -86,6 +87,12 @@
     .preview-bottom {
       border-top: 1px solid #ccc;
       border-bottom: none;
+      display: flex;
+      flex-direction: column;
+    }
+    .preview-bottom a {
+      margin-top: 0.3rem;
+      text-decoration: none;
     }
     #previewToggle {
       position: absolute;
@@ -98,11 +105,11 @@
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="preview-overlay" id="preview">
       <div class="preview-top">
-        <a href="holdingbay.html">Holding Bay</a>
-        <a href="actnow.html">Act Now</a>
-        <a href="buildmomentum.html">Build Momentum</a>
-        <a href="worthitlater.html">Worth It Later</a>
-        <a href="parkedpotential.html">Parked Potential</a>
+        <a href="holdingbay.html">🔄 Holding Bay</a>
+        <a href="actnow.html">🚀 Act Now</a>
+        <a href="buildmomentum.html">🌿 Build Momentum</a>
+        <a href="worthitlater.html">⏳ Worth It Later</a>
+        <a href="parkedpotential.html">📦 Parked Potential</a>
       </div>
       <div class="preview-content">
         <div>🔍 Search   🔽 Group by: [Date ▼]</div>
@@ -130,7 +137,8 @@
         <div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>
       </div>
       <div class="preview-bottom">
-        <a href="profile.html">Profile</a> | <a href="settings.html">Settings</a>
+        <a href="profile.html">👤 Profile</a>
+        <a href="settings.html">⚙️ Settings</a>
       </div>
     </div>
     <div class="editor-area">
@@ -182,7 +190,7 @@
       if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
     }
 
-    setInterval(autoSave, 30000); // auto save every 30 seconds
+    setInterval(autoSave, 30000);
     window.onload = loadSavedText;
 
     function startVoiceCapture() {
