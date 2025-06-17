@@ -67,7 +67,7 @@
     }
 
     .preview-overlay {
-      width: 420px; /* 100.5% of original 352px */
+      width: 420px;
       background: #fff;
       border-right: 1px solid #ccc;
       overflow-y: auto;
@@ -94,6 +94,7 @@
     .preview-settings a {
       text-decoration: none;
       color: inherit;
+      font-size: 1rem;
     }
 
     .preview-content {
@@ -138,9 +139,28 @@
     }
 
     .preview-sortbar {
-      height: 100px; /* or whatever height you want */
-      padding: 0.5rem 1rem; /* adjust padding to fit new height */
+      display: flex;
       align-items: center;
+      padding: 0;
+      margin: 0;
+      background: none;
+      border: none;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    .preview-sortbar label {
+      font-size: inherit;
+      font-weight: normal;
+      margin-right: 0.5rem;
+    }
+
+    .preview-sortbar select {
+      font-size: inherit;
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
     }
 
     .preview-settings {
@@ -182,6 +202,7 @@
 
       <div class="preview-content">
         <div class="preview-sortbar">
+          <label for="groupSelector">Group by ▼</label>
           <select id="groupSelector" onchange="updateGrouping()">
             <option value="date">Date</option>
             <option value="project">Project</option>
