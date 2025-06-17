@@ -81,21 +81,17 @@
       z-index: 100;
     }
 
-    .preview-top,
-    .preview-bottom {
+    .preview-top {
       padding: 1rem;
       background: #fafafa;
       border-bottom: 1px solid #ccc;
-    }
-
-    .preview-top {
       display: flex;
       flex-direction: column;
       gap: 0.3rem;
     }
 
     .preview-top a,
-    .preview-bottom a {
+    .preview-settings a {
       text-decoration: none;
       color: inherit;
     }
@@ -149,34 +145,27 @@
       margin-bottom: 1rem;
     }
 
-    .preview-sortbar input[type="text"] {
-      width: 70%;
-      padding: 0.3rem 0.5rem;
-      font-size: 1rem;
-    }
-
-    .preview-sortbar select {
-      padding: 0.3rem;
-      font-size: 1rem;
-    }
-
     .preview-settings {
-      border-top: 1px solid #ccc;
-      margin-top: auto;
       padding: 1rem;
       background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
-    .preview-settings a {
-      display: block;
-      text-decoration: none;
-      color: inherit;
-      margin-bottom: 0.3rem;
+    .preview-bottom {
+      padding: 1rem;
+      border-top: 1px solid #ccc;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
 
-    .preview-settings .sub-link {
-      padding-left: 1.2rem;
-      font-size: 0.95rem;
+    .preview-bottom input[type="text"] {
+      padding: 0.3rem 0.5rem;
+      font-size: 1rem;
+      width: 100%;
     }
   </style>
 </head>
@@ -190,9 +179,9 @@
         <a href="worthitlater.html">⏳ Worth It Later</a>
         <a href="parkedpotential.html">📦 Parked Potential</a>
       </div>
+
       <div class="preview-content">
         <div class="preview-sortbar">
-          <input type="text" placeholder="🔍 Search">
           <select id="groupSelector" onchange="updateGrouping()">
             <option value="date">Date</option>
             <option value="project">Project</option>
@@ -202,9 +191,14 @@
         </div>
         <div id="groupedNotes"></div>
       </div>
+
+      <div class="preview-bottom">
+        <input type="text" placeholder="🔍 Search">
+      </div>
+
       <div class="preview-settings">
         <a href="settings.html">⚙️ Settings</a>
-        <a href="profile.html" class="sub-link">👤 Profile</a>
+        <a href="profile.html">👤 Profile</a>
       </div>
     </div>
 
