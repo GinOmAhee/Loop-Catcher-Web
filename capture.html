@@ -67,7 +67,7 @@
     }
 
     .preview-overlay {
-      width: 352px; /* 100.5% of original 350px */
+      width: 352px;
       background: #fff;
       border-right: 1px solid #ccc;
       overflow-y: auto;
@@ -97,11 +97,13 @@
     .preview-top a,
     .preview-bottom a {
       text-decoration: none;
+      color: inherit;
     }
 
     .preview-content {
       padding: 1rem;
       overflow-y: auto;
+      flex-grow: 1;
     }
 
     #previewToggle {
@@ -157,6 +159,25 @@
       padding: 0.3rem;
       font-size: 1rem;
     }
+
+    .preview-settings {
+      border-top: 1px solid #ccc;
+      margin-top: auto;
+      padding: 1rem;
+      background: #fafafa;
+    }
+
+    .preview-settings a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      margin-bottom: 0.3rem;
+    }
+
+    .preview-settings .sub-link {
+      padding-left: 1.2rem;
+      font-size: 0.95rem;
+    }
   </style>
 </head>
 <body>
@@ -173,22 +194,20 @@
         <div class="preview-sortbar">
           <input type="text" placeholder="🔍 Search">
           <select id="groupSelector" onchange="updateGrouping()">
-            <option value="date">▼</option>
             <option value="date">Date</option>
             <option value="project">Project</option>
             <option value="unresolved">Unresolved Ideas</option>
             <option value="forgotten">Forgotten Ideas</option>
           </select>
         </div>
-        <div id="groupedNotes">
-          <!-- Dynamic content goes here -->
-        </div>
+        <div id="groupedNotes"></div>
       </div>
-      <div class="preview-bottom">
-        <a href="profile.html">👤 Profile</a>
+      <div class="preview-settings">
         <a href="settings.html">⚙️ Settings</a>
+        <a href="profile.html" class="sub-link">👤 Profile</a>
       </div>
     </div>
+
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <textarea id="mainText" placeholder="Start capturing..."></textarea>
@@ -342,11 +361,9 @@
             </ul>
           </div>`;
       } else if (value === 'unresolved') {
-        html = `
-          <div>✨ Last 5 unresolved ideas</div>`;
+        html = `<div>✨ Last 5 unresolved ideas</div>`;
       } else if (value === 'forgotten') {
-        html = `
-          <div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>`;
+        html = `<div>🔁 Resurface forgotten ideas every X days (like a Notes Karma system)</div>`;
       } else {
         html = `
           <div>🗓️ Today
@@ -385,7 +402,7 @@
     window.onload = function () {
       loadSavedText();
       applyMoodTheme();
-      updateGrouping(); // default grouping by date
+      updateGrouping();
       setInterval(autoSave, 30000);
     };
   </script>
