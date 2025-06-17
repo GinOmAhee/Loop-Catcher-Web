@@ -290,17 +290,15 @@
               }
             };
           }
-        });
 
         signInWithEmailAndPassword(auth, "testuser@example.com", "password123")
           .then((userCredential) => console.log("Login successful:", userCredential.user))
           .catch((error) => console.error("Login failed:", error));
       };
 
-      window.addEventListener("DOMContentLoaded", async () => {
-      await init();
+   init();
   });
 
-</script>
+ </script>
 </body>
 </html>
