@@ -336,8 +336,8 @@
             for (let i = event.resultIndex; i < event.results.length; ++i) {
               const transcript = event.results[i][0].transcript.trim().toLowerCase();
 
-              // Voice command: stop listening
-              if (event.results[i].isFinal && transcript.includes("stop listening")) {
+              // Voice command: stop
+              if (event.results[i].isFinal && transcript.includes("stop")) {
                 stopVoiceCapture();
                 return;
               }
