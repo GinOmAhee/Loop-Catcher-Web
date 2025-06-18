@@ -431,6 +431,7 @@
       const updated = stored.filter(f => f !== fileName);
       localStorage.setItem('attachedFiles', JSON.stringify(updated));
       updateFileDisplay(updated);
+      updateGrouping(); // ← ✅ Update preview after removal
     }
 
     function handleFileAttachment() {
@@ -442,14 +443,15 @@
       const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
       const updated = [...stored, ...files.map(f => f.name)];
 
-      // Prevent duplicates
       const unique = [...new Set(updated)];
 
       localStorage.setItem('attachedFiles', JSON.stringify(unique));
       updateFileDisplay(unique);
+      updateGrouping(); // ← ✅ Trigger grouping update
 
-      // Reset input so you can re-attach the same file if needed
       input.value = '';
+    }
+
     } 
 
     function updateFileDisplay(list) {
