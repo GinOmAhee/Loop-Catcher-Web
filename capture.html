@@ -188,6 +188,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+  <body>
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="preview-overlay" id="preview">
       <div class="preview-top">
@@ -201,7 +202,7 @@
       <div class="preview-content">
         <div class="preview-sortbar">
           <label for="groupSelector">Group by</label>
-          <select id="groupSelector" onchange="()">
+          <select id="groupSelector" onchange="updateGrouping()">
             <option value="date">Date</option>
             <option value="project">Project</option>
             <option value="unresolved">Unresolved Ideas</option>
@@ -236,293 +237,215 @@
   </div>
 
   <script>
-  const preview = document.getElementById('preview');
-  const toggleBtn = document.getElementById('previewToggle');
-  const saveStatus = document.getElementById('saveStatus');
-  const textarea = document.getElementById('mainText');
-  const attachedFilesList = document.getElementById('attachedFilesList');
-  const groupedNotes = document.getElementById('groupedNotes');
-  let recognition, isRecording = false, idleTimer;
-  const allowedTags = ["tasks", "notes", "meetings", "projects", "personal"];
+    const preview = document.getElementById('preview');
+    const toggleBtn = document.getElementById('previewToggle');
+    const saveStatus = document.getElementById('saveStatus');
+    const textarea = document.getElementById('mainText');
+    const attachedFilesList = document.getElementById('attachedFilesList');
+    const groupedNotes = document.getElementById('groupedNotes');
+    let recognition, isRecording = false, idleTimer;
 
-  // Initialize Firestore
-  firebase.initializeApp({ projectId: "loop-catcher" });
-  const db = firebase.firestore();
+    // Initialize Firestore
+    firebase.initializeApp({
+      apiKey: "", // Not needed here; handled by your cloud function
+      projectId: "loop-catcher"
+    });
+    const db = firebase.firestore();
 
-  // Event listeners
-  toggleBtn.addEventListener('click', e => {
-    e.stopPropagation();
-    preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
-  });
-  window.addEventListener('beforeunload', pushToFirestore);
-  textarea.addEventListener('input', () => {
-    autoSave();
-    resetIdleTimer();
-  });
+    // Event listeners
+    toggleBtn.addEventListener('click', e => { e.stopPropagation(); preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex'; });
+    window.addEventListener('beforeunload', pushToFirestore);
+    textarea.addEventListener('input', () => { autoSave(); resetIdleTimer(); });
 
-  // Functions
-  function maybeClosePreview(e) {
-    if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
-      preview.style.display = 'none';
-    }
-  }
-
-  function loadSavedText() {
-    const saved = localStorage.getItem('capturedText');
-    const lastSaved = localStorage.getItem('lastSaved');
-    const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-
-    if (saved) {
-      textarea.value = saved;
-      saveStatus.innerText = lastSaved ? `Last saved at ${new Date(lastSaved).toLocaleTimeString()}` : '';
-      saveToLocalAndFirestore(); // Save once upon load
+    // Functions
+    function maybeClosePreview(e) {
+      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') preview.style.display = 'none';
     }
 
-    updateFileDisplay(attached);
-  }
+    function loadSavedText() {
+      const saved = localStorage.getItem('capturedText');
+      const lastSaved = localStorage.getItem('lastSaved');
+      const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
 
-  function saveToLocalAndFirestore() {
-    const now = new Date();
-    localStorage.setItem('capturedText', textarea.value);
-    localStorage.setItem('lastSaved', now.toISOString());
-    saveStatus.innerText = `Saved at ${now.toLocaleTimeString()}`;
-    pushToFirestore();
-    updateGrouping(); // ✅ Update preview after save
-  }
+      if (saved) {
+        textarea.value = saved;
+        saveStatus.innerText = lastSaved ? `Last saved at ${new Date(lastSaved).toLocaleTimeString()}` : '';
+        saveToLocalAndFirestore(); // Save once upon load
+      }
 
-  function saveText() {
-    saveToLocalAndFirestore();
-  }
+      updateFileDisplay(attached);
+      updateGrouping();
+    }
 
-  function autoSave() {
-    const now = new Date();
-    localStorage.setItem('capturedText', textarea.value);
-    localStorage.setItem('lastSaved', now.toISOString());
-    saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
-    updateGrouping(); // ✅ Update preview after auto-save
-  }
+    function saveToLocalAndFirestore() {
+      const now = new Date();
+      localStorage.setItem('capturedText', textarea.value);
+      localStorage.setItem('lastSaved', now.toISOString());
+      saveStatus.innerText = `Saved at ${now.toLocaleTimeString()}`;
+      pushToFirestore();
+    }
 
-  function pushToFirestore() {
-    const content = textarea.value.trim();
-    if (!content) return;
+    function saveText() {
+      saveToLocalAndFirestore();
+    }
 
-    const note = {
-      content,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    };
+    function autoSave() {
+      const now = new Date();
+      localStorage.setItem('capturedText', textarea.value);
+      localStorage.setItem('lastSaved', now.toISOString());
+      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+      updateGrouping();
+    }
 
-    db.collection("notes").add(note)
+    function pushToFirestore() {
+      const content = textarea.value.trim();
+      if (!content) return;
+      const note = { content, timestamp: new Date().toISOString() };
+
+      fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(note)
+      })
       .then(() => console.log("✔️ Synced to Firestore"))
       .catch(err => console.error("❌ Firestore sync failed:", err));
-  }
-
-  function resetIdleTimer() {
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
-      pushToFirestore();
-      updateGrouping(); // ✅ Reflect changes in preview
-    }, 10000);
-  }
-
-  function startVoiceCapture() {
-    if (recognition) {
-      recognition.start();
-      isRecording = true;
-      document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
-    }
-  }
-
-  function stopVoiceCapture() {
-    if (recognition) {
-      recognition.stop();
-      isRecording = false;
-      document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
-    }
-  }
-
-  function saveCurrentNote() {
-    const note = textarea.value.trim();
-    if (note) {
-      const noteDiv = document.createElement("div");
-      noteDiv.className = "note-preview";
-      noteDiv.textContent = note;
-      preview.appendChild(noteDiv);
-      console.log("Note saved.");
-    } else {
-      alert("Nothing to save!");
-    }
-  }
-
-  function addTagToNote(commandText) {
-    const normalizedTag = commandText.toLowerCase().trim();
-    const existingText = textarea.value;
-
-    const matchedTag = allowedTags.find(tag => normalizedTag.includes(tag));
-    let tagToAdd;
-
-    if (matchedTag) {
-      tagToAdd = matchedTag;
-    } else {
-      const custom = normalizedTag.split("add tag")[1]?.trim();
-      tagToAdd = custom || "custom";
     }
 
-    const tagLine = `#${tagToAdd}`;
-    if (!existingText.includes(tagLine)) {
-      textarea.value += `\n${tagLine}`;
-      console.log(`Tag added: ${tagLine}`);
-    } else {
-      console.log("Tag already exists.");
-    }
-  }
-
-  function handleVoiceCommand(transcript) {
-    const normalized = transcript.trim().toLowerCase();
-
-    const commands = [
-      { keywords: ["stop"], action: stopVoiceCapture },
-      { keywords: ["clear note", "clear notes", "new note", "new notes"], action: () => textarea.value = '' },
-      { keywords: ["save note", "save notes"], action: saveCurrentNote },
-      { keywords: ["add tag", "tag"], action: () => addTagToNote(normalized) }
-    ];
-
-    for (let cmd of commands) {
-      if (cmd.keywords.some(keyword => normalized.includes(keyword))) {
-        cmd.action();
-        return true;
-      }
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(pushToFirestore, 10000);
     }
 
-    // Default: append as dictation
-    textarea.value += ` ${transcript}`;
-    return false;
-  }
+    // Voice capture logic
+    function toggleVoiceCapture() {
+       if (!('webkitSpeechRecognition' in window)) {
+         alert("Voice capture not supported in this browser.");
+         return;
+       }
 
-  function toggleVoiceCapture() {
-    if (!('webkitSpeechRecognition' in window)) {
-      alert("Voice capture not supported in this browser.");
-      return;
-    }
+        if (!recognition) {
+          recognition = new webkitSpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US';
 
-    if (!recognition) {
-      recognition = new webkitSpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = false;
+          recognition.onresult = function (event) {
+            let interim = '';
+            let final = '';
 
-      recognition.onresult = (event) => {
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            const transcript = event.results[i][0].transcript;
-            handleVoiceCommand(transcript);
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              const transcript = event.results[i][0].transcript.trim().toLowerCase();
+
+              // Voice command: stop
+              if (event.results[i].isFinal && transcript.includes("stop")) {
+                stopVoiceCapture();
+                return;
+              }
+
+              if (event.results[i].isFinal) {
+                final += transcript + ' ';
+              } else {
+                interim += transcript + ' ';
+              }
+            } 
+
+             textarea.value += final;
+             textarea.scrollTop = textarea.scrollHeight;
+           };
+
+            recognition.onerror = function (event) {
+              console.error("Speech recognition error:", event.error);
+              stopVoiceCapture();
+            };
+
+            recognition.onend = function () {
+              if (isRecording) {
+                recognition.start(); // auto-restart if still recording
+              }
+            };
+         }
+
+         if (isRecording) {
+           stopVoiceCapture();
+         } else {
+           startVoiceCapture();
+         }
+       }
+
+       function startVoiceCapture() {
+          if (recognition) {
+            recognition.start();
+            isRecording = true;
+            document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
           }
         }
-      };
 
-      recognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
-      };
-
-      recognition.onend = () => {
-        isRecording = false;
-        document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
-      };
-    }
-
-    isRecording ? stopVoiceCapture() : startVoiceCapture();
-  }
-
-  function removeFile(fileName) {
-    const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-    const updated = stored.filter(f => f !== fileName);
-    localStorage.setItem('attachedFiles', JSON.stringify(updated));
-    updateFileDisplay(updated);
-    updateGrouping();
-  }
-
-  function handleFileAttachment() {
-    const input = document.getElementById('fileInput');
-    const files = Array.from(input.files);
-    if (!files.length) return;
-
-    const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-    const updated = [...stored, ...files.map(f => f.name)];
-    const unique = [...new Set(updated)];
-
-    localStorage.setItem('attachedFiles', JSON.stringify(unique));
-    updateFileDisplay(unique);
-    updateGrouping();
-    input.value = '';
-  }
-
-  function updateFileDisplay(list) {
-    attachedFilesList.innerHTML = list.length
-      ? `<strong>📎 Attached Files:</strong><ul>${list.map(f => `<li class="file-item"><span>${f}</span><button onclick="removeFile('${f}')">🗑️</button></li>`).join('')}</ul>`
-      : '';
-  }
-
-  function updateGrouping() {
-    const saved = localStorage.getItem('capturedText');
-    const lastSavedISO = localStorage.getItem('lastSaved');
-    const groupBy = document.getElementById('groupSelector').value;
-
-    if (!saved || !lastSavedISO) {
-      groupedNotes.innerHTML = '<div>No notes available.</div>';
-      return;
-    }
-
-    const lastSaved = new Date(lastSavedISO);
-    const previewText = saved.split('\n')[0].slice(0, 40) + '…';
-
-    let html = '';
-    switch (groupBy) {
-      case 'date': {
-        const today = new Date();
-        const weekStart = new Date(today);
-        weekStart.setDate(today.getDate() - today.getDay());
-
-        if (lastSaved.toDateString() === today.toDateString()) {
-          html = `<div>🗓️ Today<ul><li>${previewText}</li></ul></div>`;
-        } else if (lastSaved >= weekStart) {
-          html = `<div>📅 This Week<ul><li>${previewText}</li></ul></div>`;
-        } else {
-          html = `<div>📆 Earlier<ul><li>${previewText}</li></ul></div>`;
+        function stopVoiceCapture() {
+          if (recognition) {
+            recognition.stop();
+            isRecording = false;
+            document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
         }
-        break;
-      }
-      case 'project':
-        html = `<div>📁 Project<ul><li>${previewText} <span class="tag">#project</span></li></ul></div>`;
-        break;
-      case 'unresolved':
-        html = `<div>❓ Unresolved<ul><li>${previewText} <span class="tag">#unresolved</span></li></ul></div>`;
-        break;
-      case 'forgotten':
-        html = `<div>🧠 Forgotten<ul><li>${previewText} <span class="tag">#forgotten</span></li></ul></div>`;
-        break;
-      default:
-        html = `<div>📄 Note<ul><li>${previewText}</li></ul></div>`;
     }
 
-    groupedNotes.innerHTML = html;
-  }
 
-  const moodThemeMap = {
-    "Calm & Clear": "theme-calm",
-    "Focused & Strategic": "theme-strategic",
-    "Open & Reflective": "theme-reflective",
-    "Driven & Bold": "theme-bold",
-    "Playful & Inventive": "theme-playful"
-  };
+    function removeFile(fileName) {
+      const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
+      const updated = stored.filter(f => f !== fileName);
+      localStorage.setItem('attachedFiles', JSON.stringify(updated));
+      updateFileDisplay(updated);
+    }
 
-  function applyMoodTheme() {
-    const vibe = localStorage.getItem('vibeLabel');
-    if (moodThemeMap[vibe]) document.body.classList.add(moodThemeMap[vibe]);
-  }
+    function updateFileDisplay(list) {
+      attachedFilesList.innerHTML = list.length
+        ? `<strong>📎 Attached Files:</strong><ul>${list.map(f => `<li class="file-item"><span>${f}</span><button onclick="removeFile('${f}')">🗑️</button></li>`).join('')}</ul>`
+        : '';
+    }
 
-  window.onload = function () {
-    applyMoodTheme();
-    loadSavedText();
-  };
-</script>
+    function updateGrouping() {
+      const saved = localStorage.getItem('capturedText');
+      const lastSavedISO = localStorage.getItem('lastSaved');
+      if (!saved || !lastSavedISO) {
+        groupedNotes.innerHTML = '<div>No notes available.</div>';
+        return;
+      }
 
+      const lastSaved = new Date(lastSavedISO);
+      const today = new Date();
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - today.getDay()); // Sunday
+
+      let html = '';
+      const previewText = saved.split('\n')[0].slice(0, 40) + '…';
+
+      if (lastSaved.toDateString() === today.toDateString()) {
+        html = `<div>🗓️ Today<ul><li>${previewText}</li></ul></div>`;
+      } else if (lastSaved >= weekStart) {
+        html = `<div>📅 This Week<ul><li>${previewText}</li></ul></div>`;
+      } else {
+        html = `<div>📆 Earlier<ul><li>${previewText}</li></ul></div>`;
+      }
+
+      groupedNotes.innerHTML = html;
+    }
+
+    const moodThemeMap = {
+      "Calm & Clear": "theme-calm",
+      "Focused & Strategic": "theme-strategic",
+      "Open & Reflective": "theme-reflective",
+      "Driven & Bold": "theme-bold",
+      "Playful & Inventive": "theme-playful"
+    };
+
+    function applyMoodTheme() {
+      const vibe = localStorage.getItem('vibeLabel');
+      if (moodThemeMap[vibe]) document.body.classList.add(moodThemeMap[vibe]);
+    }
+
+    window.onload = function() {
+      applyMoodTheme();
+      loadSavedText();
+    };
+  </script>
 </body>
 </html>
