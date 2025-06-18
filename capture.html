@@ -303,15 +303,15 @@
   function pushToFirestore() {
     const content = textarea.value.trim();
     if (!content) return;
-    const note = { content, timestamp: new Date().toISOString() };
 
-    fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(note)
-    })
-    .then(() => console.log("✔️ Synced to Firestore"))
-    .catch(err => console.error("❌ Firestore sync failed:", err));
+    const note = {
+      content,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    db.collection("notes").add(note)
+      .then(() => console.log("✔️ Synced to Firestore"))
+      .catch(err => console.error("❌ Firestore sync failed:", err));
   }
 
   function resetIdleTimer() {
