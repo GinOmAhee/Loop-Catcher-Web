@@ -201,7 +201,7 @@
       <div class="preview-content">
         <div class="preview-sortbar">
           <label for="groupSelector">Group by</label>
-          <select id="groupSelector" onchange="updateGrouping()">
+          <select id="groupSelector" onchange="()">
             <option value="date">Date</option>
             <option value="project">Project</option>
             <option value="unresolved">Unresolved Ideas</option>
@@ -274,7 +274,7 @@
       }
 
       updateFileDisplay(attached);
-      updateGrouping();
+      ();
     }
 
     function saveToLocalAndFirestore() {
@@ -294,7 +294,7 @@
       localStorage.setItem('capturedText', textarea.value);
       localStorage.setItem('lastSaved', now.toISOString());
       saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
-      updateGrouping();
+      ();
     }
 
     function pushToFirestore() {
@@ -461,30 +461,48 @@
     function updateGrouping() {
       const saved = localStorage.getItem('capturedText');
       const lastSavedISO = localStorage.getItem('lastSaved');
+      const groupBy = document.getElementById('groupSelector').value;
+
       if (!saved || !lastSavedISO) {
         groupedNotes.innerHTML = '<div>No notes available.</div>';
         return;
       }
 
       const lastSaved = new Date(lastSavedISO);
-      const today = new Date();
-      const weekStart = new Date(today);
-      weekStart.setDate(today.getDate() - today.getDay()); // Sunday
-
-      let html = '';
       const previewText = saved.split('\n')[0].slice(0, 40) + '…';
 
-      if (lastSaved.toDateString() === today.toDateString()) {
-        html = `<div>🗓️ Today<ul><li>${previewText}</li></ul></div>`;
-      } else if (lastSaved >= weekStart) {
-        html = `<div>📅 This Week<ul><li>${previewText}</li></ul></div>`;
-      } else {
-        html = `<div>📆 Earlier<ul><li>${previewText}</li></ul></div>`;
-      }
+      let html = '';
+      switch (groupBy) {
+        case 'date': {
+          const today = new Date();
+          const weekStart = new Date(today);
+          weekStart.setDate(today.getDate() - today.getDay());
 
-      groupedNotes.innerHTML = html;
+          if (lastSaved.toDateString() === today.toDateString()) {
+            html = `<div>🗓️ Today<ul><li>${previewText}</li></ul></div>`;
+          } else if (lastSaved >= weekStart) {
+            html = `<div>📅 This Week<ul><li>${previewText}</li></ul></div>`;
+          } else {
+            html = `<div>📆 Earlier<ul><li>${previewText}</li></ul></div>`;
+          }
+          break;
+       }
+       case 'project':
+         html = `<div>📁 Project<ul><li>${previewText} <span class="tag">#project</span></li></ul></div>`;
+         break;
+       case 'unresolved':
+         html = `<div>❓ Unresolved<ul><li>${previewText} <span class="tag">#unresolved</span></li></ul></div>`;
+         break;
+       case 'forgotten':
+         html = `<div>🧠 Forgotten<ul><li>${previewText} <span class="tag">#forgotten</span></li></ul></div>`;
+         break;
+       default:
+         html = `<div>📄 Note<ul><li>${previewText}</li></ul></div>`;
+     }
+
+     groupedNotes.innerHTML = html;
     }
-
+    
     const moodThemeMap = {
       "Calm & Clear": "theme-calm",
       "Focused & Strategic": "theme-strategic",
