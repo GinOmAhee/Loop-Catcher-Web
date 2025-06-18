@@ -428,13 +428,31 @@
       isRecording ? stopVoiceCapture() : startVoiceCapture();
     }
 
-
     function removeFile(fileName) {
       const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
       const updated = stored.filter(f => f !== fileName);
       localStorage.setItem('attachedFiles', JSON.stringify(updated));
       updateFileDisplay(updated);
     }
+
+    function handleFileAttachment() {
+      const input = document.getElementById('fileInput');
+      const files = Array.from(input.files);
+
+      if (!files.length) return;
+
+      const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
+      const updated = [...stored, ...files.map(f => f.name)];
+
+      // Prevent duplicates
+      const unique = [...new Set(updated)];
+
+      localStorage.setItem('attachedFiles', JSON.stringify(unique));
+      updateFileDisplay(unique);
+
+      // Reset input so you can re-attach the same file if needed
+      input.value = '';
+    } 
 
     function updateFileDisplay(list) {
       attachedFilesList.innerHTML = list.length
