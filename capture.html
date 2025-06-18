@@ -341,6 +341,13 @@
                 stopVoiceCapture();
                 return;
               }
+              if (event.results[i].isFinal && (transcript.includes("clear note") || transcript.includes("clear notes"))) {
+                textarea.value = '';
+                return;
+              }
+              if (event.results[i].isFinal && (transcript.includes("new note") || transcript.includes("new notes"))) {
+                textarea.value = '';
+                return;
 
               if (event.results[i].isFinal) {
                 final += transcript + ' ';
