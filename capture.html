@@ -287,6 +287,7 @@
     localStorage.setItem('lastSaved', now.toISOString());
     saveStatus.innerText = `Saved at ${now.toLocaleTimeString()}`;
     pushToFirestore();
+    updateGrouping(); // ✅ Update preview after save
   }
 
   function saveText() {
@@ -298,6 +299,7 @@
     localStorage.setItem('capturedText', textarea.value);
     localStorage.setItem('lastSaved', now.toISOString());
     saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+    updateGrouping(); // ✅ Update preview after auto-save
   }
 
   function pushToFirestore() {
@@ -316,7 +318,10 @@
 
   function resetIdleTimer() {
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(pushToFirestore, 10000);
+    idleTimer = setTimeout(() => {
+      pushToFirestore();
+      updateGrouping(); // ✅ Reflect changes in preview
+    }, 10000);
   }
 
   function startVoiceCapture() {
