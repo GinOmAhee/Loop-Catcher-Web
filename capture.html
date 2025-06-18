@@ -246,20 +246,25 @@
     const allowedTags = ["tasks", "notes", "meetings", "projects", "personal"];
 
     // Initialize Firestore
-    firebase.initializeApp({
-      projectId: "loop-catcher"
-    });
-    
+    firebase.initializeApp({ projectId: "loop-catcher" });
     const db = firebase.firestore();
 
     // Event listeners
-    toggleBtn.addEventListener('click', e => { e.stopPropagation(); preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex'; });
+    toggleBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
+    });
     window.addEventListener('beforeunload', pushToFirestore);
-    textarea.addEventListener('input', () => { autoSave(); resetIdleTimer(); });
+    textarea.addEventListener('input', () => {
+      autoSave();
+      resetIdleTimer();
+    });
 
     // Functions
     function maybeClosePreview(e) {
-      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') preview.style.display = 'none';
+      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
+        preview.style.display = 'none';
+      }
     }
 
     function loadSavedText() {
@@ -274,7 +279,6 @@
       }
 
       updateFileDisplay(attached);
-      ();
     }
 
     function saveToLocalAndFirestore() {
@@ -294,7 +298,6 @@
       localStorage.setItem('capturedText', textarea.value);
       localStorage.setItem('lastSaved', now.toISOString());
       saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
-      ();
     }
 
     function pushToFirestore() {
@@ -309,31 +312,30 @@
       })
       .then(() => console.log("✔️ Synced to Firestore"))
       .catch(err => console.error("❌ Firestore sync failed:", err));
-    }
+     }
 
-    function resetIdleTimer() {
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(pushToFirestore, 10000);
-    }
+     function resetIdleTimer() {
+       clearTimeout(idleTimer);
+       idleTimer = setTimeout(pushToFirestore, 10000);
+     }
 
-    // 🛠️ Helper functions
-    function startVoiceCapture() {
-      if (recognition) {
-        recognition.start();
-        isRecording = true;
-        document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
-      }
-    }
+     function startVoiceCapture() {
+       if (recognition) {
+         recognition.start();
+         isRecording = true;
+         document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
+       }
+     }
 
-    function stopVoiceCapture() {
-      if (recognition) {
-        recognition.stop();
-        isRecording = false;
-        document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
-      }
-    }
+     function stopVoiceCapture() {
+       if (recognition) {
+         recognition.stop();
+         isRecording = false;
+         document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
+       }
+     }
 
-    function saveCurrentNote() {
+     function saveCurrentNote() {
       const note = textarea.value.trim();
       if (note) {
         const noteDiv = document.createElement("div");
@@ -369,7 +371,6 @@
       }
     }
 
-    // 🧠 Voice command handler
     function handleVoiceCommand(transcript) {
       const normalized = transcript.trim().toLowerCase();
 
@@ -387,141 +388,135 @@
         }
       }
 
-      // No match = append as dictation
+      // Default: append as dictation
       textarea.value += ` ${transcript}`;
       return false;
     }
 
-    // 🚀 Voice recognition controller
     function toggleVoiceCapture() {
       if (!('webkitSpeechRecognition' in window)) {
         alert("Voice capture not supported in this browser.");
         return;
-      }
+    }
 
-      if (!recognition) {
-        recognition = new webkitSpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = false;
+    if (!recognition) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
 
-        recognition.onresult = (event) => {
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-              const transcript = event.results[i][0].transcript;
-              handleVoiceCommand(transcript);
-            }
+      recognition.onresult = (event) => {
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            const transcript = event.results[i][0].transcript;
+            handleVoiceCommand(transcript);
           }
-        };
+        }
+      };
 
-        recognition.onerror = (event) => {
-          console.error("Speech recognition error:", event.error);
-        };
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+      };
 
-        recognition.onend = () => {
-          isRecording = false;
-          document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
-        };
+      recognition.onend = () => {
+        isRecording = false;
+        document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
+      };
+    }
+
+    isRecording ? stopVoiceCapture() : startVoiceCapture();
+  }
+
+  function removeFile(fileName) {
+    const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
+    const updated = stored.filter(f => f !== fileName);
+    localStorage.setItem('attachedFiles', JSON.stringify(updated));
+    updateFileDisplay(updated);
+    updateGrouping();
+  }
+
+  function handleFileAttachment() {
+    const input = document.getElementById('fileInput');
+    const files = Array.from(input.files);
+    if (!files.length) return;
+
+    const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
+    const updated = [...stored, ...files.map(f => f.name)];
+    const unique = [...new Set(updated)];
+
+    localStorage.setItem('attachedFiles', JSON.stringify(unique));
+    updateFileDisplay(unique);
+    updateGrouping();
+    input.value = '';
+  }
+
+  function updateFileDisplay(list) {
+    attachedFilesList.innerHTML = list.length
+      ? `<strong>📎 Attached Files:</strong><ul>${list.map(f => `<li class="file-item"><span>${f}</span><button onclick="removeFile('${f}')">🗑️</button></li>`).join('')}</ul>`
+      : '';
+  }
+
+  function updateGrouping() {
+    const saved = localStorage.getItem('capturedText');
+    const lastSavedISO = localStorage.getItem('lastSaved');
+    const groupBy = document.getElementById('groupSelector').value;
+
+    if (!saved || !lastSavedISO) {
+      groupedNotes.innerHTML = '<div>No notes available.</div>';
+      return;
+    }
+
+    const lastSaved = new Date(lastSavedISO);
+    const previewText = saved.split('\n')[0].slice(0, 40) + '…';
+
+    let html = '';
+    switch (groupBy) {
+      case 'date': {
+        const today = new Date();
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay());
+
+        if (lastSaved.toDateString() === today.toDateString()) {
+          html = `<div>🗓️ Today<ul><li>${previewText}</li></ul></div>`;
+        } else if (lastSaved >= weekStart) {
+          html = `<div>📅 This Week<ul><li>${previewText}</li></ul></div>`;
+        } else {
+          html = `<div>📆 Earlier<ul><li>${previewText}</li></ul></div>`;
+        }
+        break;
       }
-
-      isRecording ? stopVoiceCapture() : startVoiceCapture();
+      case 'project':
+        html = `<div>📁 Project<ul><li>${previewText} <span class="tag">#project</span></li></ul></div>`;
+        break;
+      case 'unresolved':
+        html = `<div>❓ Unresolved<ul><li>${previewText} <span class="tag">#unresolved</span></li></ul></div>`;
+        break;
+      case 'forgotten':
+        html = `<div>🧠 Forgotten<ul><li>${previewText} <span class="tag">#forgotten</span></li></ul></div>`;
+        break;
+      default:
+        html = `<div>📄 Note<ul><li>${previewText}</li></ul></div>`;
     }
 
-    function removeFile(fileName) {
-      const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-      const updated = stored.filter(f => f !== fileName);
-      localStorage.setItem('attachedFiles', JSON.stringify(updated));
-      updateFileDisplay(updated);
-      updateGrouping(); // ← ✅ Update preview after removal
-    }
+    groupedNotes.innerHTML = html;
+  }
 
-    function handleFileAttachment() {
-      const input = document.getElementById('fileInput');
-      const files = Array.from(input.files);
+  const moodThemeMap = {
+    "Calm & Clear": "theme-calm",
+    "Focused & Strategic": "theme-strategic",
+    "Open & Reflective": "theme-reflective",
+    "Driven & Bold": "theme-bold",
+    "Playful & Inventive": "theme-playful"
+  };
 
-      if (!files.length) return;
+  function applyMoodTheme() {
+    const vibe = localStorage.getItem('vibeLabel');
+    if (moodThemeMap[vibe]) document.body.classList.add(moodThemeMap[vibe]);
+  }
 
-      const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-      const updated = [...stored, ...files.map(f => f.name)];
-
-      const unique = [...new Set(updated)];
-
-      localStorage.setItem('attachedFiles', JSON.stringify(unique));
-      updateFileDisplay(unique);
-      updateGrouping(); // ← ✅ Trigger grouping update
-
-      input.value = '';
-    }
-
-    } 
-
-    function updateFileDisplay(list) {
-      attachedFilesList.innerHTML = list.length
-        ? `<strong>📎 Attached Files:</strong><ul>${list.map(f => `<li class="file-item"><span>${f}</span><button onclick="removeFile('${f}')">🗑️</button></li>`).join('')}</ul>`
-        : '';
-    }
-
-    function updateGrouping() {
-      const saved = localStorage.getItem('capturedText');
-      const lastSavedISO = localStorage.getItem('lastSaved');
-      const groupBy = document.getElementById('groupSelector').value;
-
-      if (!saved || !lastSavedISO) {
-        groupedNotes.innerHTML = '<div>No notes available.</div>';
-        return;
-      }
-
-      const lastSaved = new Date(lastSavedISO);
-      const previewText = saved.split('\n')[0].slice(0, 40) + '…';
-
-      let html = '';
-      switch (groupBy) {
-        case 'date': {
-          const today = new Date();
-          const weekStart = new Date(today);
-          weekStart.setDate(today.getDate() - today.getDay());
-
-          if (lastSaved.toDateString() === today.toDateString()) {
-            html = `<div>🗓️ Today<ul><li>${previewText}</li></ul></div>`;
-          } else if (lastSaved >= weekStart) {
-            html = `<div>📅 This Week<ul><li>${previewText}</li></ul></div>`;
-          } else {
-            html = `<div>📆 Earlier<ul><li>${previewText}</li></ul></div>`;
-          }
-          break;
-       }
-       case 'project':
-         html = `<div>📁 Project<ul><li>${previewText} <span class="tag">#project</span></li></ul></div>`;
-         break;
-       case 'unresolved':
-         html = `<div>❓ Unresolved<ul><li>${previewText} <span class="tag">#unresolved</span></li></ul></div>`;
-         break;
-       case 'forgotten':
-         html = `<div>🧠 Forgotten<ul><li>${previewText} <span class="tag">#forgotten</span></li></ul></div>`;
-         break;
-       default:
-         html = `<div>📄 Note<ul><li>${previewText}</li></ul></div>`;
-     }
-
-     groupedNotes.innerHTML = html;
-    }
-    
-    const moodThemeMap = {
-      "Calm & Clear": "theme-calm",
-      "Focused & Strategic": "theme-strategic",
-      "Open & Reflective": "theme-reflective",
-      "Driven & Bold": "theme-bold",
-      "Playful & Inventive": "theme-playful"
-    };
-
-    function applyMoodTheme() {
-      const vibe = localStorage.getItem('vibeLabel');
-      if (moodThemeMap[vibe]) document.body.classList.add(moodThemeMap[vibe]);
-    }
-
-    window.onload = function() {
-      applyMoodTheme();
-      loadSavedText();
-    };
-  </script>
+  window.onload = function () {
+    applyMoodTheme();
+    loadSavedText();
+  };
+</script>
 </body>
 </html>
