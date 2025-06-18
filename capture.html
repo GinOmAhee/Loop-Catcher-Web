@@ -188,7 +188,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <body>
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="preview-overlay" id="preview">
       <div class="preview-top">
@@ -244,6 +243,9 @@
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
     let recognition, isRecording = false, idleTimer;
+    const textarea = document.getElementById("noteArea");
+    const preview = document.getElementById("preview");
+    const allowedTags = ["tasks", "notes", "meetings", "projects", "personal"];
 
     // Initialize Firestore
     firebase.initializeApp({
@@ -316,84 +318,114 @@
       idleTimer = setTimeout(pushToFirestore, 10000);
     }
 
-    // Voice capture logic
+    // 🛠️ Helper functions
+    function startVoiceCapture() {
+      if (recognition) {
+        recognition.start();
+        isRecording = true;
+        document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
+      }
+    }
+
+    function stopVoiceCapture() {
+      if (recognition) {
+        recognition.stop();
+        isRecording = false;
+        document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
+      }
+    }
+
+    function saveCurrentNote() {
+      const note = textarea.value.trim();
+      if (note) {
+        const noteDiv = document.createElement("div");
+        noteDiv.className = "note-preview";
+        noteDiv.textContent = note;
+        preview.appendChild(noteDiv);
+        console.log("Note saved.");
+      } else {
+        alert("Nothing to save!");
+      }
+    }
+
+    function addTagToNote(commandText) {
+      const normalizedTag = commandText.toLowerCase().trim();
+      const existingText = textarea.value;
+
+      const matchedTag = allowedTags.find(tag => normalizedTag.includes(tag));
+      let tagToAdd;
+
+      if (matchedTag) {
+        tagToAdd = matchedTag;
+      } else {
+        const custom = normalizedTag.split("add tag")[1]?.trim();
+        tagToAdd = custom || "custom";
+      }
+
+      const tagLine = `#${tagToAdd}`;
+      if (!existingText.includes(tagLine)) {
+        textarea.value += `\n${tagLine}`;
+        console.log(`Tag added: ${tagLine}`);
+      } else {
+        console.log("Tag already exists.");
+      }
+    }
+
+    // 🧠 Voice command handler
+    function handleVoiceCommand(transcript) {
+      const normalized = transcript.trim().toLowerCase();
+
+      const commands = [
+        { keywords: ["stop"], action: stopVoiceCapture },
+        { keywords: ["clear note", "clear notes", "new note", "new notes"], action: () => textarea.value = '' },
+        { keywords: ["save note", "save notes"], action: saveCurrentNote },
+        { keywords: ["add tag", "tag"], action: () => addTagToNote(normalized) }
+      ];
+
+      for (let cmd of commands) {
+        if (cmd.keywords.some(keyword => normalized.includes(keyword))) {
+          cmd.action();
+          return true;
+        }
+      }
+
+      // No match = append as dictation
+      textarea.value += ` ${transcript}`;
+      return false;
+    }
+
+    // 🚀 Voice recognition controller
     function toggleVoiceCapture() {
-       if (!('webkitSpeechRecognition' in window)) {
-         alert("Voice capture not supported in this browser.");
-         return;
-       }
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Voice capture not supported in this browser.");
+        return;
+      }
 
-        if (!recognition) {
-          recognition = new webkitSpeechRecognition();
-          recognition.continuous = true;
-          recognition.interimResults = true;
-          recognition.lang = 'en-US';
+      if (!recognition) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = false;
 
-          recognition.onresult = function (event) {
-            let interim = '';
-            let final = '';
-
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-              const transcript = event.results[i][0].transcript.trim().toLowerCase();
-
-              // Voice command: stop
-              if (event.results[i].isFinal && transcript.includes("stop")) {
-                stopVoiceCapture();
-                return;
-              }
-              if (event.results[i].isFinal && (transcript.includes("clear note") || transcript.includes("clear notes"))) {
-                textarea.value = '';
-                return;
-              }
-              if (event.results[i].isFinal && (transcript.includes("new note") || transcript.includes("new notes"))) {
-                textarea.value = '';
-                return;
-              }
-
-              if (event.results[i].isFinal) {
-                final += transcript + ' ';
-              } else {
-                interim += transcript + ' ';
-              }
-            } 
-
-             textarea.value += final;
-             textarea.scrollTop = textarea.scrollHeight;
-           };
-
-            recognition.onerror = function (event) {
-              console.error("Speech recognition error:", event.error);
-              stopVoiceCapture();
-            };
-
-            recognition.onend = function () {
-              if (isRecording) {
-                recognition.start(); // auto-restart if still recording
-              }
-            };
-         }
-
-         if (isRecording) {
-           stopVoiceCapture();
-         } else {
-           startVoiceCapture();
-         }
-       }
-
-       function startVoiceCapture() {
-          if (recognition) {
-            recognition.start();
-            isRecording = true;
-            document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
+        recognition.onresult = (event) => {
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              const transcript = event.results[i][0].transcript;
+              handleVoiceCommand(transcript);
+            }
           }
-        }
+        };
 
-        function stopVoiceCapture() {
-          if (recognition) {
-            recognition.stop();
-            isRecording = false;
-            document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
-        }
+        recognition.onerror = (event) => {
+          console.error("Speech recognition error:", event.error);
+        };
+
+        recognition.onend = () => {
+          isRecording = false;
+          document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
+        };
+      }
+
+      isRecording ? stopVoiceCapture() : startVoiceCapture();
     }
 
 
