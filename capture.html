@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Capture UI</title>
@@ -233,6 +236,27 @@
   </div>
 
   <script>
+    let db = null;
+
+    async function initializeFirebase() {
+      try {
+      const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+      const { apiKey } = await res.json();
+
+      const firebaseConfig = {
+        apiKey,
+        authDomain: "loop-catcher-firebase.firebaseapp.com",
+        projectId: "loop-catcher-firebase",
+       };
+
+       firebase.initializeApp(firebaseConfig);
+       db = firebase.firestore();
+       console.log("✅ Firebase initialized");
+     } catch (error) {
+       console.error("❌ Failed to initialize Firebase:", error);
+     }
+    }
+    
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
