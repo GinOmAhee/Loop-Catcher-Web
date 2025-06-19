@@ -115,6 +115,7 @@
       align-items: center;
       gap: 0.5rem;
       font-size: 1rem;
+      <input type="text" id="searchInput" placeholder="🔍 Search notes..." />
     }
 
     .preview-sortbar label {
@@ -237,7 +238,6 @@
         <button onclick="saveText()">💾 Save</button> <!-- This is still valid, since `async` doesn't affect the call -->
         <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
         <button onclick="document.getElementById('fileInput').click()">📎 Attach File</button>
-        document.getElementById('fileInput').addEventListener('change', handleFileAttachment);
       </div>
       <div id="attachedFilesList"></div>
       <div class="save-time" id="saveStatus"></div>
@@ -447,7 +447,7 @@
         continue; // skip to next file
       }
 
-      const uniqueId = crypto.randomUUID();
+      const uniqueId = crypto?.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
       const storedName = `${fileName}__${uniqueId}`;
       const fileRef = storageRef.child(`userFiles/${firebase.auth().currentUser.uid}/${storedName}`);
 
