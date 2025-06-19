@@ -424,7 +424,8 @@
       if (groupBy === "date") {
         const groups = {};
         notes.forEach(note => {
-          const date = new Date(note.timestamp).toLocaleDateString();
+          const rawDate = note.timestamp || note.time;
+          const date = new Date(rawDate).toLocaleDateString();
           if (!groups[date]) groups[date] = [];
           groups[date].push(note);
         });
@@ -435,7 +436,7 @@
             const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
             html += `
               <li style="margin-bottom:1rem">
-                <strong>${new Date(note.timestamp).toLocaleTimeString()}</strong><br>
+                <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong>
                 ${safeText}
                 <br><button onclick="deleteNote(${i})">🗑️ Delete</button>
               </li>`;
