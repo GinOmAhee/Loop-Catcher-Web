@@ -115,7 +115,6 @@
       align-items: center;
       gap: 0.5rem;
       font-size: 1rem;
-      <input type="text" id="searchInput" placeholder="🔍 Search notes..." />
     }
 
     .preview-sortbar label {
@@ -208,18 +207,19 @@
         <a href="parkedpotential.html">📦 Parked Potential</a>
       </div>
 
-      <div class="preview-content">
-        <div class="preview-sortbar">
-          <label for="groupSelector">Group by</label>
-          <select id="groupSelector" onchange="updateGrouping()">
-            <option value="date">Date</option>
-            <option value="project">Project</option>
-            <option value="unresolved">Unresolved Ideas</option>
-            <option value="forgotten">Forgotten Ideas</option>
-          </select>
-        </div>
-        <div id="groupedNotes"></div>
+      <div class="preview-sortbar">
+        <label for="groupSelector">Group by</label>
+        <select id="groupSelector" onchange="updateGrouping()">
+          <option value="date">Date</option>
+          <option value="project">Project</option>
+          <option value="unresolved">Unresolved Ideas</option>
+          <option value="forgotten">Forgotten Ideas</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="🔍 Search notes..." oninput="updateGrouping()" />
       </div>
+
+       <div id="groupedNotes"></div>
+     </div>
 
       <div class="preview-bottom">
         <input type="file" id="fileInput" multiple style="display: none;" aria-label="Attach files" onchange="handleFileAttachment()" />
