@@ -284,26 +284,28 @@
     }
 
     function saveText() {
+      const now = new Date();
       const noteText = textarea.value.trim();
+      const projectName = prompt("📌 Enter project name (optional):") || "General";
+
       if (!noteText) return;
 
-      const now = new Date().toISOString();
-      const project = prompt("📁 Project name (optional):") || "general"; // for grouping
+      const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
 
-      const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
-      notes.unshift({
-       text: note,
-       timestamp: now.toISOString(),
-       project: "ginomahee", // or get dynamically from user/project dropdown
-       resolved: false,       // default, user can later update to true
-       tags: [],              // you can add UI later to collect tags
-    });
+      const newNote = {
+        text: noteText,
+        time: now.toISOString(),
+        project: projectName,
+        resolved: false,     // default future feature
+        tags: []             // placeholder for future tags
+      };
 
-      localStorage.setItem("savedNotes", JSON.stringify(notes));
+      notes.unshift(newNote);
+      localStorage.setItem('savedNotes', JSON.stringify(notes));
+
       textarea.value = '';
-      saveStatus.innerText = `✅ Saved at ${new Date(now).toLocaleTimeString()}`;
-
-      updateGrouping(); // reflect new note in preview
+      saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
+      updateGrouping(); // refresh preview
     }
 
     function autoSave() {
