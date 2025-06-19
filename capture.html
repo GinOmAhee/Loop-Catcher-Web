@@ -263,6 +263,8 @@
     const textarea = document.getElementById('mainText');
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
+    const searchInput = document.querySelector('.preview-bottom input[type="text"]');
+    searchInput.addEventListener("input", updateGrouping);
     let recognition;
     let isRecording = false;
 
@@ -412,6 +414,16 @@
     }
 
     function updateGrouping() {
+      const searchInput = document.querySelector('.preview-bottom input[type="text"]');
+      const query = searchInput.value.trim().toLowerCase();
+      const highlightMatch = (text, query) => {
+        const safe = escapeHTML(text);
+        if (!query) return safe;
+        const regex = new RegExp(`(${query})`, 'gi');
+        return safe.replace(regex, `<mark>$1</mark>`);
+       };
+
+
       const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       if (notes.length === 0) {
         groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
@@ -431,18 +443,22 @@
         });
 
         for (const date in groups) {
+          const filtered = groups[date].filter(note => note.text.toLowerCase().includes(query));
+          if (filtered.length === 0) continue;
+
           html += `<h4>🗓️ ${date}</h4><ul>`;
-          groups[date].forEach((note, i) => {
-            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
+          filtered.forEach((note, i) => {
+            const safeText = highlightMatch(note.text, query).replace(/\n/g, "<br>");
             html += `
               <li style="margin-bottom:1rem">
                 <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong>
                 ${safeText}
                 <br><button onclick="deleteNote(${i})">🗑️ Delete</button>
-              </li>`;
+               </li>`;
           });
           html += "</ul>";
         }
+
 
       } else if (groupBy === "project") {
         const groups = {};
@@ -453,9 +469,11 @@
         });
 
         for (const project in groups) {
+          const filtered = groups[project].filter(note => note.text.toLowerCase().includes(query));
+          if (filtered.length === 0) continue;
           html += `<h4>📁 ${project}</h4><ul>`;
           groups[project].forEach((note, i) => {
-            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
+            const safeText = highlightMatch(note.text, query).replace(/\n/g, "<br>");
             html += `
               <li style="margin-bottom:1rem">
                 <strong>${new Date(note.timestamp).toLocaleString()}</strong><br>
@@ -472,8 +490,13 @@
           html += "<p>✅ No unresolved notes!</p>";
         } else {
           html += "<h4>❓ Unresolved Notes</h4><ul>";
-          unresolved.forEach((note, i) => {
-            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
+          const filtered = unresolved.filter(note => note.text.toLowerCase().includes(query));
+          if (filtered.length === 0) {
+            html += "<p>✅ No unresolved notes match your search!</p>";
+        } else {
+          filtered.forEach((note, i) => {
+
+            const safeText = highlightMatch(note.text, query).replace(/\n/g, "<br>");
             html += `
               <li style="margin-bottom:1rem">
                 <strong>${new Date(note.timestamp).toLocaleString()}</strong><br>
@@ -495,8 +518,13 @@
           html += "<p>🧠 Nothing forgotten yet!</p>";
         } else {
           html += "<h4>💭 Forgotten Notes (3+ days old)</h4><ul>";
-          forgotten.forEach((note, i) => {
-            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
+          const filtered = forgotten.filter(note => note.text.toLowerCase().includes(query));
+          if (filtered.length === 0) {
+            html += "<p>🧠 No forgotten notes match your search!</p>";
+          } else {
+            filtered.forEach((note, i) => {
+
+            const safeText = highlightMatch(note.text, query).replace(/\n/g, "<br>");
             html += `
               <li style="margin-bottom:1rem">
                 <strong>${new Date(note.timestamp).toLocaleString()}</strong><br>
