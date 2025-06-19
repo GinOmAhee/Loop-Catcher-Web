@@ -266,6 +266,12 @@
     let recognition;
     let isRecording = false;
 
+    textarea.addEventListener("input", () => {
+      localStorage.setItem("capturedText", textarea.value);
+      localStorage.setItem("lastSaved", new Date().toISOString());
+      updateGrouping(); // refresh the preview panel
+    });
+
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
@@ -278,11 +284,26 @@
     }
 
     function saveText() {
-      const now = new Date();
-      const content = textarea.value.trim();
-      localStorage.setItem('capturedText', content);
-      localStorage.setItem('lastSaved', now.toISOString());
-      saveStatus.innerText = `✅ Saved at ${now.toLocaleTimeString()}`;
+      const noteText = textarea.value.trim();
+      if (!noteText) return;
+
+      const now = new Date().toISOString();
+      const project = prompt("📁 Project name (optional):") || "general"; // for grouping
+
+      const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+      notes.unshift({
+       text: note,
+       timestamp: now.toISOString(),
+       project: "ginomahee", // or get dynamically from user/project dropdown
+       resolved: false,       // default, user can later update to true
+       tags: [],              // you can add UI later to collect tags
+    });
+
+      localStorage.setItem("savedNotes", JSON.stringify(notes));
+      textarea.value = '';
+      saveStatus.innerText = `✅ Saved at ${new Date(now).toLocaleTimeString()}`;
+
+      updateGrouping(); // reflect new note in preview
     }
 
     function autoSave() {
@@ -388,23 +409,102 @@
     }
 
     function updateGrouping() {
-      const content = localStorage.getItem('capturedText') || '';
-      const lastSaved = localStorage.getItem('lastSaved');
-
-      if (!content) {
-        groupedNotes.innerHTML = "<p>📭 No saved content yet.</p>";
+      const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      if (notes.length === 0) {
+        groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
         return;
       }
 
-      const safeText = escapeHTML(content).replace(/\n/g, '<br>');
-      const time = new Date(lastSaved).toLocaleString();
+      const groupBy = document.getElementById("groupSelector").value;
+      let html = "";
 
-      groupedNotes.innerHTML = `
-        <div>📝 Your Note</div>
-        <div style="margin-bottom: 1rem;">
-          <strong>${time}</strong><br>
-          ${safeText}
-        </div>`;
+      if (groupBy === "date") {
+        const groups = {};
+        notes.forEach(note => {
+          const date = new Date(note.timestamp).toLocaleDateString();
+          if (!groups[date]) groups[date] = [];
+          groups[date].push(note);
+        });
+
+        for (const date in groups) {
+          html += `<h4>🗓️ ${date}</h4><ul>`;
+          groups[date].forEach((note, i) => {
+            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
+            html += `
+              <li style="margin-bottom:1rem">
+                <strong>${new Date(note.timestamp).toLocaleTimeString()}</strong><br>
+                ${safeText}
+                <br><button onclick="deleteNote(${i})">🗑️ Delete</button>
+              </li>`;
+          });
+          html += "</ul>";
+        }
+
+      } else if (groupBy === "project") {
+        const groups = {};
+        notes.forEach(note => {
+          const project = note.project || "📂 Unlabeled";
+          if (!groups[project]) groups[project] = [];
+          groups[project].push(note);
+        });
+
+        for (const project in groups) {
+          html += `<h4>📁 ${project}</h4><ul>`;
+          groups[project].forEach((note, i) => {
+            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
+            html += `
+              <li style="margin-bottom:1rem">
+                <strong>${new Date(note.timestamp).toLocaleString()}</strong><br>
+                ${safeText}
+                <br><button onclick="deleteNote(${i})">🗑️ Delete</button>
+              </li>`;
+          });
+          html += "</ul>";
+        }
+
+      } else if (groupBy === "unresolved") {
+        const unresolved = notes.filter(note => note.resolved === false);
+        if (unresolved.length === 0) {
+          html += "<p>✅ No unresolved notes!</p>";
+        } else {
+          html += "<h4>❓ Unresolved Notes</h4><ul>";
+          unresolved.forEach((note, i) => {
+            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
+            html += `
+              <li style="margin-bottom:1rem">
+                <strong>${new Date(note.timestamp).toLocaleString()}</strong><br>
+                ${safeText}
+                <br><button onclick="deleteNote(${i})">🗑️ Delete</button>
+              </li>`;
+          });
+          html += "</ul>";
+        }
+
+      } else if (groupBy === "forgotten") {
+        const now = Date.now();
+        const forgotten = notes.filter(note => {
+          const age = now - new Date(note.timestamp).getTime();
+          return age > 3 * 24 * 60 * 60 * 1000; // older than 3 days
+        });
+
+        if (forgotten.length === 0) {
+          html += "<p>🧠 Nothing forgotten yet!</p>";
+        } else {
+          html += "<h4>💭 Forgotten Notes (3+ days old)</h4><ul>";
+          forgotten.forEach((note, i) => {
+            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
+            html += `
+              <li style="margin-bottom:1rem">
+                <strong>${new Date(note.timestamp).toLocaleString()}</strong><br>
+                ${safeText}
+                <br><button onclick="deleteNote(${i})">🗑️ Delete</button>
+              </li>`;
+          });
+          html += "</ul>";
+        }
+      }
+
+      groupedNotes.innerHTML = html;
     }
 
     function deleteNote(index) {
