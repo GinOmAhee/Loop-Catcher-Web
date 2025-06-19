@@ -279,19 +279,10 @@
 
     function saveText() {
       const now = new Date();
-      const note = textarea.value.trim();
-      if (!note) return;
-
-      const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-      notes.unshift({
-        text: note,
-        time: now.toISOString()
-      });
-      localStorage.setItem('savedNotes', JSON.stringify(notes));
-      textarea.value = '';
+      const content = textarea.value.trim();
+      localStorage.setItem('capturedText', content);
+      localStorage.setItem('lastSaved', now.toISOString());
       saveStatus.innerText = `✅ Saved at ${now.toLocaleTimeString()}`;
-
-      updateGrouping(); // Refresh preview after saving
     }
 
     function autoSave() {
@@ -397,26 +388,23 @@
     }
 
     function updateGrouping() {
-      const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-      if (notes.length === 0) {
-        groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
+      const content = localStorage.getItem('capturedText') || '';
+      const lastSaved = localStorage.getItem('lastSaved');
+
+      if (!content) {
+        groupedNotes.innerHTML = "<p>📭 No saved content yet.</p>";
         return;
       }
 
-      let html = `<div>📝 Your Saved Notes</div><ul>`;
-      notes.forEach((note, index) => {
-        const time = new Date(note.timestamp).toLocaleString();
-        const safeText = escapeHTML(note.text).replace(/\n/g, '<br>');
-    
-        html += `
-          <li style="margin-bottom: 1rem;">
-            <strong>${time}</strong><br>
-            ${safeText}
-            <br><button onclick="deleteNote(${index})">🗑️ Delete</button>
-          </li>`;
-      });
-      html += `</ul>`;
-      groupedNotes.innerHTML = html;
+      const safeText = escapeHTML(content).replace(/\n/g, '<br>');
+      const time = new Date(lastSaved).toLocaleString();
+
+      groupedNotes.innerHTML = `
+        <div>📝 Your Note</div>
+        <div style="margin-bottom: 1rem;">
+          <strong>${time}</strong><br>
+          ${safeText}
+        </div>`;
     }
 
     function deleteNote(index) {
