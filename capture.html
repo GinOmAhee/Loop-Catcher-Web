@@ -286,18 +286,19 @@
     function saveText() {
       const now = new Date();
       const noteText = textarea.value.trim();
-      const projectName = prompt("📌 Enter project name (optional):") || "General";
-
       if (!noteText) return;
+
+      let projectName = prompt("📌 Enter project name (optional):");
+      projectName = projectName?.trim() || "📂 Unlabeled";
 
       const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
 
       const newNote = {
         text: noteText,
-        time: now.toISOString(),
+        timestamp: now.toISOString(), // ✅ consistent with updateGrouping
         project: projectName,
-        resolved: false,     // default future feature
-        tags: []             // placeholder for future tags
+        resolved: false,
+        tags: []
       };
 
       notes.unshift(newNote);
@@ -305,7 +306,7 @@
 
       textarea.value = '';
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
-      updateGrouping(); // refresh preview
+      updateGrouping();
     }
 
     function autoSave() {
