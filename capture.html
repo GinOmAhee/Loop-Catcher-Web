@@ -4,6 +4,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Capture UI</title>
@@ -185,6 +188,12 @@
       padding: 0.3rem 0.5rem;
       font-size: 1rem;
     }
+    mark {
+     background: yellow;
+     padding: 0 2px;
+     border-radius: 3px;
+    }
+
   </style>
 </head>
 <body>
@@ -212,7 +221,7 @@
       </div>
 
       <div class="preview-bottom">
-        <input type="text" placeholder="🔍 Search">
+        <input type="text" id="searchInput" placeholder="🔍 Search" oninput="updateGrouping()">
       </div>
 
       <div class="preview-settings">
@@ -225,7 +234,7 @@
       <button id="previewToggle">☰</button>
       <textarea id="mainText" placeholder="Start capturing..."></textarea>
       <div class="controls">
-        <button onclick="saveText()">💾 Save</button>
+        <button onclick="saveText()">💾 Save</button> <!-- This is still valid, since `async` doesn't affect the call -->
         <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
         <button onclick="document.getElementById('fileInput').click()">📎 Attach File</button>
         <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileAttachment()" />
@@ -240,21 +249,26 @@
 
     async function initializeFirebase() {
       try {
-      const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
-      const { apiKey } = await res.json();
+        const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
 
-      const firebaseConfig = {
-        apiKey,
-        authDomain: "loop-catcher-firebase.firebaseapp.com",
-        projectId: "loop-catcher-firebase",
-       };
+        // ✅ CORS/network error handling
+        if (!res.ok) throw new Error(`API key fetch failed: ${res.status} ${res.statusText}`);
 
-       firebase.initializeApp(firebaseConfig);
-       db = firebase.firestore();
-       console.log("✅ Firebase initialized");
-     } catch (error) {
-       console.error("❌ Failed to initialize Firebase:", error);
-     }
+        const { apiKey } = await res.json();
+
+        const firebaseConfig = {
+          apiKey,
+          authDomain: "loop-catcher-firebase.firebaseapp.com",
+          projectId: "loop-catcher-firebase",
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        console.log("✅ Firebase initialized");
+      } catch (error) {
+        console.error("❌ Failed to initialize Firebase:", error);
+        alert("Firebase failed to initialize. Please check your connection or CORS settings.");
+      }
     }
     
     const preview = document.getElementById('preview');
@@ -266,10 +280,15 @@
     let recognition;
     let isRecording = false;
 
+    let debounceTimer;
     textarea.addEventListener("input", () => {
-      localStorage.setItem("capturedText", textarea.value);
-      localStorage.setItem("lastSaved", new Date().toISOString());
-      updateGrouping(); // refresh the preview panel
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        localStorage.setItem("capturedText", textarea.value);
+        localStorage.setItem("lastSaved", new Date().toISOString());
+        updateGrouping(); // refresh the preview panel
+        saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
+      }, 1000); // debounce delay: 1 second
     });
 
     toggleBtn.addEventListener('click', (e) => {
@@ -283,30 +302,50 @@
       }
     }
 
-    function saveText() {
-      const now = new Date();
-      const noteText = textarea.value.trim();
-      if (!noteText) return;
+   async function saveText() {
+     const now = new Date();
+     const noteText = textarea.value.trim();
+     if (!noteText) return;
 
-      let projectName = prompt("📌 Enter project name (optional):");
-      projectName = projectName?.trim() || "📂 Unlabeled";
+     const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
 
-      const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+     // ✅ Allow save only if different from last saved note
+     if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
+       saveStatus.innerText = `⚠️ Not saved — no changes detected`;
+       return;
+     }
 
-      const newNote = {
-        text: noteText,
-        timestamp: now.toISOString(), // ✅ consistent with updateGrouping
-        project: projectName,
-        resolved: false,
-        tags: []
-      };
+     let projectName = prompt("📌 Enter project name (optional):");
+     projectName = projectName?.trim() || "📂 Unlabeled";
 
-      notes.unshift(newNote);
-      localStorage.setItem('savedNotes', JSON.stringify(notes));
+     const newNote = {
+       text: noteText,
+       timestamp: now.toISOString(),
+       project: projectName,
+       resolved: false,
+       tags: []
+     };
 
-      textarea.value = '';
-      saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
-      updateGrouping();
+     // 🧠 Save to localStorage
+     existingNotes.unshift(newNote);
+     localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
+
+     // ☁️ Save to Firebase (if logged in + db available)
+     try {
+       if (db && firebase.auth().currentUser) {
+         const uid = firebase.auth().currentUser.uid;
+         await db.collection("users").doc(uid).collection("notes").add(newNote);
+         console.log("✅ Note saved to Firestore under user:", uid);
+       } else {
+         console.warn("⚠️ User not logged in or Firebase not ready");
+       }
+     } catch (error) {
+       console.error("❌ Failed to save note to Firestore:", error);
+     }
+
+     textarea.value = '';
+     saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
+     updateGrouping();
     }
 
     function autoSave() {
@@ -334,6 +373,12 @@
     }
 
     function startVoiceCapture() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('🎙️ Voice capture is not supported in this browser. Try using Chrome.');
+        return;
+      }
+
       recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = 'en-US';
       recognition.continuous = true;
@@ -377,19 +422,67 @@
       saveStatus.innerText = "🎤 Voice capture stopped.";
     }
 
-    function handleFileAttachment() {
+    async function handleFileAttachment() {
       const input = document.getElementById('fileInput');
       const files = Array.from(input.files);
       const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-      const updated = stored.concat(files.map(file => file.name));
-      localStorage.setItem('attachedFiles', JSON.stringify(updated));
-      updateFileDisplay(updated);
-      input.value = '';
+
+      let updated = [...stored];
+      let duplicateCount = 0;
+
+      if (!firebase.auth().currentUser || !firebase.storage) {
+        alert("⚠️ You must be logged in to upload files.");
+        return;
     }
 
-    function removeFile(fileName) {
+    const storageRef = firebase.storage().ref();
+
+    for (const file of files) {
+      const fileName = file.name;
+
+      // ✅ Check for duplicates by name
+      const isDuplicate = stored.some(f => f.originalName === fileName);
+      if (isDuplicate) {
+        duplicateCount++;
+        continue; // skip to next file
+      }
+
+      const uniqueId = crypto.randomUUID();
+      const storedName = `${fileName}__${uniqueId}`;
+      const fileRef = storageRef.child(`userFiles/${firebase.auth().currentUser.uid}/${storedName}`);
+
+      try {
+        // 🔼 Upload to Firebase Storage
+        await fileRef.put(file);
+        const downloadURL = await fileRef.getDownloadURL();
+
+        // ✅ Save metadata locally
+        updated.push({
+          originalName: fileName,
+          storedName: storedName,
+          downloadURL: downloadURL
+        });
+
+      } catch (err) {
+        console.error(`❌ Failed to upload ${fileName}:`, err);
+        alert(`❌ Upload failed for ${fileName}`);
+      }
+    }
+
+    // Show duplicate warning
+    if (duplicateCount > 0) {
+      alert(`⚠️ ${duplicateCount} file(s) already attached and were skipped.`);
+    }
+
+    // ✅ Save and update UI
+    localStorage.setItem('attachedFiles', JSON.stringify(updated));
+    updateFileDisplay(updated);
+    input.value = ''; // clear input for future uploads
+   }
+
+    function removeFile(storedName) {
       const files = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-      const updated = files.filter(f => f !== fileName);
+      const updated = files.filter(f => f.storedName !== storedName);
       localStorage.setItem('attachedFiles', JSON.stringify(updated));
       updateFileDisplay(updated);
     }
@@ -399,12 +492,14 @@
         attachedFilesList.innerHTML = '';
         return;
       }
+
       attachedFilesList.innerHTML = `<strong>📎 Attached Files:</strong><ul>${fileList.map(f => `
-        <li class="file-item">
-          <span>${f}</span>
-          <button onclick="removeFile('${f}')">🗑️</button>
-        </li>`).join('')}</ul>`;
+       <li class="file-item">
+         <span><a href="${f.downloadURL}" target="_blank">${f.originalName}</a></span>
+         <button onclick="removeFile('${f.storedName}')">🗑️</button>
+       </li>`).join('')}</ul>`;
     }
+
     function escapeHTML(text) {
       const div = document.createElement('div');
       div.innerText = text;
@@ -413,17 +508,32 @@
 
     function updateGrouping() {
       const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      const searchKeyword = document.getElementById('searchInput').value.toLowerCase().trim();
+      const groupBy = document.getElementById("groupSelector").value;
+      let html = "";
+
       if (notes.length === 0) {
         groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
         return;
       }
 
-      const groupBy = document.getElementById("groupSelector").value;
-      let html = "";
+      const highlightText = (text, keyword) => {
+        if (!keyword) return escapeHTML(text).replace(/\n/g, "<br>");
+        const safe = escapeHTML(text);
+        const regex = new RegExp(`(${keyword})`, "gi");
+        return safe.replace(regex, `<mark>$1</mark>`).replace(/\n/g, "<br>");
+       };
+
+       const filteredNotes = searchKeyword
+         ? notes.filter(note =>
+             note.text?.toLowerCase().includes(searchKeyword) ||
+             (note.project && note.project.toLowerCase().includes(searchKeyword))
+           )
+         : notes;
 
       if (groupBy === "date") {
         const groups = {};
-        notes.forEach(note => {
+        filteredNotes.forEach(note => {
           const rawDate = note.timestamp || note.time;
           const date = new Date(rawDate).toLocaleDateString();
           if (!groups[date]) groups[date] = [];
@@ -433,20 +543,20 @@
         for (const date in groups) {
           html += `<h4>🗓️ ${date}</h4><ul>`;
           groups[date].forEach((note, i) => {
-            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
+            const highlightedText = highlightText(note.text, searchKeyword);
             html += `
               <li style="margin-bottom:1rem">
-                <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong>
-                ${safeText}
-                <br><button onclick="deleteNote(${i})">🗑️ Delete</button>
-              </li>`;
+                <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+                ${highlightedText}
+                <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
+               </li>`;
           });
           html += "</ul>";
         }
 
       } else if (groupBy === "project") {
         const groups = {};
-        notes.forEach(note => {
+        filteredNotes.forEach(note => {
           const project = note.project || "📂 Unlabeled";
           if (!groups[project]) groups[project] = [];
           groups[project].push(note);
@@ -455,66 +565,88 @@
         for (const project in groups) {
           html += `<h4>📁 ${project}</h4><ul>`;
           groups[project].forEach((note, i) => {
-            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
+            const highlightedText = highlightText(note.text, searchKeyword);
             html += `
-              <li style="margin-bottom:1rem">
-                <strong>${new Date(note.timestamp).toLocaleString()}</strong><br>
-                ${safeText}
-                <br><button onclick="deleteNote(${i})">🗑️ Delete</button>
+             <li style="margin-bottom:1rem">
+               <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+               ${highlightedText}
+               <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
               </li>`;
           });
           html += "</ul>";
-        }
+         }
 
       } else if (groupBy === "unresolved") {
-        const unresolved = notes.filter(note => note.resolved === false);
+        const unresolved = filteredNotes.filter(note => note.resolved === false);
         if (unresolved.length === 0) {
           html += "<p>✅ No unresolved notes!</p>";
         } else {
-          html += "<h4>❓ Unresolved Notes</h4><ul>";
-          unresolved.forEach((note, i) => {
-            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
-            html += `
-              <li style="margin-bottom:1rem">
-                <strong>${new Date(note.timestamp).toLocaleString()}</strong><br>
-                ${safeText}
-                <br><button onclick="deleteNote(${i})">🗑️ Delete</button>
-              </li>`;
+          const groups = {};
+          unresolved.forEach(note => {
+            const project = note.project || "📂 Unlabeled";
+            if (!groups[project]) groups[project] = [];
+            groups[project].push(note);
           });
-          html += "</ul>";
+
+          for (const project in groups) {
+            const highlightedProject = highlightText(project, searchKeyword);
+            html += `<h4>📁 ${highlightedProject}</h4><ul>`;
+            groups[project].forEach((note, i) => {
+              const highlightedText = highlightText(note.text, searchKeyword);
+              html += `
+                <li style="margin-bottom:1rem">
+                  <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+                  ${highlightedText}
+                  <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
+                 </li>`;
+            });
+            html += "</ul>";
+          }
         }
 
       } else if (groupBy === "forgotten") {
         const now = Date.now();
-        const forgotten = notes.filter(note => {
-          const age = now - new Date(note.timestamp).getTime();
+        const forgotten = filteredNotes.filter(note => {
+          const age = now - new Date(note.timestamp || note.time).getTime();
           return age > 3 * 24 * 60 * 60 * 1000; // older than 3 days
         });
 
         if (forgotten.length === 0) {
           html += "<p>🧠 Nothing forgotten yet!</p>";
         } else {
-          html += "<h4>💭 Forgotten Notes (3+ days old)</h4><ul>";
-          forgotten.forEach((note, i) => {
-            const safeText = escapeHTML(note.text).replace(/\n/g, "<br>");
-            html += `
-              <li style="margin-bottom:1rem">
-                <strong>${new Date(note.timestamp).toLocaleString()}</strong><br>
-                ${safeText}
-                <br><button onclick="deleteNote(${i})">🗑️ Delete</button>
-              </li>`;
+          const groups = {};
+          forgotten.forEach(note => {
+            const project = note.project || "📂 Unlabeled";
+            if (!groups[project]) groups[project] = [];
+            groups[project].push(note);
           });
-          html += "</ul>";
+
+          for (const project in groups) {
+            const highlightedProject = highlightText(project, searchKeyword);
+            html += `<h4>📁 ${highlightedProject}</h4><ul>`;
+            groups[project].forEach((note, i) => {
+              const highlightedText = highlightText(note.text, searchKeyword);
+              html += `
+                <li style="margin-bottom:1rem">
+                  <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+                  ${highlightedText}
+                  <button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
+                 </li>`;
+             });
+             html += "</ul>";
+          }
         }
-      }
 
-      groupedNotes.innerHTML = html;
-    }
+  // Same logic can be applied to other groupBy options (project, unresolved, forgotten)
+  // You can copy the same pattern for those if needed
 
-    function deleteNote(index) {
+  groupedNotes.innerHTML = html || "<p>🔍 No matching results.</p>";
+}
+
+    function deleteNoteByTime(time) {
       const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-      notes.splice(index, 1);
-      localStorage.setItem('savedNotes', JSON.stringify(notes));
+      const updated = notes.filter(n => n.timestamp !== time);
+      localStorage.setItem('savedNotes', JSON.stringify(updated));
       updateGrouping();
     }
 
@@ -536,10 +668,20 @@
 
     window.onload = async function () { // ✅ Make the function async
       await initializeFirebase();
-      loadSavedText();
-      applyMoodTheme();
-      updateGrouping();
-      setInterval(autoSave, 30000);
+
+      firebase.auth().onAuthStateChanged(user => {
+        if (!user) {
+          alert("Please sign in first.");
+          window.location.href = "signin.html";
+        } else {
+          console.log("✅ User is signed in:", user.email);
+        }
+          loadSavedText();
+          applyMoodTheme();
+          updateGrouping();
+          setInterval(autoSave, 30000);
+        }
+      });
     };
   </script>
 </body>
