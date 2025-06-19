@@ -76,16 +76,16 @@
       width: 420px;
       background: #fff;
       border-right: 1px solid #ccc;
-      overflow-y: auto;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      display: flex; /* fix */
+      flex-direction: column;
+      height: 100vh;  /* full screen height */
       position: absolute;
       left: 0;
       top: 0;
-      bottom: 0;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      display: none;
-      flex-direction: column;
       z-index: 100;
     }
+
 
     .preview-top {
       padding: 1rem;
@@ -101,6 +101,12 @@
       text-decoration: none;
       color: inherit;
       font-size: 1rem;
+    }
+
+    .preview-middle {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
     }
 
     .preview-content {
@@ -200,13 +206,15 @@
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="preview-overlay" id="preview">
       <div class="preview-top">
-        <a href="holdingbay.html">🔄 Holding Bay</a>
-        <a href="actnow.html">🚀 Act Now</a>
-        <a href="buildmomentum.html">🌿 Build Momentum</a>
-        <a href="worthitlater.html">⏳ Worth It Later</a>
-        <a href="parkedpotential.html">📦 Parked Potential</a>
-      </div>
+      <a href="holdingbay.html">🔄 Holding Bay</a>
+      <a href="actnow.html">🚀 Act Now</a>
+      <a href="buildmomentum.html">🌿 Build Momentum</a>
+      <a href="worthitlater.html">⏳ Worth It Later</a>
+      <a href="parkedpotential.html">📦 Parked Potential</a>
+    </div>
 
+  
+    <div class="preview-middle">
       <div class="preview-sortbar">
         <label for="groupSelector">Group by</label>
         <select id="groupSelector" onchange="updateGrouping()">
@@ -218,18 +226,19 @@
         <input type="text" id="searchInput" placeholder="🔍 Search notes..." oninput="updateGrouping()" />
       </div>
 
-       <div id="groupedNotes"></div>
-     </div>
-
-      <div class="preview-bottom">
-        <input type="file" id="fileInput" multiple style="display: none;" aria-label="Attach files" onchange="handleFileAttachment()" />
-      </div>
-
-      <div class="preview-settings">
-        <a href="settings.html">⚙️ Settings</a>
-        <a href="profile.html">👤 Profile</a>
-      </div>
+      <div id="groupedNotes"></div>
     </div>
+
+    <div class="preview-bottom">
+      <input type="file" id="fileInput" multiple style="display: none;" aria-label="Attach files" onchange="handleFileAttachment()" />
+    </div>
+
+  
+   <div class="preview-settings">
+     <a href="settings.html">⚙️ Settings</a>
+     <a href="profile.html">👤 Profile</a>
+   </div>
+ </div>
 
     <div class="editor-area">
       <button id="previewToggle">☰</button>
