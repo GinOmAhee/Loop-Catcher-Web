@@ -415,6 +415,13 @@
     }
 
     window.onload = function () {
+      await initializeFirebase();
+      loadSavedText();
+      applyMoodTheme();
+      updateGrouping();
+      setInterval(autoSave, 30000);
+    };
+  </script>
       loadSavedText();
       applyMoodTheme();
       updateGrouping();
