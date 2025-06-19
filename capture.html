@@ -414,14 +414,8 @@
       }
     }
 
-    window.onload = function () {
+    window.onload = async function () { // ✅ Make the function async
       await initializeFirebase();
-      loadSavedText();
-      applyMoodTheme();
-      updateGrouping();
-      setInterval(autoSave, 30000);
-    };
-  </script>
       loadSavedText();
       applyMoodTheme();
       updateGrouping();
