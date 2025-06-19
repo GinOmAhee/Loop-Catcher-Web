@@ -518,63 +518,101 @@
         return safe.replace(regex, `<mark>$1</mark>`).replace(/\n/g, "<br>");
       };
 
-       const filteredNotes = searchKeyword
-         ? notes.filter(note =>
-             note.text?.toLowerCase().includes(searchKeyword) ||
-             (note.project && note.project.toLowerCase().includes(searchKeyword))
-           )
-         : notes;
+      const filteredNotes = searchKeyword
+        ? notes.filter(note =>
+            note.text?.toLowerCase().includes(searchKeyword) ||
+            (note.project && note.project.toLowerCase().includes(searchKeyword))
+          )
+        : notes;
 
-       const groupAndRender = (groupedNotes, icon) => {
-         for (const key in groupedNotes) {
-           html += `<h4>${icon} ${escapeHTML(key)}</h4><ul>`;
-           groupedNotes[key].forEach(note => {
-             const highlightedText = highlightText(note.text, searchKeyword);
-             html += `
-               <li style="margin-bottom:1rem">
-                 <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
-                 ${highlightedText}
-                 <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
-                </li>`;
-           });
-           html += "</ul>";
-         }
-       };
+      const now = Date.now();
 
-       const now = Date.now();
-       const groups = {};
+      if (groupBy === "date") {
+        const grouped = {};
 
-       if (groupBy === "date") {
-         filteredNotes.forEach(note => {
-           const date = new Date(note.timestamp || note.time).toLocaleDateString();
-           if (!groups[date]) groups[date] = [];
-           groups[date].push(note);
-         });
-         groupAndRender(groups, "🗓️");
+        filteredNotes.forEach(note => {
+          const date = new Date(note.timestamp || note.time).toLocaleDateString();
+          if (!grouped[date]) grouped[date] = [];
+          grouped[date].push(note);
+        });
 
-       } else if (groupBy === "project" || groupBy === "unresolved" || groupBy === "forgotten") {
-         let relevantNotes = filteredNotes;
+        for (const date in grouped) {
+          html += `<h4>🗓️ ${date}</h4><ul>`;
+          grouped[date].forEach(note => {
+            html += `
+              <li style="margin-bottom:1rem">
+                <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+                ${highlightText(note.text, searchKeyword)}
+                <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
+              </li>`;
+          });
+          html += "</ul>";
+        }
 
-         if (groupBy === "unresolved") {
-           relevantNotes = relevantNotes.filter(note => note.resolved === false);
-           if (relevantNotes.length === 0) return groupedNotes.innerHTML = "<p>✅ No unresolved notes!</p>";
-         }
+      } else if (groupBy === "project") {
+        const grouped = {};
 
-         if (groupBy === "forgotten") {
-           relevantNotes = relevantNotes.filter(note => now - new Date(note.timestamp || note.time).getTime() > 3 * 24 * 60 * 60 * 1000);
-           if (relevantNotes.length === 0) return groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
-         }
+        filteredNotes.forEach(note => {
+          const project = note.project || "📂 Unlabeled";
+          if (!grouped[project]) grouped[project] = [];
+          grouped[project].push(note);
+        });
 
-         relevantNotes.forEach(note => {
-           const project = note.project || "📂 Unlabeled";
-           if (!groups[project]) groups[project] = [];
-           groups[project].push(note);
-         });
+        for (const project in grouped) {
+          html += `<h4>📁 ${escapeHTML(project)}</h4><ul>`;
+          grouped[project].forEach(note => {
+            html += `
+              <li style="margin-bottom:1rem">
+                <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+                ${highlightText(note.text, searchKeyword)}
+                <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
+              </li>`;
+          });
+          html += "</ul>";
+        }
 
-         groupAndRender(groups, "📁");
-       }
+      } else if (groupBy === "unresolved") {
+        const unresolved = filteredNotes.filter(note => note.resolved === false);
+        if (unresolved.length === 0) {
+          groupedNotes.innerHTML = "<p>✅ No unresolved notes!</p>";
+          return;
+        }
 
-       groupedNotes.innerHTML = html;
+        html += `<h4>🧩 Unresolved Ideas</h4><ul>`;
+        unresolved.forEach(note => {
+          html += `
+            <li style="margin-bottom:1rem">
+              <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+              ${highlightText(note.text, searchKeyword)}
+              <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
+            </li>`;
+        });
+      html += "</ul>";
+
+      } else if (groupBy === "forgotten") {
+        const forgotten = filteredNotes.filter(note => {
+          const age = now - new Date(note.timestamp || note.time).getTime();
+          return age > 3 * 24 * 60 * 60 * 1000; // older than 3 days
+        });
+
+        if (forgotten.length === 0) {
+          groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
+          return;
+        }
+
+        html += `<h4>🧠 Forgotten Ideas</h4><ul>`;
+        forgotten.forEach(note => {
+          html += `
+            <li style="margin-bottom:1rem">
+              <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+              ${highlightText(note.text, searchKeyword)}
+              <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
+             </li>`;
+        });
+        html += "</ul>";
+      }
+
+      groupedNotes.innerHTML = html;
     }
 
     function deleteNoteByTime(time) {
