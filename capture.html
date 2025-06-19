@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Capture UI</title>
@@ -195,9 +189,15 @@
     }
 
   </style>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  
 </head>
 <body>
-  <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="preview-overlay" id="preview">
       <div class="preview-top">
         <a href="holdingbay.html">🔄 Holding Bay</a>
@@ -296,6 +296,8 @@
       preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
     });
 
+    document.addEventListener('click', maybeClosePreview);
+    
     function maybeClosePreview(e) {
       if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
         preview.style.display = 'none';
