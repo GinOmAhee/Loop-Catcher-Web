@@ -630,7 +630,7 @@
                 <li style="margin-bottom:1rem">
                   <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
                   ${highlightedText}
-                  <button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
+                  <button onclick="deleteNoteByTime(\`${note.timestamp}\`)">🗑️ Delete</button>
                  </li>`;
              });
              html += "</ul>";
