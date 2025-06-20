@@ -70,19 +70,17 @@
     }
 
     .preview-overlay {
-      width: 420px;
-      background: #fff;
-      border-right: 1px solid #ccc;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      display: flex; /* fix */
-      flex-direction: column;
-      height: 100vh;  /* full screen height */
-      position: relative;
-      left: 0;
+      position: fixed;
       top: 0;
-      z-index: 100;
+      left: 0;
+      width: 420px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 999;
+      display: none; /* Hidden by default */
+      flex-direction: column;
     }
-
 
     .preview-top {
       padding: 1rem;
@@ -212,7 +210,8 @@
   </style>
 </head>
 <body>
-
+<body>
+  <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
   <div class="preview-overlay" id="preview">
     <div class="preview-top">
       <a href="holdingbay.html">🔄 Holding Bay</a>
@@ -251,17 +250,19 @@
     </div>
   </div>
 
-  <!-- ✅ Text Editor stays outside preview overlay -->
-  <div class="editor-area" onclick="maybeClosePreview(event)">
-    <button id="previewToggle">☰</button>
-    <textarea id="mainText" placeholder="Start capturing..."></textarea>
-    <div class="controls">
-      <button onclick="saveText()">💾 Save</button>
-      <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
-      <button onclick="document.getElementById('fileInput').click()">📎 Attach File</button>
+  <!-- 📝 Main Editor (always visible) -->
+  <div class="main-container" onclick="maybeClosePreview(event)">
+    <div class="editor-area">
+      <button id="previewToggle">☰</button>
+      <textarea id="mainText" placeholder="Start capturing..."></textarea>
+      <div class="controls">
+        <button onclick="saveText()">💾 Save</button>
+        <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
+        <button onclick="document.getElementById('fileInput').click()">📎 Attach File</button>
+      </div>
+      <div id="attachedFilesList"></div>
+      <div class="save-time" id="saveStatus"></div>
     </div>
-    <div id="attachedFilesList"></div>
-    <div class="save-time" id="saveStatus"></div>
   </div>
 </body>
 
