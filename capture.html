@@ -25,21 +25,20 @@
     .theme-bold { background-color: #f7ddb4; color: #5d3e0a; }
     .theme-playful { background-color: #ffd6e8; color: #7e2b4e; }
 
-    .main-container {
+     .main-container {
       display: flex;
-      justify-content: center;  /* ⬅️ center horizontally */
-      align-items: center;      /* ⬆️ center vertically */
       height: 100vh;
       overflow: hidden;
-      padding-left: 420px;      /* ⬅️ offset for preview panel width */
-      box-sizing: border-box;
     }
 
     .editor-area {
+      flex-grow: 1;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
       padding: 2rem;
-      flex-grow: 1;
+      position: relative;
     }
 
     textarea {
@@ -51,7 +50,7 @@
       border-radius: 8px;
       resize: none;
     }
-
+    
     .controls {
       display: flex;
       gap: 1rem;
