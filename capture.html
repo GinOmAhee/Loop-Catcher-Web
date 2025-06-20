@@ -145,10 +145,24 @@
     }
 
     .preview-sortbar.bottom-searchbar {
-      padding: 0.75rem 1rem;
+      padding: 1rem;
       border-top: 1px solid #ddd;
       background: #fafafa;
-      flex-shrink: 0;
+    }
+
+    #searchInput {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: white;
+    }
+
+    #searchInput:focus {
+      outline: none;
+      border-color: #999;
+      box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.1);
     }
 
     #previewToggle {
@@ -263,7 +277,7 @@
 
     </div>
   </div>
-  
+
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
