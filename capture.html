@@ -131,6 +131,18 @@
       outline: none;
       cursor: pointer;
     }
+    .preview-sortbar.top-sortbar {
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .preview-sortbar.bottom-searchbar {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #ddd;
+    }
 
     #previewToggle {
       position: absolute;
@@ -220,16 +232,18 @@
           <option value="unresolved">Unresolved Ideas</option>
           <option value="forgotten">Forgotten Ideas</option>
         </select>
-        <input type="text" id="searchInput" placeholder="🔍 Search notes..." oninput="updateGrouping()" />
       </div>
 
-      <div id="groupedNotes"></div>
-    </div>
+      <div class="preview-sortbar bottom-searchbar">
+       <input
+         type="text"
+         id="searchInput"
+         placeholder="🔍 Search notes..."
+         oninput="updateGrouping()"
+         style="width: 100%; padding: 0.5rem; font-size: 1rem;" />
+      </div>
 
-    <div class="preview-bottom">
-      <input type="file" id="fileInput" multiple style="display: none;" aria-label="Attach files" onchange="handleFileAttachment()" />
-    </div>
-
+      <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
   
    <div class="preview-settings">
      <a href="settings.html">⚙️ Settings</a>
