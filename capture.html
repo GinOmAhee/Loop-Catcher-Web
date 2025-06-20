@@ -212,10 +212,9 @@
   </style>
 </head>
 <body>
-  <div class="main-container" onclick="maybeClosePreview(event)">
 
-    <div class="preview-overlay" id="preview">
-      <div class="preview-top">
+  <div class="preview-overlay" id="preview">
+    <div class="preview-top">
       <a href="holdingbay.html">🔄 Holding Bay</a>
       <a href="actnow.html">🚀 Act Now</a>
       <a href="buildmomentum.html">🌿 Build Momentum</a>
@@ -223,7 +222,6 @@
       <a href="parkedpotential.html">📦 Parked Potential</a>
     </div>
 
-  
     <div class="preview-middle">
       <div class="preview-sortbar">
         <label for="groupSelector">Group by</label>
@@ -236,36 +234,36 @@
       </div>
 
       <div class="preview-sortbar bottom-searchbar">
-       <input
-         type="text"
-         id="searchInput"
-         placeholder="🔍 Search notes..."
-         oninput="updateGrouping()"
-         style="width: 100%; padding: 0.5rem; font-size: 1rem;" />
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="🔍 Search notes..."
+          oninput="updateGrouping()"
+          style="width: 100%; padding: 0.5rem; font-size: 1rem;" />
       </div>
 
       <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
-  
+
       <div class="preview-settings">
         <a href="settings.html">⚙️ Settings</a>
         <a href="profile.html">👤 Profile</a>
-     </div>
-   </div>
- 
+      </div>
+    </div>
+  </div>
 
-  <div class="editor-area">
+  <!-- ✅ Text Editor stays outside preview overlay -->
+  <div class="editor-area" onclick="maybeClosePreview(event)">
     <button id="previewToggle">☰</button>
     <textarea id="mainText" placeholder="Start capturing..."></textarea>
     <div class="controls">
-      <button onclick="saveText()">💾 Save</button> <!-- This is still valid, since `async` doesn't affect the call -->
+      <button onclick="saveText()">💾 Save</button>
       <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
       <button onclick="document.getElementById('fileInput').click()">📎 Attach File</button>
     </div>
     <div id="attachedFilesList"></div>
     <div class="save-time" id="saveStatus"></div>
   </div>
-
-</div>
+</body>
 
   <script>
     let db = null;
