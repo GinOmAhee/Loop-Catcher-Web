@@ -145,9 +145,10 @@
     }
 
     .preview-sortbar.bottom-searchbar {
-      margin-top: 0.5rem;
-      padding-top: 0.5rem;
+      padding: 0.75rem 1rem;
       border-top: 1px solid #ddd;
+      background: #fafafa;
+      flex-shrink: 0;
     }
 
     #previewToggle {
@@ -230,6 +231,7 @@
     </div>
 
     <div class="preview-middle">
+      <!-- 1. Top: Group selector -->
       <div class="preview-sortbar">
         <label for="groupSelector">Group by</label>
         <select id="groupSelector" onchange="updateGrouping()">
@@ -240,8 +242,10 @@
         </select>
       </div>
 
+      <!-- 2. Scrollable notes area -->
       <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
-      
+
+      <!-- 3. Bottom: search input anchored in its own bar -->
       <div class="preview-sortbar bottom-searchbar">
         <input
           type="text"
@@ -251,14 +255,15 @@
           style="width: 100%; padding: 0.5rem; font-size: 1rem;" />
       </div>
 
-      <div class="preview-bottom"></div>
+      <!-- 4. Very bottom: settings/profile links -->
       <div class="preview-settings">
         <a href="settings.html">⚙️ Settings</a>
         <a href="profile.html">👤 Profile</a>
       </div>
+
     </div>
   </div>
-
+  
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
