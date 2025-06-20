@@ -105,11 +105,13 @@
       display: flex;
       flex-direction: column;
       height: 100%;
+      overflow: hidden;
     }
 
     #groupedNotes {
-     flex-grow: 1;
-     overflow-y: auto;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 1rem;
     }
 
     .preview-content {
