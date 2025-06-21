@@ -372,14 +372,17 @@
         <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
       </div>
 
-        <select onchange="applyHighlight(this.value); this.selectedIndex = 0;" title="Highlight Color">
-          <option value="">Highlight</option>
-          <option value="yellow">Yellow</option>
-          <option value="lightgreen">Light Green</option>
-          <option value="lightblue">Light Blue</option>
-          <option value="lightpink">Light Pink</option>
-          <option value="lightgray">Light Gray</option>
-        </select>
+      <!-- Highlight Color Icon Button -->
+      <button id="highlightBtn" title="Highlight">🖍️</button>
+
+      <!-- Highlight Color Dropdown -->
+      <div id="highlightDropdown" class="dropdown hidden">
+        <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+        <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+        <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+        <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+        <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
+      </div>
 
         <button onclick="format('insertUnorderedList')">• List</button>
         <button onclick="removeFormatting()">🚫</button>
@@ -451,6 +454,8 @@
     const sizeDropdown = document.getElementById("sizeDropdown");
     const textColorBtn = document.getElementById("textColorBtn");
     const textColorDropdown = document.getElementById("textColorDropdown");
+    const highlightBtn = document.getElementById("highlightBtn");
+    const highlightDropdown = document.getElementById("highlightDropdown");
 
     let recognition;
     let isRecording = false;
@@ -473,12 +478,7 @@
       sizeDropdown.style.left = `${rect.left}px`;
       sizeDropdown.style.top = `${rect.bottom + 5}px`;
     });
-
-    document.addEventListener("click", () => {
-    fontDropdown.classList.add("hidden");
-    sizeDropdown.classList.add("hidden");
-    });
-
+    
     function setFontSize(size) {
       document.execCommand("fontSize", false, size);
       sizeDropdown.classList.add("hidden");
@@ -490,10 +490,6 @@
       const rect = fontBtn.getBoundingClientRect();
       fontDropdown.style.left = `${rect.left}px`;
       fontDropdown.style.top = `${rect.bottom + 5}px`;
-    });
-
-    document.addEventListener("click", () => {
-    fontDropdown.classList.add("hidden");
     });
 
     function setFont(font) {
@@ -509,16 +505,17 @@
      textColorDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
-    document.addEventListener("click", () => {
-      fontDropdown?.classList.add("hidden");
-      sizeDropdown?.classList.add("hidden");
-      textColorDropdown?.classList.add("hidden");
-    });
-
     function setTextColor(color) {
       document.execCommand("foreColor", false, color);
       textColorDropdown.classList.add("hidden");
     }
+
+    document.addEventListener("click", () => {
+      fontDropdown?.classList.add("hidden");
+      sizeDropdown?.classList.add("hidden");
+      textColorDropdown?.classList.add("hidden");
+      highlightDropdown?.classList.add("hidden");
+    });
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -529,6 +526,18 @@
       if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
         preview.style.display = 'none';
       }
+    }
+    highlightBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      highlightDropdown.classList.toggle("hidden");
+      const rect = highlightBtn.getBoundingClientRect();
+      highlightDropdown.style.left = `${rect.left}px`;
+      highlightDropdown.style.top = `${rect.bottom + 5}px`;
+    });
+
+    function setHighlightColor(color) {
+    document.execCommand("hiliteColor", false, color);
+    highlightDropdown.classList.add("hidden");
     }
 
    async function saveText() {
