@@ -565,12 +565,6 @@
       return div.innerHTML;
     }
 
-    function escapeHTML(str) {
-      return str.replace(/[&<>"']/g, tag => (
-        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[tag]
-      ));
-    }
-
     function updateGrouping() {
       const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       const searchKeyword = document.getElementById('searchInput').value.toLowerCase().trim();
