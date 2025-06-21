@@ -54,13 +54,7 @@
       border-radius: 8px;
       resize: none;
     }
-    .format-toolbar select {
-       padding: 0.3rem;
-       border-radius: 4px;
-       font-size: 0.85rem;
-       border: 1px solid #ccc;
-    }
- 
+    
     .controls {
       display: flex;
       gap: 1rem;
@@ -319,18 +313,8 @@
         <button onclick="format('underline')"><u>U</u></button>
         <button onclick="format('strikeThrough')"><s>S</s></button>
 
-        <button id="highlightBtn" onclick="toggleHighlight()">🖍️ Highlight</button>
-
-        <select onchange="format('hiliteColor', this.value)" title="Highlight Color">
-          <option value="">Highlight</option>
-          <option value="yellow">Yellow</option>
-          <option value="lightgreen">Light Green</option>
-          <option value="lightblue">Light Blue</option>
-          <option value="lightpink">Light Pink</option>
-          <option value="lightgray">Light Gray</option>
-        </select>
-
-        <select onchange="format('hiliteColor', this.value); this.selectedIndex = 0;"></select>
+        <input type="color" onchange="format('foreColor', this.value)" title="Text Color">
+        <input type="color" onchange="format('hiliteColor', this.value)" title="Highlight">
 
         <button onclick="format('justifyLeft')">←</button>
         <button onclick="format('justifyCenter')">⇔</button>
@@ -413,10 +397,6 @@
         updateGrouping(); // refresh the preview panel
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
-    });
-
-    mainEditor.addEventListener("blur", () => {
-      if (isHighlighting) toggleHighlight(); // turn it off when editor loses focus
     });
 
     toggleBtn.addEventListener('click', (e) => {
@@ -845,22 +825,18 @@
       saveStatus.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
     }
 
-    let isHighlighting = false;
-
-    function toggleHighlight() {
-      isHighlighting = !isHighlighting;
-      const color = isHighlighting ? 'yellow' : null;
-
-      if (color) {
-        document.execCommand('styleWithCSS', false, true); // ensures real CSS gets applied
-        document.execCommand('hiliteColor', false, color);
-        document.getElementById("highlightBtn").style.background = "#ffe066";
+    function format(command, value = null) {
+      mainEditor.focus(); // make sure editor is active
+      if (command === 'hiliteColor') {
+        // Use 'backColor' as fallback if 'hiliteColor' fails
+        try {
+          document.execCommand('hiliteColor', false, value);
+        } catch {
+          document.execCommand('backColor', false, value);
+        }
       } else {
-        document.execCommand('removeFormat', false, null);
-        document.getElementById("highlightBtn").style.background = "";
+        document.execCommand(command, false, value);
       }
-
-      mainEditor.focus();
     }
 
     function removeFormatting() {
