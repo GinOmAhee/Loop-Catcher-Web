@@ -54,7 +54,13 @@
       border-radius: 8px;
       resize: none;
     }
-    
+    .format-toolbar select {
+       padding: 0.3rem;
+       border-radius: 4px;
+       font-size: 0.85rem;
+       border: 1px solid #ccc;
+    }
+ 
     .controls {
       display: flex;
       gap: 1rem;
@@ -313,8 +319,25 @@
         <button onclick="format('underline')"><u>U</u></button>
         <button onclick="format('strikeThrough')"><s>S</s></button>
 
-        <input type="color" onchange="format('foreColor', this.value)" title="Text Color">
-        <input type="color" onchange="format('hiliteColor', this.value)" title="Highlight">
+        <select onchange="format('foreColor', this.value)" title="Text Color">
+          <option value="">Text Color</option>
+          <option value="black">Black</option>
+          <option value="red">Red</option>
+          <option value="blue">Blue</option>
+          <option value="green">Green</option>
+          <option value="orange">Orange</option>
+          <option value="purple">Purple</option>
+          <option value="gray">Gray</option>
+        </select>
+
+        <select onchange="format('hiliteColor', this.value)" title="Highlight Color">
+          <option value="">Highlight</option>
+          <option value="yellow">Yellow</option>
+          <option value="lightgreen">Light Green</option>
+          <option value="lightblue">Light Blue</option>
+          <option value="lightpink">Light Pink</option>
+          <option value="lightgray">Light Gray</option>
+        </select>
 
         <button onclick="format('justifyLeft')">←</button>
         <button onclick="format('justifyCenter')">⇔</button>
