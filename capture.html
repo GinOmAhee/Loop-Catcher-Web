@@ -495,6 +495,10 @@
       fontDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
+    fontDropdown.addEventListener("click", (e) => {
+    e.stopPropagation();
+    });
+
     function setFont(font) {
       document.execCommand("fontName", false, font);
       fontDropdown.classList.add("hidden");
@@ -512,13 +516,6 @@
       document.execCommand("foreColor", false, color);
       textColorDropdown.classList.add("hidden");
     }
-
-    document.addEventListener("click", () => {
-      fontDropdown?.classList.add("hidden");
-      sizeDropdown?.classList.add("hidden");
-      textColorDropdown?.classList.add("hidden");
-      highlightDropdown?.classList.add("hidden");
-    });
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
