@@ -703,10 +703,10 @@
              color: white;
              border: none;
              border-radius: 5px;
-             padding: 0.2rem .8rem;
+             padding: 0.5rem 1rem;
              font-size: 1rem;
              cursor: pointer;
-             box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
              z-index: 999;
            ">
            🗑️
@@ -756,6 +756,26 @@
         }
       });
     };
+
+    function deleteSelectedNotes() {
+      const checkboxes = document.querySelectorAll('.note-delete-checkbox:checked');
+      if (checkboxes.length === 0) {
+        alert("⚠️ No notes selected for deletion.");
+        return;
+      }
+
+      const confirmDelete = confirm(`Are you sure you want to delete ${checkboxes.length} selected note(s)?`);
+      if (!confirmDelete) return;
+
+      let savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      const timesToDelete = Array.from(checkboxes).map(cb => cb.getAttribute('data-time'));
+
+      savedNotes = savedNotes.filter(note => !timesToDelete.includes(note.timestamp));
+      localStorage.setItem('savedNotes', JSON.stringify(savedNotes));
+
+      updateGrouping();
+      saveStatus.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
+    }
   </script>
 
  </body>
