@@ -330,16 +330,19 @@
         <div onclick="setFont('Times New Roman')">Times New Roman</div>
       </div>
 
-        <select onchange="applyStyle('fontSize', this.value)">
-          <option value="">Size</option>
-          <option value="1">Very Small</option>
-          <option value="2">Small</option>
-          <option value="3">Normal</option>
-          <option value="4">Large</option>
-          <option value="5">Very Large</option>
-          <option value="6">Huge</option>
-          <option value="7">Maximum</option>
-        </select>
+      <!-- Font Size Icon Button -->
+      <button id="fontSizeBtn" title="Font Size">🔠</button>
+
+      <!-- Size Dropdown -->
+      <div id="sizeDropdown" class="dropdown hidden">
+        <div onclick="setFontSize('1')">Very Small</div>
+        <div onclick="setFontSize('2')">Small</div>
+        <div onclick="setFontSize('3')">Normal</div>
+        <div onclick="setFontSize('4')">Large</div>
+        <div onclick="setFontSize('5')">Very Large</div>
+        <div onclick="setFontSize('6')">Huge</div>
+        <div onclick="setFontSize('7')">Maximum</div>
+      </div>
 
         <button onclick="applyFormat('bold')"><b>B</b></button>
         <button onclick="applyFormat('italic')"><i>I</i></button>
@@ -441,6 +444,8 @@
     const groupedNotes = document.getElementById('groupedNotes');
     const fontBtn = document.getElementById("fontMenuBtn");
     const fontDropdown = document.getElementById("fontDropdown");
+    const fontSizeBtn = document.getElementById("fontSizeBtn");
+    const sizeDropdown = document.getElementById("sizeDropdown");
 
     let recognition;
     let isRecording = false;
@@ -455,6 +460,24 @@
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
     });
+
+    fontSizeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sizeDropdown.classList.toggle("hidden");
+      const rect = fontSizeBtn.getBoundingClientRect();
+      sizeDropdown.style.left = `${rect.left}px`;
+      sizeDropdown.style.top = `${rect.bottom + 5}px`;
+    });
+
+    document.addEventListener("click", () => {
+    fontDropdown.classList.add("hidden");
+    sizeDropdown.classList.add("hidden");
+    });
+
+    function setFontSize(size) {
+      document.execCommand("fontSize", false, size);
+      sizeDropdown.classList.add("hidden");
+    }
 
     fontBtn.addEventListener("click", (e) => {
       e.stopPropagation();
