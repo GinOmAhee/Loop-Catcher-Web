@@ -339,6 +339,8 @@
           <option value="lightgray">Light Gray</option>
         </select>
 
+        <select onchange="format('hiliteColor', this.value); this.selectedIndex = 0;"></select>
+
         <button onclick="format('justifyLeft')">←</button>
         <button onclick="format('justifyCenter')">⇔</button>
         <button onclick="format('justifyRight')">→</button>
@@ -849,13 +851,26 @@
     }
 
     function format(command, value = null) {
-      mainEditor.focus(); // make sure editor is active
+      mainEditor.focus();
+
       if (command === 'hiliteColor') {
-        // Use 'backColor' as fallback if 'hiliteColor' fails
+        if (!value) {
+        // remove highlight by resetting background
+        document.execCommand('removeFormat', false, null);
+      } else {
         try {
           document.execCommand('hiliteColor', false, value);
         } catch {
-          document.execCommand('backColor', false, value);
+          document.execCommand('backColor', false, value); // fallback for Firefox
+        }
+      }
+
+      } else if (command === 'foreColor') {
+        if (!value) {
+          // remove font color by resetting formatting
+          document.execCommand('removeFormat', false, null);
+        } else {
+          document.execCommand('foreColor', false, value);
         }
       } else {
         document.execCommand(command, false, value);
