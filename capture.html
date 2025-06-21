@@ -241,6 +241,36 @@
      padding: 0 2px;
      border-radius: 3px;
     }
+    .dropdown {
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      border-radius: 5px;
+      padding: 0.3rem 0;
+      font-size: 0.85rem;
+      z-index: 999;
+    }
+
+    .dropdown div {
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+    }
+
+    .dropdown div:hover {
+      background-color: #eee;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #fontMenuBtn {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+    }
 
   </style>
 </head>
@@ -296,13 +326,16 @@
       <button id="previewToggle">☰</button>
       <!-- 🎨 Toolbar -->
       <div class="format-toolbar" style="margin-bottom: 1rem;">
-        <select onchange="applyStyle('fontName', this.value)">
-          <option value="">Font</option>
-          <option value="Arial">Arial</option>
-          <option value="Georgia">Georgia</option>
-          <option value="Courier New">Courier New</option>
-          <option value="Times New Roman">Times New Roman</option>
-        </select>
+        <!-- Icon Button -->
+      <button id="fontMenuBtn" title="Choose Font">🅰️</button>
+
+      <!-- Font Menu -->
+      <div id="fontDropdown" class="dropdown hidden">
+        <div onclick="setFont('Arial')">Arial</div>
+        <div onclick="setFont('Georgia')">Georgia</div>
+        <div onclick="setFont('Courier New')">Courier New</div>
+        <div onclick="setFont('Times New Roman')">Times New Roman</div>
+      </div>
 
         <select onchange="applyStyle('fontSize', this.value)">
           <option value="">Size</option>
@@ -413,6 +446,8 @@
     const mainEditor = document.getElementById('mainEditor');
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
+    const fontBtn = document.getElementById("fontMenuBtn");
+    const fontDropdown = document.getElementById("fontDropdown");
 
     let recognition;
     let isRecording = false;
@@ -427,6 +462,23 @@
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
     });
+
+    fontBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fontDropdown.classList.toggle("hidden");
+      const rect = fontBtn.getBoundingClientRect();
+      fontDropdown.style.left = `${rect.left}px`;
+      fontDropdown.style.top = `${rect.bottom + 5}px`;
+    });
+
+    document.addEventListener("click", () => {
+    fontDropdown.classList.add("hidden");
+    });
+
+    function setFont(font) {
+    applyStyle('fontFamily', font);
+    fontDropdown.classList.add("hidden");
+    }
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
