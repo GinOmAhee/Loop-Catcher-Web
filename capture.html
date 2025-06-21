@@ -564,7 +564,13 @@
 
       highlightDropdown.classList.add("hidden");
       saveStatus.innerText = `🖍️ Highlighted in ${color}`;
-    }  
+
+      try {
+        document.execCommand("hiliteColor", false, color);
+      } catch (e) {
+        console.warn("Fallback execCommand failed:", e);
+      }
+    }
 
    async function saveText() {
      const now = new Date();
