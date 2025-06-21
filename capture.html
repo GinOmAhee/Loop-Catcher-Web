@@ -379,6 +379,15 @@
       <!-- Highlight Color Icon Button -->
       <button id="highlightBtn" title="Highlight">🖍️</button>
 
+      <!-- Highlight Color Dropdown -->
+      <div id="highlightDropdown" class="dropdown hidden">
+        <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+        <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+        <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+        <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+        <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
+      </div>
+
         <button onclick="format('insertUnorderedList')">• List</button>
         <button onclick="removeFormatting()">🚫</button>
       </div>
@@ -449,9 +458,7 @@
     const sizeDropdown = document.getElementById("sizeDropdown");
     const textColorBtn = document.getElementById("textColorBtn");
     const textColorDropdown = document.getElementById("textColorDropdown");
-    const highlightBtn = document.getElementById("highlightBtn");
-    const highlightDropdown = document.getElementById("highlightDropdown");
-
+    
     let recognition;
     let isRecording = false;
     let debounceTimer;
@@ -525,6 +532,10 @@
         preview.style.display = 'none';
       }
     }
+
+    const highlightBtn = document.getElementById("highlightBtn");
+    const highlightDropdown = document.getElementById("highlightDropdown");
+
     highlightBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       highlightDropdown.classList.toggle("hidden");
@@ -1302,6 +1313,15 @@
        selection.addRange(newRange);
      }
     }
+
+    document.addEventListener("click", () => {
+      setTimeout(() => {
+        fontDropdown?.classList.add("hidden");
+        sizeDropdown?.classList.add("hidden");
+        textColorDropdown?.classList.add("hidden");
+        highlightDropdown?.classList.add("hidden");
+      }, 100); // this gives time for clicks inside dropdowns to register
+    });
 
   </script>
 
