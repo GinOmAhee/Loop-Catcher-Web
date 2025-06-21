@@ -319,16 +319,7 @@
         <button onclick="format('underline')"><u>U</u></button>
         <button onclick="format('strikeThrough')"><s>S</s></button>
 
-        <select onchange="format('foreColor', this.value)" title="Text Color">
-          <option value="">Text Color</option>
-          <option value="black">Black</option>
-          <option value="red">Red</option>
-          <option value="blue">Blue</option>
-          <option value="green">Green</option>
-          <option value="orange">Orange</option>
-          <option value="purple">Purple</option>
-          <option value="gray">Gray</option>
-        </select>
+        <button id="highlightBtn" onclick="toggleHighlight()">🖍️ Highlight</button>
 
         <select onchange="format('hiliteColor', this.value)" title="Highlight Color">
           <option value="">Highlight</option>
@@ -422,6 +413,10 @@
         updateGrouping(); // refresh the preview panel
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
+    });
+
+    mainEditor.addEventListener("blur", () => {
+      if (isHighlighting) toggleHighlight(); // turn it off when editor loses focus
     });
 
     toggleBtn.addEventListener('click', (e) => {
@@ -850,31 +845,22 @@
       saveStatus.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
     }
 
-    function format(command, value = null) {
-      mainEditor.focus();
+    let isHighlighting = false;
 
-      if (command === 'hiliteColor') {
-        if (!value) {
-        // remove highlight by resetting background
+    function toggleHighlight() {
+      isHighlighting = !isHighlighting;
+      const color = isHighlighting ? 'yellow' : null;
+
+      if (color) {
+        document.execCommand('styleWithCSS', false, true); // ensures real CSS gets applied
+        document.execCommand('hiliteColor', false, color);
+        document.getElementById("highlightBtn").style.background = "#ffe066";
+      } else {
         document.execCommand('removeFormat', false, null);
-      } else {
-        try {
-          document.execCommand('hiliteColor', false, value);
-        } catch {
-          document.execCommand('backColor', false, value); // fallback for Firefox
-        }
+        document.getElementById("highlightBtn").style.background = "";
       }
 
-      } else if (command === 'foreColor') {
-        if (!value) {
-          // remove font color by resetting formatting
-          document.execCommand('removeFormat', false, null);
-        } else {
-          document.execCommand('foreColor', false, value);
-        }
-      } else {
-        document.execCommand(command, false, value);
-      }
+      mainEditor.focus();
     }
 
     function removeFormatting() {
