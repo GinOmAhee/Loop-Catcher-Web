@@ -555,18 +555,14 @@
 
       range.insertNode(mark);
 
-      // Optional: Reselect the new mark for easier editing
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
       selection.removeAllRanges();
       selection.addRange(newRange);
 
-      document.getElementById("mainEditor").focus();
-      document.execCommand("hiliteColor", false, color);
       highlightDropdown.classList.add("hidden");
-      
       saveStatus.innerText = `🖍️ Highlighted in ${color}`;
-    }
+    }  
 
    async function saveText() {
      const now = new Date();
