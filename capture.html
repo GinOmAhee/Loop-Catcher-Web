@@ -321,13 +321,12 @@
         <!-- Icon Button -->
       <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
-      <!-- Font Menu -->
-      <div id="fontDropdown" class="dropdown hidden">
-        <div onclick="setFont('Arial')">Arial</div>
-        <div onclick="setFont('Georgia')">Georgia</div>
-        <div onclick="setFont('Courier New')">Courier New</div>
-        <div onclick="setFont('Times New Roman')">Times New Roman</div>
-      </div>
+      <select id="fontDropdown" onchange="setFont(this.value)">
+        <option value="'Arial', sans-serif">Arial</option>
+        <option value="'Georgia', serif">Georgia</option>
+        <option value="'Courier New', monospace">Courier New</option>
+        <option value="'Times New Roman', serif">Times New Roman</option>
+      </select>
 
       <!-- Font Size Icon Button -->
       <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -497,8 +496,8 @@
     });
 
     function setFont(font) {
-    applyStyle('fontFamily', font);
-    fontDropdown.classList.add("hidden");
+      document.execCommand("fontName", false, font);
+      fontDropdown.classList.add("hidden");
     }
 
     textColorBtn.addEventListener("click", (e) => {
@@ -732,7 +731,7 @@
 
       const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
-      
+
       const span = document.createElement("span");
       span.style[styleProp] = value;
       span.appendChild(selectedText);
