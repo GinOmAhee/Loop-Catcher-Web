@@ -235,7 +235,6 @@
   </style>
 </head>
 <body>
-<body>
   <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
   <div class="preview-overlay" id="preview">
     <div class="preview-top">
@@ -285,15 +284,11 @@
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <textarea id="mainText" placeholder="Start capturing..."></textarea>
-
       <div class="controls">
         <button onclick="saveText()">💾 Save</button>
         <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
         <button onclick="document.getElementById('fileInput').click()">📎 Attach File</button>
       </div>
-
-      <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
-
       <div id="attachedFilesList"></div>
       <div class="save-time" id="saveStatus"></div>
     </div>
