@@ -235,6 +235,7 @@
   </style>
 </head>
 <body>
+<body>
   <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
   <div class="preview-overlay" id="preview">
     <div class="preview-top">
@@ -262,19 +263,12 @@
 
       <!-- 3. Bottom: search input anchored in its own bar -->
       <div class="preview-sortbar bottom-searchbar">
-        <label for="searchInput">Search:</label>
         <input
           type="text"
           id="searchInput"
           placeholder="🔍 Search notes..."
           oninput="updateGrouping()"
           style="width: 100%; padding: 0.5rem; font-size: 1rem;" />
-
-        <label for="viewToggle">View:</label>
-        <select id="viewToggle" onchange="updateGrouping()">
-          <option value="grouped">Grouped</option>
-          <option value="flat">Flat</option>
-        </select>
       </div>
 
       <!-- 4. Very bottom: settings/profile links -->
@@ -567,7 +561,6 @@
       const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       const searchKeyword = document.getElementById('searchInput').value.toLowerCase().trim();
       const groupBy = document.getElementById("groupSelector").value;
-      const viewMode = document.getElementById("viewToggle")?.value || "grouped";
       let html = "";
 
       if (notes.length === 0) {
@@ -591,19 +584,7 @@
 
       const now = Date.now();
 
-      if (searchKeyword && viewMode === "flat") {
-        html = "<h4>🔍 Search Results</h4><ul>";
-        filteredNotes.forEach(note => {
-          html += `
-            <li style="margin-bottom:1rem">
-              <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
-              ${highlightText(note.text, searchKeyword)}
-              <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
-            </li>`;
-        });
-        html += "</ul>";
-
-      } else if (groupBy === "date") {
+      if (groupBy === "date") {
         const grouped = {};
 
         filteredNotes.forEach(note => {
@@ -649,7 +630,6 @@
 
       } else if (groupBy === "unresolved") {
         const unresolved = filteredNotes.filter(note => note.resolved === false);
-
         if (unresolved.length === 0) {
           groupedNotes.innerHTML = "<p>✅ No unresolved notes!</p>";
           return;
@@ -664,12 +644,12 @@
               <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
             </li>`;
         });
-        html += "</ul>";
+      html += "</ul>";
 
       } else if (groupBy === "forgotten") {
         const forgotten = filteredNotes.filter(note => {
           const age = now - new Date(note.timestamp || note.time).getTime();
-          return age > 3 * 24 * 60 * 60 * 1000;
+          return age > 3 * 24 * 60 * 60 * 1000; // older than 3 days
         });
 
         if (forgotten.length === 0) {
@@ -681,10 +661,10 @@
         forgotten.forEach(note => {
           html += `
             <li style="margin-bottom:1rem">
-            <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
-            ${highlightText(note.text, searchKeyword)}
-            <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
-          </li>`;
+              <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+              ${highlightText(note.text, searchKeyword)}
+              <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
+             </li>`;
         });
         html += "</ul>";
       }
