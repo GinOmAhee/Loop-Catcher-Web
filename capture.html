@@ -408,7 +408,7 @@
       const now = new Date();
       localStorage.setItem('capturedText', textarea.value);
       localStorage.setItem('lastSaved', now.toISOString());
-      saveStatus.innerText = Auto-saved at ${now.toLocaleTimeString()};
+      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
     }
 
     function loadSavedText() {
