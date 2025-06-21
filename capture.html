@@ -346,7 +346,7 @@
         <button onclick="toggleBold()"><b>B</b></button>
         <button onclick="toggleItalic()"><i>I</i></button>
         <button onclick="toggleUnderline()"><u>U</u></button>
-        <button onclick="applyFormat('strikeThrough')"><s>S</s></button>
+        <button onclick="toggleStrikeThrough()">S̶</button>
         <button onclick="alignText('left')">←</button>
         <button onclick="alignText('center')">⇔</button>
         <button onclick="alignText('right')">→</button>
@@ -856,6 +856,36 @@
       selection.addRange(newRange);
 
       saveStatus.innerText = `🖍️ Highlighted in ${color}`;
+    }
+
+    function toggleStrikeThrough() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const commonAncestor = range.commonAncestorContainer;
+      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+
+      // 🔍 Check if already struck through
+      const isAlreadyStruck = parentElement.closest('s, strike, del');
+      if (isAlreadyStruck) {
+        const strikeElement = isAlreadyStruck;
+        const parent = strikeElement.parentNode;
+        while (strikeElement.firstChild) {
+          parent.insertBefore(strikeElement.firstChild, strikeElement);
+        }
+        parent.removeChild(strikeElement);
+      } else {
+        const contents = range.extractContents();
+        const s = document.createElement('s'); // or 'strike' or 'del'
+        s.appendChild(contents);
+        range.insertNode(s);
+
+        selection.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.selectNodeContents(s);
+        selection.addRange(newRange);
+      }
     }
 
     function updateFileDisplay(fileList) {
