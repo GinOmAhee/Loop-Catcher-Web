@@ -609,10 +609,12 @@
           html += `<h4>🗓️ ${date}</h4><ul>`;
           grouped[date].forEach(note => {
           html += `
-            <li style="margin-bottom:1rem">
-              <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
-              ${highlightText(note.text, searchKeyword)}
-              <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-left: 10px; margin-top: 4px;" />
+            <li style="margin-bottom:1rem; display: flex; align-items: start;">
+              <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
+              <div style="flex: 1;">
+                <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+                ${highlightText(note.text, searchKeyword)}
+              </div>
             </li>`;
           });
           html += "</ul>";
@@ -631,11 +633,14 @@
           html += `<h4>📁 ${escapeHTML(project)}</h4><ul>`;
           grouped[project].forEach(note => {
             html += `
-              <li style="margin-bottom:1rem">
-                <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
-                ${highlightText(note.text, searchKeyword)}
-                <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-left: 10px; margin-top: 4px;" />
+              <li style="margin-bottom:1rem; display: flex; align-items: start;">
+                <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
+                <div style="flex: 1;">
+                  <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+                  ${highlightText(note.text, searchKeyword)}
+                </div>
               </li>`;
+
           });
           html += "</ul>";
         }
@@ -650,10 +655,12 @@
         html += `<h4>🧩 Unresolved Ideas</h4><ul>`;
         unresolved.forEach(note => {
           html += `
-            <li style="margin-bottom:1rem">
-              <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
-              ${highlightText(note.text, searchKeyword)}
-              <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-left: 10px; margin-top: 4px;" />
+            <li style="margin-bottom:1rem; display: flex; align-items: start;">
+              <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
+              <div style="flex: 1;">
+                <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+                ${highlightText(note.text, searchKeyword)}
+              </div>
             </li>`;
         });
         html += "</ul>";
@@ -672,10 +679,12 @@
         html += `<h4>🧠 Forgotten Ideas</h4><ul>`;
         forgotten.forEach(note => {
           html += `
-            <li style="margin-bottom:1rem">
-              <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
-              ${highlightText(note.text, searchKeyword)}
-              <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-left: 10px; margin-top: 4px;" />
+            <li style="margin-bottom:1rem; display: flex; align-items: start;">
+              <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
+              <div style="flex: 1;">
+                <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+                ${highlightText(note.text, searchKeyword)}
+              </div>
             </li>`;
         });
         html += "</ul>";
