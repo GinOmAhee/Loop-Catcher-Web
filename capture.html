@@ -265,6 +265,12 @@
       display: none;
     }
 
+    #mainEditor a {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    }
+
   </style>
 </head>
 <body>
@@ -745,20 +751,33 @@
       if (!url) return;
 
       const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      if (!selection.rangeCount) return;
 
       const range = selection.getRangeAt(0);
-      const selectedText = range.extractContents();
+      let selectedText = range.toString().trim();
 
       const a = document.createElement("a");
       a.href = url;
+      a.title = url;
       a.target = "_blank";
       a.rel = "noopener noreferrer";
-      a.appendChild(selectedText);
+      a.style.color = "#007bff";
+      a.style.textDecoration = "underline";
+      a.style.cursor = "pointer";
 
-      range.insertNode(a);
+      if (selectedText) {
+        a.textContent = selectedText;
+        range.deleteContents();
+        range.insertNode(a);
+      } else {
+        a.textContent = url;
+        range.insertNode(a);
+      }
+
       selection.removeAllRanges();
-      selection.selectAllChildren(a);
+      const newRange = document.createRange();
+      newRange.selectNodeContents(a);
+      selection.addRange(newRange);
     }
 
     function toggleUnorderedList() {
