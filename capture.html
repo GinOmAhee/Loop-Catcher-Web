@@ -416,7 +416,7 @@
       const lastSaved = localStorage.getItem('lastSaved');
       const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
       if (saved) textarea.value = saved;
-      if (lastSaved) saveStatus.innerText = Last saved at ${new Date(lastSaved).toLocaleTimeString()};
+      if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
       updateFileDisplay(attached);
     }
 
