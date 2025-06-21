@@ -691,9 +691,27 @@
       }
 
        html += `
-         <div style="text-align:right; margin-top:1rem;">
-           <button onclick="deleteSelectedNotes()">🗑️ Delete Selected</button>
-         </div>
+         <button 
+           onclick="deleteSelectedNotes()" 
+           title="Delete Selected" 
+           style="
+             position: sticky;
+             bottom: 0;
+             left: 0;
+             margin: 1rem;
+             background: #ff4444;
+             color: white;
+             border: none;
+             border-radius: 50%;
+             width: 40px;
+             height: 40px;
+             font-size: 1.2rem;
+             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+             cursor: pointer;
+             z-index: 999;
+           ">
+           🗑️
+         </button>
        `;
 
        groupedNotes.innerHTML = html;
