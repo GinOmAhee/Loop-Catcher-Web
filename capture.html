@@ -287,7 +287,54 @@
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
       <button id="previewToggle">☰</button>
-      <textarea id="mainText" placeholder="Start capturing..."></textarea>
+      <!-- 🎨 Toolbar -->
+      <div class="format-toolbar" style="margin-bottom: 1rem;">
+        <select onchange="format('fontName', this.value)">
+          <option value="">Font</option>
+          <option value="Arial">Arial</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Times New Roman">Times New Roman</option>
+        </select>
+
+        <select onchange="format('fontSize', this.value)">
+          <option value="">Size</option>
+          <option value="1">Very Small</option>
+          <option value="2">Small</option>
+          <option value="3">Normal</option>
+          <option value="4">Large</option>
+          <option value="5">Very Large</option>
+          <option value="6">Huge</option>
+          <option value="7">Maximum</option>
+        </select>
+
+        <button onclick="format('bold')"><b>B</b></button>
+        <button onclick="format('italic')"><i>I</i></button>
+        <button onclick="format('underline')"><u>U</u></button>
+        <button onclick="format('strikeThrough')"><s>S</s></button>
+
+        <input type="color" onchange="format('foreColor', this.value)" title="Text Color">
+        <input type="color" onchange="format('hiliteColor', this.value)" title="Highlight">
+
+        <button onclick="format('justifyLeft')">←</button>
+        <button onclick="format('justifyCenter')">⇔</button>
+        <button onclick="format('justifyRight')">→</button>
+
+        <button onclick="format('insertUnorderedList')">• List</button>
+        <button onclick="removeFormatting()">🚫</button>
+      </div>
+
+      <!-- 📝 Rich Text Editor -->
+      <div id="mainEditor" contenteditable="true" style="
+        width: 60%;
+        min-height: 300px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: white;
+        overflow-y: auto;
+      "></div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -334,7 +381,7 @@
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
-    const textarea = document.getElementById('mainText');
+    const mainEditor = document.getElementById('mainEditor');
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
 
@@ -342,14 +389,14 @@
     let isRecording = false;
     let debounceTimer;
 
-    textarea.addEventListener("input", () => {
+    mainEditor.addEventListener("input", () => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        localStorage.setItem("capturedText", textarea.value);
+        localStorage.setItem("capturedText", mainEditor.innerHTML);
         localStorage.setItem("lastSaved", new Date().toISOString());
         updateGrouping(); // refresh the preview panel
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
-      }, 1000); // debounce delay: 1 second
+      }, 1000);
     });
 
     toggleBtn.addEventListener('click', (e) => {
@@ -365,7 +412,8 @@
 
    async function saveText() {
      const now = new Date();
-     const noteText = textarea.value.trim();
+     const noteText = mainEditor.innerText.trim();
+     const noteHTML = mainEditor.innerHTML;
      if (!noteText) return;
 
      const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
@@ -381,7 +429,7 @@
      projectName = projectName?.trim() || "📂 Unlabeled";
 
      const newNote = {
-       text: noteText,
+       text: noteHTML,
        timestamp: now.toISOString(),
        project: projectName,
        resolved: false,
@@ -403,14 +451,14 @@
        console.error("❌ Failed to save note to Firestore:", error);
      }
 
-      textarea.value = '';
+      mainEditor.innerHTML = '';
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
       updateGrouping();
     }
 
     function autoSave() {
       const now = new Date();
-      localStorage.setItem('capturedText', textarea.value);
+      localStorage.setItem('capturedText', mainEditor.innerHTML);
       localStorage.setItem('lastSaved', now.toISOString());
       saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
     }
@@ -419,7 +467,7 @@
       const saved = localStorage.getItem('capturedText');
       const lastSaved = localStorage.getItem('lastSaved');
       const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-      if (saved) textarea.value = saved;
+      if (saved) mainEditor.innerHTML = saved;
       if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
       updateFileDisplay(attached);
     }
@@ -463,7 +511,7 @@
             transcript += text + '\n';
           }
         }
-        textarea.value += (textarea.value ? '\n' : '') + transcript.trim();
+        mainEditor.innerHTML += (mainEditor.innerHTML ? '\n' : '') + transcript.trim();
       };
 
       recognition.onerror = (e) => {
@@ -776,6 +824,16 @@
       updateGrouping();
       saveStatus.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
     }
+
+    function format(command, value = null) {
+      document.execCommand(command, false, value);
+    }
+
+    function removeFormatting() {
+      format("removeFormat");
+      format("unlink");
+    }
+
   </script>
 
  </body>
