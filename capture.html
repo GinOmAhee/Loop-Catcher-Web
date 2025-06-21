@@ -89,21 +89,29 @@
       flex-direction: column;
     }
 
-    .preview-top {
-      padding: 1rem;
-      background: #fafafa;
-      border-bottom: 1px solid #ccc;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
+    .preview-top a, 
+    .preview-settings a {
+      display: flex; /* lets icon + label sit side by side */
+      align-items: center; /* vertically align icon + text */
+      gap: 0.4rem; /* space between icon and text */
+      padding: 0.6rem 0.8rem; /* more clickable, comfy */
+      margin: 0.2rem 0; /* vertical spacing between links */
+      font-family: 'Inter', sans-serif; /* matches your vibe */
+      font-size: 1rem;
+      font-weight: 600; /* slightly bold */
+      color: #444; /* nice mid-gray tone */
+      text-decoration: none; /* no underline */
+      border-radius: 8px; /* soft corners */
+      background: #ffffff; /* clean white background */
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* subtle pop */
+      transition: all 0.2s ease; /* smooth hover effect */
     }
 
-    .preview-top a,
-    .preview-settings a {
-      text-decoration: none;
-      color: inherit;
-      font-size: 1rem;
-    }
+.preview-top a:hover {
+  background-color: #f0f0f0;
+  transform: translateX(2px); /* small slide on hover */
+}
+
 
     .preview-middle {
       display: flex;
