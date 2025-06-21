@@ -235,6 +235,7 @@
   </style>
 </head>
 <body>
+<body>
   <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
   <div class="preview-overlay" id="preview">
     <div class="preview-top">
@@ -284,11 +285,15 @@
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <textarea id="mainText" placeholder="Start capturing..."></textarea>
+
       <div class="controls">
         <button onclick="saveText()">💾 Save</button>
         <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
         <button onclick="document.getElementById('fileInput').click()">📎 Attach File</button>
       </div>
+
+      <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
+
       <div id="attachedFilesList"></div>
       <div class="save-time" id="saveStatus"></div>
     </div>
@@ -367,6 +372,7 @@
        return;
      }
 
+
      let projectName = prompt("📌 Enter project name (optional):");
      projectName = projectName?.trim() || "📂 Unlabeled";
 
@@ -402,7 +408,7 @@
       const now = new Date();
       localStorage.setItem('capturedText', textarea.value);
       localStorage.setItem('lastSaved', now.toISOString());
-      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+      saveStatus.innerText = Auto-saved at ${now.toLocaleTimeString()};
     }
 
     function loadSavedText() {
@@ -410,7 +416,7 @@
       const lastSaved = localStorage.getItem('lastSaved');
       const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
       if (saved) textarea.value = saved;
-      if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+      if (lastSaved) saveStatus.innerText = Last saved at ${new Date(lastSaved).toLocaleTimeString()};
       updateFileDisplay(attached);
     }
 
@@ -489,20 +495,20 @@
       const storageRef = firebase.storage().ref();
 
       for (const file of files) {
-         const fileName = file.name;
+        const fileName = file.name;
 
-         // ✅ Check for duplicates by name
-         const isDuplicate = stored.some(f => f.originalName === fileName);
-         if (isDuplicate) {
-           duplicateCount++;
-           continue; // skip to next file
-         }
+        // ✅ Check for duplicates by name
+        const isDuplicate = stored.some(f => f.originalName === fileName);
+        if (isDuplicate) {
+          duplicateCount++;
+          continue; // skip to next file
+        }
 
-         const uniqueId = crypto?.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-         const storedName = `${fileName}__${uniqueId}`;
-         const fileRef = storageRef.child(`userFiles/${firebase.auth().currentUser.uid}/${storedName}`);
+        const uniqueId = crypto?.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        const storedName = `${fileName}__${uniqueId}`;
+        const fileRef = storageRef.child(`userFiles/${firebase.auth().currentUser.uid}/${storedName}`);
 
-         try {
+        try {
           await fileRef.put(file);
           const downloadURL = await fileRef.getDownloadURL();
           updated.push({
@@ -515,11 +521,12 @@
           console.error(`❌ Failed to upload ${fileName}:`, err);
           alert(`❌ Upload failed for ${fileName}`);
         }
-      }
+    }
 
       if (duplicateCount > 0) {
         alert(`⚠️ ${duplicateCount} file(s) already attached and were skipped.`);
       }
+
 
       localStorage.setItem('attachedFiles', JSON.stringify(updated));
       updateFileDisplay(updated);
@@ -539,17 +546,29 @@
         return;
       }
 
-      attachedFilesList.innerHTML = `<strong>📎 Attached Files:</strong><ul>${fileList.map(f => `
-       <li class="file-item">
-         <span><a href="${f.downloadURL}" target="_blank">${f.originalName}</a></span>
-         <button onclick="removeFile('${f.storedName}')">🗑️</button>
-       </li>`).join('')}</ul>`;
+      attachedFilesList.innerHTML = `
+        <strong>📎 Attached Files:</strong>
+        <ul>
+          ${fileList.map(f => `
+            <li class="file-item">
+              <span><a href="${f.downloadURL}" target="_blank">${f.originalName}</a></span>
+              <button onclick="removeFile('${f.storedName}')">🗑️</button>
+            </li>
+         `).join('')}
+       </ul>
+     `;
     }
 
     function escapeHTML(text) {
       const div = document.createElement('div');
       div.innerText = text;
       return div.innerHTML;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, tag => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[tag]
+      ));
     }
 
     function updateGrouping() {
@@ -567,7 +586,7 @@
         if (!keyword) return escapeHTML(text).replace(/\n/g, "<br>");
         const safe = escapeHTML(text);
         const regex = new RegExp(`(${keyword})`, "gi");
-        return safe.replace(regex, `<mark>$1</mark>`).replace(/\n/g, "<br>");
+        return safe.replace(regex, "<mark>$1</mark>").replace(/\n/g, "<br>");
       };
 
       const filteredNotes = searchKeyword
@@ -591,12 +610,12 @@
         for (const date in grouped) {
           html += `<h4>🗓️ ${date}</h4><ul>`;
           grouped[date].forEach(note => {
-            html += `
-              <li style="margin-bottom:1rem">
-                <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
-                ${highlightText(note.text, searchKeyword)}
-                <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
-              </li>`;
+          html += `
+            <li style="margin-bottom:1rem">
+              <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
+              ${highlightText(note.text, searchKeyword)}
+              <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
+            </li>`;
           });
           html += "</ul>";
         }
@@ -639,7 +658,7 @@
               <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
             </li>`;
         });
-      html += "</ul>";
+        html += "</ul>";
 
       } else if (groupBy === "forgotten") {
         const forgotten = filteredNotes.filter(note => {
@@ -659,7 +678,7 @@
               <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
               ${highlightText(note.text, searchKeyword)}
               <br><button onclick="deleteNoteByTime('${note.timestamp}')">🗑️ Delete</button>
-             </li>`;
+            </li>`;
         });
         html += "</ul>";
       }
@@ -708,5 +727,5 @@
     };
   </script>
 
-  </body>
+ </body>
 </html>
