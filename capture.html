@@ -272,14 +272,6 @@
     pointer-events: auto;
     }
 
-    mainEditor.addEventListener("click", function (e) {
-      const el = e.target.closest("a");
-      if (el && el.href) {
-        e.preventDefault();
-        window.open(el.href, "_blank", "noopener");
-      }
-    });
-
   </style>
 </head>
 <body>
@@ -457,7 +449,7 @@
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
-    const mainEditor = document.getElementById('mainEditor');
+    const mainEditor = document.getElementById("mainEditor");
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
     const fontBtn = document.getElementById("fontMenuBtn");
@@ -1183,6 +1175,14 @@
           applyMoodTheme();
           updateGrouping();
           setInterval(autoSave, 30000);
+        }
+      });
+
+      mainEditor.addEventListener("click", function (e) {
+        const el = e.target.closest("a");
+        if (el && el.href) {
+          e.preventDefault();
+          window.open(el.href, "_blank", "noopener");
         }
       });
     };
