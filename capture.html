@@ -561,7 +561,10 @@
       selection.removeAllRanges();
       selection.addRange(newRange);
 
+      document.getElementById("mainEditor").focus();
+      document.execCommand("hiliteColor", false, color);
       highlightDropdown.classList.add("hidden");
+      
       saveStatus.innerText = `🖍️ Highlighted in ${color}`;
     }
 
