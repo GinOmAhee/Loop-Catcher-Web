@@ -527,7 +527,7 @@
         alert(`⚠️ ${duplicateCount} file(s) already attached and were skipped.`);
       }
 
-
+      console.log("📎 Final attached files:", updated);
       localStorage.setItem('attachedFiles', JSON.stringify(updated));
       updateFileDisplay(updated);
       input.value = ''; // clear input for future uploads
