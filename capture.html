@@ -243,17 +243,17 @@
   <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
   <div class="preview-overlay" id="preview">
     <div class="preview-top">
-      <a href="holdingbay.html">🔄 Holding Bay</a>
-      <a href="actnow.html">🚀 Act Now</a>
-      <a href="buildmomentum.html">🌿 Build Momentum</a>
-      <a href="worthitlater.html">⏳ Worth It Later</a>
-      <a href="parkedpotential.html">📦 Parked Potential</a>
+      <a href="holdingbay.html" title="Holding Bay">🔄</a>
+      <a href="actnow.html" title="Act Now">🚀</a>
+      <a href="buildmomentum.html" title="Build Momentum">🌿</a>
+      <a href="worthitlater.html" title="Worth It Later">⏳</a>
+      <a href="parkedpotential.html" title="Parked Potential">📦</a>
     </div>
 
     <div class="preview-middle">
       <!-- 1. Top: Group selector -->
       <div class="preview-sortbar">
-        <label for="groupSelector">Group by</label>
+        <span title="Group Notes">📂</span>
         <select id="groupSelector" onchange="updateGrouping()">
           <option value="date">Date</option>
           <option value="project">Project</option>
@@ -291,9 +291,9 @@
       <textarea id="mainText" placeholder="Start capturing..."></textarea>
 
       <div class="controls">
-        <button onclick="saveText()">💾 Save</button>
-        <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤 Start Voice</button>
-        <button onclick="document.getElementById('fileInput').click()">📎 Attach File</button>
+       <button onclick="saveText()" title="Save">💾</button>
+       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
+       <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
       </div>
 
       <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
