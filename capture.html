@@ -732,12 +732,16 @@
 
       const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
+      
       const span = document.createElement("span");
       span.style[styleProp] = value;
       span.appendChild(selectedText);
       range.insertNode(span);
+
       selection.removeAllRanges();
-      selection.addRange(range);
+      const newRange = document.createRange();
+      newRange.selectNodeContents(span);
+      selection.addRange(newRange);
     }
 
     function insertModernLink() {
