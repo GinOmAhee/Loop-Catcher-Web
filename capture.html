@@ -319,6 +319,9 @@
         <button onclick="format('italic')"><i>I</i></button>
         <button onclick="format('underline')"><u>U</u></button>
         <button onclick="format('strikeThrough')"><s>S</s></button>
+        <button onclick="format('undo')" title="Undo">↩️</button>
+        <button onclick="format('redo')" title="Redo">↪️</button>
+        <button onclick="insertLink()" title="Insert Link">🔗</button>
 
         <select onchange="format('foreColor', this.value)" title="Text Color">
           <option value="">Text Color</option>
@@ -614,6 +617,14 @@
       const updated = files.filter(f => f.storedName !== storedName);
       localStorage.setItem('attachedFiles', JSON.stringify(updated));
       updateFileDisplay(updated);
+    }
+
+    function insertLink() {
+      const url = prompt("🔗 Enter URL:");
+      if (url) {
+        mainEditor.focus();
+        document.execCommand("createLink", false, url);
+      }
     }
 
     function updateFileDisplay(fileList) {
