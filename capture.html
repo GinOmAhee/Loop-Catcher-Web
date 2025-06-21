@@ -344,7 +344,7 @@
         <div onclick="setFontSize('7')">Maximum</div>
       </div>
 
-        <button onclick="applyFormat('bold')"><b>B</b></button>
+        <button onclick="toggleBold()"><b>B</b></button>
         <button onclick="applyFormat('italic')"><i>I</i></button>
         <button onclick="applyFormat('underline')"><u>U</u></button>
         <button onclick="applyFormat('strikeThrough')"><s>S</s></button>
@@ -478,7 +478,7 @@
       sizeDropdown.style.left = `${rect.left}px`;
       sizeDropdown.style.top = `${rect.bottom + 5}px`;
     });
-    
+
     function setFontSize(size) {
       document.execCommand("fontSize", false, size);
       sizeDropdown.classList.add("hidden");
@@ -1144,6 +1144,40 @@
      const newRange = document.createRange();
      newRange.setStartAfter(range.endContainer);
      selection.addRange(newRange);
+    }
+
+    function toggleBold() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const commonAncestor = range.commonAncestorContainer;
+      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+
+      // 🔍 Check if we're already bolded
+      const isAlreadyBold = parentElement.closest('b, strong');
+
+      if (isAlreadyBold) {
+       // 🧼 Unbold: replace <b>/<strong> with its inner content
+       const boldElement = isAlreadyBold;
+       const parent = boldElement.parentNode;
+       while (boldElement.firstChild) {
+         parent.insertBefore(boldElement.firstChild, boldElement);
+       }
+       parent.removeChild(boldElement);
+     } else {
+       // 💥 Bold: wrap in <b>
+       const contents = range.extractContents();
+       const b = document.createElement('b');
+       b.appendChild(contents);
+       range.insertNode(b);
+
+       // Reset selection to newly inserted element
+       selection.removeAllRanges();
+       const newRange = document.createRange();
+       newRange.selectNodeContents(b);
+       selection.addRange(newRange);
+     }
     }
 
   </script>
