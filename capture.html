@@ -826,7 +826,17 @@
     }
 
     function format(command, value = null) {
-      document.execCommand(command, false, value);
+      mainEditor.focus(); // make sure editor is active
+      if (command === 'hiliteColor') {
+        // Use 'backColor' as fallback if 'hiliteColor' fails
+        try {
+          document.execCommand('hiliteColor', false, value);
+        } catch {
+          document.execCommand('backColor', false, value);
+        }
+      } else {
+        document.execCommand(command, false, value);
+      }
     }
 
     function removeFormatting() {
