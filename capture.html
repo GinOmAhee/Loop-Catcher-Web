@@ -85,34 +85,36 @@
       background: #fff;
       box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
       z-index: 999;
-      display: none; /* Hidden by default */
+      display: none;
       flex-direction: column;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem; /* uniform size */
     }
 
-    .preview-top a, 
+    /* Nav Links (top + bottom) */
+    .preview-top a,
     .preview-settings a {
-      display: flex; /* lets icon + label sit side by side */
-      align-items: center; /* vertically align icon + text */
-      gap: 0.3rem; /* space between icon and text */
-      padding: 0.6rem 0.9rem; /* more clickable, comfy */
-      margin: 0.2rem 0; /* vertical spacing between links */
-      font-family: 'Inter', sans-serif; /* matches your vibe */
-      font-size: 0.9rem;
-      font-weight: 600; /* slightly bold */
-      color: #444; /* nice mid-gray tone */
-      text-decoration: none; /* no underline */
-      border-radius: 5px; /* soft corners */
-      background: #ffffff; /* clean white background */
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* subtle pop */
-      transition: all 0.2s ease; /* smooth hover effect */
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.8rem;
+      margin: 0.25rem 0;
+      font-weight: 600;
+      color: #444;
+      text-decoration: none;
+      border-radius: 6px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: all 0.2s ease;
     }
 
-.preview-top a:hover {
-  background-color: #f0f0f0;
-  transform: translateX(2px); /* small slide on hover */
-}
+    .preview-top a:hover,
+    .preview-settings a:hover {
+      background-color: #f3f3f3;
+      transform: translateX(2px);
+    }
 
-
+    /* Main preview content */
     .preview-middle {
       display: flex;
       flex-direction: column;
@@ -123,55 +125,51 @@
     #groupedNotes {
       flex: 1 1 auto;
       overflow-y: auto;
-      padding: 1rem;
+      padding: 0.8rem 1rem 0.4rem;
     }
 
-    .preview-content {
-      padding: 0.9rem;
-      overflow-y: auto;
-      flex-grow: 1;
-    }
-
+    /* Sorting and search bar */
     .preview-sortbar {
-      margin-top: 0.4rem;
-      margin-bottom: 0.4rem;
+      margin: 0.3rem 1rem;
       display: flex;
       align-items: center;
-      gap: 0.3rem;
-      font-size: 0.8rem;
+      gap: 0.4rem;
+      font-size: 0.85rem;
     }
 
     .preview-sortbar label {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
     }
 
     .preview-sortbar select {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       background: transparent;
       border: none;
       outline: none;
       cursor: pointer;
-    }
-    .preview-sortbar.top-sortbar {
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      padding: 0.3rem 0.5rem;
+      border-radius: 5px;
+      background-color: #f2f2f2;
+      color: #333;
     }
 
+    /* Bottom search bar */
     .preview-sortbar.bottom-searchbar {
-      padding: 0.8rem;
+      padding: 0.6rem 1rem;
+      margin-top: 0.2rem;
       border-top: 1px solid #ddd;
       background: #fafafa;
     }
 
+    /* Search Input */
     #searchInput {
       width: 100%;
       box-sizing: border-box;
-      padding: 0.5rem 0.75rem;
+      padding: 0.45rem 0.7rem;
       border: 1px solid #ccc;
       border-radius: 6px;
-      background: white;
+      background: #fff;
+      font-size: 0.85rem;
     }
 
     #searchInput:focus {
@@ -216,12 +214,11 @@
     }
 
     .preview-settings {
-      margin-top: 0.5rem;
       padding: 1rem;
       background: #fafafa;
       display: flex;
       flex-direction: column;
-      gap: 0.3rem;
+      gap: 0.5rem;
     }
 
     .preview-bottom {
@@ -230,7 +227,7 @@
       background: #fafafa;
       display: flex;
       flex-direction: column;
-      gap: 0.3rem;
+      gap: 0.5rem;
     }
 
     .preview-bottom input[type="text"] {
