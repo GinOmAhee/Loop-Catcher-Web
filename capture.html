@@ -269,7 +269,16 @@
     color: #007bff;
     text-decoration: underline;
     cursor: pointer;
+    pointer-events: auto;
     }
+
+    mainEditor.addEventListener("click", function (e) {
+      const el = e.target.closest("a");
+      if (el && el.href) {
+        e.preventDefault();
+        window.open(el.href, "_blank", "noopener");
+      }
+    });
 
   </style>
 </head>
