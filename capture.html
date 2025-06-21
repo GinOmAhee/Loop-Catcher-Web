@@ -358,16 +358,19 @@
         <button onclick="cleanEditor()">🧹</button>
         <button onclick="insertModernLink()">🔗</button>
         
-        <select onchange="applyStyle('foreColor', this.value)" title="Text Color">
-          <option value="">Text Color</option>
-          <option value="black">Black</option>
-          <option value="red">Red</option>
-          <option value="blue">Blue</option>
-          <option value="green">Green</option>
-          <option value="orange">Orange</option>
-          <option value="purple">Purple</option>
-          <option value="gray">Gray</option>
-        </select>
+      <!-- Text Color Icon Button -->
+      <button id="textColorBtn" title="Text Color">🎨</button>
+
+      <!-- Text Color Dropdown -->
+      <div id="textColorDropdown" class="dropdown hidden">
+        <div onclick="setTextColor('black')" style="color: black;">Black</div>
+        <div onclick="setTextColor('red')" style="color: red;">Red</div>
+        <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
+        <div onclick="setTextColor('green')" style="color: green;">Green</div>
+        <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
+        <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
+        <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
+      </div>
 
         <select onchange="applyHighlight(this.value); this.selectedIndex = 0;" title="Highlight Color">
           <option value="">Highlight</option>
@@ -446,6 +449,8 @@
     const fontDropdown = document.getElementById("fontDropdown");
     const fontSizeBtn = document.getElementById("fontSizeBtn");
     const sizeDropdown = document.getElementById("sizeDropdown");
+    const textColorBtn = document.getElementById("textColorBtn");
+    const textColorDropdown = document.getElementById("textColorDropdown");
 
     let recognition;
     let isRecording = false;
@@ -494,6 +499,25 @@
     function setFont(font) {
     applyStyle('fontFamily', font);
     fontDropdown.classList.add("hidden");
+    }
+
+    textColorBtn.addEventListener("click", (e) => {
+     e.stopPropagation();
+     textColorDropdown.classList.toggle("hidden");
+     const rect = textColorBtn.getBoundingClientRect();
+     textColorDropdown.style.left = `${rect.left}px`;
+     textColorDropdown.style.top = `${rect.bottom + 5}px`;
+    });
+
+    document.addEventListener("click", () => {
+      fontDropdown?.classList.add("hidden");
+      sizeDropdown?.classList.add("hidden");
+      textColorDropdown?.classList.add("hidden");
+    });
+
+    function setTextColor(color) {
+      document.execCommand("foreColor", false, color);
+      textColorDropdown.classList.add("hidden");
     }
 
     toggleBtn.addEventListener('click', (e) => {
