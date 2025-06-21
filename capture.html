@@ -345,8 +345,8 @@
       </div>
 
         <button onclick="toggleBold()"><b>B</b></button>
-        <button onclick="applyFormat('italic')"><i>I</i></button>
-        <button onclick="applyFormat('underline')"><u>U</u></button>
+        <button onclick="toggleItalic()"><i>I</i></button>
+        <button onclick="toggleUnderline()"><u>U</u></button>
         <button onclick="applyFormat('strikeThrough')"><s>S</s></button>
         <button onclick="alignText('left')">←</button>
         <button onclick="alignText('center')">⇔</button>
@@ -1029,6 +1029,64 @@
 
        groupedNotes.innerHTML = html;
 
+    }
+
+    function toggleItalic() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const commonAncestor = range.commonAncestorContainer;
+      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+
+      const isAlreadyItalic = parentElement.closest('i, em');
+
+      if (isAlreadyItalic) {
+        const italicElement = isAlreadyItalic;
+        const parent = italicElement.parentNode;
+        while (italicElement.firstChild) {
+          parent.insertBefore(italicElement.firstChild, italicElement);
+        }
+        parent.removeChild(italicElement);
+      } else {
+        const contents = range.extractContents();
+        const i = document.createElement('i');
+        i.appendChild(contents);
+        range.insertNode(i);
+        selection.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.selectNodeContents(i);
+        selection.addRange(newRange);
+      }
+    }
+
+    function toggleUnderline() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const commonAncestor = range.commonAncestorContainer;
+      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+
+      const isAlreadyUnderlined = parentElement.closest('u');
+
+      if (isAlreadyUnderlined) {
+        const uElement = isAlreadyUnderlined;
+        const parent = uElement.parentNode;
+        while (uElement.firstChild) {
+          parent.insertBefore(uElement.firstChild, uElement);
+        }
+        parent.removeChild(uElement);
+      } else {
+        const contents = range.extractContents();
+        const u = document.createElement('u');
+        u.appendChild(contents);
+        range.insertNode(u);
+        selection.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.selectNodeContents(u);
+        selection.addRange(newRange);
+      }
     }
 
     function deleteNoteByTime(time) {
