@@ -331,7 +331,14 @@
           <option value="gray">Gray</option>
         </select>
 
-        <button id="highlightBtn" onclick="toggleHighlight()">🖍️ Highlight</button>
+        <select onchange="format('hiliteColor', this.value)" title="Highlight Color">
+          <option value="">Highlight</option>
+          <option value="yellow">Yellow</option>
+          <option value="lightgreen">Light Green</option>
+          <option value="lightblue">Light Blue</option>
+          <option value="lightpink">Light Pink</option>
+          <option value="lightgray">Light Gray</option>
+        </select>
 
         <button onclick="format('justifyLeft')">←</button>
         <button onclick="format('justifyCenter')">⇔</button>
@@ -414,10 +421,6 @@
         updateGrouping(); // refresh the preview panel
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
-    });
-
-    mainEditor.addEventListener("blur", () => {
-      if (isHighlighting) toggleHighlight(); // turn it off when editor loses focus
     });
 
     toggleBtn.addEventListener('click', (e) => {
@@ -858,25 +861,6 @@
         document.execCommand(command, false, value);
       }
     }
-
-    let isHighlighting = false;
-
-    function toggleHighlight() {
-      isHighlighting = !isHighlighting;
-      const color = isHighlighting ? 'yellow' : null;
-
-      if (color) {
-        document.execCommand('styleWithCSS', false, true); // ensures real CSS gets applied
-        document.execCommand('hiliteColor', false, color);
-        document.getElementById("highlightBtn").style.background = "#ffe066";
-      } else {
-        document.execCommand('removeFormat', false, null);
-        document.getElementById("highlightBtn").style.background = "";
-      }
-
-      mainEditor.focus();
-    }
-
 
     function removeFormatting() {
       format("removeFormat");
