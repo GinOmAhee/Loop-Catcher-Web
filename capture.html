@@ -268,7 +268,6 @@
   </style>
 </head>
 <body>
-<body>
   <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
   <div class="preview-overlay" id="preview">
     <div class="preview-top">
@@ -461,14 +460,20 @@
     let debounceTimer;
 
     mainEditor.addEventListener("input", () => {
+      // Undo/redo
+      undoStack.push(mainEditor.innerHTML);
+      redoStack = [];
+
+      // Debounced auto-save
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
         localStorage.setItem("capturedText", mainEditor.innerHTML);
         localStorage.setItem("lastSaved", new Date().toISOString());
-        updateGrouping(); // refresh the preview panel
+        updateGrouping();
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
     });
+
 
     fontSizeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -775,11 +780,6 @@
 
     let undoStack = [];
     let redoStack = [];
-
-    mainEditor.addEventListener("input", () => {
-      undoStack.push(mainEditor.innerHTML);
-      redoStack = [];
-    });
 
     function undo() {
       if (undoStack.length === 0) return;
