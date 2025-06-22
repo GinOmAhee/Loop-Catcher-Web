@@ -517,6 +517,10 @@
      textColorDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
+    textColorBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    });
+
     function setTextColor(color) {
       document.execCommand("foreColor", false, color);
       textColorDropdown.classList.add("hidden");
