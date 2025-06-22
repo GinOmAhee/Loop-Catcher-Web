@@ -510,18 +510,16 @@
     }
 
     textColorBtn.addEventListener("click", (e) => {
-     e.stopPropagation();
-     textColorDropdown.classList.toggle("hidden");
-     const rect = textColorBtn.getBoundingClientRect();
-     textColorDropdown.style.left = `${rect.left}px`;
-     textColorDropdown.style.top = `${rect.bottom + 5}px`;
-    });
+      e.stopPropagation();
+      textColorDropdown.classList.toggle("hidden");
 
-    textColorBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
+      const rect = textColorBtn.getBoundingClientRect();
+      textColorDropdown.style.left = `${rect.left}px`;
+      textColorDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
     function setTextColor(color) {
+      document.execCommand("styleWithCSS", false, true);
       document.execCommand("foreColor", false, color);
       textColorDropdown.classList.add("hidden");
     }
