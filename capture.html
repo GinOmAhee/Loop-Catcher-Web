@@ -503,6 +503,8 @@
     });
 
     function setFontSize(size) {
+      mainEditor.focus();
+      restoreSelection();
       document.execCommand("fontSize", false, size);
       sizeDropdown.classList.add("hidden");
     }
