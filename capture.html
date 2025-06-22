@@ -361,6 +361,7 @@
         <button onclick="redo()">↪️</button>
         <button onclick="cleanEditor()">🧹</button>
         <button onclick="insertModernLink()">🔗</button>
+        <button onclick="justifyText()" title="Justify Text">📰</button>
         
       <!-- Text Color Icon Button -->
       <button id="textColorBtn" title="Text Color">🎨</button>
@@ -492,6 +493,11 @@
         sel.removeAllRanges();
         sel.addRange(savedSelection);
       }
+    }
+
+    function justifyText() {
+      mainEditor.focus(); // ensure editor is active
+      document.execCommand("justifyFull", false, null);
     }
 
     fontSizeBtn.addEventListener("click", (e) => {
