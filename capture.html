@@ -859,18 +859,33 @@
 
     function autoSave() {
       const now = new Date();
-      localStorage.setItem('capturedText', mainEditor.innerHTML);
+
+      // Save current content into the active tab
+      tabs[activeTabIndex].content = mainEditor.innerHTML;
+
+      // Save full tabs array
+      localStorage.setItem('tabs', JSON.stringify(tabs));
+      localStorage.setItem('activeTabIndex', activeTabIndex);
       localStorage.setItem('lastSaved', now.toISOString());
+
       saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
     }
 
     function loadSavedText() {
-      const saved = localStorage.getItem('capturedText');
+      const savedTabs = JSON.parse(localStorage.getItem('tabs') || '[]');
+      const savedIndex = parseInt(localStorage.getItem('activeTabIndex')) || 0;
       const lastSaved = localStorage.getItem('lastSaved');
       const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
-      if (saved) mainEditor.innerHTML = saved;
-      if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
-      updateFileDisplay(attached);
+
+    if (savedTabs.length) {
+      tabs = savedTabs;
+      activeTabIndex = savedIndex;
+      mainEditor.innerHTML = tabs[activeTabIndex].content;
+      renderTabs();
+    }
+
+    if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+    updateFileDisplay(attached);
     }
 
     function toggleVoiceCapture() {
