@@ -613,6 +613,28 @@
       }
     }
 
+    const moodThemeMap = {
+      "Calm & Clear": "theme-calm",
+      "Focused & Strategic": "theme-strategic",
+      "Open & Reflective": "theme-reflective",
+      "Driven & Bold": "theme-bold",
+      "Playful & Inventive": "theme-playful"
+    };
+
+    function applyMoodTheme() {
+      const vibe = localStorage.getItem('vibeLabel');
+      const themeClass = moodThemeMap[vibe];
+      if (themeClass) {
+        document.body.classList.add(themeClass);
+      }
+    }
+
+    function maybeClosePreview(e) {
+      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
+        preview.style.display = 'none';
+      }
+    }
+
     let tabs = [
       { title: "Note 1", content: "" }
     ];
@@ -764,12 +786,6 @@
       e.stopPropagation();
       preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
     });
-
-    function maybeClosePreview(e) {
-      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
-        preview.style.display = 'none';
-      }
-    }
 
     const highlightBtn = document.getElementById("highlightBtn");
     const highlightDropdown = document.getElementById("highlightDropdown");
@@ -1409,22 +1425,6 @@
       const updated = notes.filter(n => n.timestamp !== time);
       localStorage.setItem('savedNotes', JSON.stringify(updated));
       updateGrouping();
-    }
-
-    const moodThemeMap = {
-      "Calm & Clear": "theme-calm",
-      "Focused & Strategic": "theme-strategic",
-      "Open & Reflective": "theme-reflective",
-      "Driven & Bold": "theme-bold",
-      "Playful & Inventive": "theme-playful"
-    };
-
-    function applyMoodTheme() {
-      const vibe = localStorage.getItem('vibeLabel');
-      const themeClass = moodThemeMap[vibe];
-      if (themeClass) {
-        document.body.classList.add(themeClass);
-      }
     }
 
     window.onload = async function () {
