@@ -15,197 +15,165 @@
 
   <style>
 
-    #mainEditor {
-      background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-      background-size: 100% 1.5em;
-    }
+  /* === GLOBAL STYLES === */
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+    background: #f0f0f0;
+    color: #333;
+  }
 
-    .add-tab-btn {
-      margin-left: auto;
-      border: none;
-      background: #fff59d;
-      padding: 0.4rem 0.6rem;
-      border-radius: 4px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+  #mainEditor {
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    background-size: 100% 1.5em;
+  }
 
-    .add-tab-btn:hover {
-      background: #fff176;
-    }
+  textarea {
+    width: 60%;
+    height: 300px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: none;
+  }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      font-size: 14px; /* Smaller but clean */
-      margin: 0;
-      padding: 0;
-      background: #f0f0f0;
-      color: #333;
-    }
+  .format-toolbar select {
+    padding: 0.3rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    border: 1px solid #ccc;
+  }
 
-    .theme-calm { background-color: #cfe3d5; color: #2f4633; }
-    .theme-strategic { background-color: #d7d7da; color: #2e2e32; }
-    .theme-reflective { background-color: #e2dfc9; color: #443f1d; }
-    .theme-bold { background-color: #f7ddb4; color: #5d3e0a; }
-    .theme-playful { background-color: #ffd6e8; color: #7e2b4e; }
+  /* === MAIN LAYOUT === */
+  .main-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
 
-     .main-container {
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
+  .editor-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+  }
 
-    .editor-area {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      position: relative;
-    }
+  /* === THEME VARIABLES === */
+  .theme-calm {
+    --tab-bg: #dceefb;
+    --tab-hover: #c5e1e1;
+    --tab-text: #2b6cb0;
+    --tab-active-bg: #bee3f8;
+    --tab-border: #90cdf4;
+    background-color: #cfe3d5;
+    color: #2f4633;
+  }
 
-    textarea {
-      width: 60%;
-      height: 300px;
-      padding: 1rem;
-      font-size: 0.9rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      resize: none;
-    }
+  .theme-strategic {
+    --tab-bg: #e6fffa;
+    --tab-hover: #a2c4f5;
+    --tab-text: #2c7a7b;
+    --tab-active-bg: #b2f5ea;
+    --tab-border: #81e6d9;
+    background-color: #d7d7da;
+    color: #2e2e32;
+  }
 
-    .tab {
-      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    }
+  .theme-reflective {
+    --tab-bg: #fefcbf;
+    --tab-hover: #e0d4f5;
+    --tab-text: #744210;
+    --tab-active-bg: #faf089;
+    --tab-border: #ecc94b;
+    background-color: #e2dfc9;
+    color: #443f1d;
+  }
 
-    /* Default tab bar */
-    .tab-bar {
-      display: flex;
-      align-items: center;
-      border-bottom: 2px solid #ccc;
-      margin-bottom: 0.5rem;
-      padding-left: 0.5rem;
-    }
+  .theme-bold {
+    --tab-bg: #fed7d7;
+    --tab-hover: #f59d9d;
+    --tab-text: #9b2c2c;
+    --tab-active-bg: #feb2b2;
+    --tab-border: #fc8181;
+    background-color: #f7ddb4;
+    color: #5d3e0a;
+  }
 
-    /* Optional mood-based tab bar enhancements */
-    .theme-calm .tab-bar {
-      background-color: #ebf8ff;
-      border-color: #90cdf4;
-    }
+  .theme-playful {
+    --tab-bg: #fbd38d;
+    --tab-hover: #ffe066;
+    --tab-text: #b7791f;
+    --tab-active-bg: #f6ad55;
+    --tab-border: #f6ad55;
+    background-color: #ffd6e8;
+    color: #7e2b4e;
+  }
 
-    .theme-strategic .tab-bar {
-      background-color: #e6fffa;
-      border-color: #81e6d9;
-    }
+  /* === TAB STYLES === */
+  .tab-bar {
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+    background-color: var(--tab-bg);
+    border-color: var(--tab-border);
+    transition: background-color 0.3s ease;
+  }
 
-    .theme-reflective .tab-bar {
-      background-color: #fefcbf;
-      border-color: #ecc94b;
-    }
+  .tab,
+  .tab.add-tab {
+    padding: 0.5rem 1rem;
+    margin-right: 4px;
+    border-radius: 8px 8px 0 0;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: var(--tab-bg);
+    color: var(--tab-text);
+    border: 1px solid var(--tab-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
 
-    .theme-bold .tab-bar {
-      background-color: #fff5f5;
-      border-color: #fc8181;
-    }
+  .tab:hover {
+    background-color: var(--tab-hover);
+  }
 
-    .theme-playful .tab-bar {
-      background-color: #fffaf0;
-      border-color: #FFEB99;
-    }
+  .tab.active {
+    background-color: var(--tab-active-bg);
+  }
 
+  .tab.add-tab {
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    margin-left: 0.5rem;
+  }
 
-    /* Default tab style */
-    .tab {
-      padding: 0.5rem 1rem;
-      margin-right: 4px;
-      border-radius: 8px 8px 0 0;
-      background-color: #eee;
-      cursor: pointer;
-      font-weight: bold;
-    }
+  /* === ADD TAB BUTTON === */
+  .add-tab-btn {
+    margin-left: auto;
+    border: none;
+    background: #fff59d;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
 
-    .tab:hover {
-      background-color: var(--tab-hover-color, #fff59d);
-      transition: background-color 0.3s ease;
-    }
-
-    .theme-calm {
-      --tab-hover-color: #c5e1e1;
-    }
-
-    .theme-strategic {
-      --tab-hover-color: #a2c4f5;
-    }
-
-    .theme-reflective {
-      --tab-hover-color: #e0d4f5;
-    }
-
-    .theme-bold {
-      --tab-hover-color: #f59d9d;
-    }
-
-    .theme-playful {
-      --tab-hover-color: #ffe066;
-    }
-
-    .tab.active {
-      background-color: #ddd;
-    }
-
-    /* Mood-based overrides */
-    .theme-calm .tab {
-      background-color: #dceefb;
-      color: #2b6cb0;
-    }
-
-    .theme-calm .tab.active {
-      background-color: #bee3f8;
-    }
-
-    .theme-strategic .tab {
-      background-color: #e6fffa;
-      color: #2c7a7b;
-    }
-
-    .theme-strategic .tab.active {
-      background-color: #b2f5ea;
-    }
-
-    .theme-reflective .tab {
-      background-color: #fefcbf;
-      color: #744210;
-    }
-
-    .theme-reflective .tab.active {
-      background-color: #faf089;
-    }
-
-    .theme-bold .tab {
-      background-color: #fed7d7;
-      color: #9b2c2c;
-    }
-
-    .theme-bold .tab.active {
-      background-color: #feb2b2;
-    }
-
-    .theme-playful .tab {
-      background-color: #fbd38d;
-      color: #b7791f;
-    }
-
-    .theme-playful .tab.active {
-      background-color: #f6ad55;
-    }
-
-    .format-toolbar select {
-       padding: 0.3rem;
-       border-radius: 4px;
-       font-size: 0.85rem;
-       border: 1px solid #ccc;
-    }
+  .add-tab-btn:hover {
+    background: #fff176;
+  }
 
     .controls {
       display: flex;
@@ -558,7 +526,6 @@
         <button onclick="removeFormatting()">🚫</button>
       </div>
 
-      <button onclick="addNewTab()">➕ New Tab</button>
       <!-- 📝 Rich Text Editor -->
       <div id="mainEditor" contenteditable="true" style="
         width: 60%;
@@ -642,6 +609,7 @@
 
     function renderTabs() {
       tabBar.innerHTML = ""; // Clear old tabs
+
       tabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
         tabBtn.innerText = tab.title;
@@ -649,6 +617,14 @@
         tabBtn.onclick = () => switchTab(index);
         tabBar.appendChild(tabBtn);
       });
+
+      // ➕ Add the "+" tab at the end
+      const addTabBtn = document.createElement("div");
+      addTabBtn.innerText = "+";
+      addTabBtn.className = "tab add-tab";
+      addTabBtn.title = "Add new tab";
+      addTabBtn.onclick = addNewTab;
+      tabBar.appendChild(addTabBtn);
     }
 
     function switchTab(index) {
