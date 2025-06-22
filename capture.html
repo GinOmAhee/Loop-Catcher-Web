@@ -527,6 +527,7 @@
 
     textColorBtn.addEventListener("click", (e) => {
       e.stopPropagation();
+      saveSelection();
       textColorDropdown.classList.toggle("hidden");
 
       const rect = textColorBtn.getBoundingClientRect();
