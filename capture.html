@@ -478,6 +478,22 @@
       }, 1000);
     });
 
+    let savedSelection = null;
+
+    function saveSelection() {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        savedSelection = sel.getRangeAt(0).cloneRange();
+      }
+    }
+
+    function restoreSelection() {
+      if (savedSelection) {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(savedSelection);
+      }
+    }
 
     fontSizeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
