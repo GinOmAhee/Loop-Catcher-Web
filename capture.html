@@ -14,6 +14,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
+
+    #mainEditor {
+      background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+      background-size: 100% 1.5em;
+    }
+
+    .add-tab-btn {
+      margin-left: auto;
+      border: none;
+      background: #fff59d;
+      padding: 0.4rem 0.6rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .add-tab-btn:hover {
+      background: #fff176;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       font-size: 14px; /* Smaller but clean */
@@ -58,19 +78,32 @@
     .tab-bar {
       display: flex;
       gap: 6px;
-      margin-bottom: 10px;
+      background: #fdf6e3;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid #e0dcbf;
+      font-family: 'Segoe UI', sans-serif;
     }
 
     .tab {
-      padding: 5px 10px;
-      background-color: #eee;
-      border-radius: 6px;
+      padding: 6px 12px;
+      border-radius: 6px 6px 0 0;
+      background: #fff9c4;
+      font-weight: 500;
+      color: #333;
       cursor: pointer;
+      border: 1px solid #e0dcbf;
+      border-bottom: none;
+      transition: all 0.2s ease;
+    }
+
+    .tab:hover {
+      background: #fff59d;
     }
 
     .tab.active {
-      background-color: #ccc;
+      background: #ffffff;
       font-weight: bold;
+      box-shadow: inset 0 -2px 0 #fbc02d;
     }
 
     .format-toolbar select {
@@ -279,15 +312,33 @@
       background-color: #eee;
     }
 
+    #tabBar button {
+     background: none;
+     border: none;
+     font-size: 1.2rem;
+     cursor: pointer;
+     color: #666;
+    }
+
+    #tabBar button:hover {
+     color: #000;
+    }
+
     .hidden {
       display: none;
     }
 
-    #mainEditor a {
-    color: #007bff;
-    text-decoration: underline;
-    cursor: pointer;
-    pointer-events: auto;
+    #mainEditor {
+      background: #fffdf5;
+      border: 1px solid #e0dcbf;
+      padding: 1rem;
+      border-radius: 0 0 6px 6px;
+      min-height: 300px;
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #333;
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.05);
     }
 
   </style>
