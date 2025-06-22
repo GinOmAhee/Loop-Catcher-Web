@@ -75,35 +75,129 @@
       resize: none;
     }
 
-    .tab-bar {
-      display: flex;
-      gap: 6px;
-      background: #fdf6e3;
-      padding: 0.5rem 1rem;
-      border-bottom: 1px solid #e0dcbf;
-      font-family: 'Segoe UI', sans-serif;
+    .tab {
+      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     }
 
+    /* Default tab bar */
+    .tab-bar {
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid #ccc;
+      margin-bottom: 0.5rem;
+      padding-left: 0.5rem;
+    }
+
+    /* Optional mood-based tab bar enhancements */
+    .theme-calm .tab-bar {
+      background-color: #ebf8ff;
+      border-color: #90cdf4;
+    }
+
+    .theme-strategic .tab-bar {
+      background-color: #e6fffa;
+      border-color: #81e6d9;
+    }
+
+    .theme-reflective .tab-bar {
+      background-color: #fefcbf;
+      border-color: #ecc94b;
+    }
+
+    .theme-bold .tab-bar {
+      background-color: #fff5f5;
+      border-color: #fc8181;
+    }
+
+    .theme-playful .tab-bar {
+      background-color: #fffaf0;
+      border-color: #f6ad55;
+    }
+
+
+    /* Default tab style */
     .tab {
-      padding: 6px 12px;
-      border-radius: 6px 6px 0 0;
-      background: #fff9c4;
-      font-weight: 500;
-      color: #333;
+      padding: 0.5rem 1rem;
+      margin-right: 4px;
+      border-radius: 8px 8px 0 0;
+      background-color: #eee;
       cursor: pointer;
-      border: 1px solid #e0dcbf;
-      border-bottom: none;
-      transition: all 0.2s ease;
+      font-weight: bold;
     }
 
     .tab:hover {
-      background: #fff59d;
+      background-color: var(--tab-hover-color, #fff59d);
+      transition: background-color 0.3s ease;
+    }
+
+    .theme-calm {
+      --tab-hover-color: #c5e1e1;
+    }
+
+    .theme-strategic {
+      --tab-hover-color: #a2c4f5;
+    }
+
+    .theme-reflective {
+      --tab-hover-color: #e0d4f5;
+    }
+
+    .theme-bold {
+      --tab-hover-color: #f59d9d;
+    }
+
+    .theme-playful {
+      --tab-hover-color: #ffe066;
     }
 
     .tab.active {
-      background: #ffffff;
-      font-weight: bold;
-      box-shadow: inset 0 -2px 0 #fbc02d;
+      background-color: #ddd;
+    }
+
+    /* Mood-based overrides */
+    .theme-calm .tab {
+      background-color: #dceefb;
+      color: #2b6cb0;
+    }
+
+    .theme-calm .tab.active {
+      background-color: #bee3f8;
+    }
+
+    .theme-strategic .tab {
+      background-color: #e6fffa;
+      color: #2c7a7b;
+    }
+
+    .theme-strategic .tab.active {
+      background-color: #b2f5ea;
+    }
+
+    .theme-reflective .tab {
+      background-color: #fefcbf;
+      color: #744210;
+    }
+
+    .theme-reflective .tab.active {
+      background-color: #faf089;
+    }
+
+    .theme-bold .tab {
+      background-color: #fed7d7;
+      color: #9b2c2c;
+    }
+
+    .theme-bold .tab.active {
+      background-color: #feb2b2;
+    }
+
+    .theme-playful .tab {
+      background-color: #fbd38d;
+      color: #b7791f;
+    }
+
+    .theme-playful .tab.active {
+      background-color: #f6ad55;
     }
 
     .format-toolbar select {
@@ -551,6 +645,10 @@
     tabs.push({ title: `Note ${tabs.length + 1}`, content: "" });
     switchTab(tabs.length - 1); // Switch to new tab
     }
+
+    document.body.className = ""; // Remove old
+    document.body.classList.add(newThemeClass); // Add new
+    renderTabs(); // Re-render tabs to refresh their classes if needed
 
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
