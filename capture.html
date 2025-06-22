@@ -55,6 +55,24 @@
       resize: none;
     }
 
+    .tab-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .tab {
+      padding: 5px 10px;
+      background-color: #eee;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background-color: #ccc;
+      font-weight: bold;
+    }
+
     .format-toolbar select {
        padding: 0.3rem;
        border-radius: 4px;
@@ -319,6 +337,8 @@
     </div>
   </div>
 
+  <div id="tabBar" class="tab-bar"></div>
+
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
@@ -393,6 +413,7 @@
         <button onclick="removeFormatting()">🚫</button>
       </div>
 
+      <button onclick="addNewTab()">➕ New Tab</button>
       <!-- 📝 Rich Text Editor -->
       <div id="mainEditor" contenteditable="true" style="
         width: 60%;
@@ -446,7 +467,40 @@
         alert("Firebase failed to initialize. Please check your connection or CORS settings.");
       }
     }
-    
+
+    let tabs = [
+      { title: "Note 1", content: "" }
+    ];
+    let activeTabIndex = 0;
+
+    function renderTabs() {
+      tabBar.innerHTML = ""; // Clear old tabs
+      tabs.forEach((tab, index) => {
+        const tabBtn = document.createElement("div");
+        tabBtn.innerText = tab.title;
+        tabBtn.className = "tab" + (index === activeTabIndex ? " active" : "");
+        tabBtn.onclick = () => switchTab(index);
+        tabBar.appendChild(tabBtn);
+      });
+    }
+
+    function switchTab(index) {
+    // Save current editor content to current tab
+    tabs[activeTabIndex].content = mainEditor.innerHTML;
+
+    // Switch active tab
+    activeTabIndex = index;
+
+    // Load new content
+    mainEditor.innerHTML = tabs[index].content;
+    renderTabs();
+    }
+
+    function addNewTab() {
+    tabs.push({ title: `Note ${tabs.length + 1}`, content: "" });
+    switchTab(tabs.length - 1); // Switch to new tab
+    }
+
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
