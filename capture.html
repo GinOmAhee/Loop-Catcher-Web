@@ -628,15 +628,10 @@
     }
 
     function switchTab(index) {
-    // Save current editor content to current tab
-    tabs[activeTabIndex].content = mainEditor.innerHTML;
-
-    // Switch active tab
-    activeTabIndex = index;
-
-    // Load new content
-    mainEditor.innerHTML = tabs[index].content;
-    renderTabs();
+      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      activeTabIndex = index;
+      mainEditor.innerHTML = tabs[index].content;
+      renderTabs();
     }
 
     function addNewTab() {
