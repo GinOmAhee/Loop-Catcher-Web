@@ -969,6 +969,15 @@
      `;
     }
 
+    function loadNoteIntoEditor(noteHTML) {
+      mainEditor.innerHTML = noteHTML;
+      mainEditor.focus();
+      saveStatus.innerText = "📝 Loaded note from preview";
+      preview.style.display = 'none';
+      undoStack.push(noteHTML);
+      redoStack = [];
+    }
+
     function escapeHTML(text) {
       const div = document.createElement('div');
       div.innerText = text;
@@ -1017,7 +1026,9 @@
           html += `
             <li style="margin-bottom:1rem; display: flex; align-items: start;">
               <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-              <div style="flex: 1;">
+              <div 
+                style="flex: 1; cursor: pointer;" 
+                onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
                 <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
                 ${highlightText(note.text, searchKeyword)}
               </div>
@@ -1041,7 +1052,9 @@
             html += `
               <li style="margin-bottom:1rem; display: flex; align-items: start;">
                 <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-                <div style="flex: 1;">
+                <div 
+                  style="flex: 1; cursor: pointer;" 
+                  onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
                   <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
                   ${highlightText(note.text, searchKeyword)}
                 </div>
@@ -1063,7 +1076,9 @@
           html += `
             <li style="margin-bottom:1rem; display: flex; align-items: start;">
               <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-              <div style="flex: 1;">
+              <div 
+                style="flex: 1; cursor: pointer;" 
+                onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
                 <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
                 ${highlightText(note.text, searchKeyword)}
               </div>
@@ -1087,7 +1102,9 @@
           html += `
             <li style="margin-bottom:1rem; display: flex; align-items: start;">
               <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-              <div style="flex: 1;">
+              <div 
+                style="flex: 1; cursor: pointer;" 
+                onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
                 <strong>${new Date(note.timestamp || note.time).toLocaleString()}</strong><br>
                 ${highlightText(note.text, searchKeyword)}
               </div>
