@@ -608,6 +608,12 @@
     let activeTabIndex = 0;
 
     function renderTabs() {
+      const tabBar = document.querySelector(".tab-bar");
+      if (!tabBar) {
+        console.warn("⚠️ Tab bar element not found in the DOM.");
+        return;
+      }
+
       tabBar.innerHTML = ""; // Clear old tabs
 
       tabs.forEach((tab, index) => {
