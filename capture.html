@@ -559,6 +559,7 @@
 
     highlightBtn.addEventListener("click", (e) => {
       e.stopPropagation();
+      saveSelection();
       highlightDropdown.classList.toggle("hidden");
       const rect = highlightBtn.getBoundingClientRect();
       highlightDropdown.style.left = `${rect.left}px`;
@@ -566,6 +567,8 @@
     });
 
     function setHighlightColor(color) {
+      mainEditor.focus();
+      restoreSelection();
       const selection = window.getSelection();
       if (!selection.rangeCount || selection.isCollapsed) return;
 
