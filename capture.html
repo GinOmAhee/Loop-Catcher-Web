@@ -615,20 +615,28 @@
       }
 
       tabBar.innerHTML = ""; // Clear old tabs
-
       tabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
         tabBtn.innerText = tab.title;
         tabBtn.className = "tab" + (index === activeTabIndex ? " active" : "");
         tabBtn.onclick = () => switchTab(index);
+
+        // ✨ Double-click to rename
+        tabBtn.ondblclick = () => {
+          const newTitle = prompt("Rename this tab:", tab.title);
+          if (newTitle && newTitle.trim()) {
+            tabs[index].title = newTitle.trim();
+            renderTabs(); // Re-render with updated name
+          }
+        };
+
         tabBar.appendChild(tabBtn);
       });
 
-      // ➕ Add the "+" tab at the end
+      // Re-add the ➕ add-tab button
       const addTabBtn = document.createElement("div");
       addTabBtn.innerText = "+";
       addTabBtn.className = "tab add-tab";
-      addTabBtn.title = "Add new tab";
       addTabBtn.onclick = addNewTab;
       tabBar.appendChild(addTabBtn);
     }
