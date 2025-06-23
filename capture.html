@@ -427,49 +427,6 @@
     display: none;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --natural-beige: #1e1e1e;
-      --soft-plum: #e0c9dd;
-      --muted-green: #9ac5a3;
-    }
-
-    body {
-      background-color: var(--natural-beige);
-      color: var(--soft-plum);
-    }
-
-    button {
-      background: #2b2b2b;
-      border-color: #444;
-      color: var(--soft-plum);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    button:hover {
-      border-color: var(--muted-green);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-
-    button:active {
-      background: #344d39;
-    }
-
-    .skip {
-      color: var(--muted-green);
-    }
-
-    .skip:hover {
-      color: #b0e1bd;
-    }
-
-    .nudge, .floating-nudge {
-      color: #ccc;
-      background: rgba(50, 50, 50, 0.95);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    }
-  }
-
   .theme-toggle {
     position: fixed;
     top: 1rem;
