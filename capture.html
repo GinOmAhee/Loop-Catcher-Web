@@ -636,6 +636,8 @@
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
         tabBtn.appendChild(tabLabel);
+        
+        tabLabel.onclick = () => switchTab(index);
 
         // ✏️ Inline edit on double-click
         tabLabel.ondblclick = (e) => {
@@ -659,8 +661,6 @@
           tabBtn.replaceChild(input, tabLabel);
           input.focus();
         };
-
-        tabBtn.onclick = () => switchTab(index); // ✅ Happens only if you’re not renaming
 
         tabBar.appendChild(tabBtn);
       });
