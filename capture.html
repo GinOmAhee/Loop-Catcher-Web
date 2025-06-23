@@ -635,7 +635,7 @@
         console.warn("⚠️ Tab bar element not found in the DOM.");
         return;
       }
-      
+
       tabBar.innerHTML = ""; // Clear old tabs
 
       tabs.forEach((tab, index) => {
@@ -646,46 +646,34 @@
         tabLabel.innerText = tab.title;
         tabBtn.appendChild(tabLabel);
 
+        // Single-click: switch tab
         tabLabel.onclick = () => switchTab(index);
 
-        // ✏️ Inline edit on double-click
+        // Double-click: rename tab
         tabLabel.ondblclick = (e) => {
-          console.log("Double-click triggered!");
-          e.stopPropagation(); // Prevent triggering switchTab
+          e.stopPropagation();
+
           const input = document.createElement("input");
           input.type = "text";
           input.value = tab.title;
           input.className = "tab-rename-input";
 
-          input.onclick = (e) => e.stopPropagation(); // 🛑 Important fix
+          input.onclick = (e) => e.stopPropagation();
+
           input.onkeydown = (e) => {
             if (e.key === "Enter") input.blur();
-            if (e.key === "Escape") renderTabs(); // Cancel edit
+            if (e.key === "Escape") renderTabs();
           };
-
-          input.addEventListener("input", () => {
-            console.log("Typing...", input.value);
-          });
 
           input.onblur = () => {
             setTimeout(() => {
               tab.title = input.value.trim() || tab.title;
               renderTabs();
-            }, 300); // ⏳ short delay;
-
-            tab.title = input.value.trim() || tab.title;
-            renderTabs();
+            }, 200); // Short delay to stabilize focus
           };
 
-          console.log("Replacing this:", tabLabel);
-          console.log("From inside:", tabBtn);
-          console.log("Is child?", tabBtn.contains(tabLabel));
-
-          tabBtn.replaceChild(input, tabLabel);
-          setTimeout(() => input.focus(), 0); // Delays focus just one tick
-
-          console.log("Input added:", input);
-          console.log("tabBtn innerHTML:", tabBtn.innerHTML);
+          tabLabel.replaceWith(input);
+          setTimeout(() => input.focus(), 0);
         };
 
         tabBar.appendChild(tabBtn);
