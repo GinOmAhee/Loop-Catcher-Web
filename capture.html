@@ -673,6 +673,8 @@
           });
 
           tabBtn.replaceChild(input, tabLabel);
+          console.log("🧪 tabBtn children after replace:", tabBtn.innerHTML);
+          
           setTimeout(() => {
             input.focus();
             input.select();
