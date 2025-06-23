@@ -549,6 +549,9 @@
         overflow-y: auto;
       "></div>
 
+      <div id="tabBar" class="tab-bar"></div>
+      <div id="mainEditor" contenteditable="true" class="notepad"></div>
+
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
        <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
@@ -668,10 +671,6 @@
       });
 
       // ➕ Add-tab button
-      tabs.forEach((tab, index) => {
-        // ... tab rendering code here
-      });
-      
       const addTabBtn = document.createElement("div");
       addTabBtn.innerText = "+";
       addTabBtn.className = "tab add-tab";
