@@ -648,6 +648,9 @@
           input.value = tab.title;
           input.className = "tab-rename-input";
 
+          input.onblur = null;
+          input.onkeydown = null;
+
           input.onclick = (e) => e.stopPropagation(); // 🛑 Important fix
           input.onkeydown = (e) => {
             if (e.key === "Enter") input.blur();
