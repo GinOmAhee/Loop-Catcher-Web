@@ -507,12 +507,16 @@
     background: rgba(30, 30, 30, 0.95);
   }
 
+  body.dark-theme.theme-strategic #mainEditor,
+  body.dark-theme.theme-calm #mainEditor,
+  body.dark-theme.theme-reflective #mainEditor,
+  body.dark-theme.theme-bold #mainEditor,
+  body.dark-theme.theme-playful #mainEditor,
   body.dark-theme #mainEditor {
-    background: #222;
-    color: #ddd;
-    caret-color: #eee; /* optional: makes cursor visible */
-}
-
+    background: #222 !important;
+    color: #ddd !important;
+    caret-color: #eee !important;
+  }
 
   </style>
 </head>
@@ -723,6 +727,10 @@
       if (themeClass) {
         document.body.classList.add(themeClass);
       }
+    }
+
+    if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-theme');
     }
 
     // Load saved theme or default to system
