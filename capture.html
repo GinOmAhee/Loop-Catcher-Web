@@ -669,11 +669,18 @@
               console.log("❌ title unchanged");
             }
 
-          setTimeout(() => {
-            renderTabs();
-          }, 150); // delay helps avoid racing the blur
+            setTimeout(() => {
+              renderTabs();
+            }, 150); // delay helps avoid racing the blur
           });
 
+          tabBtn.replaceChild(input, tabLabel);
+
+          setTimeout(() => {
+            input.focus();
+            input.select();
+          }, 0);
+        });
 
         tabBar.appendChild(tabBtn);
       });
