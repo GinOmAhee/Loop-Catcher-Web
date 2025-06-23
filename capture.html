@@ -563,6 +563,8 @@
 </body>
 
   <script>
+    let isRenamingTab = false;
+
     let db = null;
 
     async function initializeFirebase() {
@@ -619,6 +621,11 @@
     let activeTabIndex = 0;
 
     function renderTabs() {
+      if (isRenamingTab) {
+        console.warn("⛔ Skipping renderTabs(): rename input is still active");
+        return;
+      }
+      
       const tabBar = document.querySelector(".tab-bar");
       if (!tabBar) return;
 
