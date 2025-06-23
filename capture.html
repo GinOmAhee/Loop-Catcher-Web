@@ -650,12 +650,14 @@
         console.warn("⛔ Skipping renderTabs(): rename input is still active");
         return;
       }
-      
+
       const tabBar = document.querySelector(".tab-bar");
       if (!tabBar) return;
 
-      // Prevent re-render only if rename input exists AND it's already in the DOM
-      if (document.activeElement && document.activeElement.classList.contains("tab-rename-input")) {
+      if (
+        document.activeElement &&
+        document.activeElement.classList.contains("tab-rename-input")
+      ) {
         console.warn("⛔ Skipping render: rename input is active");
         return;
       }
@@ -669,40 +671,12 @@
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
         tabLabel.className = "tab-label";
-
         tabLabel.addEventListener("click", () => switchTab(index));
 
-        const minimizeBtn = document.createElement("button");
-        minimizeBtn.innerText = "_";
-        minimizeBtn.className = "tab-mini-btn";
-        minimizeBtn.onclick = (e) => {
-          e.stopPropagation();
-          mainEditor.innerHTML = "";
-          saveStatus.innerText = `🧊 Minimized "${tab.title}"`;
-        };
-
-        // ⬇️ Close Button
-        const closeBtn = document.createElement("button");
-        closeBtn.innerText = "×";
-        closeBtn.className = "tab-close-btn";
-        closeBtn.onclick = (e) => {
-          e.stopPropagation();
-          tabs.splice(index, 1);
-          if (activeTabIndex >= index) activeTabIndex = Math.max(0, activeTabIndex - 1);
-          safeRenderTabs();
-          mainEditor.innerHTML = tabs[activeTabIndex]?.content || "";
-        };
-
-        // Bundle extra buttons inside the tab
-        tabBtn.appendChild(tabLabel);      // 🧱 attach label first
-        tabBtn.appendChild(minimizeBtn);
-        tabBtn.appendChild(closeBtn);
-        tabBar.appendChild(tabBtn);        // 🪄 now tab is in the DOM
-      });            
-
+        // Handle rename flow on double-click
         tabLabel.addEventListener("dblclick", (e) => {
           e.stopPropagation();
-          isRenamingTab = true; // 👈 this is what's missing right now!
+          isRenamingTab = true;
           console.log("🖱️ Double-clicked on tab:", tab.title);
 
           const input = document.createElement("input");
@@ -717,8 +691,6 @@
           });
 
           input.addEventListener("blur", (e) => {
-            console.log("📌 blur triggered");
-
             const newTitle = e.target.value.trim();
             if (newTitle && newTitle !== tab.title) {
               tabs[index].title = newTitle;
@@ -727,27 +699,17 @@
             } else {
               console.log("❌ title unchanged or empty");
             }
-
-            isRenamingTab = false; // <- This line is CRITICAL
-
-            setTimeout(() => renderTabs(), 100);
+            isRenamingTab = false;
+            setTimeout(renderTabs, 100);
           });
 
           tabBtn.replaceChild(input, tabLabel);
-          console.log("🧪 tabBtn children after replace:", tabBtn.innerHTML);
-          input.addEventListener("focus", () => console.log("🎯 Input received focus"));
-
-          document.body.style.pointerEvents = "none"; // 🚫 briefly disable clicks
-          
-          console.log("👁️ Input right before focus:", input);
-          
           setTimeout(() => {
             input.focus();
             input.select();
           }, 100);
         });
-      
-        // ➖ Minimize button
+
         const minimizeBtn = document.createElement("button");
         minimizeBtn.innerText = "➖";
         minimizeBtn.className = "tab-minimize-btn";
@@ -756,12 +718,11 @@
           e.stopPropagation();
           if (activeTabIndex === index) {
             tabs[activeTabIndex].content = mainEditor.innerHTML;
-            mainEditor.innerHTML = ""; // clear editor
+            mainEditor.innerHTML = "";
             saveStatus.innerText = `🗂️ "${tab.title}" minimized.`;
           }
         };
 
-        // ❌ Close button
         const closeBtn = document.createElement("button");
         closeBtn.innerText = "✖";
         closeBtn.className = "tab-close-btn";
@@ -781,7 +742,6 @@
           switchTab(activeTabIndex);
         };
 
-        // Attach
         tabBtn.appendChild(tabLabel);
         tabBtn.appendChild(minimizeBtn);
         tabBtn.appendChild(closeBtn);
