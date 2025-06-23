@@ -626,7 +626,6 @@
         console.warn("⚠️ Tab bar element not found in the DOM.");
         return;
       }
-
       
       tabBar.innerHTML = ""; // Clear old tabs
 
@@ -663,7 +662,6 @@
 
         tabBtn.onclick = () => switchTab(index); // ✅ Happens only if you’re not renaming
 
-        tabBtn.appendChild(tabLabel);
         tabBar.appendChild(tabBtn);
       });
 
