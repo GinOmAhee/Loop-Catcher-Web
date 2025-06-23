@@ -654,12 +654,18 @@
           };
 
           input.onblur = () => {
-            tab.title = input.value.trim() || tab.title;
-            renderTabs();
+            setTimeout(() => {
+              tab.title = input.value.trim() || tab.title;
+              renderTabs();
+            }, 200);
           };
 
           tabLabel.replaceWith(input);
-          setTimeout(() => input.focus(), 0);
+          // ✅ Now that input exists in the DOM, we can safely focus/select
+          setTimeout(() => {
+            input.focus();
+            input.select(); // 🔥 Highlight all text for quick rename
+          }, 0);
         };
 
         tabBtn.appendChild(tabLabel);
