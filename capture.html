@@ -556,6 +556,8 @@
     </div>
   </div>
 
+  <!-- Your main HTML content above -->
+
 </body>
 
   <script>
@@ -629,9 +631,12 @@
 
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
-        tabLabel.className = "tab-label"; // optional styling class
+        tabLabel.className = "tab-label";
 
-        // ✅ Attach inline rename logic to the LABEL
+        // ✅ Clicking the label switches tabs
+        tabLabel.onclick = () => switchTab(index);
+
+        // ✅ Double-click to rename
         tabLabel.ondblclick = (e) => {
           e.stopPropagation();
 
@@ -644,7 +649,7 @@
 
           input.onkeydown = (e) => {
             if (e.key === "Enter") input.blur();
-            if (e.key === "Escape") renderTabs(); // cancel rename
+            if (e.key === "Escape") renderTabs();
           };
 
           input.onblur = () => {
@@ -655,8 +660,6 @@
           tabLabel.replaceWith(input);
           setTimeout(() => input.focus(), 0);
         };
-
-        tabBtn.onclick = () => switchTab(index); // ✅ Clicking anywhere on the tab switches
 
         tabBtn.appendChild(tabLabel);
         tabBar.appendChild(tabBtn);
