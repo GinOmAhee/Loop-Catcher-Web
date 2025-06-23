@@ -511,7 +511,8 @@
     background: #222;
     color: #ddd;
     caret-color: #eee; /* optional: makes cursor visible */
-  }
+}
+
 
   </style>
 </head>
@@ -703,6 +704,8 @@
       }
     }
 
+    const switchEl = document.getElementById('themeSwitch');
+
     const moodThemeMap = {
       "Calm & Clear": "theme-calm",
       "Focused & Strategic": "theme-strategic",
@@ -714,10 +717,42 @@
     function applyMoodTheme() {
       const vibe = localStorage.getItem('vibeLabel');
       const themeClass = moodThemeMap[vibe];
+
+      Object.values(moodThemeMap).forEach(cls => document.body.classList.remove(cls));
+
       if (themeClass) {
         document.body.classList.add(themeClass);
       }
     }
+
+    // Load saved theme or default to system
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.body.classList.add('dark-theme');
+        switchEl.checked = true;
+      } else {
+        document.body.classList.remove('dark-theme');
+        switchEl.checked = false;
+      }
+    }
+
+    // Watch toggle switch
+    switchEl.addEventListener('change', () => {
+      if (switchEl.checked) {
+        document.body.classList.add('dark-theme');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark-theme');
+        localStorage.setItem('theme', 'light');
+      }
+    });
+
+    // Apply mood theme first, then theme preference
+    applyMoodTheme();
+    loadTheme();
 
     function maybeClosePreview(e) {
       if (e.target.classList.contains("tab-rename-input")) return;
@@ -1770,33 +1805,6 @@
         highlightDropdown?.classList.add("hidden");
       }, 100); // this gives time for clicks inside dropdowns to register
     });
-
-  
-    const switchEl = document.getElementById('themeSwitch');
-
-    // Load saved theme or default to system
-    function loadTheme() {
-      const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-        document.body.classList.add('dark-theme');
-        switchEl.checked = true;
-      }
-    }
-
-    // Watch toggle switch
-    switchEl.addEventListener('change', () => {
-      if (switchEl.checked) {
-        document.body.classList.add('dark-theme');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.body.classList.remove('dark-theme');
-        localStorage.setItem('theme', 'light');
-      }
-    });
-
-    loadTheme();
 
   </script>
 
