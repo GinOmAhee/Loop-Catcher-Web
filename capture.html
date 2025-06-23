@@ -25,6 +25,15 @@
     color: #333;
   }
 
+  :root {
+    --editor-bg: white;
+    --editor-text: #222;
+  }
+
+  body.dark-theme {
+    --editor-bg: #222;
+    --editor-text: #ddd;
+  }
   #mainEditor {
     background: #fffdf5;
     border: 1px solid #e0dcbf;
@@ -219,12 +228,6 @@
     --tab-bg: #f9f9f9;
     --tab-text: #333;
     --tab-border: #ccc;
-  }
-
-  body.dark-theme {
-    --tab-bg: #120321;
-    --tab-text: #eee;
-    --tab-border: #555;
   }
 
   .controls {
@@ -486,11 +489,6 @@
     transform: translateX(25px);
   }
 
-  body.dark-theme {
-    background-color: #0e161a;
-    color: #f1f1f1;
-  }
-
   body.dark-theme button {
     background: #1e1e1e;
     color: #f1f1f1;
@@ -657,7 +655,8 @@
         font-size: 0.9rem;
         border: 1px solid #ccc;
         border-radius: 8px;
-        background: white;
+        background: var(--editor-bg);
+        color: var(--editor-text);
         overflow-y: auto;
       "></div>
 
