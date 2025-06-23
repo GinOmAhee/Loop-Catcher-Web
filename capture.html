@@ -657,24 +657,23 @@
             if (e.key === "Escape") renderTabs(); // cancel rename
           });
 
-          input.addEventListener("blur", () => {
-            console.log("📌 blur triggered");
+          input.addEventListener("blur", (e) => {
+            console.log("📌 blur triggered"); // check console
+            const newTitle = e.target.value.trim();
 
-            const newTitle = input.value.trim();
             if (newTitle && newTitle !== tab.title) {
               tabs[index].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
+              console.log("✅ title saved:", newTitle);
+            } else {
+              console.log("❌ title unchanged");
             }
-            setTimeout(() => renderTabs(), 50);
-          });
-
-          tabBtn.replaceChild(input, tabLabel);
 
           setTimeout(() => {
-            input.focus();
-            input.select();
-          }, 0);
-        });
+            renderTabs();
+          }, 150); // delay helps avoid racing the blur
+          });
+
 
         tabBar.appendChild(tabBtn);
       });
