@@ -685,6 +685,8 @@
               console.log("❌ title unchanged or empty");
             }
 
+            isRenamingTab = false; // <- This line is CRITICAL
+
             setTimeout(() => renderTabs(), 100);
           });
 
