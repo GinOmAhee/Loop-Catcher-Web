@@ -679,11 +679,18 @@
 
           document.body.style.pointerEvents = "none"; // 🚫 briefly disable clicks
           
+          console.log("👁️ Input right before focus:", input);
+          
           setTimeout(() => {
-            input.focus();
-            input.select();
-            document.body.style.pointerEvents = "auto"; // ✅ re-enable clicks
-          }, 50); // a short delay is enough—50 milliseconds is super quick
+            const testInput = document.querySelector('.tab-rename-input');
+            console.log("🔍 Found in DOM after insert:", testInput);
+            if (testInput) {
+              testInput.focus();
+              testInput.select();
+            } else {
+              console.warn("❌ Input was removed before it could be focused");
+            }
+          }, 100);
         });
       });
 
