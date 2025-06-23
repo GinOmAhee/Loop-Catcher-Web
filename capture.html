@@ -152,18 +152,6 @@
     background-color: var(--tab-active-bg);
   }
 
-  .tab.add-tab {
-    font-size: 1.2rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    padding: 0;
-    margin-left: 0.5rem;
-  }
-
   /* === ADD TAB BUTTON === */
   .add-tab-btn {
     margin-left: auto;
@@ -626,6 +614,7 @@
     let activeTabIndex = 0;
 
     function renderTabs() {
+      console.log("🔄 Rendering tabs...");
       const tabBar = document.querySelector(".tab-bar");
       if (!tabBar) {
         console.warn("⚠️ Tab bar element not found in the DOM.");
