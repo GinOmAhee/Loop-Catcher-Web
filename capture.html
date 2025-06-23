@@ -660,6 +660,7 @@
 
         tabLabel.addEventListener("dblclick", (e) => {
           e.stopPropagation();
+          isRenamingTab = true; // 👈 this is what's missing right now!
           console.log("🖱️ Double-clicked on tab:", tab.title);
 
           const input = document.createElement("input");
