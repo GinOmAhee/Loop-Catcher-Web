@@ -659,6 +659,10 @@
             renderTabs();
           };
 
+          console.log("Replacing this:", tabLabel);
+          console.log("From inside:", tabBtn);
+          console.log("Is child?", tabBtn.contains(tabLabel));
+
           tabBtn.replaceChild(input, tabLabel);
           input.focus();
 
