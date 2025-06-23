@@ -651,6 +651,10 @@
             if (e.key === "Escape") renderTabs(); // Cancel edit
           };
 
+          input.addEventListener("input", () => {
+            console.log("Typing...", input.value);
+          });
+
           input.onblur = () => {
             tab.title = input.value.trim() || tab.title;
             renderTabs();
@@ -661,7 +665,7 @@
           console.log("Is child?", tabBtn.contains(tabLabel));
 
           tabBtn.replaceChild(input, tabLabel);
-          input.focus();
+          setTimeout(() => input.focus(), 0); // Delays focus just one tick
 
           console.log("Input added:", input);
           console.log("tabBtn innerHTML:", tabBtn.innerHTML);
