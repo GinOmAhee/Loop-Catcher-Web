@@ -129,6 +129,10 @@
 
   .tab,
   .tab.add-tab {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    min-width: 80px;
     padding: 0.5rem 1rem;
     margin-right: 4px;
     border-radius: 8px 8px 0 0;
@@ -176,10 +180,13 @@
   }
 
   .tab-rename-input {
-    background: lightyellow;
-    border: 2px solid red;
-    font-size: 1rem;
     width: 100%;
+    min-width: 60px;
+    font-size: 1rem;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    background: #fffbe6;
     box-sizing: border-box;
   }
 
