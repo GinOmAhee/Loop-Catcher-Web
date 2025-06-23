@@ -210,6 +210,23 @@
     background: rgba(255, 255, 255, 0.1);
   }
 
+  .tab {
+    background-color: var(--tab-bg);
+    color: var(--tab-text);
+  }
+
+  :root {
+    --tab-bg: #f9f9f9;
+    --tab-text: #333;
+    --tab-border: #ccc;
+  }
+
+  body.dark-theme {
+    --tab-bg: #120321;
+    --tab-text: #eee;
+    --tab-border: #555;
+  }
+
   .controls {
     display: flex;
     gap: 1rem;
