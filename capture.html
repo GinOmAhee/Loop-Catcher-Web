@@ -193,7 +193,7 @@
     padding: 0.2rem;
   }
 
-  .tab button {
+  .tab-close-btn {
     all: unset;
     font-size: 0.85rem;
     margin-left: 6px;
@@ -710,21 +710,8 @@
           }, 100);
         });
 
-        const minimizeBtn = document.createElement("button");
-        minimizeBtn.innerText = "➖";
-        minimizeBtn.className = "tab-minimize-btn";
-        minimizeBtn.title = "Minimize Tab";
-        minimizeBtn.onclick = (e) => {
-          e.stopPropagation();
-          if (activeTabIndex === index) {
-            tabs[activeTabIndex].content = mainEditor.innerHTML;
-            mainEditor.innerHTML = "";
-            saveStatus.innerText = `🗂️ "${tab.title}" minimized.`;
-          }
-        };
-
         const closeBtn = document.createElement("button");
-        closeBtn.innerText = "✖";
+        closcloseBtn.innerText = "⨯"; // tight and clean
         closeBtn.className = "tab-close-btn";
         closeBtn.title = "Close Tab";
         closeBtn.onclick = (e) => {
@@ -743,7 +730,6 @@
         };
 
         tabBtn.appendChild(tabLabel);
-        tabBtn.appendChild(minimizeBtn);
         tabBtn.appendChild(closeBtn);
         tabBar.appendChild(tabBtn);
       });
