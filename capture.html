@@ -607,6 +607,7 @@
     }
 
     function maybeClosePreview(e) {
+      if (e.target.classList.contains("tab-rename-input")) return;
       if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
         preview.style.display = 'none';
       }
@@ -674,11 +675,15 @@
 
           tabBtn.replaceChild(input, tabLabel);
           console.log("🧪 tabBtn children after replace:", tabBtn.innerHTML);
+          input.addEventListener("focus", () => console.log("🎯 Input received focus"));
+
+          document.body.style.pointerEvents = "none"; // 🚫 briefly disable clicks
           
           setTimeout(() => {
             input.focus();
             input.select();
-          }, 0);
+            document.body.style.pointerEvents = "auto"; // ✅ re-enable clicks
+          }, 50); // a short delay is enough—50 milliseconds is super quick
         });
       });
 
