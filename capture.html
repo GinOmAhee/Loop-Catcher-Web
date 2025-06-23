@@ -636,20 +636,17 @@
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
         tabLabel.className = "tab-label";
-        tabBtn.appendChild(tabLabel);
 
         tabLabel.addEventListener("click", () => switchTab(index));
 
         tabLabel.addEventListener("dblclick", (e) => {
           e.stopPropagation();
+          console.log("🖱️ Double-clicked on tab:", tab.title);
 
-        
           const input = document.createElement("input");
           input.className = "tab-rename-input";
           input.value = tab.title;
 
-          input.className = "tab-rename-input";
-          
           input.addEventListener("click", (e) => e.stopPropagation());
 
           input.addEventListener("keydown", (e) => {
@@ -658,31 +655,27 @@
           });
 
           input.addEventListener("blur", (e) => {
-            console.log("📌 blur triggered"); // check console
-            const newTitle = e.target.value.trim();
+            console.log("📌 blur triggered");
 
+            const newTitle = e.target.value.trim();
             if (newTitle && newTitle !== tab.title) {
               tabs[index].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
-              console.log("✅ title saved:", newTitle);
-            } else {
-              console.log("❌ title unchanged");
+              console.log("✅ title updated to:", newTitle);
             }
 
-            setTimeout(() => {
-              renderTabs();
-            }, 150); // delay helps avoid racing the blur
+            setTimeout(() => renderTabs(), 100);
           });
 
-          tabBtn.replaceChild(input, tabLabel);
-
+          tabBtn.replaceChild(input, tabLabel); // ✅ safe now
           setTimeout(() => {
             input.focus();
             input.select();
           }, 0);
         });
 
-        tabBar.appendChild(tabBtn);
+        tabBtn.appendChild(tabLabel); // 👈 make sure this happens BEFORE replaceChild is called
+        tabBar.appendChild(tabBtn);   // 👈 only after tabBtn is fully ready
       });
 
       const addTabBtn = document.createElement("div");
