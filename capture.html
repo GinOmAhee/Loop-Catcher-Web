@@ -638,9 +638,6 @@
         tabLabel.innerText = tab.title;
         tabBtn.appendChild(tabLabel);
 
-        // 🖱️ Switch tabs on click
-        tabBtn.onclick = () => switchTab(index);
-
         // ✏️ Inline edit on double-click
         tabLabel.ondblclick = (e) => {
           e.stopPropagation(); // Prevent triggering switchTab
@@ -649,23 +646,24 @@
           input.value = tab.title;
           input.className = "tab-rename-input";
 
-          // Replace label with input
-          tabBtn.replaceChild(input, tabLabel);
-          input.focus();
+          input.onclick = (e) => e.stopPropagation(); // 🛑 Important fix
+          input.onkeydown = (e) => {
+            if (e.key === "Enter") input.blur();
+            if (e.key === "Escape") renderTabs(); // Cancel edit
+          };
 
-          // 💾 Save new title
           input.onblur = () => {
-            const newTitle = input.value.trim() || tab.title;
-            tabs[index].title = newTitle;
+            tab.title = input.value.trim() || tab.title;
             renderTabs();
           };
 
-          input.onkeydown = (e) => {
-            if (e.key === "Enter") input.blur();
-            if (e.key === "Escape") renderTabs(); // cancel
-          };
+          tabBtn.replaceChild(input, tabLabel);
+          input.focus();
         };
 
+        tabBtn.onclick = () => switchTab(index); // ✅ Happens only if you’re not renaming
+
+        tabBtn.appendChild(tabLabel);
         tabBar.appendChild(tabBtn);
       });
 
