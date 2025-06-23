@@ -192,6 +192,13 @@
     box-sizing: border-box;
   }
 
+  .tab-label {
+    pointer-events: auto !important;
+    user-select: text !important;
+    cursor: text;
+    padding: 0.2rem;
+  }
+
   .controls {
     display: flex;
     gap: 1rem;
@@ -617,19 +624,10 @@
     let activeTabIndex = 0;
 
     function renderTabs() {
-      console.log("🔄 Rendering tabs...");
       const tabBar = document.querySelector(".tab-bar");
-      if (!tabBar) {
-        console.warn("⚠️ Tab bar element not found in the DOM.");
-        return;
-      }
+      if (!tabBar) return;
 
-      if (document.querySelector(".tab-rename-input")) {
-        console.warn("⛔ Skipping render: rename input active");
-        return;
-      }
-
-      tabBar.innerHTML = ""; // Clear old tabs
+      tabBar.innerHTML = "";
 
       tabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
@@ -639,45 +637,42 @@
         tabLabel.innerText = tab.title;
         tabLabel.className = "tab-label";
 
-        // ✅ Clicking the label switches tabs
-        tabLabel.onclick = () => switchTab(index);
+        tabLabel.addEventListener("click", () => switchTab(index));
 
-        // ✅ Double-click to rename
-        tabLabel.ondblclick = (e) => {
+        tabLabel.addEventListener("dblclick", (e) => {
           e.stopPropagation();
 
           const input = document.createElement("input");
-          input.type = "text";
-          input.value = tab.title;
           input.className = "tab-rename-input";
+          input.value = tab.title;
 
-          input.onclick = (e) => e.stopPropagation();
+          input.addEventListener("click", (e) => e.stopPropagation());
 
-          input.onkeydown = (e) => {
+          input.addEventListener("keydown", (e) => {
             if (e.key === "Enter") input.blur();
             if (e.key === "Escape") renderTabs();
-          };
+          });
 
-          input.onblur = () => {
-            setTimeout(() => {
-              tab.title = input.value.trim() || tab.title;
-              renderTabs();
-            }, 200);
-          };
+          input.addEventListener("blur", () => {
+            const newTitle = input.value.trim();
+            if (newTitle) {
+              tab.title = newTitle;
+              localStorage.setItem('tabs', JSON.stringify(tabs));
+            }
+            renderTabs();
+          });
 
-          tabLabel.replaceWith(input);
-          // ✅ Now that input exists in the DOM, we can safely focus/select
+          tabBtn.replaceChild(input, tabLabel);
           setTimeout(() => {
             input.focus();
-            input.select(); // 🔥 Highlight all text for quick rename
+            input.select();
           }, 0);
-        };
+        });
 
         tabBtn.appendChild(tabLabel);
         tabBar.appendChild(tabBtn);
       });
 
-      // ➕ Add-tab button
       const addTabBtn = document.createElement("div");
       addTabBtn.innerText = "+";
       addTabBtn.className = "tab add-tab";
