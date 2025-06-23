@@ -624,6 +624,11 @@
         return;
       }
 
+      if (document.querySelector(".tab-rename-input")) {
+        console.warn("⛔ Skipping render: rename input active");
+        return;
+      }
+
       tabBar.innerHTML = ""; // Clear old tabs
 
       tabs.forEach((tab, index) => {
