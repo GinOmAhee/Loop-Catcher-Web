@@ -627,7 +627,11 @@
       const tabBar = document.querySelector(".tab-bar");
       if (!tabBar) return;
 
-      if (document.querySelector(".tab-rename-input")) return;
+      // Prevent re-render only if rename input exists AND it's already in the DOM
+      if (document.activeElement && document.activeElement.classList.contains("tab-rename-input")) {
+        console.warn("⛔ Skipping render: rename input is active");
+        return;
+      }
 
       tabBar.innerHTML = "";
 
