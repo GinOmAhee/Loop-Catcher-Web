@@ -622,7 +622,7 @@
 
     function safeRenderTabs() {
       if (!isRenamingTab) {
-        safeRenderTabs();
+        renderTabs(); // ✅ Call the real function that draws the tabs
       } else {
         console.warn("⛔ renderTabs() skipped due to active rename");
       }
