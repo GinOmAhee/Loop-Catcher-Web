@@ -568,6 +568,10 @@
     </div>
   </div>
 
+  <!-- Your main HTML content above -->
+
+<input type="text" placeholder="Test input" style="position:fixed; top:10px; left:10px; z-index:9999;">
+
 </body>
 
   <script>
@@ -640,12 +644,9 @@
 
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
-        tabBtn.appendChild(tabLabel);
+        tabLabel.className = "tab-label"; // optional styling class
 
-        // Single-click: switch tab
-        tabLabel.onclick = () => switchTab(index);
-
-        // Double-click: rename tab
+        // ✅ Attach inline rename logic to the LABEL
         tabLabel.ondblclick = (e) => {
           e.stopPropagation();
 
@@ -658,20 +659,21 @@
 
           input.onkeydown = (e) => {
             if (e.key === "Enter") input.blur();
-            if (e.key === "Escape") renderTabs();
+            if (e.key === "Escape") renderTabs(); // cancel rename
           };
 
           input.onblur = () => {
-            setTimeout(() => {
-              tab.title = input.value.trim() || tab.title;
-              renderTabs();
-            }, 200); // Short delay to stabilize focus
+            tab.title = input.value.trim() || tab.title;
+            renderTabs();
           };
 
           tabLabel.replaceWith(input);
           setTimeout(() => input.focus(), 0);
         };
 
+        tabBtn.onclick = () => switchTab(index); // ✅ Clicking anywhere on the tab switches
+
+        tabBtn.appendChild(tabLabel);
         tabBar.appendChild(tabBtn);
       });
 
