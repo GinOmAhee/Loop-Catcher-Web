@@ -636,11 +636,12 @@
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
         tabBtn.appendChild(tabLabel);
-        
+
         tabLabel.onclick = () => switchTab(index);
 
         // ✏️ Inline edit on double-click
         tabLabel.ondblclick = (e) => {
+          console.log("Double-click triggered!");
           e.stopPropagation(); // Prevent triggering switchTab
           const input = document.createElement("input");
           input.type = "text";
