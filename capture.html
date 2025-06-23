@@ -663,6 +663,11 @@
           });
 
           input.onblur = () => {
+            setTimeout(() => {
+              tab.title = input.value.trim() || tab.title;
+              renderTabs();
+            }, 300); // ⏳ short delay;
+            
             tab.title = input.value.trim() || tab.title;
             renderTabs();
           };
