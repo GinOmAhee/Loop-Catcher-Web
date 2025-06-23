@@ -627,6 +627,8 @@
       const tabBar = document.querySelector(".tab-bar");
       if (!tabBar) return;
 
+      if (document.querySelector(".tab-rename-input")) return;
+
       tabBar.innerHTML = "";
 
       tabs.forEach((tab, index) => {
@@ -661,7 +663,9 @@
             if (newTitle && newTitle !== tab.title) {
               tabs[index].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
-              console.log("✅ title updated to:", newTitle);
+              console.log("✅ title saved:", newTitle);
+            } else {
+              console.log("❌ title unchanged or empty");
             }
 
             setTimeout(() => renderTabs(), 100);
