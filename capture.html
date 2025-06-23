@@ -175,6 +175,17 @@
     background: #fff176;
   }
 
+  .tab-rename-input {
+    font-size: 0.9rem;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+    background: #fff;
+    color: #333;
+  }
+
     .controls {
       display: flex;
       gap: 1rem;
@@ -614,26 +625,49 @@
         return;
       }
 
+      
       tabBar.innerHTML = ""; // Clear old tabs
+
       tabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
-        tabBtn.innerText = tab.title;
         tabBtn.className = "tab" + (index === activeTabIndex ? " active" : "");
+
+        const tabLabel = document.createElement("span");
+        tabLabel.innerText = tab.title;
+        tabBtn.appendChild(tabLabel);
+
+        // 🖱️ Switch tabs on click
         tabBtn.onclick = () => switchTab(index);
 
-        // ✨ Double-click to rename
-        tabBtn.ondblclick = () => {
-          const newTitle = prompt("Rename this tab:", tab.title);
-          if (newTitle && newTitle.trim()) {
-            tabs[index].title = newTitle.trim();
-            renderTabs(); // Re-render with updated name
-          }
+        // ✏️ Inline edit on double-click
+        tabLabel.ondblclick = (e) => {
+          e.stopPropagation(); // Prevent triggering switchTab
+          const input = document.createElement("input");
+          input.type = "text";
+          input.value = tab.title;
+          input.className = "tab-rename-input";
+
+          // Replace label with input
+          tabBtn.replaceChild(input, tabLabel);
+          input.focus();
+
+          // 💾 Save new title
+          input.onblur = () => {
+            const newTitle = input.value.trim() || tab.title;
+            tabs[index].title = newTitle;
+            renderTabs();
+          };
+
+          input.onkeydown = (e) => {
+            if (e.key === "Enter") input.blur();
+            if (e.key === "Escape") renderTabs(); // cancel
+          };
         };
 
         tabBar.appendChild(tabBtn);
       });
 
-      // Re-add the ➕ add-tab button
+      // ➕ Add-tab button
       const addTabBtn = document.createElement("div");
       addTabBtn.innerText = "+";
       addTabBtn.className = "tab add-tab";
