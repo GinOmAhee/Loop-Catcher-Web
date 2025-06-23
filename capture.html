@@ -620,6 +620,14 @@
     ];
     let activeTabIndex = 0;
 
+    function safeRenderTabs() {
+      if (!isRenamingTab) {
+        safeRenderTabs();
+      } else {
+        console.warn("⛔ renderTabs() skipped due to active rename");
+      }
+    }
+
     function renderTabs() {
       if (isRenamingTab) {
         console.warn("⛔ Skipping renderTabs(): rename input is still active");
@@ -712,7 +720,7 @@
       tabs[activeTabIndex].content = mainEditor.innerHTML;
       activeTabIndex = index;
       mainEditor.innerHTML = tabs[index].content;
-      renderTabs();
+      safeRenderTabs();
     }
 
     function addNewTab() {
@@ -725,7 +733,7 @@
 
     document.body.className = ""; // Remove old
     document.body.classList.add(newThemeClass); // Add new
-    renderTabs(); // Re-render tabs to refresh their classes if needed
+    safeRenderTabs(); // Re-render tabs to refresh their classes if needed
 
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
@@ -958,13 +966,13 @@
         tabs = savedTabs;
         activeTabIndex = savedIndex;
         mainEditor.innerHTML = tabs[activeTabIndex].content;
-        renderTabs();
+        safeRenderTabs();
 
       } else {
         // ✅ in case there's nothing saved yet
         tabs = [{ title: "Note 1", content: "" }];
         activeTabIndex = 0;
-        renderTabs(); // safely render fresh default
+        safeRenderTabs(); // safely render fresh default
       }
 
       if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
