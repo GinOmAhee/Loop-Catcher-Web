@@ -636,20 +636,20 @@
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
         tabLabel.className = "tab-label";
+        tabBtn.appendChild(tabLabel);
 
         tabLabel.addEventListener("click", () => switchTab(index));
 
         tabLabel.addEventListener("dblclick", (e) => {
           e.stopPropagation();
 
+        
           const input = document.createElement("input");
           input.className = "tab-rename-input";
           input.value = tab.title;
-          input.style.minWidth = "60px";
-          input.style.padding = "2px";
-          input.style.fontSize = "inherit";
-          input.style.fontWeight = "bold";
 
+          input.className = "tab-rename-input";
+          
           input.addEventListener("click", (e) => e.stopPropagation());
 
           input.addEventListener("keydown", (e) => {
@@ -659,17 +659,16 @@
 
           input.addEventListener("blur", () => {
             console.log("📌 blur triggered");
+
             const newTitle = input.value.trim();
             if (newTitle && newTitle !== tab.title) {
               tabs[index].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
             }
-            setTimeout(() => renderTabs(), 100);
+            setTimeout(() => renderTabs(), 50);
           });
 
-          tabBtn.replaceChild(tabLabel, tabLabel); // Just to prevent accidental nesting
-          tabBtn.replaceChild(input, tabLabel); // Replace the label with input
-          tabBtn.onclick = null;
+          tabBtn.replaceChild(input, tabLabel);
 
           setTimeout(() => {
             input.focus();
@@ -677,7 +676,6 @@
           }, 0);
         });
 
-        tabBtn.appendChild(tabLabel);
         tabBar.appendChild(tabBtn);
       });
 
