@@ -26,6 +26,17 @@
   }
 
   #mainEditor {
+    background: #fffdf5;
+    border: 1px solid #e0dcbf;
+    padding: 1rem;
+    border-radius: 0 0 6px 6px;
+    min-height: 300px;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #333;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.05);
+
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
     background-size: 100% 1.5em;
   }
@@ -131,7 +142,7 @@
   .tab.add-tab {
     display: inline-flex;
     align-items: center;
-    position: relative;
+    flex: none;
     min-width: 80px;
     padding: 0.5rem 1rem;
     margin-right: 4px;
@@ -168,243 +179,235 @@
   }
 
   .tab-rename-input {
+    font-weight: bold;
+    font-family: inherit;
+    color: var(--tab-text);
+    font-size: inherit;
     width: 100%;
     min-width: 60px;
-    font-size: 1rem;
-    padding: 0.2rem 0.4rem;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    background: #fffbe6;
+    padding: 0.25rem 0.4rem;
+    border: 1px solid var(--tab-border, #ccc);
+    border-radius: 6px;
+    background: #fffef8;
     box-sizing: border-box;
   }
 
-    .controls {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
-      align-items: center;
-    }
+  .controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    align-items: center;
+  }
 
-    .controls button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+  .controls button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
 
-    .save-time {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #666;
-    }
+  .save-time {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
 
-    .preview-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 420px;
-      height: 100vh;
-      background: #fff;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      z-index: 999;
-      display: none;
-      flex-direction: column;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.85rem; /* uniform size */
-    }
+  .preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 420px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    display: none;
+    flex-direction: column;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem; /* uniform size */
+  }
 
-    /* Nav Links (top + bottom) */
-    .preview-top a,
-    .preview-settings a {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.5rem 0.8rem;
-      margin: 0.25rem 0;
-      font-weight: 600;
-      color: #444;
-      text-decoration: none;
-      border-radius: 6px;
-      background: #fff;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-      transition: all 0.2s ease;
-    }
+  /* Nav Links (top + bottom) */
+  .preview-top a,
+  .preview-settings a {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.8rem;
+    margin: 0.25rem 0;
+    font-weight: 600;
+    color: #444;
+    text-decoration: none;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+  }
 
-    .preview-top a:hover,
-    .preview-settings a:hover {
-      background-color: #f3f3f3;
-      transform: translateX(2px);
-    }
+  .preview-top a:hover,
+  .preview-settings a:hover {
+    background-color: #f3f3f3;
+    transform: translateX(2px);
+  }
 
-    /* Main preview content */
-    .preview-middle {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow: hidden;
-    }
+  /* Main preview content */
+  .preview-middle {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
 
-    #groupedNotes {
-      flex: 1 1 auto;
-      overflow-y: auto;
-      padding: 0.8rem 1rem 0.4rem;
-    }
+  #groupedNotes {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0.8rem 1rem 0.4rem;
+  }
 
-    /* Sorting and search bar */
-    .preview-sortbar {
-      margin: 0.3rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.85rem;
-    }
+  /* Sorting and search bar */
+  .preview-sortbar {
+    margin: 0.3rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+  }
 
-    .preview-sortbar label {
-      font-size: 0.85rem;
-    }
+  .preview-sortbar label {
+    font-size: 0.85rem;
+  }
 
-    .preview-sortbar select {
-      font-size: 0.85rem;
-      background: transparent;
-      border: none;
-      outline: none;
-      cursor: pointer;
-      padding: 0.3rem 0.5rem;
-      border-radius: 5px;
-      background-color: #f2f2f2;
-      color: #333;
-    }
+  .preview-sortbar select {
+    font-size: 0.85rem;
+    background: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    color: #333;
+  }
 
-    /* Bottom search bar */
-    .preview-sortbar.bottom-searchbar {
-      padding: 0.6rem 1rem;
-      margin-top: 0.2rem;
-      border-top: 1px solid #ddd;
-      background: #fafafa;
-    }
+  /* Bottom search bar */
+  .preview-sortbar.bottom-searchbar {
+    padding: 0.6rem 1rem;
+    margin-top: 0.2rem;
+    border-top: 1px solid #ddd;
+    background: #fafafa;
+  }
 
-    /* Search Input */
-    #searchInput {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 0.45rem 0.7rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background: #fff;
-      font-size: 0.85rem;
-    }
+  /* Search Input */
+  #searchInput {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 0.85rem;
+  }
 
-    #searchInput:focus {
-      outline: none;
-      border-color: #999;
-      box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.1);
-    }
+  #searchInput:focus {
+    outline: none;
+    border-color: #999;
+    box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.1);
+  }
 
-    #previewToggle {
-      position: absolute;
-      left: 1rem;
-      top: 1rem;
-    }
+  #previewToggle {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+  }
 
-    #attachedFilesList {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #444;
-      max-width: 60%;
-      word-wrap: break-word;
-    }
+  #attachedFilesList {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #444;
+    max-width: 60%;
+    word-wrap: break-word;
+  }
 
-    #attachedFilesList ul {
-      padding-left: 1.2rem;
-    }
+  #attachedFilesList ul {
+    padding-left: 1.2rem;
+  }
 
-    .file-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+  .file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-    .file-item span {
-      flex: 1;
-    }
+  .file-item span {
+    flex: 1;
+  }
 
-    .file-item button {
-      background: none;
-      border: none;
-      color: red;
-      cursor: pointer;
-    }
+  .file-item button {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+  }
 
-    .preview-bottom {
-      padding: 1rem;
-      border-top: 1px solid #ccc;
-      background: #fafafa;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
+  .preview-bottom {
+    padding: 1rem;
+    border-top: 1px solid #ccc;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-    .preview-bottom input[type="text"] {
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-      padding: 0.3rem 0.5rem;
-      font-size: 1rem;
-    }
-    mark {
-     background: yellow;
-     padding: 0 2px;
-     border-radius: 3px;
-    }
-    .dropdown {
-      position: absolute;
-      background: white;
-      border: 1px solid #ccc;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      border-radius: 5px;
-      padding: 0.3rem 0;
-      font-size: 0.85rem;
-      z-index: 999;
-    }
+  .preview-bottom input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0.3rem 0.5rem;
+    font-size: 1rem;
+  }
 
-    .dropdown div {
-      padding: 0.4rem 1rem;
-      cursor: pointer;
-    }
+  mark {
+    background: yellow;
+    padding: 0 2px;
+    border-radius: 3px;
+  }
 
-    .dropdown div:hover {
-      background-color: #eee;
-    }
+  .dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    border-radius: 5px;
+    padding: 0.3rem 0;
+    font-size: 0.85rem;
+    z-index: 999;
+  }
 
-    #tabBar button {
-     background: none;
-     border: none;
-     font-size: 1.2rem;
-     cursor: pointer;
-     color: #666;
-    }
+  .dropdown div {
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+  }
 
-    #tabBar button:hover {
-     color: #000;
-    }
+  .dropdown div:hover {
+    background-color: #eee;
+  }
 
-    .hidden {
-      display: none;
-    }
+  #tabBar button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+  }
 
-    #mainEditor {
-      background: #fffdf5;
-      border: 1px solid #e0dcbf;
-      padding: 1rem;
-      border-radius: 0 0 6px 6px;
-      min-height: 300px;
-      font-family: 'Courier New', monospace;
-      font-size: 1rem;
-      line-height: 1.5;
-      color: #333;
-      box-shadow: inset 0 0 4px rgba(0,0,0,0.05);
-    }
+  #tabBar button:hover {
+    color: #000;
+  }
+
+  .hidden {
+    display: none;
+  }
 
   </style>
 </head>
