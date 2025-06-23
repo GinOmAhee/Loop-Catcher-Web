@@ -654,21 +654,23 @@
 
           input.addEventListener("keydown", (e) => {
             if (e.key === "Enter") input.blur();
-            if (e.key === "Escape") renderTabs();
+            if (e.key === "Escape") renderTabs(); // cancel rename
           });
 
           input.addEventListener("blur", () => {
+            console.log("📌 blur triggered");
             const newTitle = input.value.trim();
             if (newTitle && newTitle !== tab.title) {
               tabs[index].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
             }
-
-            // 👇 Give DOM time to chill before re-render
             setTimeout(() => renderTabs(), 100);
           });
 
-          tabBtn.replaceChild(input, tabLabel);
+          tabBtn.replaceChild(tabLabel, tabLabel); // Just to prevent accidental nesting
+          tabBtn.replaceChild(input, tabLabel); // Replace the label with input
+          tabBtn.onclick = null;
+
           setTimeout(() => {
             input.focus();
             input.select();
