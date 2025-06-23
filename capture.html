@@ -631,7 +631,7 @@
 
       tabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
-        tabBtn.className = "tab" + (index === activeTabIndex ? " active" : "");
+        tabBtn.className = "tab";
 
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
@@ -645,6 +645,10 @@
           const input = document.createElement("input");
           input.className = "tab-rename-input";
           input.value = tab.title;
+          input.style.minWidth = "60px";
+          input.style.padding = "2px";
+          input.style.fontSize = "inherit";
+          input.style.fontWeight = "bold";
 
           input.addEventListener("click", (e) => e.stopPropagation());
 
@@ -655,11 +659,13 @@
 
           input.addEventListener("blur", () => {
             const newTitle = input.value.trim();
-            if (newTitle) {
-              tab.title = newTitle;
-              localStorage.setItem('tabs', JSON.stringify(tabs));
+            if (newTitle && newTitle !== tab.title) {
+              tabs[index].title = newTitle;
+              localStorage.setItem("tabs", JSON.stringify(tabs));
             }
-            renderTabs();
+
+            // 👇 Give DOM time to chill before re-render
+            setTimeout(() => renderTabs(), 100);
           });
 
           tabBtn.replaceChild(input, tabLabel);
@@ -926,15 +932,21 @@
       const lastSaved = localStorage.getItem('lastSaved');
       const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
 
-    if (savedTabs.length) {
-      tabs = savedTabs;
-      activeTabIndex = savedIndex;
-      mainEditor.innerHTML = tabs[activeTabIndex].content;
-      renderTabs();
-    }
+      if (savedTabs.length) {
+        tabs = savedTabs;
+        activeTabIndex = savedIndex;
+        mainEditor.innerHTML = tabs[activeTabIndex].content;
+        renderTabs();
 
-    if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
-    updateFileDisplay(attached);
+      } else {
+        // ✅ in case there's nothing saved yet
+        tabs = [{ title: "Note 1", content: "" }];
+        activeTabIndex = 0;
+        renderTabs(); // safely render fresh default
+      }
+
+      if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+      updateFileDisplay(attached);
     }
 
     function toggleVoiceCapture() {
