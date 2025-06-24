@@ -99,10 +99,6 @@
     text-shadow: none !important;
   }
 
-  body.dark-theme .preview-overlay h4 {
-    color: #eee;
-  }
-
   body.dark-theme .preview-top a:hover,
   body.dark-theme .preview-settings a:hover {
     background-color: #222;
@@ -438,15 +434,6 @@
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-  }
-
-  .preview-overlay h4 {
-    font-weight: 500;
-    color: #222;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    margin: 0.6rem 0 0.2rem;
   }
 
   .note-preview {
@@ -847,38 +834,36 @@
       if (themeClass) document.body.classList.add(themeClass);
     }
 
-    const switchEl = document.getElementById('themeSwitch');
+    document.addEventListener('DOMContentLoaded', () => {
+      const switchEl = document.getElementById('themeSwitch');
 
-    // Load saved theme or default to system
-    function loadTheme() {
-      const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      function loadTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
 
-      const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-
-      if (useDark) {
-        document.body.classList.add('dark-theme');
-        switchEl.checked = true; // Visually turn the switch ON
-      } else {
-       document.body.classList.remove('dark-theme');
-       switchEl.checked = false; // Visually turn the switch OFF
+        if (useDark) {
+          document.body.classList.add('dark-theme');
+          switchEl.checked = true;
+        } else {
+          document.body.classList.remove('dark-theme');
+          switchEl.checked = false;
+        }
       }
-    }
 
-    // Watch toggle switch
-    switchEl.addEventListener('change', () => {
-      if (switchEl.checked) {
-        document.body.classList.add('dark-theme');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.body.classList.remove('dark-theme');
-        localStorage.setItem('theme', 'light');
-      }
+      switchEl.addEventListener('change', () => {
+        if (switchEl.checked) {
+          document.body.classList.add('dark-theme');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          document.body.classList.remove('dark-theme');
+          localStorage.setItem('theme', 'light');
+        }
+      });
+
+      applyMoodTheme(); // This should already exist globally
+      loadTheme();
     });
-
-    // Apply mood theme first, then theme preference
-    applyMoodTheme();
-    loadTheme();
 
     function maybeClosePreview(e) {
       if (e.target.classList.contains("tab-rename-input")) return;
@@ -1605,7 +1590,7 @@
         });
 
         for (const date in grouped) {
-          html += `<h4>🗓️ ${date}</h4><ul>`;
+          html += `<h5>🗓️ ${date}</h5><ul>`;
           grouped[date].forEach(note => {
           html += `
             <li style="margin-bottom:1rem; display: flex; align-items: start;">
