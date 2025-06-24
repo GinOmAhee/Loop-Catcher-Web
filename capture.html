@@ -153,6 +153,14 @@
     background-color: #333;
   }
 
+  body.dark-theme .note-preview {
+    color: #ddd; /* or #f1f1f1 if you want max contrast */
+  }
+
+  :root {
+    --preview-text-color: #333;
+  }
+
   /* === THEME CLASSES === */
   .theme-calm {
     --tab-bg: #dceefb;
@@ -405,6 +413,15 @@
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+  }
+
+  .note-preview {
+    flex: 1;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    color: var(--preview-text-color); /* Add fallback below */
   }
 
   #groupedNotes {
@@ -1559,7 +1576,7 @@
             <li style="margin-bottom:1rem; display: flex; align-items: start;">
               <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
               <div 
-                style="flex: 1; cursor: pointer;" 
+                class="note-preview" 
                 onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
                 ${highlightText(note.text, searchKeyword)}
               </div>
@@ -1584,7 +1601,7 @@
               <li style="margin-bottom:1rem; display: flex; align-items: start;">
                 <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
                 <div 
-                  style="flex: 1; cursor: pointer;" 
+                  class="note-preview" 
                   onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
                   ${highlightText(note.text, searchKeyword)}
                 </div>
@@ -1607,7 +1624,7 @@
             <li style="margin-bottom:1rem; display: flex; align-items: start;">
               <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
               <div 
-                style="flex: 1; cursor: pointer;" 
+                class="note-preview" 
                 onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
                 ${highlightText(note.text, searchKeyword)}
               </div>
@@ -1632,7 +1649,7 @@
             <li style="margin-bottom:1rem; display: flex; align-items: start;">
               <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
               <div 
-                style="flex: 1; cursor: pointer;" 
+                class="note-preview" 
                 onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
                 ${highlightText(note.text, searchKeyword)}
               </div>
