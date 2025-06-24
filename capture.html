@@ -1021,6 +1021,13 @@
           setTimeout(() => {
             input.focus();
             input.select();
+
+            if (document.body.classList.contains("dark-theme")) {
+              input.style.background = "#1e1e1e";
+              input.style.color = "#eee";
+              input.style.border = "1px dashed hotpink";
+              input.style.caretColor = "hotpink";
+            }
           }, 100);
         });
 
