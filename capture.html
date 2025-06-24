@@ -666,12 +666,15 @@
       }
     }
 
+    const switchEl = document.getElementById('themeSwitch');
+
     const theme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (theme === 'dark' || (!theme && prefersDark)) {
       document.documentElement.classList.add('dark-theme');
+      if (switchEl) switchEl.checked = true;
     }
-
+    
     const moodThemeMap = {
       "Calm & Clear": "theme-calm",
       "Focused & Strategic": "theme-strategic",
@@ -721,8 +724,6 @@
     // Apply mood theme first, then theme preference
     applyMoodTheme();
     loadTheme();
-
-    const switchEl = document.getElementById('themeSwitch');
 
     function maybeClosePreview(e) {
       if (e.target.classList.contains("tab-rename-input")) return;
