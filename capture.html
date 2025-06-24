@@ -141,14 +141,18 @@
     color: #eee;
   }
 
-  select {
+  body.dark-theme select {
+    background-color: #1e1e1e;
+    color: #eee;
+    border: 1px solid #444;
+    padding-right: 1.5rem; /* leaves space for the arrow */
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    appearance: none;
-    padding-right: 1.5rem; /* so arrow doesn’t overlap text */
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%23eee" ... />');
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23ccc" viewBox="0 0 24 24" ... />');
     background-repeat: no-repeat;
     background-position: right 0.5rem center;
+    background-size: 1rem;
   }
 
   body.dark-theme .preview-sortbar,
@@ -466,6 +470,16 @@
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+  }
+
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 1.5rem; /* so arrow doesn’t overlap text */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23eee" ... />');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
   }
 
   .note-preview {
