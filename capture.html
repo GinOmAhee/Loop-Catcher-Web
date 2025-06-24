@@ -62,6 +62,24 @@
     caret-color: #eee !important;
   }
 
+  body.dark-theme .preview-overlay {
+    background: rgba(20, 20, 20, 0.95); /* darker overlay */
+    color: #ddd; /* adjust text if needed */
+  }
+
+  body.dark-theme .preview-overlay input,
+  body.dark-theme .preview-overlay textarea {
+    background: #222;
+    color: #eee;
+    border: 1px solid #444;
+  }
+
+  body.dark-theme .preview-overlay button {
+    background-color: #333;
+    color: #f1f1f1;
+    border: 1px solid #555;
+  }
+
   /* === THEME CLASSES === */
   .theme-calm {
     --tab-bg: #dceefb;
@@ -648,7 +666,11 @@
       }
     }
 
-    const switchEl = document.getElementById('themeSwitch');
+    const theme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (theme === 'dark' || (!theme && prefersDark)) {
+      document.documentElement.classList.add('dark-theme');
+    }
 
     const moodThemeMap = {
       "Calm & Clear": "theme-calm",
@@ -667,10 +689,6 @@
       if (themeClass) {
         document.body.classList.add(themeClass);
       }
-    }
-
-    if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark-theme');
     }
 
     // Load saved theme or default to system
@@ -703,6 +721,8 @@
     // Apply mood theme first, then theme preference
     applyMoodTheme();
     loadTheme();
+
+    const switchEl = document.getElementById('themeSwitch');
 
     function maybeClosePreview(e) {
       if (e.target.classList.contains("tab-rename-input")) return;
