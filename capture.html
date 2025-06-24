@@ -198,9 +198,9 @@
   .main-container {
     display: flex;
     height: 100vh;
-    overflow: hidden;
   }
   .editor-area {
+    overflow-y: auto; /* Add this if you want scrolling here */
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -217,6 +217,9 @@
     padding-left: 0.5rem;
     margin-bottom: 0.5rem;
     border-bottom: 2px solid #ccc;
+    position: sticky;
+    top: 0;
+    z-index: 10; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
