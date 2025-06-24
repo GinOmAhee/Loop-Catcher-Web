@@ -26,12 +26,12 @@
   }
 
   :root {
-    --editor-bg: none;
+    --editor-bg: white;
     --editor-text: #222;
   }
 
   body.dark-theme {
-    --editor-bg: #1f2f35;
+    --editor-bg: #000000;
     --editor-text: #ddd;
   }
 
@@ -223,18 +223,6 @@
   .tab {
     background-color: var(--tab-bg);
     color: var(--tab-text);
-  }
-
-  :root {
-    --tab-bg: #f9f9f9;
-    --tab-text: #333;
-    --tab-border: #ccc;
-  }
-
-  body.dark-theme {
-    --tab-bg: #000c10;
-    --tab-text: #eee;
-    --tab-border: #555;
   }
 
   .controls {
@@ -526,6 +514,18 @@
     background: #222 !important;
     color: #ddd !important;
     caret-color: #eee !important;
+  }
+
+  :root {
+    --tab-bg: #f9f9f9;
+    --tab-text: #333;
+    --tab-border: #ccc;
+  }
+
+  body.dark-theme {
+    --tab-bg: #000c10;
+    --tab-text: #eee;
+    --tab-border: #555;
   }
 
   </style>
