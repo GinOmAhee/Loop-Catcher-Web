@@ -142,6 +142,17 @@
     box-shadow: 0 2px 6px rgba(255,255,255,0.1);
   }
 
+  /* 🖤 DARK THEME */
+  body.dark-theme .dropdown {
+    background: #1a1a1a;
+    border-color: #444;
+    color: #f1f1f1;
+  }
+
+  body.dark-theme .dropdown div:hover {
+    background-color: #333;
+  }
+
   /* === THEME CLASSES === */
   .theme-calm {
     --tab-bg: #dceefb;
@@ -1631,27 +1642,7 @@
       }
 
        html += `
-         <button
-           class="delete-notes-btn"
-           onclick="deleteSelectedNotes()" 
-           title="Delete Selected" 
-           style="
-             position: sticky;
-             bottom: 10px;
-             right: 10px;
-             float: right;
-             background: #d46a6a;
-             color: white;
-             border: none;
-             border-radius: 5px;
-             padding: 0.5rem 1rem;
-             font-size: 1rem;
-             cursor: pointer;
-             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-             z-index: 999;
-           ">
-           🗑️
-         </button>
+         <button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>
        `;
 
        groupedNotes.innerHTML = html;
