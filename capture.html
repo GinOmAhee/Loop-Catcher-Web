@@ -69,12 +69,11 @@
   }
 
   body.dark-theme .tab.active {
-    background-color: #2d3b44 !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    border-bottom: inset 0 -1px 0 hotpink;
-    box-shadow: 0 2px 8px rgba(0, 188, 212, 0.2) !important;
-    z-index: 9999 !important;
+    background-color: var(--tab-active-bg);
+    color: #fff;
+    font-weight: 600;
+    border-bottom: 2px dashed hotpink; /* or change to #ff69b4, #e75480, etc. */
+    outline: none;
   }
 
   body.dark-theme .preview-overlay {
