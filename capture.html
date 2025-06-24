@@ -86,6 +86,19 @@
     border-color: #555;
   }
 
+  body.dark-theme .preview-top a,
+  body.dark-theme .preview-settings a {
+    background: #111; /* or #1a1a1a if you want a softer black */
+    color: #eee;
+    box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
+  }
+
+  body.dark-theme .preview-top a:hover,
+  body.dark-theme .preview-settings a:hover {
+    background-color: #222;
+    transform: translateX(2px);
+  }
+
   /* === THEME CLASSES === */
   .theme-calm {
     --tab-bg: #dceefb;
