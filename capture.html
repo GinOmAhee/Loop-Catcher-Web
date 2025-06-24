@@ -990,6 +990,13 @@
           input.className = "tab-rename-input";
           input.value = tab.title;
 
+          if (document.body.classList.contains("dark-theme")) {
+            input.style.background = "#1e1e1e";
+            input.style.color = "#eee";
+            input.style.border = "1px dashed hotpink";
+            input.style.caretColor = "hotpink";
+          }
+
           input.addEventListener("click", (e) => e.stopPropagation());
 
           input.addEventListener("keydown", (e) => {
