@@ -916,6 +916,10 @@
         const tabBtn = document.createElement("div");
         tabBtn.className = "tab";
 
+        if (index === activeTabIndex) {
+          tabBtn.classList.add("active");
+        }
+
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
         tabLabel.className = "tab-label";
