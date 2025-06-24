@@ -86,6 +86,11 @@
     border-color: #555;
   }
 
+  body.dark-theme #searchInput:focus {
+    border-color: #888;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+  }
+
   body.dark-theme .preview-top a,
   body.dark-theme .preview-settings a {
     background: #111; /* or #1a1a1a if you want a softer black */
@@ -97,6 +102,23 @@
   body.dark-theme .preview-settings a:hover {
     background-color: #222;
     transform: translateX(2px);
+  }
+
+  body.dark-theme .dropdown {
+    background: #1e1e1e;
+    color: #eee;
+    border-color: #444;
+  }
+
+  body.dark-theme .dropdown div:hover {
+   background-color: #333;
+  }
+
+  body.dark-theme .preview-sortbar,
+  body.dark-theme .preview-sortbar.bottom-searchbar {
+    background: #121212;
+    color: #eee;
+    border-top: 1px solid #444;
   }
 
   /* === THEME CLASSES === */
