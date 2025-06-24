@@ -134,6 +134,13 @@
   body.dark-theme.theme-strategic #groupedNotes {
     color: #eee;
   }
+  
+  /* 💡 Dark theme override */
+  body.dark-theme .delete-notes-btn {
+    background: #aa4444;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(255,255,255,0.1);
+  }
 
   /* === THEME CLASSES === */
   .theme-calm {
@@ -298,6 +305,24 @@
     border: 1px solid #ccc;
     cursor: pointer;
   }
+
+  .delete-notes-btn {
+    position: sticky;
+    bottom: 10px;
+    right: 10px;
+    float: right;
+    background: #d46a6a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    z-index: 999;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
   .controls {
     display: flex;
     gap: 1rem;
@@ -1606,7 +1631,8 @@
       }
 
        html += `
-         <button 
+         <button
+           class="delete-notes-btn"
            onclick="deleteSelectedNotes()" 
            title="Delete Selected" 
            style="
