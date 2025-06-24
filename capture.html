@@ -122,6 +122,19 @@
     border-top: none;
   }
 
+  body.dark-theme #groupedNotes {
+    color: #f1f1f1; /* or whatever light color suits your theme */
+  }
+
+  body.dark-theme #groupedNotes li,
+  body.dark-theme #groupedNotes div {
+    color: #f1f1f1;
+  }
+
+  body.dark-theme.theme-strategic #groupedNotes {
+    color: #eee;
+  }
+
   /* === THEME CLASSES === */
   .theme-calm {
     --tab-bg: #dceefb;
@@ -527,7 +540,7 @@
   .preview-settings a,
   #groupedNotes,
   #searchInput {
-    color: #222; /* you can lighten this if needed */
+    color: #dddddd; /* you can lighten this if needed */
     font-weight: 500; /* or 400 for a softer look */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
