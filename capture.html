@@ -528,6 +528,19 @@
     --tab-border: #555;
   }
 
+  .tab.active {
+    background-color: var(--tab-active-bg);
+  }
+
+  :root {
+    --tab-active-bg: #fff; /* light mode active tab */
+  }
+
+  body.dark-theme {
+    --tab-active-bg: #2d3b44;
+    --tab-text: #eee;
+  }
+
   </style>
 </head>
 <body>
@@ -749,12 +762,14 @@
       const savedTheme = localStorage.getItem('theme');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+
+      if (useDark) {
         document.body.classList.add('dark-theme');
-        switchEl.checked = true;
+        switchEl.checked = true; // Visually turn the switch ON
       } else {
-        document.body.classList.remove('dark-theme');
-        switchEl.checked = false;
+       document.body.classList.remove('dark-theme');
+       switchEl.checked = false; // Visually turn the switch OFF
       }
     }
 
