@@ -74,9 +74,13 @@
 
   body.dark-theme .tab-rename-input {
     background: #1e1e1e;
-    border: 1px dashed hotpink;
     color: #eee;
+    border: 1px dashed hotpink;
     caret-color: hotpink;
+    outline: none;
+    box-shadow: 0 0 0 1px hotpink; /* optional: soft focus ring */
+    transition: all 0.2s ease-in-out;
+
     position: relative;
     z-index: 9999;
     display: block;
@@ -375,7 +379,7 @@
     cursor: pointer;
     transition: background 0.2s ease;
   }
-  
+
   .tab button:hover {
     background: rgba(255, 255, 255, 0.1);
   }
