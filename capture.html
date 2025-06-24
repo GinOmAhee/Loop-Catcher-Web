@@ -72,14 +72,6 @@
     box-shadow: inset 0 -2px 0 hotpink;
   }
 
-  body:not(.dark-theme) .tab-rename-input {
-    background: lightgoldenrodyellow;
-    border: 2px dashed red;
-    position: relative;
-    z-index: 9999;
-    display: block;
-  }
-
   body.dark-theme .tab-rename-input {
     background: #1e1e1e;
     border: 1px dashed hotpink;
@@ -351,22 +343,26 @@
   .tab:hover {
     background-color: var(--tab-hover);
   }
+
   .tab.active {
     background-color: var(--tab-active-bg);
   }
-  .tab-rename-input {
-    background: lightgoldenrodyellow !important;
-    border: 2px dashed red !important;
-    position: relative !important;
-    z-index: 9999 !important;
-    display: block !important;
+
+  body:not(.dark-theme) .tab-rename-input {
+    background: lightgoldenrodyellow;
+    border: 2px dashed red;
+    position: relative;
+    z-index: 9999;
+    display: block;
   }
+
   .tab-label {
     pointer-events: auto !important;
     user-select: text !important;
     cursor: text;
     padding: 0.2rem;
   }
+
   .tab-close-btn {
     all: unset;
     font-size: 0.85rem;
@@ -379,6 +375,7 @@
     cursor: pointer;
     transition: background 0.2s ease;
   }
+  
   .tab button:hover {
     background: rgba(255, 255, 255, 0.1);
   }
