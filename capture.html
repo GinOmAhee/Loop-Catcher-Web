@@ -737,11 +737,13 @@
       const vibe = localStorage.getItem('vibeLabel');
       const themeClass = moodThemeMap[vibe];
 
-      Object.values(moodThemeMap).forEach(cls => document.body.classList.remove(cls));
+      // Remove all mood theme classes first
+      Object.values(moodThemeMap).forEach(cls =>
+        document.body.classList.remove(cls)
+      );
 
-      if (themeClass) {
-        document.body.classList.add(themeClass);
-      }
+      // Add the selected theme class
+      if (themeClass) document.body.classList.add(themeClass);
     }
 
     const switchEl = document.getElementById('themeSwitch');
