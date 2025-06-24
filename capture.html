@@ -130,6 +130,27 @@
    background-color: #333;
   }
 
+  body.dark-theme select {
+    background-color: #1e1e1e;
+    color: #eee;
+    border: 1px solid #444;
+  }
+
+  body.dark-theme select option {
+    background-color: #1e1e1e;
+    color: #eee;
+  }
+
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 1.5rem; /* so arrow doesn’t overlap text */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23eee" ... />');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+  }
+
   body.dark-theme .preview-sortbar,
   body.dark-theme .preview-sortbar.bottom-searchbar {
     background: transparent;
