@@ -171,6 +171,36 @@
     border-top: none;
   }
 
+  .search-dropdown {
+    border: none;
+    background: transparent;
+    color: var(--text-color, #f0f0f0); /* Light text for dark background */
+    appearance: none;
+    padding: 0.6rem;
+    padding-right: 1.5rem;
+    font-size: 0.95rem;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  /* Caret for dark background */
+  .preview-sortbar.bottom-searchbar::after {
+    content: "▾"; /* Elegant, non-solid caret */
+    font-size: 0.85rem;
+    color: var(--text-color, #f0f0f0);
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  /* Optional: override the container background */
+  .preview-sortbar.bottom-searchbar {
+    background: #1e1e1e;
+    border-top: 1px solid #333;
+  }
+
   body.dark-theme #groupedNotes {
     color: #f1f1f1; /* or whatever light color suits your theme */
   }
@@ -528,6 +558,30 @@
     background: #fafafa;
   }
 
+  .search-dropdown {
+    border: none;
+    background: transparent;
+    color: var(--text-color, #333); /* Fallback if you're not using CSS vars */
+    appearance: none;
+    padding: 0.6rem;
+    padding-right: 1.5rem;
+    font-size: 0.95rem;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  /* Pseudo-element to create the non-solid caret */
+  .preview-sortbar.bottom-searchbar::after {
+    content: "▾"; /* You can also try ˅ or ⌄ */
+    font-size: 0.85rem;
+    color: var(--text-color, #333);
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
   #searchInput {
     width: 100%;
     box-sizing: border-box;
@@ -736,20 +790,11 @@
 
       <!-- 3. Bottom: search input anchored in its own bar -->
       <div class="preview-sortbar bottom-searchbar" style="display: flex; gap: 0.5rem;">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="🔍 Search notes..."
-          oninput="updateGrouping()"
-          style="flex: 1; padding: 0.5rem; font-size: 1rem;" />
-    
-        <select
-          id="searchScope"
-          onchange="updateGrouping()"
-          style="padding: 0.5rem; font-size: 1rem; border-radius: 5px; border: 1px solid #ccc;">
-          <option value="group">🔍 In Group</option>
-          <option value="all">🌐 All Notes</option>
-        </select>
+        <input id="searchInput" type="text" placeholder="Search notes..." />
+        <select id="searchScope" class="search-dropdown">
+         <option value="group">Grouped</option>
+         <option value="all">Search All</option>
+       </select>
       </div>
 
       <!-- 4. Very bottom: settings/profile links -->
