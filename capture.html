@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -648,13 +649,8 @@
     font-size: 1rem;
   }
   
-  mark {
-    background: linear-gradient(
-      90deg,
-    hotpink 0%,
-    deeppink 50%,
-    hotpink 100%
-    );
+  .highlight-glow {
+    background: linear-gradient(90deg, hotpink 0%, deeppink 50%, hotpink 100%);
     background-size: 200% auto;
     color: white;
     padding: 0 2px;
@@ -662,13 +658,9 @@
     animation: shimmerPulse 1.4s ease-in-out infinite alternate;
   }
 
-  /* Keyframes for shimmer animation */
-  @keyframes shimmerPulse {
-    0% {
-      background-position: 0% center;
-    }
-    100% {
-      background-position: 100% center;
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
     }
   }
 
@@ -1311,7 +1303,7 @@
       const selectedText = range.extractContents();
 
       const mark = document.createElement("mark");
-      mark.style.backgroundColor = color;
+      mark.classList.add("highlight-glow");
       mark.appendChild(selectedText);
 
       range.insertNode(mark);
