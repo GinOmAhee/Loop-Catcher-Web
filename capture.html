@@ -649,10 +649,23 @@
     font-size: 1rem;
   }
 
-   mark {
-    background: yellow;
+  .highlight-glow {
+    display: inline-block;
+    background: linear-gradient(90deg, hotpink 0%, deeppink 50%, hotpink 100%);
+    background-size: 200% auto;
+    color: white;
     padding: 0 2px;
     border-radius: 3px;
+    animation: shimmerPulse 1.4s ease-in-out infinite alternate;
+  }
+
+  @keyframes shimmerPulse {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 100% center;
+    }
   }
 
   /* === DROPDOWN MENU === */
@@ -1294,7 +1307,9 @@
       const selectedText = range.extractContents();
 
       const mark = document.createElement("mark");
-      mark.style.backgroundColor = color;
+      requestAnimationFrame(() => {
+        mark.classList.add("highlight-glow");
+      });
       mark.appendChild(selectedText);
 
       range.insertNode(mark);
@@ -1744,7 +1759,7 @@
         if (!keyword) return escapeHTML(text).replace(/\n/g, "<br>");
         const safe = escapeHTML(text);
         const regex = new RegExp(`(${keyword})`, "gi");
-        return safe.replace(regex, "<mark>$1</mark>").replace(/\n/g, "<br>");
+        return safe.replace(regex, '<mark class="highlight-glow">$1</mark>').replace(/\n/g, "<br>"); 
       };
 
       let filteredNotes;
