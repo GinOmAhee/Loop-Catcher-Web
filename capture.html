@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -583,7 +584,9 @@
   }
 
   #searchInput:focus {
-    box-shadow: 0 0 0 6px hotpink;
+    outline: none;
+    border-color: transparent; /* or keep it if needed */
+    box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.4); /* hot pink glow */
   }
 
   /* Dropdown styled like it's inside the same input */
@@ -749,6 +752,14 @@
     
   body.dark-theme select {
     box-shadow: inset 0 -1px 0 hotpink;
+  }
+
+  #searchInput:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 4px hotpink !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: hotpink !important;
   }
 
   </style>
