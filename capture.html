@@ -724,6 +724,7 @@
         <span title="Group Notes">📂</span>
         <select id="groupSelector" onchange="updateGrouping()">
           <option value="date">Date</option>
+          <option value="title">Title</option>
           <option value="project">Project</option>
           <option value="unresolved">Unresolved Ideas</option>
           <option value="forgotten">Forgotten Ideas</option>
@@ -1702,6 +1703,36 @@
           });
           html += "</ul>";
         }
+
+      else if (groupBy === "title") {
+        const grouped = {};
+
+        filteredNotes.forEach(note => {
+          // Get first letter of the note's content (text), fallback to "?"
+          const firstChar = (note.text || "?").trim().charAt(0).toUpperCase() || "?";
+
+          if (!grouped[firstChar]) grouped[firstChar] = [];
+          grouped[firstChar].push(note);
+        });
+
+        const sortedLetters = Object.keys(grouped).sort();
+
+        sortedLetters.forEach(letter => {
+          html += `<h4>📘 ${letter}</h4><ul>`;
+          grouped[letter].forEach(note => {
+            html += `
+              <li style="margin-bottom:1rem; display: flex; align-items: start;">
+                <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
+                <div 
+                  class="note-preview" 
+                  onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
+                  ${highlightText(note.text, searchKeyword)}
+                </div>
+              </li>`;
+            });
+            html += "</ul>";
+        });
+      }
 
       } else if (groupBy === "project") {
         const grouped = {};
