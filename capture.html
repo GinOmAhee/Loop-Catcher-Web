@@ -201,6 +201,10 @@
     border-top: 1px solid #333;
   }
 
+  body.dark-theme .search-wrapper::after {
+    color: var(--text-color, #f1f1f1);
+  }
+
   body.dark-theme #groupedNotes {
     color: #f1f1f1; /* or whatever light color suits your theme */
   }
@@ -558,39 +562,47 @@
     background: #fafafa;
   }
 
-  .search-dropdown {
+  .search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-color, #ccc);
+    border-radius: 6px;
+    background: var(--input-bg, #fafafa);
+    overflow: hidden;
+  }
+
+  /* Input takes up most space */
+  #searchInput {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
     border: none;
     background: transparent;
-    color: var(--text-color, #333); /* Fallback if you're not using CSS vars */
-    appearance: none;
-    padding: 0.6rem;
-    padding-right: 1.5rem;
-    font-size: 0.95rem;
-    z-index: 1;
-    cursor: pointer;
+    color: var(--text-color, #333);
+    font-size: 1rem;
   }
 
-  /* Pseudo-element to create the non-solid caret */
-  .preview-sortbar.bottom-searchbar::after {
-    content: "▾"; /* You can also try ˅ or ⌄ */
+  /* Dropdown styled like it's inside the same input */
+  .search-dropdown {
+    border: none;
+    padding: 0.6rem 1.5rem 0.6rem 0.6rem;
+    background: transparent;
+    color: var(--text-color, #333);
+    appearance: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  /* Caret overlay */
+  .search-wrapper::after {
+    content: "▾";
+    position: absolute;
+    right: 0.75rem;
     font-size: 0.85rem;
     color: var(--text-color, #333);
-    position: absolute;
-    right: 1.25rem;
-    top: 50%;
-    transform: translateY(-50%);
     pointer-events: none;
   }
-
-  #searchInput {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0.45rem 0.7rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background: #fff;
-    font-size: 0.85rem;
-  }
+  
   #searchInput:focus {
     outline: none;
     border-color: #999;
@@ -789,12 +801,14 @@
       <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
 
       <!-- 3. Bottom: search input anchored in its own bar -->
-      <div class="preview-sortbar bottom-searchbar" style="display: flex; gap: 0.5rem;">
-        <input id="searchInput" type="text" placeholder="Search notes..." />
-        <select id="searchScope" class="search-dropdown">
-         <option value="group">Grouped</option>
-         <option value="all">Search All</option>
-       </select>
+      <div class="preview-sortbar bottom-searchbar">
+        <div class="search-wrapper">
+          <input id="searchInput" type="text" placeholder="Search notes..." />
+          <select id="searchScope" class="search-dropdown">
+            <option value="group">Grouped</option>
+            <option value="all">Search All</option>
+          </select>
+        </div>
       </div>
 
       <!-- 4. Very bottom: settings/profile links -->
