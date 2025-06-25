@@ -1286,6 +1286,7 @@
      projectName = projectName?.trim() || "📂 Unlabeled";
 
      console.log("📝 Saving note from tab:", tabs[activeTabIndex]);
+     const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
 
      const newNote = {
        text: noteHTML,
