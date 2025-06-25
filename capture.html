@@ -1703,17 +1703,29 @@
               const title = note.title?.toLowerCase() || "";
               const project = note.project?.toLowerCase() || "";
               return `${text} ${title} ${project}`.includes(searchKeyword);
-          })
-        : notes;
-    } else {
-      // Default: Search only within the currently grouped field (your current logic)
-      filteredNotes = searchKeyword
-        ? notes.filter(note =>
-            note.text?.toLowerCase().includes(searchKeyword) ||
-            (note.project && note.project.toLowerCase().includes(searchKeyword))
-          )
-        : notes;
-    }
+            })
+          : notes;
+      } else {
+        // Default: Search only within the currently grouped field (your current logic)
+        filteredNotes = searchKeyword
+          ? notes.filter(note =>
+              note.text?.toLowerCase().includes(searchKeyword) ||
+              (note.project && note.project.toLowerCase().includes(searchKeyword))
+            )
+          : notes;
+      }
+
+      const now = Date.now();
+
+      // 💡 Grouping logic starts here
+      if (groupBy === "date") {
+        const grouped = {};
+
+        filteredNotes.forEach(note => {
+          const date = new Date(note.timestamp || note.time).toLocaleDateString();
+          if (!grouped[date]) grouped[date] = [];
+          grouped[date].push(note);
+        });
 
         for (const date in grouped) {
           html += `<h4>🗓️ ${date}</h4><ul>`;
