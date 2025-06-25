@@ -1363,7 +1363,7 @@
 
       mainEditor.innerHTML = '';
       tabs[activeTabIndex].content = '';
-      tabs[activeTabIndex].title = 'Note 1';
+      tabs[activeTabIndex].title = 'Untitled';
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
