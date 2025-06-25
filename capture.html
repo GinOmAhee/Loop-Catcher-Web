@@ -1715,11 +1715,10 @@
         const grouped = {};
 
         filteredNotes.forEach(note => {
-          const title = (note.title || note.text || "Untitled").trim();
-          const groupKey = title || "Untitled";
+          const title = (note.title || "Untitled").trim();
 
-          if (!grouped[groupKey]) grouped[groupKey] = [];
-          grouped[groupKey].push(note);
+          if (!grouped[title]) grouped[title] = [];
+          grouped[title].push(note);
         });
 
         const sortedTitles = Object.keys(grouped).sort();
