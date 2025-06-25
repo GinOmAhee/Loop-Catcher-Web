@@ -1715,18 +1715,18 @@
         const grouped = {};
 
         filteredNotes.forEach(note => {
-          // Get first letter of the note's content (text), fallback to "?"
-          const firstChar = (note.text || "?").trim().charAt(0).toUpperCase() || "?";
+          const title = (note.title || note.text || "Untitled").trim();
+          const groupKey = title || "Untitled";
 
-          if (!grouped[firstChar]) grouped[firstChar] = [];
-          grouped[firstChar].push(note);
+          if (!grouped[groupKey]) grouped[groupKey] = [];
+          grouped[groupKey].push(note);
         });
 
-        const sortedLetters = Object.keys(grouped).sort();
+        const sortedTitles = Object.keys(grouped).sort();
 
-        sortedLetters.forEach(letter => {
-          html += `<h4>📘 ${letter}</h4><ul>`;
-          grouped[letter].forEach(note => {
+        sortedTitles.forEach(title => {
+          html += `<h4>📘 ${escapeHTML(title)}</h4><ul>`;
+          grouped[title].forEach(note => {
             html += `
               <li style="margin-bottom:1rem; display: flex; align-items: start;">
                 <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
@@ -1736,8 +1736,8 @@
                   ${highlightText(note.text, searchKeyword)}
                 </div>
               </li>`;
-            });
-            html += "</ul>";
+          });
+          html += "</ul>";
         });
 
       } else if (groupBy === "project") {
