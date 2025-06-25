@@ -735,13 +735,18 @@
       <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
 
       <!-- 3. Bottom: search input anchored in its own bar -->
-      <div class="preview-sortbar bottom-searchbar">
+      <div class="preview-sortbar bottom-searchbar" style="display: flex; gap: 0.5rem;">
         <input
           type="text"
           id="searchInput"
           placeholder="🔍 Search notes..."
           oninput="updateGrouping()"
-          style="width: 100%; padding: 0.5rem; font-size: 1rem;" />
+          style="flex: 1; padding: 0.5rem; font-size: 1rem;" />
+    
+        <select id="searchScope" onchange="updateGrouping()" style="padding: 0.5rem; font-size: 1rem;">
+          <option value="group">🔍 In Group</option>
+          <option value="all">🌐 All Notes</option>
+        </select>
       </div>
 
       <!-- 4. Very bottom: settings/profile links -->
@@ -1088,8 +1093,8 @@
     }
 
     function addNewTab() {
-    tabs.push({ title: `Note ${tabs.length + 1}`, content: "" });
-    switchTab(tabs.length - 1); // Switch to new tab
+      tabs.push({ title: "Untitled", content: "" });
+      switchTab(tabs.length - 1); // Switch to new tab
     }
 
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
@@ -1669,6 +1674,7 @@
     function updateGrouping() {
       const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       const searchKeyword = document.getElementById('searchInput').value.toLowerCase().trim();
+      const searchScope = document.getElementById("searchScope")?.value || "group";
       const groupBy = document.getElementById("groupSelector").value;
       let html = "";
 
@@ -1684,23 +1690,27 @@
         return safe.replace(regex, "<mark>$1</mark>").replace(/\n/g, "<br>");
       };
 
-      const filteredNotes = searchKeyword
+      let filteredNotes;
+
+      if (searchScope === "all") {
+        // Search across ALL notes
+        filteredNotes = searchKeyword
+          ? notes.filter(note => {
+              const text = note.text?.toLowerCase() || "";
+              const title = note.title?.toLowerCase() || "";
+              const project = note.project?.toLowerCase() || "";
+              return `${text} ${title} ${project}`.includes(searchKeyword);
+          })
+        : notes;
+    } else {
+      // Default: Search only within the currently grouped field (your current logic)
+      filteredNotes = searchKeyword
         ? notes.filter(note =>
             note.text?.toLowerCase().includes(searchKeyword) ||
             (note.project && note.project.toLowerCase().includes(searchKeyword))
           )
         : notes;
-
-      const now = Date.now();
-
-      if (groupBy === "date") {
-        const grouped = {};
-
-        filteredNotes.forEach(note => {
-          const date = new Date(note.timestamp || note.time).toLocaleDateString();
-          if (!grouped[date]) grouped[date] = [];
-          grouped[date].push(note);
-        });
+    }
 
         for (const date in grouped) {
           html += `<h4>🗓️ ${date}</h4><ul>`;
