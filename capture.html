@@ -123,8 +123,8 @@
   }
 
   body.dark-theme #searchInput:focus {
-    border-color: #888;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+    border-color: hotpink;
+    box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.4); /* hot pink glow */
   }
 
   body.dark-theme .preview-top a,
@@ -584,7 +584,9 @@
   }
 
   #searchInput:focus {
-    box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.6); /* Hot pink glow */
+    outline: none;
+    border-color: transparent; /* or keep it if needed */
+    box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.4); /* hot pink glow */
   }
 
   /* Dropdown styled like it's inside the same input */
