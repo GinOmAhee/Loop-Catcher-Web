@@ -1703,7 +1703,7 @@
               const title = note.title?.toLowerCase() || "";
               const project = note.project?.toLowerCase() || "";
               return `${text} ${title} ${project}`.includes(searchKeyword);
-            })
+          })
           : notes;
         html += `<h4>🌐 Search Results (All Notes)</h4><ul>`;
         filteredNotes.forEach(note => {
