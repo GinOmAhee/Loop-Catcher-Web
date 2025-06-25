@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -565,7 +566,9 @@
     display: flex;
     align-items: center;
     width: 100%;
-    border: none
+    position: relative;         /* Needed for ::after and input glow alignment */
+    overflow: visible;          /* Lets glow shine outside the box */
+    border: none;               /* Fixed the missing semicolon */
     border-radius: 0;
     background: var(--input-bg, #fafafa);
     padding: 0.2rem 0.4rem;
@@ -751,14 +754,6 @@
     
   body.dark-theme select {
     box-shadow: inset 0 -1px 0 hotpink;
-  }
-
-  #searchInput:focus {
-    outline: none !important;
-    box-shadow: 0 0 0 4px hotpink !important;
-    background-color: transparent !important;
-    border: none !important;
-    color: hotpink !important;
   }
 
   </style>
