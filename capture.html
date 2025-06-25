@@ -1339,6 +1339,10 @@
         safeRenderTabs(); // safely render fresh default
       }
 
+      // ✅ Set tab title based on loaded content
+      const text = mainEditor.innerText || "";
+      document.title = text.split("\n")[0]?.trim() || "Note";
+
       if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
       updateFileDisplay(attached);
     }
@@ -1644,6 +1648,13 @@
       preview.style.display = 'none';
       undoStack.push(noteHTML);
       redoStack = [];
+
+      // 💡 Extract the first line to use as tab title
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = noteHTML;
+      const text = tempDiv.innerText || "";
+      const titleLine = text.split("\n")[0]?.trim() || "Note";
+      document.title = titleLine;
     }
 
     function escapeHTML(text) {
@@ -1889,6 +1900,13 @@
         } else {
           console.log("✅ User is signed in:", user.email);
           loadSavedText();
+
+          // 🔄 Keep tab title in sync while typing
+          mainEditor.addEventListener("input", () => {
+          const text = mainEditor.innerText || "";
+          document.title = text.split("\n")[0]?.trim() || "Note";
+          });
+          
           applyMoodTheme();
           updateGrouping();
           safeRenderTabs();
