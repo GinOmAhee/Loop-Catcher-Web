@@ -1901,7 +1901,12 @@
           mainEditor.addEventListener("input", () => {
             const text = mainEditor.innerText || "";
             console.log("Updating title to:", text.split("\n")[0]);
-            document.title = text.split("\n")[0]?.trim() || "Note";
+            
+            if (tabs[activeTabIndex]) {
+              tabs[activeTabIndex].title = title;
+              localStorage.setItem("tabs", JSON.stringify(tabs)); // optional but smart
+              safeRenderTabs(); // 👈 this is what triggers the title to show in your app's tabs
+            }
           });
 
           applyMoodTheme();
