@@ -1280,6 +1280,7 @@
      const newNote = {
        text: noteHTML,
        timestamp: now.toISOString(),
+       title: tabs[activeTabIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
        project: projectName,
        resolved: false,
        tags: []
