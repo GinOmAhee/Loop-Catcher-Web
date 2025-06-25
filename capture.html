@@ -1339,10 +1339,6 @@
         safeRenderTabs(); // safely render fresh default
       }
 
-      // ✅ Set tab title based on loaded content
-      const text = mainEditor.innerText || "";
-      document.title = text.split("\n")[0]?.trim() || "Note";
-
       if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
       updateFileDisplay(attached);
     }
@@ -1903,10 +1899,10 @@
 
           // 🔄 Keep tab title in sync while typing
           mainEditor.addEventListener("input", () => {
-          const text = mainEditor.innerText || "";
-          document.title = text.split("\n")[0]?.trim() || "Note";
+            const text = mainEditor.innerText || "";
+            document.title = text.split("\n")[0]?.trim() || "Note";
           });
-          
+
           applyMoodTheme();
           updateGrouping();
           safeRenderTabs();
