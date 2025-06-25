@@ -1900,6 +1900,7 @@
           // 🔄 Keep tab title in sync while typing
           mainEditor.addEventListener("input", () => {
             const text = mainEditor.innerText || "";
+            console.log("Updating title to:", text.split("\n")[0]);
             document.title = text.split("\n")[0]?.trim() || "Note";
           });
 
