@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,8 +123,8 @@
   }
 
   body.dark-theme #searchInput:focus {
-    border-color: hotpink;
-    box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.4); /* hot pink glow */
+    border-color: #888;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
   }
 
   body.dark-theme .preview-top a,
@@ -586,8 +587,8 @@
 
   #searchInput:focus {
     outline: none;
-    border-color: transparent; /* or keep it if needed */
-    box-shadow: 0 0 0 2px rgba(255, 105, 180, 0.4); /* hot pink glow */
+    border-color: #999;
+    box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.1);
   }
 
   /* Dropdown styled like it's inside the same input */
@@ -647,20 +648,11 @@
     padding: 0.3rem 0.5rem;
     font-size: 1rem;
   }
-  
-  .highlight-glow {
-    background: linear-gradient(90deg, hotpink 0%, deeppink 50%, hotpink 100%);
-    background-size: 200% auto;
-    color: white;
+
+   mark {
+    background: yellow;
     padding: 0 2px;
     border-radius: 3px;
-    animation: shimmerPulse 1.4s ease-in-out infinite alternate;
-  }
-
-  @keyframes fadeIn {
-    to {
-      opacity: 1;
-    }
   }
 
   /* === DROPDOWN MENU === */
@@ -1302,7 +1294,7 @@
       const selectedText = range.extractContents();
 
       const mark = document.createElement("mark");
-      mark.classList.add("highlight-glow");
+      mark.style.backgroundColor = color;
       mark.appendChild(selectedText);
 
       range.insertNode(mark);
