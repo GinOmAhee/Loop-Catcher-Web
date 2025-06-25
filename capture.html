@@ -1705,6 +1705,20 @@
               return `${text} ${title} ${project}`.includes(searchKeyword);
             })
           : notes;
+        html += `<h4>🌐 Search Results (All Notes)</h4><ul>`;
+        filteredNotes.forEach(note => {
+          html += `
+            <li style="margin-bottom:1rem; display: flex; align-items: start;">
+              <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
+              <div 
+                class="note-preview" 
+                onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
+                ${highlightText(note.text, searchKeyword)}
+              </div>
+            </li>`;
+        });
+        html += "</ul>";
+
       } else {
         // Default: Search only within the currently grouped field (your current logic)
         filteredNotes = searchKeyword
@@ -1717,141 +1731,110 @@
 
       const now = Date.now();
 
-      // 💡 Grouping logic starts here
-      if (groupBy === "date") {
-        const grouped = {};
+      if (searchScope !== "all") {
+        // 💡 Grouping logic starts here
+        if (groupBy === "date") {
+          const grouped = {};
 
-        filteredNotes.forEach(note => {
-          const date = new Date(note.timestamp || note.time).toLocaleDateString();
-          if (!grouped[date]) grouped[date] = [];
-          grouped[date].push(note);
-        });
+          filteredNotes.forEach(note => {
+            const date = new Date(note.timestamp || note.time).toLocaleDateString();
+            if (!grouped[date]) grouped[date] = [];
+            grouped[date].push(note);
+          });
 
-        for (const date in grouped) {
-          html += `<h4>🗓️ ${date}</h4><ul>`;
-          grouped[date].forEach(note => {
-          html += `
-            <li style="margin-bottom:1rem; display: flex; align-items: start;">
-              <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-              <div 
-                class="note-preview" 
-                onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
-                ${highlightText(note.text, searchKeyword)}
-              </div>
-            </li>`;
+          for (const date in grouped) {
+            html += `<h4>🗓️ ${date}</h4><ul>`;
+            grouped[date].forEach(note => {
+              html += renderNoteItem(note, searchKeyword);
+            });
+            html += "</ul>";
+          }
+
+        } else if (groupBy === "title") {
+          const grouped = {};
+
+          filteredNotes.forEach(note => {
+            const title = (note.title || "Untitled").trim();
+            if (!grouped[title]) grouped[title] = [];
+            grouped[title].push(note);
+          });
+
+          const sortedTitles = Object.keys(grouped).sort();
+          sortedTitles.forEach(title => {
+            html += `<h4>📘 ${escapeHTML(title)}</h4><ul>`;
+            grouped[title].forEach(note => {
+              html += renderNoteItem(note, searchKeyword);
+            });
+            html += "</ul>";
+          });
+
+        } else if (groupBy === "project") {
+          const grouped = {};
+
+          filteredNotes.forEach(note => {
+            const project = note.project || "📂 Unlabeled";
+            if (!grouped[project]) grouped[project] = [];
+            grouped[project].push(note);
+          });
+
+          for (const project in grouped) {
+            html += `<h4>📁 ${escapeHTML(project)}</h4><ul>`;
+            grouped[project].forEach(note => {
+              html += renderNoteItem(note, searchKeyword);
+            });
+            html += "</ul>";
+          }
+
+        } else if (groupBy === "unresolved") {
+          const unresolved = filteredNotes.filter(note => note.resolved === false);
+          if (unresolved.length === 0) {
+            groupedNotes.innerHTML = "<p>✅ No unresolved notes!</p>";
+            return;
+          }
+
+          html += `<h4>🧩 Unresolved Ideas</h4><ul>`;
+          unresolved.forEach(note => {
+            html += renderNoteItem(note, searchKeyword);
+          });
+          html += "</ul>";
+
+        } else if (groupBy === "forgotten") {
+          const forgotten = filteredNotes.filter(note => {
+            const age = now - new Date(note.timestamp || note.time).getTime();
+            return age > 3 * 24 * 60 * 60 * 1000; // older than 3 days
+          });
+
+          if (forgotten.length === 0) {
+            groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
+            return;
+          }
+
+          html += `<h4>🧠 Forgotten Ideas</h4><ul>`;
+          forgotten.forEach(note => {
+            html += renderNoteItem(note, searchKeyword);
           });
           html += "</ul>";
         }
 
-      } else if (groupBy === "title") {
-        const grouped = {};
+        html += `
+          <button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>
+  `      ;
 
-        filteredNotes.forEach(note => {
-          const title = (note.title || "Untitled").trim();
-
-          if (!grouped[title]) grouped[title] = [];
-          grouped[title].push(note);
-        });
-
-        const sortedTitles = Object.keys(grouped).sort();
-
-        sortedTitles.forEach(title => {
-          html += `<h4>📘 ${escapeHTML(title)}</h4><ul>`;
-          grouped[title].forEach(note => {
-            html += `
-              <li style="margin-bottom:1rem; display: flex; align-items: start;">
-                <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-                <div 
-                  class="note-preview" 
-                  onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
-                  ${highlightText(note.text, searchKeyword)}
-                </div>
-              </li>`;
-          });
-          html += "</ul>";
-        });
-
-      } else if (groupBy === "project") {
-        const grouped = {};
-
-        filteredNotes.forEach(note => {
-          const project = note.project || "📂 Unlabeled";
-          if (!grouped[project]) grouped[project] = [];
-          grouped[project].push(note);
-        });
-
-        for (const project in grouped) {
-          html += `<h4>📁 ${escapeHTML(project)}</h4><ul>`;
-          grouped[project].forEach(note => {
-            html += `
-              <li style="margin-bottom:1rem; display: flex; align-items: start;">
-                <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-                <div 
-                  class="note-preview" 
-                  onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
-                  ${highlightText(note.text, searchKeyword)}
-                </div>
-              </li>`;
-
-          });
-          html += "</ul>";
-        }
-
-      } else if (groupBy === "unresolved") {
-        const unresolved = filteredNotes.filter(note => note.resolved === false);
-        if (unresolved.length === 0) {
-          groupedNotes.innerHTML = "<p>✅ No unresolved notes!</p>";
-          return;
-        }
-
-        html += `<h4>🧩 Unresolved Ideas</h4><ul>`;
-        unresolved.forEach(note => {
-          html += `
-            <li style="margin-bottom:1rem; display: flex; align-items: start;">
-              <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-              <div 
-                class="note-preview" 
-                onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
-                ${highlightText(note.text, searchKeyword)}
-              </div>
-            </li>`;
-        });
-        html += "</ul>";
-
-      } else if (groupBy === "forgotten") {
-        const forgotten = filteredNotes.filter(note => {
-          const age = now - new Date(note.timestamp || note.time).getTime();
-          return age > 3 * 24 * 60 * 60 * 1000; // older than 3 days
-        });
-
-        if (forgotten.length === 0) {
-          groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
-          return;
-        }
-
-        html += `<h4>🧠 Forgotten Ideas</h4><ul>`;
-        forgotten.forEach(note => {
-          html += `
-            <li style="margin-bottom:1rem; display: flex; align-items: start;">
-              <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-              <div 
-                class="note-preview" 
-                onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
-                ${highlightText(note.text, searchKeyword)}
-              </div>
-            </li>`;
-        });
-        html += "</ul>";
+        groupedNotes.innerHTML = html;
       }
 
-       html += `
-         <button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>
-       `;
-
-       groupedNotes.innerHTML = html;
-
+      // Helper to keep note rendering clean
+      function renderNoteItem(note, keyword) {
+        return `
+          <li style="margin-bottom:1rem; display: flex; align-items: start;">
+            <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
+            <div class="note-preview" onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
+              ${highlightText(note.text, keyword)}
+            </div>
+          </li>`;
+      }
     }
-
+    
     function toggleItalic() {
       const selection = window.getSelection();
       if (!selection.rangeCount || selection.isCollapsed) return;
