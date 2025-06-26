@@ -1132,17 +1132,7 @@
         closeBtn.title = "Close Tab";
         closeBtn.onclick = (e) => {
           e.stopPropagation();
-          if (tabs.length === 1) {
-            alert("⚠️ You need at least one tab.");
-            return;
-          }
-
-          tabs.splice(index, 1);
-          if (activeTabIndex >= index) activeTabIndex = Math.max(0, activeTabIndex - 1);
-          localStorage.setItem("tabs", JSON.stringify(tabs));
-          localStorage.setItem("activeTabIndex", activeTabIndex);
-          renderTabs();
-          switchTab(activeTabIndex);
+          closeTab(index);
         };
 
         tabBtn.appendChild(tabLabel);
@@ -1163,6 +1153,31 @@
       mainEditor.innerHTML = tabs[index].content;
       safeRenderTabs();
     }
+
+    function closeTab(index) {
+      if (index === activeTabIndex && hasUnsavedChanges) {
+        const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
+        if (!confirmClose) return;
+      }
+
+      tabs.splice(index, 1);
+
+      // Always have at least one tab
+      if (tabs.length === 0) {
+        tabs.push({ title: "Untitled", content: "" });
+        activeTabIndex = 0;
+      } else if (index <= activeTabIndex) {
+        activeTabIndex = Math.max(0, activeTabIndex - 1);
+      }
+
+      mainEditor.innerHTML = tabs[activeTabIndex].content || "";
+      hasUnsavedChanges = false;
+
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      localStorage.setItem("activeTabIndex", activeTabIndex);
+
+      safeRenderTabs(); // or renderTabs(), depending on your setup
+    } 
 
     let hasUnsavedChanges = false;
 
