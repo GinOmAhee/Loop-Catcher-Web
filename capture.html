@@ -287,101 +287,24 @@
   }
 
   /* === EDITOR & INPUT === */
-  .editor-container {
-    position: relative;
-    width: 60%;
-    margin: 2rem auto;
-  }
-
   #mainEditor {
-    position: relative;
-    width: 100%;
-    background: var(--editor-bg);
+    background: #fffdf5;
     border: 1px solid #e0dcbf;
-    border-radius: 8px;
-    padding: 0rem;
+    border-radius: 0 0 6px 6px;
+    padding: 1rem;
     min-height: 300px;
     font-family: 'Courier New', monospace;
     font-size: 1rem;
     line-height: 1.5;
-    color: var(--editor-text);
-    overflow: visible;
+    color: #333;
     box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
     background-size: 100% 1.5em;
   }
-
-  .editor-margins {
-    position: absolute;
-    inset: 0;
-    pointer-events: none; /* Prevent interference */
-    z-index: 20;
-  }
-
-  .editor-content {
-    min-height: 300px;
-    font-size: 0.9rem;
-    transition: padding 0.2s ease;
-    background: transparent;
-  }
-
-  .margin-handles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 99.99%;
-    pointer-events: none;
-    z-index: 50;
-  }
-
-  .handle {
-    position: absolute;
-    background: hotpink;
-    color: white;
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    cursor: pointer;
-    user-select: none;
-    z-index: 10;
-    pointer-events: auto; /* But allow drag handles to be interactive */
-  }
-
-  .handle span {
-    pointer-events: none;
-  }
-
-  .handle-top    { top: 0;    left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-  .handle-bottom { bottom: 0; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-  .handle-left { 
-    top: 0;
-    left: 0;
-    height: 99.99%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding-left: 4px;
-    transform: none;
-    cursor: ew-resize;
-  }
-
-  .handle-right { 
-    top: 0;
-    right: 0;
-    height: 99.99%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 4px;
-    transform: none;
-    cursor: ew-resize;
-  }
-
   textarea {
     width: 60%;
     height: 300px;
-    padding: 2rem;
+    padding: 1rem;
     font-size: 0.9rem;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -998,27 +921,18 @@
         <button onclick="removeFormatting()">🚫</button>
       </div>
 
-      <div class="margin-presets">
-        <button onclick="applyPreset('normal')">Normal</button>
-        <button onclick="applyPreset('wide')">Wide</button>
-        <button onclick="applyPreset('narrow')">Narrow</button>
-        <button onclick="saveCurrentMargins()">Save My Style</button>
-        <button onclick="loadSavedPreset()">Load My Style</button>
-      </div>
-
-      <div class="editor-container">
-        <div id="mainEditor" contenteditable="true">
-          <div class="editor-content">
-            <!-- user types here -->
-          </div>
-        </div>
-        <div class="margin-handles">
-          <div class="handle handle-top"><span>1.0 in</span></div>
-          <div class="handle handle-right"><span>1.0 in</span></div>
-          <div class="handle handle-bottom"><span>1.0 in</span></div>
-          <div class="handle handle-left"><span>1.0 in</span></div>
-        </div>
-      </div>
+      <!-- 📝 Rich Text Editor -->
+      <div id="mainEditor" contenteditable="true" style="
+        width: 60%;
+        min-height: 300px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: var(--editor-bg);
+        color: var(--editor-text);
+        overflow-y: auto;
+      "></div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -2216,105 +2130,6 @@
        selection.addRange(newRange);
      }
     }
-
-    const presets = {
-      normal: { top: 96, right: 96, bottom: 96, left: 96 },       // 1in
-      wide:   { top: 72, right: 144, bottom: 72, left: 144 },     // 0.75in top/bottom, 1.5in sides
-      narrow: { top: 48, right: 48, bottom: 48, left: 48 }        // 0.5in
-    };
-
-    function applyPreset(name) {
-      const p = presets[name];
-      if (!p) return;
-      applyMargins(p.top, p.right, p.bottom, p.left);
-    }
-
-    function applyMargins(top, right, bottom, left) {
-      const editor = document.querySelector(".editor-content");
-      editor.style.paddingTop = `${top}px`;
-      editor.style.paddingRight = `${right}px`;
-      editor.style.paddingBottom = `${bottom}px`;
-      editor.style.paddingLeft = `${left}px`;
-
-      // Update visual handles too, if needed
-      document.querySelector(".handle-top span").textContent = `${(top / 96).toFixed(1)} in`;
-      document.querySelector(".handle-right span").textContent = `${(right / 96).toFixed(1)} in`;
-      document.querySelector(".handle-bottom span").textContent = `${(bottom / 96).toFixed(1)} in`;
-      document.querySelector(".handle-left span").textContent = `${(left / 96).toFixed(1)} in`;
-    }
-
-    function saveCurrentMargins() {
-      const editor = document.querySelector(".editor-content");
-      const top = parseInt(getComputedStyle(editor).paddingTop);
-      const right = parseInt(getComputedStyle(editor).paddingRight);
-      const bottom = parseInt(getComputedStyle(editor).paddingBottom);
-      const left = parseInt(getComputedStyle(editor).paddingLeft);
-
-      const margins = { top, right, bottom, left };
-      localStorage.setItem("myMarginPreset", JSON.stringify(margins));
-
-      alert("✨ Your margin style has been saved!");
-    }
-
-    function loadSavedPreset() {
-      const stored = localStorage.getItem("myMarginPreset");
-      if (!stored) return alert("You haven't saved a style yet!");
-      const m = JSON.parse(stored);
-      applyMargins(m.top, m.right, m.bottom, m.left);
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      DPI = 96; // 96px per inch
-      const editorContent = document.querySelector(".editor-content");
-      const handles = document.querySelectorAll(".handle");
-
-      let activeHandle = null;
-
-      handles.forEach(handle => {
-        handle.addEventListener("mousedown", () => {
-          activeHandle = handle;
-          document.body.style.userSelect = "none";
-        });
-      });
-
-      document.addEventListener("mouseup", () => {
-        activeHandle = null;
-        document.body.style.userSelect = "";
-      });
-
-      document.addEventListener("mousemove", (e) => {
-        if (!activeHandle) return;
-
-        const container = document.querySelector(".editor-container");
-        const bounds = container.getBoundingClientRect();
-
-        const getInches = (px) => Math.max(0, px / DPI).toFixed(1) + " in";
-
-        if (activeHandle.classList.contains("handle-top")) {
-          const offset = e.clientY - bounds.top;
-          editorContent.style.paddingTop = `${offset}px`;
-          activeHandle.querySelector("span").textContent = getInches(offset);
-        }
-
-        if (activeHandle.classList.contains("handle-bottom")) {
-          const offset = bounds.bottom - e.clientY;
-          editorContent.style.paddingBottom = `${offset}px`;
-          activeHandle.querySelector("span").textContent = getInches(offset);
-        }
-
-        if (activeHandle.classList.contains("handle-left")) {
-          const offset = e.clientX - bounds.left;
-          editorContent.style.paddingLeft = `${offset}px`;
-          activeHandle.querySelector("span").textContent = getInches(offset);
-        }
-
-        if (activeHandle.classList.contains("handle-right")) {
-          const offset = bounds.right - e.clientX;
-          editorContent.style.paddingRight = `${offset}px`;
-          activeHandle.querySelector("span").textContent = getInches(offset);
-        }
-      });
-    });
 
     document.addEventListener("click", () => {
       setTimeout(() => {
