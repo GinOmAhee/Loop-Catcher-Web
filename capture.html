@@ -1111,6 +1111,7 @@
               tabs[index].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
               console.log("✅ title saved:", newTitle);
+              hasUnsavedChanges = true; // <-- 🧠 this is the magic line
             } else {
               console.log("❌ title unchanged or empty");
             }
@@ -1156,6 +1157,10 @@
       addTabBtn.className = "tab add-tab";
       addTabBtn.onclick = addNewTab;
       tabBar.appendChild(addTabBtn);
+    }
+
+    function markUnsaved() {
+      hasUnsavedChanges = true;
     }
 
     function switchTab(index) {
