@@ -809,8 +809,13 @@
       <!-- 3. Bottom: search input anchored in its own bar -->
       <div class="preview-sortbar bottom-searchbar">
         <div class="search-wrapper">
-          <input id="searchInput" type="text" placeholder="Search notes..." />
-          <select id="searchScope" class="search-dropdown">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 Search notes..."
+            oninput="updateGrouping()"  <!-- ← THIS LINE must be here -->
+            style="..." />
+          <select id="searchScope" onchange="updateGrouping()" ...>
             <option value="group">Grouped</option>
             <option value="all">Search All</option>
           </select>
@@ -1794,7 +1799,7 @@
           groupedNotes.innerHTML = html;
           return;
         }
-        
+
         html += renderGroupedSection("🌐", "Search Results (All Notes)", filteredNotes);
       } else {
         const grouped = {};
