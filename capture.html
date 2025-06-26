@@ -1789,6 +1789,12 @@
       let html = "";
 
       if (scope === "all") {
+        if (filteredNotes.length === 0) {
+          html = `<p>😶 No results found for '${escapeHTML(keyword)}'</p>`;
+          groupedNotes.innerHTML = html;
+          return;
+        }
+        
         html += renderGroupedSection("🌐", "Search Results (All Notes)", filteredNotes);
       } else {
         const grouped = {};
