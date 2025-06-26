@@ -344,7 +344,12 @@
   .tab {
     display: inline-flex;
     align-items: center;
-    min-width: 80px;
+    min-width: 100px;
+    max-width: 100px;
+    width: 100px; /* optional for clarity */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     padding: 0.5rem 1rem;
     margin-right: 4px;
     border-radius: 8px 8px 0 0;
@@ -394,6 +399,12 @@
   }
 
   .tab-label {
+    display: inline-block;
+    max-width: 95px; /* or whatever size fits your layout */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
     pointer-events: auto !important;
     user-select: text !important;
     cursor: text;
