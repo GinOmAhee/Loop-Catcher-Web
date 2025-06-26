@@ -859,6 +859,15 @@
         <!-- Icon Button -->
       <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
+      <div class="margin-controls" style="margin-bottom: 0.75rem;">
+        <label>Margins (in inches):</label>
+        <input type="number" step="0.1" min="0" id="marginTop" placeholder="Top" style="width: 3.5rem;" /> in
+        <input type="number" step="0.1" min="0" id="marginRight" placeholder="Right" style="width: 3.5rem;" /> in
+        <input type="number" step="0.1" min="0" id="marginBottom" placeholder="Bottom" style="width: 3.5rem;" /> in
+        <input type="number" step="0.1" min="0" id="marginLeft" placeholder="Left" style="width: 3.5rem;" /> in
+        <button onclick="applyCustomMargins()">Apply</button>
+      </div>
+
       <select id="fontDropdown" onchange="setFont(this.value)">
         <option value="'Arial', sans-serif">Arial</option>
         <option value="'Georgia', serif">Georgia</option>
@@ -922,16 +931,6 @@
       </div>
 
         <button onclick="removeFormatting()">🚫</button>
-      </div>
-
-      <div class="margin-controls" style="margin-bottom: 0.5rem;">
-        <label for="marginSelect">🧾 Margin:</label>
-        <select id="marginSelect" onchange="setDocumentMargin(this.value)">
-          <option value="0.5in">0.5 inch</option>
-          <option value="1in" selected>1 inch</option>
-          <option value="1.5in">1.5 inch</option>
-          <option value="2in">2 inch</option>
-        </select>
       </div>
 
       <!-- 📝 Rich Text Editor -->
@@ -2110,8 +2109,14 @@
      selection.addRange(newRange);
     }
 
-    function setDocumentMargin(size) {
-      document.getElementById("mainEditor").style.padding = size;
+    function applyCustomMargins() {
+      const top = document.getElementById("marginTop").value || 1;
+      const right = document.getElementById("marginRight").value || 1;
+      const bottom = document.getElementById("marginBottom").value || 1;
+      const left = document.getElementById("marginLeft").value || 1;
+
+      const paddingValue = `${top}in ${right}in ${bottom}in ${left}in`;
+      document.getElementById("mainEditor").style.padding = paddingValue;
     }
 
     function toggleBold() {
