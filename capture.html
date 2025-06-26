@@ -288,10 +288,15 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
+    width: 8.5in;
+    height: 11in;
+    box-sizing: border-box; /* 👈 ensures padding doesn't increase box size */
+    padding: var(--margin-top, 1in) var(--margin-right, 1in) var(--margin-bottom, 1in) var(--margin-left, 1in);
+    overflow: auto;
     background: #fffdf5;
     border: 1px solid #e0dcbf;
+    margin: 2rem auto;
     border-radius: 0 0 6px 6px;
-    padding: 1rem;
     min-height: 300px;
     font-family: 'Courier New', monospace;
     font-size: 1rem;
