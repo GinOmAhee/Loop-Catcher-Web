@@ -355,7 +355,7 @@
   .handle-top    { top: 0;    left: 50%; transform: translateX(-50%); cursor: ns-resize; }
   .handle-bottom { bottom: 0; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
   .handle-left   { top: 50%;  left: 0;    transform: translateY(-50%); cursor: ew-resize; }
-  .handle-right  { top: 50%;  right: 0;   transform: translateY(-50%); cursor: ew-resize; }
+  .handle-right  { top: 50%;  right: -1px;   transform: translateY(-50%); cursor: ew-resize; }
 
   textarea {
     width: 60%;
@@ -2240,55 +2240,57 @@
       applyMargins(m.top, m.right, m.bottom, m.left);
     }
 
-    const DPI = 96; // 96px per inch
-    const editorContent = document.querySelector(".editor-content");
-    const handles = document.querySelectorAll(".handle");
+    window.addEventListener("DOMContentLoaded", () => {
+      DPI = 96; // 96px per inch
+      const editorContent = document.querySelector(".editor-content");
+      const handles = document.querySelectorAll(".handle");
 
-    let activeHandle = null;
+      let activeHandle = null;
 
-    handles.forEach(handle => {
-      handle.addEventListener("mousedown", () => {
-        activeHandle = handle;
-        document.body.style.userSelect = "none";
+      handles.forEach(handle => {
+        handle.addEventListener("mousedown", () => {
+          activeHandle = handle;
+          document.body.style.userSelect = "none";
+        });
       });
-    });
 
-    document.addEventListener("mouseup", () => {
-      activeHandle = null;
-      document.body.style.userSelect = "";
-    });
+      document.addEventListener("mouseup", () => {
+        activeHandle = null;
+        document.body.style.userSelect = "";
+      });
 
-    document.addEventListener("mousemove", (e) => {
-      if (!activeHandle) return;
+      document.addEventListener("mousemove", (e) => {
+        if (!activeHandle) return;
 
-      const container = document.querySelector(".editor-container");
-      const bounds = container.getBoundingClientRect();
+        const container = document.querySelector(".editor-container");
+        const bounds = container.getBoundingClientRect();
 
-      const getInches = (px) => Math.max(0, px / DPI).toFixed(1) + " in";
+        const getInches = (px) => Math.max(0, px / DPI).toFixed(1) + " in";
 
-      if (activeHandle.classList.contains("handle-top")) {
-        const offset = e.clientY - bounds.top;
-        editorContent.style.paddingTop = `${offset}px`;
-        activeHandle.querySelector("span").textContent = getInches(offset);
-      }
+        if (activeHandle.classList.contains("handle-top")) {
+          const offset = e.clientY - bounds.top;
+          editorContent.style.paddingTop = `${offset}px`;
+          activeHandle.querySelector("span").textContent = getInches(offset);
+        }
 
-      if (activeHandle.classList.contains("handle-bottom")) {
-        const offset = bounds.bottom - e.clientY;
-        editorContent.style.paddingBottom = `${offset}px`;
-        activeHandle.querySelector("span").textContent = getInches(offset);
-      }
+        if (activeHandle.classList.contains("handle-bottom")) {
+          const offset = bounds.bottom - e.clientY;
+          editorContent.style.paddingBottom = `${offset}px`;
+          activeHandle.querySelector("span").textContent = getInches(offset);
+        }
 
-      if (activeHandle.classList.contains("handle-left")) {
-        const offset = e.clientX - bounds.left;
-        editorContent.style.paddingLeft = `${offset}px`;
-        activeHandle.querySelector("span").textContent = getInches(offset);
-      }
+        if (activeHandle.classList.contains("handle-left")) {
+          const offset = e.clientX - bounds.left;
+          editorContent.style.paddingLeft = `${offset}px`;
+          activeHandle.querySelector("span").textContent = getInches(offset);
+        }
 
-      if (activeHandle.classList.contains("handle-right")) {
-        const offset = bounds.right - e.clientX;
-        editorContent.style.paddingRight = `${offset}px`;
-        activeHandle.querySelector("span").textContent = getInches(offset);
-      }
+        if (activeHandle.classList.contains("handle-right")) {
+          const offset = bounds.right - e.clientX;
+          editorContent.style.paddingRight = `${offset}px`;
+          activeHandle.querySelector("span").textContent = getInches(offset);
+        }
+      });
     });
 
     document.addEventListener("click", () => {
