@@ -1353,9 +1353,6 @@
      let projectName = prompt("📌 Enter project name (optional):");
      projectName = projectName?.trim() || "📂 Unlabeled";
 
-     console.log("📝 Saving note from tab:", tabs[activeTabIndex]);
-     const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
-
      const newNote = {
        text: noteHTML,
        timestamp: now.toISOString(),
