@@ -461,6 +461,31 @@
     transition: background 0.3s ease, color 0.3s ease;
   }
 
+  .margin-slider-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    max-width: 400px;
+    padding: 1rem;
+    border-radius: 12px;
+    background: var(--panel-bg, #f4f4f4);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    font-family: "Inter", sans-serif;
+    font-size: 0.95rem;
+  }
+
+  .margin-slider-panel label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .margin-slider-panel input[type="range"] {
+    flex: 1;
+    accent-color: hotpink;
+  }
+
   .controls {
     display: flex;
     gap: 1rem;
@@ -933,6 +958,13 @@
         color: var(--editor-text);
         overflow-y: auto;
       "></div>
+
+      <div class="margin-slider-panel">
+        <label>Top Margin <input type="range" id="marginTopSlider" min="0" max="3" step="0.1" value="1"> <span id="topVal">1in</span></label>
+        <label>Right Margin <input type="range" id="marginRightSlider" min="0" max="3" step="0.1" value="1"> <span id="rightVal">1in</span></label>
+        <label>Bottom Margin <input type="range" id="marginBottomSlider" min="0" max="3" step="0.1" value="1"> <span id="bottomVal">1in</span></label>
+        <label>Left Margin <input type="range" id="marginLeftSlider" min="0" max="3" step="0.1" value="1"> <span id="leftVal">1in</span></label>
+      </div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -1724,6 +1756,29 @@
       newRange.selectNodeContents(container);
       selection.addRange(newRange);
     }
+
+    function applySliderMargins() {
+      const top = document.getElementById("marginTopSlider").value;
+      const right = document.getElementById("marginRightSlider").value;
+      const bottom = document.getElementById("marginBottomSlider").value;
+      const left = document.getElementById("marginLeftSlider").value;
+
+      // Update live labels
+      document.getElementById("topVal").textContent = `${top}in`;
+      document.getElementById("rightVal").textContent = `${right}in`;
+      document.getElementById("bottomVal").textContent = `${bottom}in`;
+      document.getElementById("leftVal").textContent = `${left}in`;
+
+      const editor = document.getElementById("mainEditor");
+      if (editor) {
+        editor.style.padding = `${top}in ${right}in ${bottom}in ${left}in`;
+      }
+    }
+
+    // Attach listeners to sliders
+    ["Top", "Right", "Bottom", "Left"].forEach(side => {
+      document.getElementById(`margin${side}Slider`).addEventListener("input", applySliderMargins);
+    });
 
     function toggleStrikeThrough() {
       const selection = window.getSelection();
