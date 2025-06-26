@@ -288,6 +288,9 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
+    padding: 1in; /* classic 1-inch margin on all sides */
+    max-width: 8.5in; /* optional: keeps it letter-sized */
+    margin: 2rem auto; /* centers the writing area */
     background: #fffdf5;
     border: 1px solid #e0dcbf;
     border-radius: 0 0 6px 6px;
@@ -919,6 +922,16 @@
       </div>
 
         <button onclick="removeFormatting()">🚫</button>
+      </div>
+
+      <div class="margin-controls" style="margin-bottom: 0.5rem;">
+        <label for="marginSelect">🧾 Margin:</label>
+        <select id="marginSelect" onchange="setDocumentMargin(this.value)">
+          <option value="0.5in">0.5 inch</option>
+          <option value="1in" selected>1 inch</option>
+          <option value="1.5in">1.5 inch</option>
+          <option value="2in">2 inch</option>
+        </select>
       </div>
 
       <!-- 📝 Rich Text Editor -->
@@ -2095,6 +2108,10 @@
      const newRange = document.createRange();
      newRange.setStartAfter(range.endContainer);
      selection.addRange(newRange);
+    }
+
+    function setDocumentMargin(size) {
+      document.getElementById("mainEditor").style.padding = size;
     }
 
     function toggleBold() {
