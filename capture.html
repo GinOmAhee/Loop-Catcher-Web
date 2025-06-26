@@ -2178,16 +2178,6 @@
      selection.addRange(newRange);
     }
 
-    function applyCustomMargins() {
-      const top = document.getElementById("marginTop").value || 1;
-      const right = document.getElementById("marginRight").value || 1;
-      const bottom = document.getElementById("marginBottom").value || 1;
-      const left = document.getElementById("marginLeft").value || 1;
-
-      const paddingValue = `${top}in ${right}in ${bottom}in ${left}in`;
-      document.getElementById("mainEditor").style.padding = paddingValue;
-    }
-
     function toggleBold() {
       const selection = window.getSelection();
       if (!selection.rangeCount || selection.isCollapsed) return;
