@@ -290,7 +290,7 @@
   #mainEditor {
     position: relative;
     width: 60%;
-    background: var(--editor-bg);
+    background: var(--editor-bg)
     border: 1px solid #e0dcbf;
     border-radius: 8px;
     padding: 1rem;
@@ -319,6 +319,16 @@
     background: transparent;
   }
 
+  .margin-handles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+  }
+
   .handle {
     position: absolute;
     background: hotpink;
@@ -328,7 +338,7 @@
     border-radius: 4px;
     cursor: pointer;
     user-select: none;
-    z-index: 999;
+    z-index: 10;
     pointer-events: auto; /* But allow drag handles to be interactive */
   }
 
@@ -970,14 +980,14 @@
       </div>
 
       <div id="mainEditor" contenteditable="true">
-        <div class="margin-handles">
-          <div class="handle handle-top"><span>1.0 in</span></div>
-          <div class="handle handle-right"><span>1.0 in</span></div>
-          <div class="handle handle-bottom"><span>1.0 in</span></div>
-          <div class="handle handle-left"><span>1.0 in</span></div>
-        </div>
-
         <!-- User types here directly -->
+      </div>
+
+      <div class="margin-handles">
+        <div class="handle handle-top"><span>1.0 in</span></div>
+        <div class="handle handle-right"><span>1.0 in</span></div>
+        <div class="handle handle-bottom"><span>1.0 in</span></div>
+        <div class="handle handle-left"><span>1.0 in</span></div>
       </div>
 
 
