@@ -330,6 +330,73 @@
     position: relative;
   }
 
+  .margin-visualizer {
+    position: relative;
+    width: 300px;
+    height: 200px;
+    margin: 2rem auto;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+
+  .margin-box-content {
+    position: absolute;
+    top: 1in;
+    right: 1in;
+    bottom: 1in;
+    left: 1in;
+    background: white;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    border-radius: 4px;
+  }
+
+  .handle {
+    position: absolute;
+    background: hotpink;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: ns-resize;
+    user-select: none;
+  }
+
+  .handle span {
+    pointer-events: none;
+  }
+
+  .handle-top {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .handle-right {
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+  }
+
+  .handle-bottom {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: ns-resize;
+  }
+
+  .handle-left {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+  }
+
   /* === TABS === */
   .tab-bar {
     display: flex;
@@ -859,15 +926,6 @@
         <!-- Icon Button -->
       <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
-      <div class="margin-controls" style="margin-bottom: 0.75rem;">
-        <label>Margins (in inches):</label>
-        <input type="number" step="0.1" min="0" id="marginTop" placeholder="Top" style="width: 3.5rem;" /> in
-        <input type="number" step="0.1" min="0" id="marginRight" placeholder="Right" style="width: 3.5rem;" /> in
-        <input type="number" step="0.1" min="0" id="marginBottom" placeholder="Bottom" style="width: 3.5rem;" /> in
-        <input type="number" step="0.1" min="0" id="marginLeft" placeholder="Left" style="width: 3.5rem;" /> in
-        <button onclick="applyCustomMargins()">Apply</button>
-      </div>
-
       <select id="fontDropdown" onchange="setFont(this.value)">
         <option value="'Arial', sans-serif">Arial</option>
         <option value="'Georgia', serif">Georgia</option>
@@ -931,6 +989,17 @@
       </div>
 
         <button onclick="removeFormatting()">🚫</button>
+      </div>
+
+      <div class="margin-visualizer">
+        <div class="handle handle-top"><span>1.0 in</span></div>
+        <div class="handle handle-right"><span>1.0 in</span></div>
+        <div class="handle handle-bottom"><span>1.0 in</span></div>
+        <div class="handle handle-left"><span>1.0 in</span></div>
+
+        <div class="margin-box-content">
+          Content Area
+        </div>
       </div>
 
       <!-- 📝 Rich Text Editor -->
@@ -2152,6 +2221,57 @@
        selection.addRange(newRange);
      }
     }
+
+    const contentBox = document.querySelector(".margin-box-content");
+    const handles = document.querySelectorAll(".handle");
+    const DPI = 96; // 96px = 1 inch
+
+    let activeHandle = null;
+
+    handles.forEach(handle => {
+      handle.addEventListener("mousedown", (e) => {
+        activeHandle = handle;
+        document.body.style.userSelect = "none";
+      });
+    });
+
+    document.addEventListener("mouseup", () => {
+      activeHandle = null;
+      document.body.style.userSelect = "";
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!activeHandle) return;
+
+      const rect = contentBox.getBoundingClientRect();
+      const visualizer = document.querySelector(".margin-visualizer");
+
+      let val;
+
+      if (activeHandle.classList.contains("handle-top")) {
+        val = e.clientY - visualizer.getBoundingClientRect().top;
+        contentBox.style.top = `${val}px`;
+        activeHandle.querySelector("span").textContent = `${(val / DPI).toFixed(1)} in`;
+      }
+
+      if (activeHandle.classList.contains("handle-bottom")) {
+        val = visualizer.getBoundingClientRect().bottom - e.clientY;
+        contentBox.style.bottom = `${val}px`;
+        activeHandle.querySelector("span").textContent = `${(val / DPI).toFixed(1)} in`;
+      }
+
+      if (activeHandle.classList.contains("handle-left")) {
+        val = e.clientX - visualizer.getBoundingClientRect().left;
+        contentBox.style.left = `${val}px`;
+        activeHandle.querySelector("span").textContent = `${(val / DPI).toFixed(1)} in`;
+      }
+
+      if (activeHandle.classList.contains("handle-right")) {
+        val = visualizer.getBoundingClientRect().right - e.clientX;
+        contentBox.style.right = `${val}px`;
+        activeHandle.querySelector("span").textContent = `${(val / DPI).toFixed(1)} in`;
+      }
+    });
 
     document.addEventListener("click", () => {
       setTimeout(() => {
