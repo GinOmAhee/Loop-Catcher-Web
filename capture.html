@@ -344,6 +344,7 @@
   .tab {
     display: inline-flex;
     align-items: center;
+    justify-content: space-between;
     gap: 3rem; /* ← this creates space between label & close button */
     min-width: 150px;
     max-width: 150px;
@@ -400,6 +401,7 @@
   }
 
   .tab-label {
+    flex-grow: 1;
     display: inline-block;
     max-width: 145px; /* or whatever size fits your layout */
     overflow: hidden;
@@ -413,10 +415,11 @@
   }
 
   .tab-close-btn {
+    flex-shrink: 0;
     all: unset;
     font-size: 0.85rem;
-    margin-left: 2px;
-    padding: 0 0.4rem;
+    margin-left: 6px;
+    padding: 2px 6px;
     line-height: 1;
     border-radius: 4px;
     background: transparent;
