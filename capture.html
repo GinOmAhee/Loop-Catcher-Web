@@ -1164,6 +1164,8 @@
       safeRenderTabs();
     }
 
+    let hasUnsavedChanges = false;
+
     function addNewTab() {
       tabs.push({ title: "Untitled", content: "" });
       switchTab(tabs.length - 1); // Switch to new tab
@@ -1390,9 +1392,15 @@
       updateGrouping();
     }
 
+    mainEditor.addEventListener("input", () => {
+     hasUnsavedChanges = true;
+    });
+
     function autoSave() {
       console.log("✅ autoSave() was called");
       const now = new Date();
+
+      if (!mainEditor) return;
 
       // Save current content into the active tab
       tabs[activeTabIndex].content = mainEditor.innerHTML;
@@ -1403,7 +1411,16 @@
       localStorage.setItem('lastSaved', now.toISOString());
 
       saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+
+      hasUnsavedChanges = false; // Reset after save
     }
+
+    window.addEventListener("beforeunload", (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = ""; // Required for most browsers
+      }
+    });
 
     function loadSavedText() {
       const savedTabs = JSON.parse(localStorage.getItem('tabs') || '[]');
