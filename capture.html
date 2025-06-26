@@ -206,6 +206,11 @@
     color: #ddd; /* or #f1f1f1 if you want max contrast */
   }
 
+  body.dark-theme .search-wrapper {
+    background: #1e1e1e;
+    border-color: #444;
+  }
+
   /* === THEME CLASSES === */
   .theme-calm {
     --tab-bg: #dceefb;
@@ -528,15 +533,27 @@
     background: #fafafa;
   }
 
-  #searchInput {
+  .search-wrapper {
+    display: flex;
+    align-items: center;
     width: 100%;
-    box-sizing: border-box;
-    padding: 0.45rem 0.7rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color, #ccc);
     border-radius: 6px;
-    background: #fff;
-    font-size: 0.85rem;
+    background: var(--input-bg, #fafafa);
+    padding: 0.2rem 0.4rem;
+    box-sizing: border-box;
   }
+
+  #searchInput {
+    flex: 1;
+    box-sizing: border-box;
+    padding: 0.6rem 0.8rem;
+    border: none; /* Let .search-wrapper handle the border */
+    background: transparent;
+    color: var(--text-color, #333);
+    font-size: 1rem;
+  }
+
   #searchInput:focus {
     outline: none;
     border-color: #999;
@@ -736,12 +753,13 @@
 
       <!-- 3. Bottom: search input anchored in its own bar -->
       <div class="preview-sortbar bottom-searchbar">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="🔍 Search notes..."
-          oninput="updateGrouping()"
-          style="width: 100%; padding: 0.5rem; font-size: 1rem;" />
+        <div class="search-wrapper">
+          <input id="searchInput" type="text" placeholder="Search notes..." />
+          <select id="searchScope" class="search-dropdown">
+            <option value="group">Grouped</option>
+            <option value="all">Search All</option>
+          </select>
+        </div>
       </div>
 
       <!-- 4. Very bottom: settings/profile links -->
@@ -949,7 +967,7 @@
     }
 
     let tabs = [
-      { title: "Note 1", content: "" }
+      { title: "Untitled", content: "" }
     ];
     let activeTabIndex = 0;
 
@@ -1305,7 +1323,7 @@
 
       mainEditor.innerHTML = '';
       tabs[activeTabIndex].content = '';
-      tabs[activeTabIndex].title = 'Note 1';
+      tabs[activeTabIndex].title = 'Untitled';
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
@@ -1341,7 +1359,7 @@
 
       } else {
         // ✅ in case there's nothing saved yet
-        tabs = [{ title: "Note 1", content: "" }];
+        tabs = [{ title: "Untitled", content: "" }];
         activeTabIndex = 0;
         safeRenderTabs(); // safely render fresh default
       }
