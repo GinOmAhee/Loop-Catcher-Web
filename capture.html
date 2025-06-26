@@ -287,6 +287,12 @@
   }
 
   /* === EDITOR & INPUT === */
+  .editor-container {
+    position: relative;
+    width: 60%;
+    margin: 2rem auto;
+  }
+
   #mainEditor {
     position: relative;
     width: 60%;
@@ -979,17 +985,17 @@
         <button onclick="loadSavedPreset()">Load My Style</button>
       </div>
 
-      <div id="mainEditor" contenteditable="true">
-        <!-- User types here directly -->
+      <div class="editor-container">
+        <div id="mainEditor" contenteditable="true">
+          <!-- user types here -->
+        </div>
+        <div class="margin-handles">
+          <div class="handle handle-top"><span>1.0 in</span></div>
+          <div class="handle handle-right"><span>1.0 in</span></div>
+          <div class="handle handle-bottom"><span>1.0 in</span></div>
+          <div class="handle handle-left"><span>1.0 in</span></div>
+        </div>
       </div>
-
-      <div class="margin-handles">
-        <div class="handle handle-top"><span>1.0 in</span></div>
-        <div class="handle handle-right"><span>1.0 in</span></div>
-        <div class="handle handle-bottom"><span>1.0 in</span></div>
-        <div class="handle handle-left"><span>1.0 in</span></div>
-      </div>
-
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -2255,7 +2261,7 @@
     document.addEventListener("mousemove", (e) => {
       if (!activeHandle) return;
 
-      const container = document.querySelector("#mainEditor");
+      const container = document.querySelector(".editor-container");
       const bounds = container.getBoundingClientRect();
 
       const getInches = (px) => Math.max(0, px / DPI).toFixed(1) + " in";
