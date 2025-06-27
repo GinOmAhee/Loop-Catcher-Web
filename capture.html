@@ -2236,7 +2236,6 @@
         const type = handle.classList.contains("left") || handle.classList.contains("right") ? "horizontal" : "vertical";
         
     function onMove(moveEvent) {
-      console.log("Dragging bottom handle...", offsetY);
       const rect = editor.getBoundingClientRect();
 
       if (type === "horizontal") {
