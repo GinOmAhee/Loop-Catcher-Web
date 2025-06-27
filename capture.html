@@ -288,11 +288,14 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
+    width: 8.5in;
+    height: 11in;
     background: #fffdf5;
     border: 1px solid #e0dcbf;
     border-radius: 0 0 6px 6px;
-    padding: 1rem;
-    min-height: 300px;
+    padding: 1in;
+    overflow: auto;
+    box-sizing: border-box;
     font-family: 'Courier New', monospace;
     font-size: 1rem;
     line-height: 1.5;
@@ -319,26 +322,32 @@
   .editor-wrapper {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    position: relative;
-    max-width: fit-content;
-    margin: auto;
+    gap: 0.5rem;
   }
 
+  /* Ensure top ruler isn’t tall */
   .horizontal-ruler {
+    height: 30px;
+    display: flex;
+    justify-content: space-between;
+    background: #f0f0f0;
     position: relative;
-    height: 24px;
-    width: 8.5in;
-    margin-left: 1.2rem;
-    background: repeating-linear-gradient(to right, #ddd 0, #ddd 1px, transparent 1px, transparent 10px);
   }
 
+  /* Editor row */
+  .content-row {
+    display: flex;
+    align-items: stretch;
+  }
+
+  /* Vertical ruler fixed width */
   .vertical-ruler {
-    position: relative;
-    width: 24px;
-    height: 11in;
+    width: 30px;
     background: #f3f3f3;
-    background: repeating-linear-gradient(to bottom, #ddd 0, #ddd 1px, transparent 1px, transparent 10px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
   }
 
   .margin-handle {
@@ -920,22 +929,6 @@
         <!-- Icon Button -->
       <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
-      <div class="editor-wrapper">
-        <div class="horizontal-ruler">
-          <div class="margin-handle left" draggable="true"></div>
-          <div class="margin-handle right" draggable="true"></div>
-        </div>
-
-        <div class="content-row">
-          <div class="vertical-ruler">
-            <div class="margin-handle top" draggable="true"></div>
-            <div class="margin-handle bottom" draggable="true"></div>
-          </div>
-
-          <div id="mainEditor" contenteditable="true"></div>
-        </div>
-      </div>
-
       <select id="fontDropdown" onchange="setFont(this.value)">
         <option value="'Arial', sans-serif">Arial</option>
         <option value="'Georgia', serif">Georgia</option>
@@ -999,6 +992,22 @@
       </div>
 
         <button onclick="removeFormatting()">🚫</button>
+      </div>
+
+            <div class="editor-wrapper">
+        <div class="horizontal-ruler">
+          <div class="margin-handle left" draggable="true"></div>
+          <div class="margin-handle right" draggable="true"></div>
+        </div>
+
+        <div class="content-row">
+          <div class="vertical-ruler">
+            <div class="margin-handle top" draggable="true"></div>
+            <div class="margin-handle bottom" draggable="true"></div>
+          </div>
+
+          <div id="mainEditor" contenteditable="true"></div>
+        </div>
       </div>
 
       <div class="controls">
