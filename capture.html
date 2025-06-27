@@ -2188,11 +2188,22 @@
        selection.addRange(newRange);
      }
     }
+
+    // ✅ Wait for DOM to be fully loaded
+    window.addEventListener("DOMContentLoaded", () => {
+      initRuler();
+    });
     
     function initRuler() {
+      const marginTooltip = document.getElementById("marginTooltip");
       const editor = document.getElementById("mainEditor");
 
-      const marginState = {
+      if (!editor) {
+        console.error("❌ Editor not found. Cannot init margin rulers.");
+        return;
+      }
+
+      const rulers = {
         top: document.getElementById("topMarginRuler"),
         bottom: document.getElementById("bottomMarginRuler"),
         left: document.getElementById("leftMarginRuler"),
@@ -2210,7 +2221,6 @@
           const startY = e.clientY;
           const startX = e.clientX;
 
-          const editor = document.getElementById("mainEditor");
           const initialStyles = window.getComputedStyle(editor);
           const startMargin = {
             top: parseInt(initialStyles.marginTop),
@@ -2258,11 +2268,6 @@
 
       console.log("📏 Rulers initialized!");
     }
-
-    // ✅ Run only after DOM is ready
-    window.addEventListener("DOMContentLoaded", () => {
-      initRuler();
-    });
 
     document.addEventListener("click", () => {
       setTimeout(() => {
