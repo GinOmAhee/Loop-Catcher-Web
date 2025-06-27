@@ -341,11 +341,12 @@
     position: fixed;
     background: black;
     color: white;
-    padding: 2px 6px;
+    padding: 3px 6px;
     border-radius: 4px;
     font-size: 12px;
     pointer-events: none;
     z-index: 10000;
+    display: none;
   }
 
   textarea {
@@ -2197,79 +2198,62 @@
       initRuler();
     });
     
-    function initRuler() {
-      const marginTooltip = document.getElementById("marginTooltip");
-      const editor = document.getElementById("mainEditor");
+    function initRuler(rulerId, orientation) {
+      const ruler = document.getElementById(rulerId);
+      const tooltip = document.getElementById('marginTooltip');
+      const editor = document.getElementById('mainEditor');
+      let isDragging = false;
 
-      if (!editor) {
-        console.error("❌ Editor not found. Cannot init margin rulers.");
-        return;
-      }
-
-      const rulers = {
-        top: document.getElementById("topMarginRuler"),
-        bottom: document.getElementById("bottomMarginRuler"),
-        left: document.getElementById("leftMarginRuler"),
-        right: document.getElementById("rightMarginRuler")
-      };
-
-      Object.entries(rulers).forEach(([position, el]) => {
-        if (!el) {
-          console.warn(`⚠️ Missing ${position}MarginRuler`);
-          return;
-        }
-
-        el.addEventListener("mousedown", (e) => {
-          e.preventDefault();
-          const startY = e.clientY;
-          const startX = e.clientX;
-
-          const initialStyles = window.getComputedStyle(editor);
-          const startMargin = {
-            top: parseInt(initialStyles.marginTop),
-            bottom: parseInt(initialStyles.marginBottom),
-            left: parseInt(initialStyles.marginLeft),
-            right: parseInt(initialStyles.marginRight)
-          };
-
-          function onMouseMove(ev) {
-            let value;
-            if (position === "top" || position === "bottom") {
-              const dy = ev.clientY - startY;
-              value = startMargin[position] + dy;
-              editor.style[`margin${capitalize(position)}`] = `${value}px`;
-              positionTooltip(ev.clientX, ev.clientY, `${position} margin: ${value}px`);
-            } else {
-              const dx = ev.clientX - startX;
-              value = startMargin[position] + dx * (position === "left" ? 1 : -1);
-              editor.style[`margin${capitalize(position)}`] = `${value}px`;
-              positionTooltip(ev.clientX, ev.clientY, `${position} margin: ${value}px`);
-            }
-          }
-
-          function onMouseUp() {
-            document.removeEventListener("mousemove", onMouseMove);
-            document.removeEventListener("mouseup", onMouseUp);
-            marginTooltip.style.display = "none";
-          }
-
-          document.addEventListener("mousemove", onMouseMove);
-          document.addEventListener("mouseup", onMouseUp);
-        });
+      ruler.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        document.body.style.cursor = 'grabbing';
+        tooltip.style.display = 'block';
       });
 
-      function capitalize(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-      }
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
 
-      function positionTooltip(x, y, text) {
-        marginTooltip.style.display = "block";
-        marginTooltip.style.left = `${x + 10}px`;
-        marginTooltip.style.top = `${y + 10}px`;
-        marginTooltip.innerText = text;
-      }
+        let value;
 
-      console.log("📏 Rulers initialized!");
+        if (orientation === 'vertical') {
+          value = e.clientX;
+          tooltip.style.left = `${e.clientX + 10}px`;
+          tooltip.style.top = `${e.clientY}px`;
+
+          if (rulerId === 'leftMarginRuler') {
+            editor.style.marginLeft = `${value}px`;
+          } else if (rulerId === 'rightMarginRuler') {
+            const screenWidth = window.innerWidth;
+            const rightMargin = screenWidth - value;
+            editor.style.marginRight = `${rightMargin}px`;
+            value = rightMargin;
+          }
+
+        } else if (orientation === 'horizontal') {
+          value = e.clientY;
+          tooltip.style.left = `${e.clientX + 10}px`;
+          tooltip.style.top = `${e.clientY}px`;
+
+          if (rulerId === 'topMarginRuler') {
+            editor.style.marginTop = `${value}px`;
+          } else if (rulerId === 'bottomMarginRuler') {
+            const screenHeight = window.innerHeight;
+            const bottomMargin = screenHeight - value;
+            editor.style.marginBottom = `${bottomMargin}px`;
+            value = bottomMargin;
+          }
+        }
+
+        tooltip.innerText = `Margin: ${value}px`;
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (isDragging) {
+          isDragging = false;
+          tooltip.style.display = 'none';
+          document.body.style.cursor = 'default';
+        }
+      });
     }
 
     document.addEventListener("click", () => {
