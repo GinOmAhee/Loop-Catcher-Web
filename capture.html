@@ -298,6 +298,7 @@
   }
 
   #mainEditor {
+    border: 2px dashed hotpink;
     width: 100%;
     height: 100%;
     box-sizing: border-box;
@@ -324,12 +325,12 @@
 
   .margin-handle.left {
     left: 1in;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
   }
 
   .margin-handle.right {
     right: 1in;
-    transform: translate(50%, -50%);
+    transform: translateX(50%); /* makes it float too far */
   }
 
   textarea {
