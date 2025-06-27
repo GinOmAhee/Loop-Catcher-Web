@@ -301,6 +301,50 @@
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
     background-size: 100% 1.5em;
   }
+
+  .ruler {
+    position: absolute;
+    background: #eee;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .ruler.vertical {
+    width: 20px;
+    top: 0;
+    bottom: 0;
+  }
+  .ruler.horizontal {
+    height: 20px;
+    left: 0;
+    right: 0;
+  }
+  #leftRuler { left: 0; }
+  #rightRuler { right: 0; }
+  #topRuler { top: 0; height: 20px; }
+  #bottomRuler { bottom: 0; height: 20px; }
+
+  .handler {
+    position: absolute;
+    width: 6px;
+    height: 100%;
+    background: hotpink;
+    cursor: ew-resize;
+    pointer-events: auto;
+  }
+  .horizontal .handler {
+    width: 100%;
+    height: 6px;
+    cursor: ns-resize;
+  }
+  #topHandle, #bottomHandle {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #leftHandle, #rightHandle {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
   textarea {
     width: 60%;
     height: 300px;
@@ -933,6 +977,12 @@
         color: var(--editor-text);
         overflow-y: auto;
       "></div>
+
+      <!-- RULER MARGIN HANDLERS -->
+      <div id="topRuler" class="ruler horizontal"><div class="handler" id="topHandle"></div></div>
+      <div id="bottomRuler" class="ruler horizontal"><div class="handler" id="bottomHandle"></div></div>
+      <div id="leftRuler" class="ruler vertical"><div class="handler" id="leftHandle"></div></div>
+      <div id="rightRuler" class="ruler vertical"><div class="handler" id="rightHandle"></div></div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -2130,6 +2180,58 @@
        selection.addRange(newRange);
      }
     }
+
+    const editor = document.getElementById("mainEditor");
+
+    const marginState = {
+      top: 2,
+      bottom: 2,
+      left: 2,
+      right: 2,
+    };
+
+    function applyMargins() {
+      editor.style.paddingTop = `${marginState.top}cm`;
+      editor.style.paddingBottom = `${marginState.bottom}cm`;
+      editor.style.paddingLeft = `${marginState.left}cm`;
+      editor.style.paddingRight = `${marginState.right}cm`;
+    }
+
+    function initRuler(handleId, axis, side) {
+      const handle = document.getElementById(handleId);
+      let isDragging = false;
+
+      handle.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        document.body.style.cursor = axis === "x" ? "ew-resize" : "ns-resize";
+      });
+
+      document.addEventListener("mouseup", () => {
+        if (isDragging) {
+          isDragging = false;
+          document.body.style.cursor = "";
+        }
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        const offset = axis === "x" ? e.clientX : e.clientY;
+        const cmValue = Math.round(offset / 37.8); // rough conversion to cm
+
+        marginState[side] = cmValue;
+        applyMargins();
+
+        // 💬 Optional: show live feedback
+        document.getElementById("saveStatus").innerText = `📏 ${side} margin: ${cmValue}cm`;
+      });
+    }
+
+    ["top", "bottom", "left", "right"].forEach((side) => {
+      const axis = side === "top" || side === "bottom" ? "y" : "x";
+      initRuler(`${side}Handle`, axis, side);
+    });
+
+    applyMargins();
 
     document.addEventListener("click", () => {
       setTimeout(() => {
