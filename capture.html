@@ -287,23 +287,47 @@
   }
 
   /* === EDITOR & INPUT === */
-  #mainEditor {
+  .editor-wrapper {
+    position: relative;
     width: 8.5in;
     height: 11in;
     background: #fffdf5;
-    border: 1px solid #e0dcbf;
-    border-radius: 0 0 6px 6px;
-    padding: 1in 1in 1in 1in;
-    overflow: hidden;
-    box-sizing: content-box;
-    font-family: 'Courier New', monospace;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #333;
-    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-    background-size: 100% 1.5em;
+    border: 1px solid #ccc;
+    margin: 2rem auto;
+    box-shadow: 0 0 6px rgba(0,0,0,0.1);
   }
+
+  #mainEditor {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 1in; /* initial margin */
+    font-family: 'Courier New', monospace;
+    line-height: 1.5;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size: 100% 1.5em;
+    overflow: hidden;
+  }
+
+  .margin-handle {
+    position: absolute;
+    top: 0;
+    width: 12px;
+    height: 100%;
+    background: transparent;
+    cursor: ew-resize;
+  }
+
+  .margin-handle.left {
+    left: 1in;
+    transform: translateX(-50%);
+  }
+
+  .margin-handle.right {
+    right: 1in;
+    transform: translateX(50%);
+  }
+
   textarea {
     width: 60%;
     height: 300px;
@@ -312,45 +336,6 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     resize: none;
-  }
-
-  .editor-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    justify-content: center;
-    padding: 2rem;
-    max-width: 100vw;
-    max-height: 100vh;
-    overflow: auto;
-    box-sizing: border-box;
-  }
-
-  /* Vertical ruler on the left */
-  .vertical-ruler {
-    width: 30px;
-    background: #f3f3f3;
-    position: relative;
-  }
-
-  /* Margin handle inside the vertical ruler */
-  .margin-handle {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    background: hotpink;
-    border-radius: 50%;
-    pointer-events: all;
-    z-index: 9999;
-    border: 2px solid black;
-  }
-
-  .margin-handle.bottom {
-    bottom: 1in;
-    left: 50%;
-    transform: translateX(-50%);
-    cursor: ns-resize;
   }
 
   /* === LAYOUT === */
@@ -963,20 +948,10 @@
         <button onclick="removeFormatting()">🚫</button>
       </div>
 
-     <div style="height: 100vh; overflow-y: auto;">
-       <div class="editor-wrapper">
-         <div class="horizontal-ruler">
-           <div class="margin-handle left" draggable="true"></div>
-           <div class="margin-handle right" draggable="true"></div>
-         </div>
-
-         <div class="content-row">
-           <div class="vertical-ruler">
-           </div>
-
-           <div id="mainEditor" contenteditable="true"></div>
-         </div>
-       </div>
+     <div class="editor-wrapper">
+       <div id="mainEditor" contenteditable="true"></div>
+       <div class="margin-handle left"></div>
+       <div class="margin-handle right"></div>
      </div>
 
       <div class="controls">
