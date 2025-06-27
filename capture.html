@@ -330,6 +330,7 @@
 
   .margin-handle.right {
     right: 1in;
+    transform: translateX(-50%);
   }
 
   textarea {
@@ -952,11 +953,17 @@
         <button onclick="removeFormatting()">🚫</button>
       </div>
 
-     <div class="editor-wrapper">
-       <div id="mainEditor" contenteditable="true"></div>
-       <div class="margin-handle left"></div>
-       <div class="margin-handle right"></div>
-     </div>
+      <div class="main-container">
+        <div class="editor-area">
+          <div class="editor-wrapper">
+            <div id="mainEditor" contenteditable="true">
+              <!-- optional: text content -->
+            </div>
+            <div class="margin-handle left"></div>
+            <div class="margin-handle right"></div>
+          </div>
+        </div>
+      </div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
