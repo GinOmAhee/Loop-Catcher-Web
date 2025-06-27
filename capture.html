@@ -290,13 +290,16 @@
   #mainEditor {
     flex: 1;
     width: 100%;
-    max-width: 800px; /* Optional: limit width for a "paper" feel */
-    overflow-y: auto;
+    max-width: 800px;
     min-height: 400px;
     padding: 1rem;
+    font-size: 0.9rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     background: var(--editor-bg, #fff);
+    color: var(--editor-text, #000);
+    overflow-y: auto;
+    box-sizing: border-box;
   }
 
   .margin-ruler {
@@ -346,15 +349,15 @@
     display: none;
   }
 
-  #toolbar {
+  #editorToolbar {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 999;
     background: var(--editor-bg, #fff);
     padding: 0.5rem;
-    border-bottom: 1px solid #ddd;
     width: 100%;
-    max-width: 800px; /* Match editor width */
+    max-width: 800px;
+    border-bottom: 1px solid #ccc;
   }
 
   textarea {
@@ -373,13 +376,13 @@
     height: 100vh;
   }
   .editor-area {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    flex: 1;
     align-items: center;
-    padding: 2rem;
+    overflow-y: auto;
+    padding: 1rem;
     position: relative;
-    overflow: hidden; /* Stop scroll from pushing UI */
   }
 
   /* === TABS === */
