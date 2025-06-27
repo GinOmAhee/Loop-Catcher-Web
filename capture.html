@@ -320,6 +320,7 @@
   }
 
   .editor-wrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;         /* Center horizontally */
@@ -364,6 +365,11 @@
     border-radius: 50%;
     cursor: ew-resize;
     z-index: 10;
+    pointer-events: all;
+  }
+
+  body * {
+    outline: 1px dashed red !important;
   }
 
   .margin-handle.top,
