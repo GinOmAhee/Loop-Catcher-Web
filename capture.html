@@ -2152,49 +2152,34 @@
     }
 
     const editor = document.getElementById("mainEditor");
+    const handles = document.querySelectorAll(".margin-handle");
 
-    let draggingHandle = null;
-
-    document.querySelectorAll(".margin-handle").forEach((handle) => {
-      handle.addEventListener("dragstart", (e) => e.preventDefault()); // Prevent ghost image
-
+    handles.forEach(handle => {
       handle.addEventListener("mousedown", (e) => {
         e.preventDefault();
-        const type = handle.classList.contains("left") || handle.classList.contains("right") ? "horizontal" : "vertical";
-        
-    function onMove(moveEvent) {
-      const rect = editor.getBoundingClientRect();
+        const isLeft = handle.classList.contains("left");
 
-      if (type === "horizontal") {
-        const offsetX = moveEvent.clientX - rect.left;
-        if (handle.classList.contains("left")) {
-          editor.style.paddingLeft = `${offsetX}px`;
-        } else {
-          const right = rect.right - moveEvent.clientX;
-          editor.style.paddingRight = `${right}px`;
+        function onMove(event) {
+          const rect = editor.getBoundingClientRect();
+          const offset = event.clientX - rect.left;
+          const inverse = rect.right - event.clientX;
+
+          if (isLeft) {
+            editor.style.paddingLeft = `${Math.max(30, offset)}px`;
+            handle.style.left = `${offset}px`;
+          } else {
+           editor.style.paddingRight = `${Math.max(30, inverse)}px`;
+           handle.style.right = `${Math.max(30, inverse)}px`;
+          }
         }
-      } else {
-        const offsetY = moveEvent.clientY - rect.top;
-        if (handle.classList.contains("top")) {
-          editor.style.paddingTop = `${offsetY}px`;
-        } else {
-          const bottom = rect.bottom - moveEvent.clientY;
-          editor.style.paddingBottom = `${bottom}px`;
-        }
-      }
-    }
 
         function onUp() {
-          console.log("Handle clicked:", handle.className);
-          handle.style.background = "lime";  // Visual confirmation
-
           document.removeEventListener("mousemove", onMove);
           document.removeEventListener("mouseup", onUp);
         }
 
         document.addEventListener("mousemove", onMove);
         document.addEventListener("mouseup", onUp);
-        
       });
     });
 
