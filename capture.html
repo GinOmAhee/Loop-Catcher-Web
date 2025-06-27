@@ -2226,38 +2226,41 @@
       });
     });
 
-    document.addEventListener('mouseup', () => {
-      draggingHandle = null;
-    });
+    document.querySelectorAll(".margin-handle").forEach((handle) => {
+      handle.addEventListener("dragstart", (e) => e.preventDefault()); // Prevent ghost image
 
-    document.addEventListener('mousemove', (e) => {
-      if (!draggingHandle) return;
+      handle.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        const type = handle.classList.contains("left") || handle.classList.contains("right") ? "horizontal" : "vertical";
+        
+        function onMove(moveEvent) {
+          if (type === "horizontal") {
+            const offset = moveEvent.clientX - editor.offsetLeft;
+            if (handle.classList.contains("left")) {
+              editor.style.paddingLeft = `${offset}px`;
+            } else {
+              const right = editor.offsetWidth - offset;
+              editor.style.paddingRight = `${right}px`;
+            }
+          } else {
+            const offset = moveEvent.clientY - editor.offsetTop;
+            if (handle.classList.contains("top")) {
+              editor.style.paddingTop = `${offset}px`;
+            } else {
+              const bottom = editor.offsetHeight - offset;
+              editor.style.paddingBottom = `${bottom}px`;
+            }
+          }
+        }
 
-      const editorRect = editor.getBoundingClientRect();
+        function onUp() {
+          document.removeEventListener("mousemove", onMove);
+          document.removeEventListener("mouseup", onUp);
+        }
 
-      if (draggingHandle.classList.contains("left")) {
-        const offset = Math.max(0.5, (e.clientX - editorRect.left) / 96); // in inches
-        editor.style.paddingLeft = `${offset}in`;
-        draggingHandle.style.left = `${offset * 96}px`;
-      }
-
-      if (draggingHandle.classList.contains("right")) {
-        const offset = Math.max(0.5, (editorRect.right - e.clientX) / 96);
-        editor.style.paddingRight = `${offset}in`;
-        draggingHandle.style.right = `${offset * 96}px`;
-      }
-
-      if (draggingHandle.classList.contains("top")) {
-        const offset = Math.max(0.5, (e.clientY - editorRect.top) / 96);
-        editor.style.paddingTop = `${offset}in`;
-        draggingHandle.style.top = `${offset * 96}px`;
-      }
-
-      if (draggingHandle.classList.contains("bottom")) {
-        const offset = Math.max(0.5, (editorRect.bottom - e.clientY) / 96);
-        editor.style.paddingBottom = `${offset}in`;
-        draggingHandle.style.bottom = `${offset * 96}px`;
-      }
+        document.addEventListener("mousemove", onMove);
+        document.addEventListener("mouseup", onUp);
+      });
     });
 
     document.addEventListener("click", () => {
