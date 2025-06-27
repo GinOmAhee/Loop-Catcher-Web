@@ -2258,12 +2258,16 @@
     }
 
         function onUp() {
+          console.log("Handle clicked:", handle.className);
+          handle.style.background = "lime";  // Visual confirmation
+
           document.removeEventListener("mousemove", onMove);
           document.removeEventListener("mouseup", onUp);
         }
 
         document.addEventListener("mousemove", onMove);
         document.addEventListener("mouseup", onUp);
+        
       });
     });
 
