@@ -2193,16 +2193,23 @@
      }
     }
 
-    // ✅ Wait for DOM to be fully loaded
     window.addEventListener("DOMContentLoaded", () => {
-      initRuler();
+      initRuler("topMarginRuler", "horizontal");
+      initRuler("bottomMarginRuler", "horizontal");
+      initRuler("leftMarginRuler", "vertical");
+      initRuler("rightMarginRuler", "vertical");
     });
-    
+
     function initRuler(rulerId, orientation) {
       const ruler = document.getElementById(rulerId);
       const tooltip = document.getElementById('marginTooltip');
       const editor = document.getElementById('mainEditor');
       let isDragging = false;
+
+      if (!ruler || !tooltip || !editor) {
+        console.warn(`🚫 Missing one or more required elements for ${rulerId}`);
+        return;
+      }
 
       ruler.addEventListener('mousedown', (e) => {
         isDragging = true;
