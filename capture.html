@@ -287,93 +287,20 @@
   }
 
   /* === EDITOR & INPUT === */
-  .scroll-container {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  #editorWrapper {
-    width: 100%;
-    max-width: 800px;
-    box-sizing: border-box;
-  }
-
   #mainEditor {
-    flex: 1;
-    width: 100%;
-    max-width: 800px;
-    min-height: 400px;
+    background: #fffdf5;
+    border: 1px solid #e0dcbf;
+    border-radius: 0 0 6px 6px;
     padding: 1rem;
-    font-size: 0.9rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: var(--editor-bg, #fff);
-    color: var(--editor-text, #000);
-    overflow-y: auto;
-    box-sizing: border-box;
+    min-height: 300px;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #333;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    background-size: 100% 1.5em;
   }
-
-  .margin-ruler {
-    position: absolute;
-    background-color: rgba(0, 123, 255, 0.3); /* light blue overlay */
-    z-index: 9999;
-    cursor: grab;
-  }
-
-  .margin-ruler.vertical {
-    width: 6px;
-    top: 0;
-    bottom: 0;
-  }
-
-  .margin-ruler.horizontal {
-    height: 6px;
-    left: 0;
-    right: 0;
-  }
-
-  #leftMarginRuler {
-    left: 0;
-  }
-
-  #rightMarginRuler {
-    right: 0;
-  }
-
-  #topMarginRuler {
-    top: 0;
-  }
-
-  #bottomMarginRuler {
-    bottom: 0;
-  }
-
-  #marginTooltip {
-    position: fixed;
-    background: black;
-    color: white;
-    padding: 3px 6px;
-    border-radius: 4px;
-    font-size: 12px;
-    pointer-events: none;
-    z-index: 10000;
-    display: none;
-  }
-
-  #editorToolbar {
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    background: var(--editor-bg, #fff);
-    padding: 0.5rem;
-    width: 100%;
-    max-width: 800px;
-    border-bottom: 1px solid #ccc;
-  }
-
   textarea {
     width: 60%;
     height: 300px;
@@ -390,12 +317,13 @@
     height: 100vh;
   }
   .editor-area {
-    flex: 1;
+    overflow-y: auto; /* Add this if you want scrolling here */
     display: flex;
+    flex: 1;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    overflow: hidden
-    padding: 1rem;
+    padding: 2rem;
     position: relative;
   }
 
@@ -993,24 +921,18 @@
         <button onclick="removeFormatting()">🚫</button>
       </div>
 
-      <div class="scroll-container">
-        <div id="editorWrapper">
-          <!-- RULERS -->
-          <div id="topMarginRuler" class="margin-ruler horizontal"></div>
-          <div style="display: flex; width: 100%;">
-            <div id="leftMarginRuler" class="margin-ruler vertical"></div>
-            <div id="mainEditor" contenteditable="true">
-              <h1>Interactive Margin Editor</h1>
-              <p>Try dragging the rulers to adjust the margins.</p>
-            </div>
-            <div id="rightMarginRuler" class="margin-ruler vertical"></div>
-          </div>
-          <div id="bottomMarginRuler" class="margin-ruler horizontal"></div>
-        </div>
-      </div>
-
-    <!-- Tooltip (outside for global use) -->
-    <div id="marginTooltip"></div>
+      <!-- 📝 Rich Text Editor -->
+      <div id="mainEditor" contenteditable="true" style="
+        width: 60%;
+        min-height: 300px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: var(--editor-bg);
+        color: var(--editor-text);
+        overflow-y: auto;
+      "></div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -2207,76 +2129,6 @@
        newRange.selectNodeContents(b);
        selection.addRange(newRange);
      }
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      initRuler("topMarginRuler", "horizontal");
-      initRuler("bottomMarginRuler", "horizontal");
-      initRuler("leftMarginRuler", "vertical");
-      initRuler("rightMarginRuler", "vertical");
-    });
-
-    function initRuler(rulerId, orientation) {
-      const ruler = document.getElementById(rulerId);
-      const tooltip = document.getElementById('marginTooltip');
-      const editor = document.getElementById('mainEditor');
-      let isDragging = false;
-
-      if (!ruler || !tooltip || !editor) {
-        console.warn(`🚫 Missing one or more required elements for ${rulerId}`);
-        return;
-      }
-
-      ruler.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        document.body.style.cursor = 'grabbing';
-        tooltip.style.display = 'block';
-      });
-
-      document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-
-        let value;
-
-        if (orientation === 'vertical') {
-          value = e.clientX;
-          tooltip.style.left = `${e.clientX + 10}px`;
-          tooltip.style.top = `${e.clientY}px`;
-
-          if (rulerId === 'leftMarginRuler') {
-            editor.style.marginLeft = `${value}px`;
-          } else if (rulerId === 'rightMarginRuler') {
-            const screenWidth = window.innerWidth;
-            const rightMargin = screenWidth - value;
-            editor.style.marginRight = `${rightMargin}px`;
-            value = rightMargin;
-          }
-
-        } else if (orientation === 'horizontal') {
-          value = e.clientY;
-          tooltip.style.left = `${e.clientX + 10}px`;
-          tooltip.style.top = `${e.clientY}px`;
-
-          if (rulerId === 'topMarginRuler') {
-            editor.style.marginTop = `${value}px`;
-          } else if (rulerId === 'bottomMarginRuler') {
-            const screenHeight = window.innerHeight;
-            const bottomMargin = screenHeight - value;
-            editor.style.marginBottom = `${bottomMargin}px`;
-            value = bottomMargin;
-          }
-        }
-
-        tooltip.innerText = `Margin: ${value}px`;
-      });
-
-      document.addEventListener('mouseup', () => {
-        if (isDragging) {
-          isDragging = false;
-          tooltip.style.display = 'none';
-          document.body.style.cursor = 'default';
-        }
-      });
     }
 
     document.addEventListener("click", () => {
