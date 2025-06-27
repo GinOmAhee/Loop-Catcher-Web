@@ -287,49 +287,20 @@
   }
 
   /* === EDITOR & INPUT === */
-  .editor-wrapper {
-    position: relative;
-    width: 8.5in;
-    height: 11in;
-    background: #fffdf5;
-    border: 1px solid #ccc;
-    box-shadow: 0 0 6px rgba(0,0,0,0.1);
-  }
-
   #mainEditor {
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    padding: 1in;
+    background: #fffdf5;
+    border: 1px solid #e0dcbf;
+    border-radius: 0 0 6px 6px;
+    padding: 1rem;
+    min-height: 300px;
     font-family: 'Courier New', monospace;
+    font-size: 1rem;
     line-height: 1.5;
-    background-image: linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+    color: #333;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
     background-size: 100% 1.5em;
-    overflow: hidden;
   }
-
-  .margin-handle {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 40px;
-    background: hotpink;
-    border-radius: 4px;
-    cursor: ew-resize;
-    z-index: 10;
-  }
-  .margin-handle.left { left: 1in; }
-  .margin-handle.right { right: 1in; }
-
-  .controls {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    background: #f5f5f5;
-    border-top: 1px solid #ccc;
-  }
-
   textarea {
     width: 60%;
     height: 300px;
@@ -343,18 +314,17 @@
   /* === LAYOUT === */
   .main-container {
     display: flex;
-    flex-direction: column;
     height: 100vh;
   }
-
   .editor-area {
-    flex: 1;
+    overflow-y: auto; /* Add this if you want scrolling here */
     display: flex;
+    flex: 1;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: #fafafa;
-    overflow-y: auto;
     padding: 2rem;
+    position: relative;
   }
 
   /* === TABS === */
@@ -491,17 +461,12 @@
     transition: background 0.3s ease, color 0.3s ease;
   }
 
-  .toolbar {
+  .controls {
     display: flex;
-    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
     align-items: center;
-    padding: 0.5rem 1rem;
-    background: #f0f0f0;
-    border-bottom: 1px solid #ccc;
-    gap: 0.5rem;
-    z-index: 1000;
   }
-
   .controls button {
     padding: 0.5rem 1rem;
     font-size: 1rem;
@@ -526,21 +491,6 @@
     font-size: 0.9rem;
     color: #666;
   }
-
-  .topbar {
-  display: flex;
-  justify-content: flex-start;
-  padding: 0.5rem 1rem;
-  background: #f9f9f9;
-  border-bottom: 1px solid #ddd;
-}
-
-#previewToggle {
-  font-size: 1.2rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
 
   /* === PREVIEW PANEL === */
   .preview-overlay {
@@ -897,66 +847,107 @@
 
   <div id="tabBar" class="tab-bar"></div>
 
+  <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
-    <div class="topbar">
-      <button id="previewToggle" title="Toggle Preview Overlay">☰</button>
-    </div>
-
-    <div class="toolbar">
+    <div class="editor-area">
       <button id="previewToggle">☰</button>
+      <!-- 🎨 Toolbar -->
+      <div class="format-toolbar" style="margin-bottom: 1rem;">
+        <!-- Icon Button -->
       <button id="fontMenuBtn" title="Choose Font">🅰️</button>
-      <button id="fontSizeBtn" title="Font Size">🔠</button>
-      <button onclick="toggleBold()"><b>B</b></button>
-      <button onclick="toggleItalic()"><i>I</i></button>
-      <button onclick="toggleUnderline()"><u>U</u></button>
-      <button onclick="toggleStrikeThrough()">S̶</button>
-      <button onclick="alignText('left')">←</button>
-      <button onclick="alignText('center')">⇔</button>
-      <button onclick="alignText('right')">→</button>
-      <button onclick="justifyText()">📰</button>
-      <button onclick="toggleUnorderedList()">• List</button>
-      <button onclick="undo()">↩️</button>
-      <button onclick="redo()">↪️</button>
-      <button onclick="cleanEditor()">🧹</button>
-      <button onclick="insertModernLink()">🔗</button>
-      <button id="textColorBtn">🎨</button>
-      <button id="highlightBtn">🖍️</button>
-      <button onclick="removeFormatting()">🚫</button>
 
-      <!-- Font Dropdown -->
       <select id="fontDropdown" onchange="setFont(this.value)">
         <option value="'Arial', sans-serif">Arial</option>
         <option value="'Georgia', serif">Georgia</option>
         <option value="'Courier New', monospace">Courier New</option>
         <option value="'Times New Roman', serif">Times New Roman</option>
       </select>
-    </div>
 
-    <!-- ✏️ Editor -->
-    <div class="editor-area">
-      <div class="editor-wrapper">
-        <div id="mainEditor" contenteditable="true"></div>
-        <div class="margin-handle left"></div>
-        <div class="margin-handle right"></div>
+      <!-- Font Size Icon Button -->
+      <button id="fontSizeBtn" title="Font Size">🔠</button>
+
+      <!-- Size Dropdown -->
+      <div id="sizeDropdown" class="dropdown hidden">
+        <div onclick="setFontSize('1')">Very Small</div>
+        <div onclick="setFontSize('2')">Small</div>
+        <div onclick="setFontSize('3')">Normal</div>
+        <div onclick="setFontSize('4')">Large</div>
+        <div onclick="setFontSize('5')">Very Large</div>
+        <div onclick="setFontSize('6')">Huge</div>
+        <div onclick="setFontSize('7')">Maximum</div>
       </div>
-    </div>
 
-    <!-- 🎯 Dropdown Panels -->
-    <div id="sizeDropdown" class="dropdown hidden"> ... </div>
-    <div id="textColorDropdown" class="dropdown hidden"> ... </div>
-    <div id="highlightDropdown" class="dropdown hidden"> ... </div>
+        <button onclick="toggleBold()"><b>B</b></button>
+        <button onclick="toggleItalic()"><i>I</i></button>
+        <button onclick="toggleUnderline()"><u>U</u></button>
+        <button onclick="toggleStrikeThrough()">S̶</button>
+        <button onclick="alignText('left')">←</button>
+        <button onclick="alignText('center')">⇔</button>
+        <button onclick="alignText('right')">→</button>
+        <button onclick="justifyText()" title="Justify Text">📰</button>
+        <button onclick="toggleUnorderedList()">• List</button>
+        <button onclick="undo()">↩️</button>
+        <button onclick="redo()">↪️</button>
+        <button onclick="cleanEditor()">🧹</button>
+        <button onclick="insertModernLink()">🔗</button>
+        
+    
+      <!-- Text Color Icon Button -->
+      <button id="textColorBtn" title="Text Color">🎨</button>
 
-    <!-- 💾 Save / Voice / File -->
-    <div class="controls">
-      <button onclick="saveText()">💾</button>
-      <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤</button>
-      <button onclick="document.getElementById('fileInput').click()">📎</button>
-      <input type="file" id="fileInput" style="display:none" multiple onchange="handleFileAttachment()" />
+      <!-- Text Color Dropdown -->
+      <div id="textColorDropdown" class="dropdown hidden">
+        <div onclick="setTextColor('black')" style="color: black;">Black</div>
+        <div onclick="setTextColor('red')" style="color: red;">Red</div>
+        <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
+        <div onclick="setTextColor('green')" style="color: green;">Green</div>
+        <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
+        <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
+        <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
+      </div>
+
+      <!-- Highlight Color Icon Button -->
+      <button id="highlightBtn" title="Highlight">🖍️</button>
+
+      <!-- Highlight Color Dropdown -->
+      <div id="highlightDropdown" class="dropdown hidden">
+        <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+        <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+        <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+        <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+        <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
+      </div>
+
+        <button onclick="removeFormatting()">🚫</button>
+      </div>
+
+      <!-- 📝 Rich Text Editor -->
+      <div id="mainEditor" contenteditable="true" style="
+        width: 60%;
+        min-height: 300px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: var(--editor-bg);
+        color: var(--editor-text);
+        overflow-y: auto;
+      "></div>
+
+      <div class="controls">
+       <button onclick="saveText()" title="Save">💾</button>
+       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
+       <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
+      </div>
+
+      <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
+
       <div id="attachedFilesList"></div>
       <div class="save-time" id="saveStatus"></div>
     </div>
   </div>
 
+  <!-- Your main HTML content above -->
 
 </body>
 
@@ -2139,38 +2130,6 @@
        selection.addRange(newRange);
      }
     }
-
-    const editor = document.getElementById("mainEditor");
-    const handles = document.querySelectorAll(".margin-handle");
-
-    handles.forEach(handle => {
-      handle.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        const isLeft = handle.classList.contains("left");
-
-        function onMove(event) {
-          const rect = editor.getBoundingClientRect();
-          const offset = event.clientX - rect.left;
-          const inverse = rect.right - event.clientX;
-
-          if (isLeft) {
-            editor.style.paddingLeft = `${Math.max(30, offset)}px`;
-            handle.style.left = `${offset}px`;
-          } else {
-           editor.style.paddingRight = `${Math.max(30, inverse)}px`;
-           handle.style.right = `${Math.max(30, inverse)}px`;
-          }
-        }
-
-        function onUp() {
-          document.removeEventListener("mousemove", onMove);
-          document.removeEventListener("mouseup", onUp);
-        }
-
-        document.addEventListener("mousemove", onMove);
-        document.addEventListener("mouseup", onUp);
-      });
-    });
 
     document.addEventListener("click", () => {
       setTimeout(() => {
