@@ -288,20 +288,15 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
-    height: 70vh; /* You can tweak this to fit your layout */
+    flex: 1;
+    width: 100%;
+    max-width: 800px; /* Optional: limit width for a "paper" feel */
     overflow-y: auto;
-    background: var(--editor-bg);
-    border: 1px solid #e0dcbf;
-    border-radius: 8px;
+    min-height: 400px;
     padding: 1rem;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: var(--editor-text);
-    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-    background-size: 100% 1.5em;
-    padding-bottom: 4rem; /* space for bottom ruler */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: var(--editor-bg, #fff);
   }
 
   .margin-ruler {
@@ -351,6 +346,17 @@
     display: none;
   }
 
+  #toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--editor-bg, #fff);
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
+    max-width: 800px; /* Match editor width */
+  }
+
   textarea {
     width: 60%;
     height: 300px;
@@ -367,14 +373,13 @@
     height: 100vh;
   }
   .editor-area {
-    overflow-y: auto; /* Add this if you want scrolling here */
     display: flex;
-    flex: 1;
     flex-direction: column;
-    justify-content: center;
+    flex: 1;
     align-items: center;
     padding: 2rem;
     position: relative;
+    overflow: hidden; /* Stop scroll from pushing UI */
   }
 
   /* === TABS === */
