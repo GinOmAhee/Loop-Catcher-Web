@@ -493,6 +493,17 @@
     transition: background 0.3s ease, color 0.3s ease;
   }
 
+  .toolbar {
+    background: #f5f5f5;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10000;
+  }
+
   .controls {
     display: flex;
     gap: 1rem;
@@ -883,10 +894,6 @@
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
       <button id="previewToggle">☰</button>
-      <!-- 🎨 Toolbar -->
-      <div class="format-toolbar" style="margin-bottom: 1rem;">
-        <!-- Icon Button -->
-      <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
       <select id="fontDropdown" onchange="setFont(this.value)">
         <option value="'Arial', sans-serif">Arial</option>
@@ -894,9 +901,6 @@
         <option value="'Courier New', monospace">Courier New</option>
         <option value="'Times New Roman', serif">Times New Roman</option>
       </select>
-
-      <!-- Font Size Icon Button -->
-      <button id="fontSizeBtn" title="Font Size">🔠</button>
 
       <!-- Size Dropdown -->
       <div id="sizeDropdown" class="dropdown hidden">
@@ -909,24 +913,6 @@
         <div onclick="setFontSize('7')">Maximum</div>
       </div>
 
-        <button onclick="toggleBold()"><b>B</b></button>
-        <button onclick="toggleItalic()"><i>I</i></button>
-        <button onclick="toggleUnderline()"><u>U</u></button>
-        <button onclick="toggleStrikeThrough()">S̶</button>
-        <button onclick="alignText('left')">←</button>
-        <button onclick="alignText('center')">⇔</button>
-        <button onclick="alignText('right')">→</button>
-        <button onclick="justifyText()" title="Justify Text">📰</button>
-        <button onclick="toggleUnorderedList()">• List</button>
-        <button onclick="undo()">↩️</button>
-        <button onclick="redo()">↪️</button>
-        <button onclick="cleanEditor()">🧹</button>
-        <button onclick="insertModernLink()">🔗</button>
-        
-    
-      <!-- Text Color Icon Button -->
-      <button id="textColorBtn" title="Text Color">🎨</button>
-
       <!-- Text Color Dropdown -->
       <div id="textColorDropdown" class="dropdown hidden">
         <div onclick="setTextColor('black')" style="color: black;">Black</div>
@@ -938,9 +924,6 @@
         <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
       </div>
 
-      <!-- Highlight Color Icon Button -->
-      <button id="highlightBtn" title="Highlight">🖍️</button>
-
       <!-- Highlight Color Dropdown -->
       <div id="highlightDropdown" class="dropdown hidden">
         <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
@@ -950,10 +933,34 @@
         <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
       </div>
 
-        <button onclick="removeFormatting()">🚫</button>
-      </div>
-
       <div class="main-container">
+        <div class="toolbar">
+          <!-- 🎨 Toolbar -->
+          <div class="format-toolbar" style="margin-bottom: 1rem;">
+          <!-- Icon Button -->
+          <button id="fontMenuBtn" title="Choose Font">🅰️</button>
+          <!-- Font Size Icon Button -->
+          <button id="fontSizeBtn" title="Font Size">🔠</button>
+          <button onclick="toggleBold()"><b>B</b></button>
+          <button onclick="toggleItalic()"><i>I</i></button>
+          <button onclick="toggleUnderline()"><u>U</u></button>
+          <button onclick="toggleStrikeThrough()">S̶</button>
+          <button onclick="alignText('left')">←</button>
+          <button onclick="alignText('center')">⇔</button>
+          <button onclick="alignText('right')">→</button>
+          <button onclick="justifyText()" title="Justify Text">📰</button>
+          <button onclick="toggleUnorderedList()">• List</button>
+          <button onclick="undo()">↩️</button>
+          <button onclick="redo()">↪️</button>
+          <button onclick="cleanEditor()">🧹</button>
+          <button onclick="insertModernLink()">🔗</button>
+          <!-- Text Color Icon Button -->
+          <button id="textColorBtn" title="Text Color">🎨</button>
+          <!-- Highlight Color Icon Button -->
+          <button id="highlightBtn" title="Highlight">🖍️</button>
+          <button onclick="removeFormatting()">🚫</button>
+        </div>
+
         <div class="editor-area">
           <div class="editor-wrapper">
             <div id="mainEditor" contenteditable="true">
