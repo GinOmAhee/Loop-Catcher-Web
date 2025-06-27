@@ -302,47 +302,50 @@
     background-size: 100% 1.5em;
   }
 
-  .ruler {
+  .margin-ruler {
     position: absolute;
-    background: #eee;
-    z-index: 20;
-    pointer-events: none;
+    background-color: rgba(0, 123, 255, 0.3); /* light blue overlay */
+    z-index: 9999;
+    cursor: grab;
   }
-  .ruler.vertical {
-    width: 20px;
+
+  .margin-ruler.vertical {
+    width: 6px;
     top: 0;
     bottom: 0;
   }
-  .ruler.horizontal {
-    height: 20px;
+
+  .margin-ruler.horizontal {
+    height: 6px;
     left: 0;
     right: 0;
   }
-  #leftRuler { left: 0; }
-  #rightRuler { right: 0; }
-  #topRuler { top: 0; height: 20px; }
-  #bottomRuler { bottom: 0; height: 20px; }
 
-  .handler {
-    position: absolute;
-    width: 6px;
-    height: 100%;
-    background: hotpink;
-    cursor: ew-resize;
-    pointer-events: auto;
+  #leftMarginRuler {
+    left: 0;
   }
-  .horizontal .handler {
-    width: 100%;
-    height: 6px;
-    cursor: ns-resize;
+
+  #rightMarginRuler {
+    right: 0;
   }
-  #topHandle, #bottomHandle {
-    left: 50%;
-    transform: translateX(-50%);
+
+  #topMarginRuler {
+    top: 0;
   }
-  #leftHandle, #rightHandle {
-    top: 50%;
-    transform: translateY(-50%);
+
+  #bottomMarginRuler {
+    bottom: 0;
+  }
+
+  #marginTooltip {
+    position: fixed;
+    background: black;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 10000;
   }
 
   textarea {
