@@ -969,10 +969,10 @@
   
         <!-- Margin Rulers (Top, Left, Right, Bottom) -->
         <div id="topMarginRuler" class="margin-ruler horizontal"></div>
+        <div id="bottomMarginRuler" class="margin-ruler horizontal"></div>
         <div id="leftMarginRuler" class="margin-ruler vertical"></div>
         <div id="rightMarginRuler" class="margin-ruler vertical"></div>
-        <div id="bottomMarginRuler" class="margin-ruler horizontal"></div>
-
+        
       <!-- 📝 Rich Text Editor -->
       <div id="mainEditor" contenteditable="true" style="
         min-height: 300px;
@@ -2188,58 +2188,81 @@
        selection.addRange(newRange);
      }
     }
+    
+    function initRuler() {
+      const editor = document.getElementById("mainEditor");
 
-    const editor = document.getElementById("mainEditor");
+      const marginState = {
+        top: document.getElementById("topMarginRuler"),
+        bottom: document.getElementById("bottomMarginRuler"),
+        left: document.getElementById("leftMarginRuler"),
+        right: document.getElementById("rightMarginRuler")
+      };
 
-    const marginState = {
-      top: 2,
-      bottom: 2,
-      left: 2,
-      right: 2,
-    };
-
-    function applyMargins() {
-      editor.style.paddingTop = `${marginState.top}cm`;
-      editor.style.paddingBottom = `${marginState.bottom}cm`;
-      editor.style.paddingLeft = `${marginState.left}cm`;
-      editor.style.paddingRight = `${marginState.right}cm`;
-    }
-
-    function initRuler(handleId, axis, side) {
-      const handle = document.getElementById(handleId);
-      let isDragging = false;
-
-      handle.addEventListener("mousedown", (e) => {
-        isDragging = true;
-        document.body.style.cursor = axis === "x" ? "ew-resize" : "ns-resize";
-      });
-
-      document.addEventListener("mouseup", () => {
-        if (isDragging) {
-          isDragging = false;
-          document.body.style.cursor = "";
+      Object.entries(rulers).forEach(([position, el]) => {
+        if (!el) {
+          console.warn(`⚠️ Missing ${position}MarginRuler`);
+          return;
         }
+
+        el.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          const startY = e.clientY;
+          const startX = e.clientX;
+
+          const editor = document.getElementById("mainEditor");
+          const initialStyles = window.getComputedStyle(editor);
+          const startMargin = {
+            top: parseInt(initialStyles.marginTop),
+            bottom: parseInt(initialStyles.marginBottom),
+            left: parseInt(initialStyles.marginLeft),
+            right: parseInt(initialStyles.marginRight)
+          };
+
+          function onMouseMove(ev) {
+            let value;
+            if (position === "top" || position === "bottom") {
+              const dy = ev.clientY - startY;
+              value = startMargin[position] + dy;
+              editor.style[`margin${capitalize(position)}`] = `${value}px`;
+              positionTooltip(ev.clientX, ev.clientY, `${position} margin: ${value}px`);
+            } else {
+              const dx = ev.clientX - startX;
+              value = startMargin[position] + dx * (position === "left" ? 1 : -1);
+              editor.style[`margin${capitalize(position)}`] = `${value}px`;
+              positionTooltip(ev.clientX, ev.clientY, `${position} margin: ${value}px`);
+            }
+          }
+
+          function onMouseUp() {
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+            marginTooltip.style.display = "none";
+          }
+
+          document.addEventListener("mousemove", onMouseMove);
+          document.addEventListener("mouseup", onMouseUp);
+        });
       });
 
-      document.addEventListener("mousemove", (e) => {
-        if (!isDragging) return;
-        const offset = axis === "x" ? e.clientX : e.clientY;
-        const cmValue = Math.round(offset / 37.8); // rough conversion to cm
+      function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
 
-        marginState[side] = cmValue;
-        applyMargins();
+      function positionTooltip(x, y, text) {
+        marginTooltip.style.display = "block";
+        marginTooltip.style.left = `${x + 10}px`;
+        marginTooltip.style.top = `${y + 10}px`;
+        marginTooltip.innerText = text;
+      }
 
-        // 💬 Optional: show live feedback
-        document.getElementById("saveStatus").innerText = `📏 ${side} margin: ${cmValue}cm`;
-      });
+      console.log("📏 Rulers initialized!");
     }
 
-    ["top", "bottom", "left", "right"].forEach((side) => {
-      const axis = side === "top" || side === "bottom" ? "y" : "x";
-      initRuler(`${side}Handle`, axis, side);
+    // ✅ Run only after DOM is ready
+    window.addEventListener("DOMContentLoaded", () => {
+      initRuler();
     });
-
-    applyMargins();
 
     document.addEventListener("click", () => {
       setTimeout(() => {
