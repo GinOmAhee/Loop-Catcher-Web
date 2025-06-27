@@ -288,15 +288,10 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
-    width: 8.5in;
-    height: 11in;
-    box-sizing: border-box; /* 👈 ensures padding doesn't increase box size */
-    padding: var(--margin-top, 1in) var(--margin-right, 1in) var(--margin-bottom, 1in) var(--margin-left, 1in);
-    overflow: auto;
     background: #fffdf5;
     border: 1px solid #e0dcbf;
-    margin: 2rem auto;
     border-radius: 0 0 6px 6px;
+    padding: 1rem;
     min-height: 300px;
     font-family: 'Courier New', monospace;
     font-size: 1rem;
@@ -314,6 +309,40 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     resize: none;
+  }
+
+  .margin-panel {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.5rem 0.75rem;
+    align-items: center;
+    max-width: 400px;
+    margin: 1rem auto;
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    font-size: 0.9rem;
+  }
+
+  .margin-row {
+    display: contents; /* use grid from parent */
+  }
+
+  .margin-panel label {
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .margin-panel input[type="range"] {
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .margin-panel span {
+    font-variant-numeric: tabular-nums;
+    width: 3rem;
+    text-align: right;
   }
 
   /* === LAYOUT === */
@@ -464,31 +493,6 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     z-index: 999;
     transition: background 0.3s ease, color 0.3s ease;
-  }
-
-  .margin-slider-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-    max-width: 400px;
-    padding: 1rem;
-    border-radius: 12px;
-    background: var(--panel-bg, #f4f4f4);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-    font-family: "Inter", sans-serif;
-    font-size: 0.95rem;
-  }
-
-  .margin-slider-panel label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.6rem;
-  }
-
-  .margin-slider-panel input[type="range"] {
-    flex: 1;
-    accent-color: hotpink;
   }
 
   .controls {
@@ -951,6 +955,29 @@
         <button onclick="removeFormatting()">🚫</button>
       </div>
 
+      <div id="marginControls" class="margin-panel">
+       <div class="margin-row">
+         <label>Top</label>
+         <input type="range" min="0" max="3" step="0.1" value="1" id="marginTopSlider">
+         <span id="marginTopValue">1 in</span>
+       </div>
+       <div class="margin-row">
+         <label>Right</label>
+         <input type="range" min="0" max="3" step="0.1" value="1" id="marginRightSlider">
+         <span id="marginRightValue">1 in</span>
+       </div>
+       <div class="margin-row">
+         <label>Bottom</label>
+         <input type="range" min="0" max="3" step="0.1" value="1" id="marginBottomSlider">
+         <span id="marginBottomValue">1 in</span>
+       </div>
+       <div class="margin-row">
+         <label>Left</label>
+         <input type="range" min="0" max="3" step="0.1" value="1" id="marginLeftSlider">
+         <span id="marginLeftValue">1 in</span>
+       </div>
+     </div>
+
       <!-- 📝 Rich Text Editor -->
       <div id="mainEditor" contenteditable="true" style="
         width: 60%;
@@ -963,13 +990,6 @@
         color: var(--editor-text);
         overflow-y: auto;
       "></div>
-
-      <div class="margin-slider-panel">
-        <label>Top Margin <input type="range" id="marginTopSlider" min="0" max="3" step="0.1" value="1"> <span id="topVal">1in</span></label>
-        <label>Right Margin <input type="range" id="marginRightSlider" min="0" max="3" step="0.1" value="1"> <span id="rightVal">1in</span></label>
-        <label>Bottom Margin <input type="range" id="marginBottomSlider" min="0" max="3" step="0.1" value="1"> <span id="bottomVal">1in</span></label>
-        <label>Left Margin <input type="range" id="marginLeftSlider" min="0" max="3" step="0.1" value="1"> <span id="leftVal">1in</span></label>
-      </div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -1762,29 +1782,6 @@
       selection.addRange(newRange);
     }
 
-    function applySliderMargins() {
-      const top = document.getElementById("marginTopSlider").value;
-      const right = document.getElementById("marginRightSlider").value;
-      const bottom = document.getElementById("marginBottomSlider").value;
-      const left = document.getElementById("marginLeftSlider").value;
-
-      // Update live labels
-      document.getElementById("topVal").textContent = `${top}in`;
-      document.getElementById("rightVal").textContent = `${right}in`;
-      document.getElementById("bottomVal").textContent = `${bottom}in`;
-      document.getElementById("leftVal").textContent = `${left}in`;
-
-      const editor = document.getElementById("mainEditor");
-      if (editor) {
-        editor.style.padding = `${top}in ${right}in ${bottom}in ${left}in`;
-      }
-    }
-
-    // Attach listeners to sliders
-    ["Top", "Right", "Bottom", "Left"].forEach(side => {
-      document.getElementById(`margin${side}Slider`).addEventListener("input", applySliderMargins);
-    });
-
     function toggleStrikeThrough() {
       const selection = window.getSelection();
       if (!selection.rangeCount || selection.isCollapsed) return;
@@ -2190,6 +2187,28 @@
        selection.addRange(newRange);
      }
     }
+
+    function updateMargins() {
+      const top = parseFloat(marginTopSlider.value).toFixed(1);
+      const right = parseFloat(marginRightSlider.value).toFixed(1);
+      const bottom = parseFloat(marginBottomSlider.value).toFixed(1);
+      const left = parseFloat(marginLeftSlider.value).toFixed(1);
+
+      mainEditor.style.setProperty('--margin-top', top + 'in');
+      mainEditor.style.setProperty('--margin-right', right + 'in');
+      mainEditor.style.setProperty('--margin-bottom', bottom + 'in');
+      mainEditor.style.setProperty('--margin-left', left + 'in');
+
+      marginTopValue.textContent = `${top} in`;
+      marginRightValue.textContent = `${right} in`;
+      marginBottomValue.textContent = `${bottom} in`;
+      marginLeftValue.textContent = `${left} in`;
+    }
+
+    ["Top", "Right", "Bottom", "Left"].forEach(side => {
+      const slider = document.getElementById(`margin${side}Slider`);
+      slider.addEventListener("input", updateMargins);
+    });
 
     document.addEventListener("click", () => {
       setTimeout(() => {
