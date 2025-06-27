@@ -965,9 +965,16 @@
         <button onclick="removeFormatting()">🚫</button>
       </div>
 
+      <div id="editorWrapper" style="position: relative; width: 60%; margin: 0 auto;">
+  
+        <!-- Margin Rulers (Top, Left, Right, Bottom) -->
+        <div id="topMarginRuler" class="margin-ruler horizontal"></div>
+        <div id="leftMarginRuler" class="margin-ruler vertical"></div>
+        <div id="rightMarginRuler" class="margin-ruler vertical"></div>
+        <div id="bottomMarginRuler" class="margin-ruler horizontal"></div>
+
       <!-- 📝 Rich Text Editor -->
       <div id="mainEditor" contenteditable="true" style="
-        width: 60%;
         min-height: 300px;
         padding: 1rem;
         font-size: 0.9rem;
@@ -976,13 +983,14 @@
         background: var(--editor-bg);
         color: var(--editor-text);
         overflow-y: auto;
-      "></div>
+      ">
+        <h1>Interactive Margin Editor</h1>
+        <p>Try dragging the rulers to adjust the margins.</p>
+      </div>
+    </div>
 
-      <!-- RULER MARGIN HANDLERS -->
-      <div id="topRuler" class="ruler horizontal"><div class="handler" id="topHandle"></div></div>
-      <div id="bottomRuler" class="ruler horizontal"><div class="handler" id="bottomHandle"></div></div>
-      <div id="leftRuler" class="ruler vertical"><div class="handler" id="leftHandle"></div></div>
-      <div id="rightRuler" class="ruler vertical"><div class="handler" id="rightHandle"></div></div>
+    <!-- Tooltip (outside for global use) -->
+    <div id="marginTooltip"></div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
