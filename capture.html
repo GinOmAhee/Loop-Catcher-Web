@@ -293,16 +293,14 @@
     height: 11in;
     background: #fffdf5;
     border: 1px solid #ccc;
-    margin: 2rem auto;
     box-shadow: 0 0 6px rgba(0,0,0,0.1);
   }
 
   #mainEditor {
-    border: 2px dashed hotpink;
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-    padding: 1in; /* initial margin */
+    padding: 1in;
     font-family: 'Courier New', monospace;
     line-height: 1.5;
     background-image: linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
@@ -313,24 +311,23 @@
   .margin-handle {
     position: absolute;
     top: 50%;
+    transform: translateY(-50%);
     width: 16px;
     height: 40px;
-    background: limegreen;
-    border: 2px solid black;
+    background: hotpink;
     border-radius: 4px;
-    z-index: 9999;
-    transform: translateY(-50%);
     cursor: ew-resize;
+    z-index: 10;
   }
+  .margin-handle.left { left: 1in; }
+  .margin-handle.right { right: 1in; }
 
-  .margin-handle.left {
-    left: 1in;
-    transform: translateX(-50%);
-  }
-
-  .margin-handle.right {
-    right: 1in;
-    transform: translateX(-50%);
+  .controls {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #f5f5f5;
+    border-top: 1px solid #ccc;
   }
 
   textarea {
@@ -346,17 +343,18 @@
   /* === LAYOUT === */
   .main-container {
     display: flex;
+    flex-direction: column;
     height: 100vh;
   }
+
   .editor-area {
-    overflow-y: auto; /* Add this if you want scrolling here */
-    display: flex;
     flex: 1;
-    flex-direction: column;
+    display: flex;
     justify-content: center;
     align-items: center;
+    background: #fafafa;
+    overflow-y: auto;
     padding: 2rem;
-    position: relative;
   }
 
   /* === TABS === */
@@ -494,22 +492,16 @@
   }
 
   .toolbar {
-    background: #f5f5f5;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #ddd;
     display: flex;
-    gap: 1rem;
-    position: sticky;
-    top: 0;
-    z-index: 10000;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+    gap: 0.5rem;
+    z-index: 1000;
   }
 
-  .controls {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-    align-items: center;
-  }
   .controls button {
     padding: 0.5rem 1rem;
     font-size: 1rem;
@@ -534,6 +526,21 @@
     font-size: 0.9rem;
     color: #666;
   }
+
+  .topbar {
+  display: flex;
+  justify-content: flex-start;
+  padding: 0.5rem 1rem;
+  background: #f9f9f9;
+  border-bottom: 1px solid #ddd;
+}
+
+#previewToggle {
+  font-size: 1.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
 
   /* === PREVIEW PANEL === */
   .preview-overlay {
@@ -890,102 +897,66 @@
 
   <div id="tabBar" class="tab-bar"></div>
 
-  <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
-    <div class="editor-area">
-      <button id="previewToggle">☰</button>
+    <div class="topbar">
+      <button id="previewToggle" title="Toggle Preview Overlay">☰</button>
+    </div>
 
+    <div class="toolbar">
+      <button id="previewToggle">☰</button>
+      <button id="fontMenuBtn" title="Choose Font">🅰️</button>
+      <button id="fontSizeBtn" title="Font Size">🔠</button>
+      <button onclick="toggleBold()"><b>B</b></button>
+      <button onclick="toggleItalic()"><i>I</i></button>
+      <button onclick="toggleUnderline()"><u>U</u></button>
+      <button onclick="toggleStrikeThrough()">S̶</button>
+      <button onclick="alignText('left')">←</button>
+      <button onclick="alignText('center')">⇔</button>
+      <button onclick="alignText('right')">→</button>
+      <button onclick="justifyText()">📰</button>
+      <button onclick="toggleUnorderedList()">• List</button>
+      <button onclick="undo()">↩️</button>
+      <button onclick="redo()">↪️</button>
+      <button onclick="cleanEditor()">🧹</button>
+      <button onclick="insertModernLink()">🔗</button>
+      <button id="textColorBtn">🎨</button>
+      <button id="highlightBtn">🖍️</button>
+      <button onclick="removeFormatting()">🚫</button>
+
+      <!-- Font Dropdown -->
       <select id="fontDropdown" onchange="setFont(this.value)">
         <option value="'Arial', sans-serif">Arial</option>
         <option value="'Georgia', serif">Georgia</option>
         <option value="'Courier New', monospace">Courier New</option>
         <option value="'Times New Roman', serif">Times New Roman</option>
       </select>
+    </div>
 
-      <!-- Size Dropdown -->
-      <div id="sizeDropdown" class="dropdown hidden">
-        <div onclick="setFontSize('1')">Very Small</div>
-        <div onclick="setFontSize('2')">Small</div>
-        <div onclick="setFontSize('3')">Normal</div>
-        <div onclick="setFontSize('4')">Large</div>
-        <div onclick="setFontSize('5')">Very Large</div>
-        <div onclick="setFontSize('6')">Huge</div>
-        <div onclick="setFontSize('7')">Maximum</div>
+    <!-- ✏️ Editor -->
+    <div class="editor-area">
+      <div class="editor-wrapper">
+        <div id="mainEditor" contenteditable="true"></div>
+        <div class="margin-handle left"></div>
+        <div class="margin-handle right"></div>
       </div>
+    </div>
 
-      <!-- Text Color Dropdown -->
-      <div id="textColorDropdown" class="dropdown hidden">
-        <div onclick="setTextColor('black')" style="color: black;">Black</div>
-        <div onclick="setTextColor('red')" style="color: red;">Red</div>
-        <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
-        <div onclick="setTextColor('green')" style="color: green;">Green</div>
-        <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
-        <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
-        <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
-      </div>
+    <!-- 🎯 Dropdown Panels -->
+    <div id="sizeDropdown" class="dropdown hidden"> ... </div>
+    <div id="textColorDropdown" class="dropdown hidden"> ... </div>
+    <div id="highlightDropdown" class="dropdown hidden"> ... </div>
 
-      <!-- Highlight Color Dropdown -->
-      <div id="highlightDropdown" class="dropdown hidden">
-        <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
-        <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
-        <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
-        <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
-        <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
-      </div>
-
-      <div class="main-container">
-        <div class="toolbar">
-          <!-- 🎨 Toolbar -->
-          <div class="format-toolbar" style="margin-bottom: 1rem;">
-          <!-- Icon Button -->
-          <button id="fontMenuBtn" title="Choose Font">🅰️</button>
-          <!-- Font Size Icon Button -->
-          <button id="fontSizeBtn" title="Font Size">🔠</button>
-          <button onclick="toggleBold()"><b>B</b></button>
-          <button onclick="toggleItalic()"><i>I</i></button>
-          <button onclick="toggleUnderline()"><u>U</u></button>
-          <button onclick="toggleStrikeThrough()">S̶</button>
-          <button onclick="alignText('left')">←</button>
-          <button onclick="alignText('center')">⇔</button>
-          <button onclick="alignText('right')">→</button>
-          <button onclick="justifyText()" title="Justify Text">📰</button>
-          <button onclick="toggleUnorderedList()">• List</button>
-          <button onclick="undo()">↩️</button>
-          <button onclick="redo()">↪️</button>
-          <button onclick="cleanEditor()">🧹</button>
-          <button onclick="insertModernLink()">🔗</button>
-          <!-- Text Color Icon Button -->
-          <button id="textColorBtn" title="Text Color">🎨</button>
-          <!-- Highlight Color Icon Button -->
-          <button id="highlightBtn" title="Highlight">🖍️</button>
-          <button onclick="removeFormatting()">🚫</button>
-        </div>
-
-        <div class="editor-area">
-          <div class="editor-wrapper">
-            <div id="mainEditor" contenteditable="true">
-              <!-- optional: text content -->
-            </div>
-            <div class="margin-handle left"></div>
-            <div class="margin-handle right"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="controls">
-       <button onclick="saveText()" title="Save">💾</button>
-       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
-       <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
-      </div>
-
-      <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
-
+    <!-- 💾 Save / Voice / File -->
+    <div class="controls">
+      <button onclick="saveText()">💾</button>
+      <button id="voiceBtn" onclick="toggleVoiceCapture()">🎤</button>
+      <button onclick="document.getElementById('fileInput').click()">📎</button>
+      <input type="file" id="fileInput" style="display:none" multiple onchange="handleFileAttachment()" />
       <div id="attachedFilesList"></div>
       <div class="save-time" id="saveStatus"></div>
     </div>
   </div>
 
-  <!-- Your main HTML content above -->
 
 </body>
 
