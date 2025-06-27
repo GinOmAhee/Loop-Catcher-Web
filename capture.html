@@ -314,17 +314,12 @@
     resize: none;
   }
 
-  .content-row {
-    display: flex;
-    align-items: stretch;
-  }
-
   .editor-wrapper {
     position: relative;
     display: flex;
-    flex-direction: column;
-    align-items: center;         /* Center horizontally */
-    justify-content: center;     /* Center vertically if needed */
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
     padding: 2rem;
     max-width: 100vw;
     max-height: 100vh;
@@ -332,69 +327,30 @@
     box-sizing: border-box;
   }
 
-  /* Ensure top ruler isn’t tall */
-  .horizontal-ruler {
-    height: 30px;
-    display: flex;
-    justify-content: space-between;
-    background: #f0f0f0;
-    position: relative;
-  }
-
-  /* Editor row */
-  .content-row {
-    display: flex;
-    align-items: stretch;
-  }
-
-  /* Vertical ruler fixed width */
+  /* Vertical ruler on the left */
   .vertical-ruler {
     width: 30px;
     background: #f3f3f3;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     position: relative;
   }
 
+  /* Margin handle inside the vertical ruler */
   .margin-handle {
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 16px;
+    height: 16px;
     background: hotpink;
     border-radius: 50%;
-    cursor: ew-resize;
-    z-index: 10;
     pointer-events: all;
-  }
-
-  body * {
-    outline: 1px dashed red !important;
-  }
-
-  .margin-handle.top,
-  .margin-handle.bottom {
-    left: 50%;
-    transform: translateX(-50%);
-    cursor: ns-resize;
-  }
-
-  .margin-handle.left {
-    top: 7px;
-    left: 1in;
-  }
-
-  .margin-handle.right {
-    top: 7px;
-    right: 1in;
-  }
-
-  .margin-handle.top {
-    top: 1in;
+    z-index: 9999;
+    border: 2px solid black;
   }
 
   .margin-handle.bottom {
     bottom: 1in;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: ns-resize;
   }
 
   /* === LAYOUT === */
@@ -1007,25 +963,23 @@
         <button onclick="removeFormatting()">🚫</button>
       </div>
 
-      <div style="height: 100vh; overflow-y: auto;">
-        <div class="editor-wrapper"> ... </div>
-      </div>
+     <div style="height: 100vh; overflow-y: auto;">
+       <div class="editor-wrapper">
+         <div class="horizontal-ruler">
+           <div class="margin-handle left" draggable="true"></div>
+           <div class="margin-handle right" draggable="true"></div>
+         </div>
 
-      <div class="editor-wrapper">
-        <div class="horizontal-ruler">
-          <div class="margin-handle left" draggable="true"></div>
-          <div class="margin-handle right" draggable="true"></div>
-        </div>
+         <div class="content-row">
+           <div class="vertical-ruler">
+             <div class="margin-handle top" draggable="true"></div>
+             <div class="margin-handle bottom" draggable="true"></div>
+           </div>
 
-        <div class="content-row">
-          <div class="vertical-ruler">
-            <div class="margin-handle top" draggable="true"></div>
-            <div class="margin-handle bottom" draggable="true"></div>
-          </div>
-
-          <div id="mainEditor" contenteditable="true"></div>
-        </div>
-      </div>
+           <div id="mainEditor" contenteditable="true"></div>
+         </div>
+       </div>
+     </div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
