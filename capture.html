@@ -311,38 +311,62 @@
     resize: none;
   }
 
-  .margin-panel {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 0.5rem 0.75rem;
-    align-items: center;
-    max-width: 400px;
-    margin: 1rem auto;
-    background: #f9f9f9;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    font-size: 0.9rem;
+  .editor-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+    max-width: fit-content;
+    margin: auto;
   }
 
-  .margin-row {
-    display: contents; /* use grid from parent */
+  .horizontal-ruler {
+    position: relative;
+    height: 24px;
+    width: 8.5in;
+    margin-left: 1.2rem;
+    background: repeating-linear-gradient(to right, #ddd 0, #ddd 1px, transparent 1px, transparent 10px);
   }
 
-  .margin-panel label {
-    white-space: nowrap;
-    font-weight: 500;
+  .vertical-ruler {
+    position: relative;
+    width: 24px;
+    height: 11in;
+    background: repeating-linear-gradient(to bottom, #ddd 0, #ddd 1px, transparent 1px, transparent 10px);
   }
 
-  .margin-panel input[type="range"] {
-    width: 100%;
-    cursor: pointer;
+  .margin-handle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: hotpink;
+    border-radius: 50%;
+    cursor: ew-resize;
   }
 
-  .margin-panel span {
-    font-variant-numeric: tabular-nums;
-    width: 3rem;
-    text-align: right;
+  .margin-handle.top,
+  .margin-handle.bottom {
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: ns-resize;
+  }
+
+  .margin-handle.left {
+    top: 7px;
+    left: 1in;
+  }
+
+  .margin-handle.right {
+    top: 7px;
+    right: 1in;
+  }
+
+  .margin-handle.top {
+    top: 1in;
+  }
+
+  .margin-handle.bottom {
+    bottom: 1in;
   }
 
   /* === LAYOUT === */
@@ -890,6 +914,22 @@
         <!-- Icon Button -->
       <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
+      <div class="editor-wrapper">
+        <div class="horizontal-ruler">
+          <div class="margin-handle left" draggable="true"></div>
+          <div class="margin-handle right" draggable="true"></div>
+        </div>
+
+        <div class="content-row">
+          <div class="vertical-ruler">
+            <div class="margin-handle top" draggable="true"></div>
+            <div class="margin-handle bottom" draggable="true"></div>
+          </div>
+
+          <div id="mainEditor" contenteditable="true"></div>
+        </div>
+      </div>
+
       <select id="fontDropdown" onchange="setFont(this.value)">
         <option value="'Arial', sans-serif">Arial</option>
         <option value="'Georgia', serif">Georgia</option>
@@ -954,42 +994,6 @@
 
         <button onclick="removeFormatting()">🚫</button>
       </div>
-
-      <div id="marginControls" class="margin-panel">
-       <div class="margin-row">
-         <label>Top</label>
-         <input type="range" min="0" max="3" step="0.1" value="1" id="marginTopSlider">
-         <span id="marginTopValue">1 in</span>
-       </div>
-       <div class="margin-row">
-         <label>Right</label>
-         <input type="range" min="0" max="3" step="0.1" value="1" id="marginRightSlider">
-         <span id="marginRightValue">1 in</span>
-       </div>
-       <div class="margin-row">
-         <label>Bottom</label>
-         <input type="range" min="0" max="3" step="0.1" value="1" id="marginBottomSlider">
-         <span id="marginBottomValue">1 in</span>
-       </div>
-       <div class="margin-row">
-         <label>Left</label>
-         <input type="range" min="0" max="3" step="0.1" value="1" id="marginLeftSlider">
-         <span id="marginLeftValue">1 in</span>
-       </div>
-     </div>
-
-      <!-- 📝 Rich Text Editor -->
-      <div id="mainEditor" contenteditable="true" style="
-        width: 60%;
-        min-height: 300px;
-        padding: 1rem;
-        font-size: 0.9rem;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background: var(--editor-bg);
-        color: var(--editor-text);
-        overflow-y: auto;
-      "></div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -2188,26 +2192,47 @@
      }
     }
 
-    function updateMargins() {
-      const top = parseFloat(marginTopSlider.value).toFixed(1);
-      const right = parseFloat(marginRightSlider.value).toFixed(1);
-      const bottom = parseFloat(marginBottomSlider.value).toFixed(1);
-      const left = parseFloat(marginLeftSlider.value).toFixed(1);
+    let draggingHandle = null;
 
-      mainEditor.style.setProperty('--margin-top', top + 'in');
-      mainEditor.style.setProperty('--margin-right', right + 'in');
-      mainEditor.style.setProperty('--margin-bottom', bottom + 'in');
-      mainEditor.style.setProperty('--margin-left', left + 'in');
+    document.querySelectorAll('.margin-handle').forEach(handle => {
+      handle.addEventListener('mousedown', (e) => {
+        draggingHandle = handle;
+        e.preventDefault();
+      });
+    });
 
-      marginTopValue.textContent = `${top} in`;
-      marginRightValue.textContent = `${right} in`;
-      marginBottomValue.textContent = `${bottom} in`;
-      marginLeftValue.textContent = `${left} in`;
-    }
+    document.addEventListener('mouseup', () => {
+      draggingHandle = null;
+    });
 
-    ["Top", "Right", "Bottom", "Left"].forEach(side => {
-      const slider = document.getElementById(`margin${side}Slider`);
-      slider.addEventListener("input", updateMargins);
+    document.addEventListener('mousemove', (e) => {
+      if (!draggingHandle) return;
+
+      const editorRect = editor.getBoundingClientRect();
+
+      if (draggingHandle.classList.contains("left")) {
+        const offset = Math.max(0.5, (e.clientX - editorRect.left) / 96); // in inches
+        editor.style.paddingLeft = `${offset}in`;
+        draggingHandle.style.left = `${offset * 96}px`;
+      }
+
+      if (draggingHandle.classList.contains("right")) {
+        const offset = Math.max(0.5, (editorRect.right - e.clientX) / 96);
+        editor.style.paddingRight = `${offset}in`;
+        draggingHandle.style.right = `${offset * 96}px`;
+      }
+
+      if (draggingHandle.classList.contains("top")) {
+        const offset = Math.max(0.5, (e.clientY - editorRect.top) / 96);
+        editor.style.paddingTop = `${offset}in`;
+        draggingHandle.style.top = `${offset * 96}px`;
+      }
+
+      if (draggingHandle.classList.contains("bottom")) {
+        const offset = Math.max(0.5, (editorRect.bottom - e.clientY) / 96);
+        editor.style.paddingBottom = `${offset}in`;
+        draggingHandle.style.bottom = `${offset * 96}px`;
+      }
     });
 
     document.addEventListener("click", () => {
