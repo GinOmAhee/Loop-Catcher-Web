@@ -288,18 +288,20 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
-    background: #fffdf5;
+    height: 70vh; /* You can tweak this to fit your layout */
+    overflow-y: auto;
+    background: var(--editor-bg);
     border: 1px solid #e0dcbf;
-    border-radius: 0 0 6px 6px;
+    border-radius: 8px;
     padding: 1rem;
-    min-height: 300px;
     font-family: 'Courier New', monospace;
-    font-size: 1rem;
+    font-size: 0.9rem;
     line-height: 1.5;
-    color: #333;
+    color: var(--editor-text);
     box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
     background-size: 100% 1.5em;
+    padding-bottom: 4rem; /* space for bottom ruler */
   }
 
   .margin-ruler {
