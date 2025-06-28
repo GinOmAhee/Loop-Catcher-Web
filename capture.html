@@ -2235,13 +2235,18 @@
      }
     }
 
-    const paperSizeSelect = document.getElementById("paperSizeSelect");
-    const printPaperSize = document.getElementById("printPaperSize");
+    document.addEventListener("DOMContentLoaded", () => {
+      const printPaperSize = document.getElementById("printPaperSize");
+      const paperSizeSelect = document.getElementById("paperSizeSelect");
 
-    const pageSizeMap = {
-      A4: { width: 794, height: 1123 }, // in px @96dpi
-      Letter: { width: 816, height: 1056 }
-    };
+      if (printPaperSize && paperSizeSelect) {
+       printPaperSize.addEventListener("change", () => {
+         const size = printPaperSize.value;
+         applyPaperSize(size);
+         paperSizeSelect.value = size;
+       });
+      }
+    });
 
     function applyPaperSize(size) {
       const editor = document.getElementById("mainEditor");
