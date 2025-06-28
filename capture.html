@@ -300,10 +300,11 @@
   }
 
   .hidden-editor {
-    visibility: hidden;
+    opacity: 0;
     pointer-events: none;
-    transition: visibility 0s, opacity 0.3s ease;
+    transition: opacity 0.3s ease;
   }
+  
   .hidden-editor.visible {
     visibility: visible;
     opacity: 1;
@@ -2015,6 +2016,14 @@
           window.location.href = "signin.html";
         } else {
           console.log("✅ User is signed in:", user.email);
+
+          const editor = document.querySelector('.hidden-editor');
+          if (editor) {
+            editor.style.display = 'block'; // ensure it's in flow, if it might have been none
+            editor.getBoundingClientRect(); // force reflow
+            editor.classList.add('visible');
+          }
+
           loadSavedText();
 
           mainEditor.addEventListener("input", () => {
