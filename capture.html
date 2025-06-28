@@ -239,6 +239,22 @@
     color: #ddd; /* or #f1f1f1 if you want max contrast */
   }
 
+  #modeToggleBtn {
+    background: #f1f1f1;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  body.dark-mode #modeToggleBtn {
+    background: #222;
+    color: #eee;
+    border: 1px solid #555;
+  }
+
   /* === THEME CLASSES === */
   .theme-calm {
     --tab-bg: #dceefb;
