@@ -300,11 +300,16 @@
   }
 
   .hidden-editor {
-    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    min-height: 300px;
+    width: 60%;
   }
 
   .hidden-editor.visible {
-    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   textarea {
