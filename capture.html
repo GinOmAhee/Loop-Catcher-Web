@@ -2260,15 +2260,16 @@
 
             if (position === "top" || position === "bottom") {
               const dy = ev.clientY - startY;
-              value = Math.max(0, startMargin[position] + dy);
+              value = Math.max(0, startPadding[position] + dy);
             } else if (position === "left" || position === "right") {
               const dx = ev.clientX - startX;
-              value = Math.max(0, startMargin[position] + (position === "left" ? dx : -dx));
+              value = Math.max(0, startPadding[position] + (position === "left" ? dx : -dx));
             }
 
             editor.style[`padding${capitalize(position)}`] = `${value}px`;
             positionTooltip(ev.clientX, ev.clientY, `${position} padding: ${value}px`);
 
+            }
           }
 
           function onMouseUp() {
