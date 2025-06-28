@@ -288,15 +288,23 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
+    margin: 0 auto;
     width: 60%;
     min-height: 300px;
-    padding: 1rem;
+    padding: 1in;
     font-size: 0.9rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     background: var(--editor-bg, #fff);
     color: var(--editor-text, #000);
     overflow-y: auto;
+    box-shadow: 0 0 4px rgba(0,0,0,0.2);
+  }
+
+  .page-break-guide {
+    border-top: 1px dotted #ccc;
+    margin: 2rem 0;
+    height: 0;
   }
 
   .hidden-editor {
@@ -873,6 +881,24 @@
       <button id="previewToggle">☰</button>
       <!-- 🎨 Toolbar -->
       <div class="format-toolbar" style="margin-bottom: 1rem;">
+
+      <!-- ✅ Toolbar Dropdown for Paper Size -->
+      <div class="toolbar-group">
+        <label for="paperSizeSelect">📄 Paper:</label>
+        <select id="paperSizeSelect">
+          <option value="A4">A4 (210mm × 297mm)</option>
+          <option value="Letter">Letter (8.5in × 11in)</option>
+        </select>
+      </div>
+
+      <!-- ✅ Inside Print Panel (Optional) -->
+      <div class="print-options">
+        <label for="printPaperSize">📄 Paper Size:</label>
+        <select id="printPaperSize">
+          <option value="A4">A4</option>
+          <option value="Letter">Letter</option>
+        </select>
+      </div>
         
       <!-- Margin Button -->
       <button id="marginBtn" title="Set Margins">📏</button>
@@ -2215,6 +2241,41 @@
        selection.addRange(newRange);
      }
     }
+
+    const paperSizeSelect = document.getElementById("paperSizeSelect");
+    const printPaperSize = document.getElementById("printPaperSize");
+
+    const pageSizeMap = {
+      A4: { width: 794, height: 1123 }, // in px @96dpi
+      Letter: { width: 816, height: 1056 }
+    };
+
+    function applyPaperSize(size) {
+      const editor = document.getElementById("mainEditor");
+      const page = pageSizeMap[size] || pageSizeMap["A4"];
+
+      editor.style.maxWidth = page.width + "px";
+      editor.style.minHeight = page.height + "px";
+
+      // Optional: update page break rendering here if needed
+    }
+
+    paperSizeSelect.addEventListener("change", () => {
+      const size = paperSizeSelect.value;
+      applyPaperSize(size);
+      printPaperSize.value = size; // 🔁 sync to print panel
+    });
+
+    printPaperSize.addEventListener("change", () => {
+      const size = printPaperSize.value;
+      applyPaperSize(size);
+      paperSizeSelect.value = size; // 🔁 sync to toolbar
+    });
+
+    // 🪄 On load, set default
+    window.addEventListener("DOMContentLoaded", () => {
+      applyPaperSize(paperSizeSelect.value);
+    });
 
     // ✅ Margin Input UI logic
     document.addEventListener("DOMContentLoaded", () => {
