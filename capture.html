@@ -443,7 +443,7 @@
   }
 
   /* === TOOLBAR & CONTROLS === */
-  .format-toolbar select,
+  .format-toolbar select
   .preview-sortbar select {
     padding: 0.3rem;
     font-size: 0.85rem;
@@ -452,6 +452,15 @@
     color: #333;
     border: 1px solid #ccc;
     cursor: pointer;
+  }
+
+  .format-toolbar {
+    position: sticky;
+    top: 0;
+    background: var(--editor-bg, #fff);
+    z-index: 10;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ccc;
   }
 
   .margin-dropdown {
@@ -639,8 +648,10 @@
 
   #previewToggle {
     position: absolute;
+    align-self: flex-start;
     top: 1rem;
     left: 1rem;
+    margin-bottom: 1rem;
   }
 
   #attachedFilesList {
@@ -872,7 +883,6 @@
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
       <button id="previewToggle">☰</button>
-      <!-- 🎨 Toolbar -->
       <div class="format-toolbar" style="margin-bottom: 1rem;">
         
       <!-- Margin Button -->
