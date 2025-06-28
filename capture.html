@@ -287,6 +287,24 @@
   }
 
   /* === EDITOR & INPUT === */
+  #modeToggleBtn {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  #modeToggleBtn:hover {
+    background: #f0f0f0;
+  }
+
   #mainEditor {
     width: 60%;
     min-height: 300px;
@@ -2312,6 +2330,58 @@
       document.getElementById("printBtn").addEventListener("click", printNote);
 
     });
+
+    let currentMode = localStorage.getItem("editorMode") || "document"; // default mode
+    const modeToggleBtn = document.getElementById("modeToggleBtn");
+
+    function toggleEditorMode() {
+      currentMode = currentMode === "notepad" ? "document" : "notepad";
+      localStorage.setItem("editorMode", currentMode);
+      applyEditorMode();
+    }
+
+    function applyEditorMode() {
+      const editor = document.getElementById("mainEditor");
+      const toolbar = document.getElementById("toolbar"); // make sure you wrap formatting buttons in a container w/ this ID
+      const status = document.getElementById("saveStatus");
+
+      if (currentMode === "notepad") {
+        // 🧠 NOTEPAD MODE
+        toolbar.style.display = "none";
+        editor.style.fontFamily = "Courier, monospace";
+        editor.style.fontSize = "1.2rem";
+        editor.style.padding = "2rem";
+        editor.style.border = "none";
+        editor.style.boxShadow = "none";
+        editor.setAttribute("data-mode", "notepad");
+
+        modeToggleBtn.innerText = "📄 Document Mode";
+        status.innerText = "🧠 Notepad Mode Active";
+
+        // Auto-title
+        const now = new Date();
+        const label = `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+        if (tabs[activeTabIndex]) {
+          tabs[activeTabIndex].title = label;
+          localStorage.setItem("tabs", JSON.stringify(tabs));
+          safeRenderTabs();
+        }
+      } else {
+        // 📄 DOCUMENT MODE
+        toolbar.style.display = "flex";
+        editor.style.fontFamily = "Arial, sans-serif";
+        editor.style.fontSize = "1rem";
+        editor.style.padding = "1in";
+        editor.style.border = "1px solid #ccc";
+        editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
+        editor.setAttribute("data-mode", "document");
+
+        modeToggleBtn.innerText = "🧠 Quick Note Mode";
+        status.innerText = "📄 Document Mode Active";
+      }
+    }
+
+    modeToggleBtn.addEventListener("click", toggleEditorMode);
 
     document.addEventListener("click", () => {
       setTimeout(() => {
