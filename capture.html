@@ -2436,6 +2436,12 @@
           if (tabs && tabs[activeTabIndex]) {
             tabs[activeTabIndex].title = "";
             localStorage.setItem("tabs", JSON.stringify(tabs));
+
+            // ✨ Update DOM immediately
+            const tabBarEl = document.querySelectorAll(".tab-label")[activeTabIndex];
+            if (tabBarEl) {
+              tabBarEl.innerText = tabs[activeTabIndex].title || `Tab ${activeTabIndex + 1}`;
+            }
             safeRenderTabs();
           }
         }
