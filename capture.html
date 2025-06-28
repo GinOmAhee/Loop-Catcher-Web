@@ -988,12 +988,13 @@
        <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
       </div>
 
+      <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
+
       <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
 
       <div id="attachedFilesList"></div>
       <div class="save-time" id="saveStatus"></div>
 
-      <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
     </div>
   </div>
 
@@ -2335,30 +2336,29 @@
 
     });
 
-    let currentMode = localStorage.getItem("editorMode") || "document"; // default mode
+    const editor = document.getElementById("mainEditor");
     const modeToggleBtn = document.getElementById("modeToggleBtn");
 
     function toggleEditorMode() {
       const currentMode = localStorage.getItem("editorMode") || "document";
       const newMode = currentMode === "notepad" ? "document" : "notepad";
-      console.log(`Toggling to: ${newMode}`);
+      console.log(`🔁 Switching to: ${newMode}`);
       applyEditorMode(newMode);
       localStorage.setItem("editorMode", newMode);
     }
 
-    function applyEditorMode() {
-      const toolbar = document.getElementById("toolbar"); // make sure you wrap formatting buttons in a container w/ this ID
+    function applyEditorMode(mode) {
+      const toolbar = document.getElementById("toolbar");
       const status = document.getElementById("saveStatus");
 
       if (!editor) {
-        console.warn("Editor element not found.");
+        console.warn("⚠️ Editor not found.");
         return;
       }
 
       if (mode === "notepad") {
         // 🧠 NOTEPAD MODE
         if (toolbar) toolbar.style.display = "none";
-
         editor.style.fontFamily = "Courier, monospace";
         editor.style.fontSize = "1.2rem";
         editor.style.padding = "2rem";
@@ -2369,10 +2369,10 @@
         if (modeToggleBtn) modeToggleBtn.innerText = "📄 Document Mode";
         if (status) status.innerText = "🧠 Notepad Mode Active";
 
-        // Auto-title for notepad mode
+        // Optional: Auto-title
         const now = new Date();
         const label = `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-        if (tabs[activeTabIndex]) {
+        if (tabs && tabs[activeTabIndex]) {
           tabs[activeTabIndex].title = label;
           localStorage.setItem("tabs", JSON.stringify(tabs));
           safeRenderTabs();
@@ -2381,7 +2381,6 @@
       } else {
         // 📄 DOCUMENT MODE
         if (toolbar) toolbar.style.display = "flex";
-
         editor.style.fontFamily = "Arial, sans-serif";
         editor.style.fontSize = "1rem";
         editor.style.padding = "1in";
@@ -2393,6 +2392,16 @@
         if (status) status.innerText = "📄 Document Mode Active";
       }
     }
+
+    // ✅ Attach on DOM ready
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedMode = localStorage.getItem("editorMode") || "document";
+      applyEditorMode(savedMode);
+
+      if (modeToggleBtn) {
+        modeToggleBtn.addEventListener("click", toggleEditorMode);
+      }
+    });
 
     document.addEventListener("click", () => {
       setTimeout(() => {
