@@ -1296,22 +1296,6 @@
       document.execCommand("justifyFull", false, null);
     }
 
-    fontSizeBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      saveSelection();
-      sizeDropdown.classList.toggle("hidden");
-      const rect = fontSizeBtn.getBoundingClientRect();
-      sizeDropdown.style.left = `${rect.left}px`;
-      sizeDropdown.style.top = `${rect.bottom + 5}px`;
-    });
-
-    function setFontSize(size) {
-      mainEditor.focus();
-      restoreSelection();
-      document.execCommand("fontSize", false, size);
-      sizeDropdown.classList.add("hidden");
-    }
-
     fontBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       fontDropdown.classList.toggle("hidden");
