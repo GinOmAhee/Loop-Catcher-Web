@@ -291,6 +291,7 @@
     background: #fffdf5;
     border: 1px solid #e0dcbf;
     border-radius: 0 0 6px 6px;
+    padding-top: 3.5rem; /* adjust based on toolbar height */
     padding: 1rem;
     min-height: 300px;
     font-family: 'Courier New', monospace;
@@ -899,7 +900,15 @@
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <!-- 🎨 Toolbar -->
-      <div class="format-toolbar" style="margin-bottom: 1rem;">
+      <div class="format-toolbar" style="
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: var(--editor-bg, #fff); /* Keep background solid */
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #ccc;
+      ">
+      
         <!-- Icon Button -->
       <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
