@@ -911,7 +911,7 @@
           <option value="24pt">24</option>
           <option value="36pt">36</option>
         </select>
-        <button id="applyFontSizeBtn">Apply</button>
+        <button id="applyFontSize">Apply</button>
       </div>
 
         <button onclick="toggleBold()"><b>B</b></button>
@@ -2138,13 +2138,13 @@
       const dropdownSelect = document.getElementById("fontSizeSelect");
       const customInput = document.getElementById("customFontSize");
 
-      document.getElementById("fontSizeDropdown").addEventListener("mousedown", (e) => {
-        const isInput = e.target.tagName === "INPUT";
-        if (!isInput) {
-          e.preventDefault(); // 🛡️ Keep selection only if not an input
+      // Prevent blur while allowing interaction with dropdown
+      document.getElementById("fontSizeDropdownPanel").addEventListener("mousedown", (e) => {
+        if (!["INPUT", "SELECT", "BUTTON"].includes(e.target.tagName)) {
+          e.preventDefault(); // Prevent deselection but allow interaction
         }
       });
-    
+
       fontSizeBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         saveSelection();
