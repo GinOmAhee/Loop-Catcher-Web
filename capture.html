@@ -2431,9 +2431,15 @@
 
           modeToggleBtn.innerText = "🧠 Quick Note Mode";
           status && (status.innerText = "📄 Document Mode Active");
+
+          // 📄 Reset tab title (optional)
+          if (tabs && tabs[activeTabIndex]) {
+            tabs[activeTabIndex].title = "";
+            localStorage.setItem("tabs", JSON.stringify(tabs));
+            safeRenderTabs();
+          }
         }
-      }
-    });
+      });
 
     // ✅ Attach on DOM ready
     window.addEventListener("DOMContentLoaded", () => {
