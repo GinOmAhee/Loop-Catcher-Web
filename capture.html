@@ -288,19 +288,18 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
-    background: #fffdf5;
-    border: 1px solid #e0dcbf;
-    border-radius: 0 0 6px 6px;
+    min-height: 400px;      /* or whatever works for you */
+    max-height: 600px;
+    overflow-y: auto;
     padding: 1rem;
-    min-height: 300px;
-    font-family: 'Courier New', monospace;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #333;
-    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
-    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-    background-size: 100% 1.5em;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: var(--editor-bg, #fff);
+    color: var(--editor-text, #000);
+    transition: all 0.2s ease-in-out; /* smooth adjustment */
   }
+
   textarea {
     width: 60%;
     height: 300px;
@@ -317,14 +316,14 @@
     height: 100vh;
   }
   .editor-area {
-    overflow-y: auto; /* Add this if you want scrolling here */
     display: flex;
-    flex: 1;
     flex-direction: column;
-    justify-content: center;
+    flex: 1;
+    min-height: 100vh; /* make sure it takes screen space */
     align-items: center;
+    justify-content: flex-start;
     padding: 2rem;
-    position: relative;
+    overflow-y: auto;
   }
 
   /* === TABS === */
