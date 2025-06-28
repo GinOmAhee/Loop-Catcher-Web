@@ -454,26 +454,6 @@
     cursor: pointer;
   }
 
-  .font-dropdown {
-    position: absolute;
-    top: 50px;
-    left: 10px;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 0.7rem;
-    border-radius: 5px;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  .hidden {
-    display: none;
-  }
-  .font-dropdown select,
-  .font-dropdown input {
-    margin-top: 0.5rem;
-    width: 100%;
-  }
-
   .margin-dropdown {
     position: absolute;
     background: white;
@@ -919,20 +899,15 @@
       <!-- Font Size Icon Button -->
       <button id="fontSizeBtn" title="Font Size">🔠</button>
 
-      <div id="fontSizeDropdownPanel" class="dropdown hidden">
-        <label>Choose or enter font size (pt):</label>
-        <select id="fontSizeDropdown">
-          <option value="8pt">8</option>
-          <option value="10pt">10</option>
-          <option value="12pt" selected>12</option>
-          <option value="14pt">14</option>
-          <option value="16pt">16</option>
-          <option value="18pt">18</option>
-          <option value="24pt">24</option>
-          <option value="36pt">36</option>
-        </select>
-        <input type="number" id="customFontSize" placeholder="Custom (pt)" min="1" />
-        <button id="applyFontSizeBtn">Apply</button>
+      <!-- Size Dropdown -->
+      <div id="sizeDropdown" class="dropdown hidden">
+        <div onclick="setFontSize('1')">Very Small</div>
+        <div onclick="setFontSize('2')">Small</div>
+        <div onclick="setFontSize('3')">Normal</div>
+        <div onclick="setFontSize('4')">Large</div>
+        <div onclick="setFontSize('5')">Very Large</div>
+        <div onclick="setFontSize('6')">Huge</div>
+        <div onclick="setFontSize('7')">Maximum</div>
       </div>
 
         <button onclick="toggleBold()"><b>B</b></button>
@@ -1317,58 +1292,21 @@
       document.execCommand("justifyFull", false, null);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const fontSizeDropdown = document.getElementById("fontSizeDropdownPanel");
-      const customInput = document.getElementById("customFontSizeInput");
-      const dropdownSelect = document.getElementById("fontSizeDropdown");
-      const applyBtn = document.getElementById("applyFontSizeBtn");
-
-      document.getElementById("fontSizeDropdown").addEventListener("mousedown", (e) => {
-        const isInput = e.target.tagName === "INPUT";
-        if (!isInput) {
-          e.preventDefault(); // 🛡️ Keep selection only if not an input
-        } 
-      });
-
-      fontSizeBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        saveSelection(); // <-- Save the range before user interacts with inputs
-        fontSizeDropdown.classList.toggle("hidden");
-        const rect = fontSizeBtn.getBoundingClientRect();
-        fontSizeDropdown.style.left = `${rect.left}px`;
-        fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
+    fontSizeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      saveSelection();
+      sizeDropdown.classList.toggle("hidden");
+      const rect = fontSizeBtn.getBoundingClientRect();
+      sizeDropdown.style.left = `${rect.left}px`;
+      sizeDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
-    applyBtn.addEventListener("click", () => {
-      restoreSelection(); // <-- Reapply the range back into view
-
-      const customValue = document.getElementById("customFontSize").value.trim();
-      const selectedSize = dropdownSelect.value;
-      const fontSize = customValue !== "" ? `${customValue}pt` : selectedSize;
-
-      const selection = window.getSelection();
-      if (!selection.rangeCount) return;
-
-      const range = selection.getRangeAt(0);
-      if (range.collapsed) return;
-
-      const span = document.createElement("span");
-      span.style.fontSize = fontSize;
-      span.textContent = range.toString();
-
-      range.deleteContents();
-      range.insertNode(span);
-
-      fontSizeDropdown.classList.add("hidden");
-      document.getElementById("customFontSize").value = "";
-    });
-
-
-    document.addEventListener("click", (e) => {
-      if (!fontSizeDropdown.contains(e.target) && !fontSizeBtn.contains(e.target)) {
-        fontSizeDropdown.classList.add("hidden");
-      }
-    });
+    function setFontSize(size) {
+      mainEditor.focus();
+      restoreSelection();
+      document.execCommand("fontSize", false, size);
+      sizeDropdown.classList.add("hidden");
+    }
 
     fontBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -2237,7 +2175,6 @@
         marginDropdown.style.top = `${rect.bottom + 5}px`;
         marginDropdown.style.left = `${rect.left}px`;
       });
-    });
 
       function inchesToPixels(inches) {
         return parseFloat(inches) * 96;
