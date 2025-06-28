@@ -288,6 +288,7 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
+    visibility: hidden;
     min-height: 400px;      /* or whatever works for you */
     max-height: 600px;
     overflow-y: auto;
@@ -2207,6 +2208,10 @@
       editor.style.paddingRight = `${right}px`;
 
       marginDropdown.classList.add("hidden");
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("mainEditor").style.visibility = "visible";
     });
 
     document.addEventListener("click", () => {
