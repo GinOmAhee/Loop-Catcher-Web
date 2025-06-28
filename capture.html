@@ -2265,7 +2265,7 @@
             } else {
               const dx = ev.clientX - startX;
               value = startMargin[position] + dx * (position === "left" ? 1 : -1);
-              editor.style[`margin${capitalize(position)}`] = `${value}px`;
+              editor.style[`padding${capitalize(position)}`] = `${value}px`;
               positionTooltip(ev.clientX, ev.clientY, `${position} margin: ${value}px`);
             }
           }
