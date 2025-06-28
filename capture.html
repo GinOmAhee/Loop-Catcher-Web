@@ -443,7 +443,7 @@
   }
 
   /* === TOOLBAR & CONTROLS === */
-  .format-toolbar select
+  .format-toolbar select,
   .preview-sortbar select {
     padding: 0.3rem;
     font-size: 0.85rem;
@@ -452,15 +452,6 @@
     color: #333;
     border: 1px solid #ccc;
     cursor: pointer;
-  }
-
-  .format-toolbar {
-    position: sticky;
-    top: 0;
-    background: var(--editor-bg, #fff);
-    z-index: 10;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #ccc;
   }
 
   .margin-dropdown {
@@ -648,10 +639,8 @@
 
   #previewToggle {
     position: absolute;
-    align-self: flex-start;
     top: 1rem;
     left: 1rem;
-    margin-bottom: 1rem;
   }
 
   #attachedFilesList {
@@ -883,6 +872,7 @@
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
       <button id="previewToggle">☰</button>
+      <!-- 🎨 Toolbar -->
       <div class="format-toolbar" style="margin-bottom: 1rem;">
         
       <!-- Margin Button -->
@@ -909,20 +899,15 @@
       <!-- Font Size Icon Button -->
       <button id="fontSizeBtn" title="Font Size">🔠</button>
 
-      <div id="fontSizeDropdownPanel" class="dropdown hidden">
-        <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
-        <select id="fontSizeSelect">
-          <option value="" disabled selected>Select font size</option>
-          <option value="8pt">8</option>
-          <option value="10pt">10</option>
-          <option value="12pt" selected>12</option>
-          <option value="14pt">14</option>
-          <option value="16pt">16</option>
-          <option value="18pt">18</option>
-          <option value="24pt">24</option>
-          <option value="36pt">36</option>
-        </select>
-        <button id="applyFontSize">Apply</button>
+      <!-- Size Dropdown -->
+      <div id="sizeDropdown" class="dropdown hidden">
+        <div onclick="setFontSize('1')">Very Small</div>
+        <div onclick="setFontSize('2')">Small</div>
+        <div onclick="setFontSize('3')">Normal</div>
+        <div onclick="setFontSize('4')">Large</div>
+        <div onclick="setFontSize('5')">Very Large</div>
+        <div onclick="setFontSize('6')">Huge</div>
+        <div onclick="setFontSize('7')">Maximum</div>
       </div>
 
         <button onclick="toggleBold()"><b>B</b></button>
@@ -1305,6 +1290,22 @@
     function justifyText() {
       mainEditor.focus(); // ensure editor is active
       document.execCommand("justifyFull", false, null);
+    }
+
+    fontSizeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      saveSelection();
+      sizeDropdown.classList.toggle("hidden");
+      const rect = fontSizeBtn.getBoundingClientRect();
+      sizeDropdown.style.left = `${rect.left}px`;
+      sizeDropdown.style.top = `${rect.bottom + 5}px`;
+    });
+
+    function setFontSize(size) {
+      mainEditor.focus();
+      restoreSelection();
+      document.execCommand("fontSize", false, size);
+      sizeDropdown.classList.add("hidden");
     }
 
     fontBtn.addEventListener("click", (e) => {
@@ -2126,69 +2127,6 @@
      newRange.setStartAfter(range.endContainer);
      selection.addRange(newRange);
     }
-
-    document.addEventListener("selectionchange", () => {
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-        savedRange = selection.getRangeAt(0).cloneRange();
-      }
-    });
-
-      const fontSizeDropdown = document.getElementById("fontSizeDropdownPanel");
-      const applyBtn = document.getElementById("applyFontSize");
-      const dropdownSelect = document.getElementById("fontSizeSelect");
-      const customInput = document.getElementById("customFontSize");
-
-      fontSizeDropdown.addEventListener("mousedown", (e) => {
-        const tag = e.target.tagName;
-        if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
-          e.preventDefault(); // only block blur on non-interactive elements
-        }
-      });
-
-      fontSizeBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        saveSelection();
-        fontSizeDropdown.classList.toggle("hidden");
-
-        const rect = fontSizeBtn.getBoundingClientRect();
-        fontSizeDropdown.style.left = `${rect.left}px`;
-        fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
-
-        setTimeout(() => customInput.focus(), 0);
-      });
-
-      applyBtn.addEventListener("click", () => {
-        restoreSelection();
-
-        const customValue = customInput.value.trim();
-        const selectedSize = dropdownSelect.value;
-        const fontSize = customValue !== "" ? `${customValue}pt` : selectedSize;
-
-        if (!fontSize) return; // Nothing selected or entered
-
-        const selection = window.getSelection();
-        if (!selection.rangeCount || selection.isCollapsed) return;
-
-        const range = selection.getRangeAt(0);
-        const span = document.createElement("span");
-        span.style.fontSize = fontSize;
-        span.textContent = range.toString();
-
-        range.deleteContents();
-        range.insertNode(span);
-
-        fontSizeDropdown.classList.add("hidden");
-        customInput.value = "";
-        dropdownSelect.selectedIndex = 0; // reset dropdown
-      });
-
-      // Hide dropdown when clicking outside
-      document.addEventListener("click", (e) => {
-        if (!fontSizeDropdown.contains(e.target) && !fontSizeBtn.contains(e.target)) {
-          fontSizeDropdown.classList.add("hidden");
-        }
-      });
 
     function toggleBold() {
       const selection = window.getSelection();
