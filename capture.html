@@ -1889,7 +1889,7 @@
       const renderNoteItem = (note) => `
         <li style="margin-bottom:1rem; display: flex; align-items: start;">
           <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-          <div class="note-preview" onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
+          <div class="note-preview" onclick='loadNoteIntoEditor(decodeURIComponent("${encodeURIComponent(note.text)}"))'>
             ${highlightText(note.text, keyword)}
           </div>
         </li>
@@ -2433,8 +2433,10 @@
           status && (status.innerText = "📄 Document Mode Active");
 
           // 📄 Reset tab title (optional)
+          // 📄 Auto-set tab title based on first line of note
           if (tabs && tabs[activeTabIndex]) {
-            tabs[activeTabIndex].title = "";
+            const text = mainEditor.innerText || "";
+            tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "Untitled";
             localStorage.setItem("tabs", JSON.stringify(tabs));
 
             // ✨ Update DOM immediately
