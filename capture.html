@@ -2116,14 +2116,23 @@
      selection.addRange(newRange);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("selectionchange", () => {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+        savedRange = selection.getRangeAt(0).cloneRange();
+      }
+    });
+
       const fontSizeDropdown = document.getElementById("fontSizeDropdownPanel");
       const applyBtn = document.getElementById("applyFontSize");
       const dropdownSelect = document.getElementById("fontSizeSelect");
       const customInput = document.getElementById("customFontSize");
 
       fontSizeDropdown.addEventListener("mousedown", (e) => {
-        e.preventDefault(); // Prevent loss of selection, regardless of element
+        const tag = e.target.tagName;
+        if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
+          e.preventDefault(); // only block blur on non-interactive elements
+        }
       });
 
       fontSizeBtn.addEventListener("click", (e) => {
