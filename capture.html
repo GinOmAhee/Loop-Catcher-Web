@@ -2133,13 +2133,18 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      const fontSizeBtn = document.getElementById("fontSizeBtn");
       const fontSizeDropdown = document.getElementById("fontSizeDropdown");
       const applyBtn = document.getElementById("applyFontSize");
       const dropdownSelect = document.getElementById("fontSizeSelect");
       const customInput = document.getElementById("customFontSize");
-      const mainEditor = document.getElementById("mainEditor");
 
+      document.getElementById("fontSizeDropdown").addEventListener("mousedown", (e) => {
+        const isInput = e.target.tagName === "INPUT";
+        if (!isInput) {
+          e.preventDefault(); // 🛡️ Keep selection only if not an input
+        }
+      });
+    
       fontSizeBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         saveSelection();
