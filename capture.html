@@ -288,16 +288,18 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
-    background: #fffdf5;
+    background: var(--editor-bg, #fff);
     border: 1px solid #e0dcbf;
-    border-radius: 0 0 6px 6px;
+    border-radius: 8px;
+    margin: auto;
     padding-top: 3.5rem; /* adjust based on toolbar height */
     padding: 1rem;
-    min-height: 300px;
+    height: 400px;
+    overflow-y: auto;
     font-family: 'Courier New', monospace;
-    font-size: 1rem;
+    font-size: 0.9rem;
     line-height: 1.5;
-    color: #333;
+    color: var(--editor-text, #000);
     box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
     background-size: 100% 1.5em;
@@ -481,7 +483,15 @@
   }
 
   /* === TOOLBAR & CONTROLS === */
-  .format-toolbar select,
+  .format-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--editor-bg, #fff);
+    padding: 0.5rem 0.5rem;
+    border-bottom: 1px solid #ccc;
+  }
+
   .preview-sortbar select {
     padding: 0.3rem;
     font-size: 0.85rem;
