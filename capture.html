@@ -288,69 +288,19 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
-    background: var(--editor-bg, #fff);
+    background: #fffdf5;
     border: 1px solid #e0dcbf;
-    border-radius: 8px;
-    margin: auto;
-    padding-top: 3.5rem; /* adjust based on toolbar height */
+    border-radius: 0 0 6px 6px;
     padding: 1rem;
-    height: 400px;
-    overflow-y: auto;
+    min-height: 300px;
     font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
+    font-size: 1rem;
     line-height: 1.5;
-    color: var(--editor-text, #000);
+    color: #333;
     box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
     background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
     background-size: 100% 1.5em;
   }
-
-  .margin-ruler {
-    position: absolute;
-    background-color: rgba(0, 123, 255, 0.3); /* light blue overlay */
-    z-index: 9999;
-    cursor: grab;
-  }
-
-  .margin-ruler.vertical {
-    width: 6px;
-    top: 0;
-    bottom: 0;
-  }
-
-  .margin-ruler.horizontal {
-    height: 6px;
-    left: 0;
-    right: 0;
-  }
-
-  #leftMarginRuler {
-    left: 0;
-  }
-
-  #rightMarginRuler {
-    right: 0;
-  }
-
-  #topMarginRuler {
-    top: 0;
-  }
-
-  #bottomMarginRuler {
-    bottom: 0;
-  }
-
-  #marginTooltip {
-    position: fixed;
-    background: black;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 12px;
-    pointer-events: none;
-    z-index: 10000;
-  }
-
   textarea {
     width: 60%;
     height: 300px;
@@ -483,15 +433,7 @@
   }
 
   /* === TOOLBAR & CONTROLS === */
-  .format-toolbar {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: var(--editor-bg, #fff);
-    padding: 0.5rem 0.5rem;
-    border-bottom: 1px solid #ccc;
-  }
-
+  .format-toolbar select,
   .preview-sortbar select {
     padding: 0.3rem;
     font-size: 0.85rem;
@@ -500,6 +442,17 @@
     color: #333;
     border: 1px solid #ccc;
     cursor: pointer;
+  }
+
+  .margin-dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 0.8rem;
+    border-radius: 6px;
+    z-index: 999;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   }
 
   .delete-notes-btn {
@@ -910,15 +863,19 @@
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <!-- 🎨 Toolbar -->
-      <div class="format-toolbar" style="
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        background: var(--editor-bg, #fff); /* Keep background solid */
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #ccc;
-      ">
-      
+      <div class="format-toolbar" style="margin-bottom: 1rem;">
+        
+      <!-- Margin Button -->
+      <button id="marginBtn" title="Set Margins">📏</button>
+
+      <!-- Margin Dropdown -->
+      <div id="marginDropdown" class="dropdown hidden">
+        <label>Top: <input type="number" id="marginTopInput" value="20" /> px</label><br>
+        <label>Bottom: <input type="number" id="marginBottomInput" value="20" /> px</label><br>
+        <label>Left: <input type="number" id="marginLeftInput" value="20" /> px</label><br>
+        <label>Right: <input type="number" id="marginRightInput" value="20" /> px</label><br>
+        <button id="applyMarginBtn">✅ Apply</button>
+      </div>
         <!-- Icon Button -->
       <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
@@ -987,35 +944,18 @@
         <button onclick="removeFormatting()">🚫</button>
       </div>
 
-      <div id="editorWrapper" style="position: relative; width: 60%; margin: 0 auto;">
-  
-        <!-- TOP RULER -->
-        <div id="topMarginRuler" class="margin-ruler horizontal"></div>
-
-        <!-- Left Ruler + Editor + Right Ruler -->
-        <div style="display: flex; width: 100%;">
-          <div id="leftMarginRuler" class="margin-ruler vertical"></div>
-          <!-- 📝 Rich Text Editor -->
-          <div id="mainEditor" contenteditable="true" style="
-            flex: 1;
-            min-height: 300px;
-            padding: 1rem;
-            font-size: 0.9rem;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background: var(--editor-bg);
-            color: var(--editor-text);
-            overflow-y: auto;
-          ">
-           <h1>Interactive Margin Editor</h1>
-           <p>Try dragging the rulers to adjust the margins.</p>
-          </div>
-          <div id="rightMarginRuler" class="margin-ruler vertical"></div>
-        </div>
-
-        <!-- BOTTOM RULER -->
-        <div id="bottomMarginRuler" class="margin-ruler horizontal"></div>
-      </div>
+      <!-- 📝 Rich Text Editor -->
+      <div id="mainEditor" contenteditable="true" style="
+        width: 60%;
+        min-height: 300px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: var(--editor-bg);
+        color: var(--editor-text);
+        overflow-y: auto;
+      "></div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -2214,86 +2154,42 @@
      }
     }
 
-  
-    // ✅ Wait for DOM to be fully loaded
-    window.addEventListener("DOMContentLoaded", () => {
-      initRuler();
-    });
-
-    function initRuler() {
-      const marginTooltip = document.getElementById("marginTooltip");
+    // ✅ Margin Input UI logic
+    document.addEventListener("DOMContentLoaded", () => {
+      const marginBtn = document.getElementById("marginBtn");
+      const marginDropdown = document.getElementById("marginDropdown");
       const editor = document.getElementById("mainEditor");
 
-      if (!editor) {
-        console.error("❌ Editor not found. Cannot init margin rulers.");
-        return;
-      }
-
-      const rulers = {
-        top: document.getElementById("topMarginRuler"),
-        bottom: document.getElementById("bottomMarginRuler"),
-        left: document.getElementById("leftMarginRuler"),
-        right: document.getElementById("rightMarginRuler")
-      };
-
-      Object.entries(rulers).forEach(([position, el]) => {
-        if (!el) {
-          console.warn(`⚠️ Missing ${position}MarginRuler`);
-          return;
-        }
-
-        el.addEventListener("mousedown", (e) => {
-          e.preventDefault();
-          const startX = e.clientX;
-          const startY = e.clientY;
-
-          const initialStyles = window.getComputedStyle(editor);
-          const startMargin = {
-            top: parseInt(initialStyles.marginTop),
-            bottom: parseInt(initialStyles.marginBottom),
-            left: parseInt(initialStyles.marginLeft),
-            right: parseInt(initialStyles.marginRight)
-          };
-
-          function onMouseMove(ev) {
-            let value;
-
-            if (position === "top" || position === "bottom") {
-              const dy = ev.clientY - startY;
-              value = Math.max(0, startPadding[position] + dy);
-            } else if (position === "left" || position === "right") {
-              const dx = ev.clientX - startX;
-              value = Math.max(0, startPadding[position] + (position === "left" ? dx : -dx));
-            }
-
-            editor.style[`padding${capitalize(position)}`] = `${value}px`;
-            positionTooltip(ev.clientX, ev.clientY, `${position} padding: ${value}px`);
-          }
-
-          function onMouseUp() {
-            document.removeEventListener("mousemove", onMouseMove);
-            document.removeEventListener("mouseup", onMouseUp);
-            marginTooltip.style.display = "none";
-          }
-
-          document.addEventListener("mousemove", onMouseMove);
-          document.addEventListener("mouseup", onMouseUp);
-        });
+      marginBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        marginDropdown.classList.toggle("hidden");
+        const rect = marginBtn.getBoundingClientRect();
+        marginDropdown.style.top = `${rect.bottom + 5}px`;
+        marginDropdown.style.left = `${rect.left}px`;
       });
 
-      function capitalize(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-      }
+      // Apply margins when user hits "Apply"
+      document.getElementById("applyMarginBtn").addEventListener("click", () => {
+        const top = document.getElementById("marginTop").value || 0;
+        const bottom = document.getElementById("marginBottom").value || 0;
+        const left = document.getElementById("marginLeft").value || 0;
+        const right = document.getElementById("marginRight").value || 0;
 
-      function positionTooltip(x, y, text) {
-        marginTooltip.style.display = "block";
-        marginTooltip.style.left = `${x + 10}px`;
-        marginTooltip.style.top = `${y + 10}px`;
-        marginTooltip.innerText = text;
-      }
+        editor.style.paddingTop = `${top}px`;
+        editor.style.paddingBottom = `${bottom}px`;
+        editor.style.paddingLeft = `${left}px`;
+        editor.style.paddingRight = `${right}px`;
 
-      console.log("📏 Margin rulers ready!");
-    }
+        marginDropdown.classList.add("hidden");
+      });
+
+      // Close dropdown if clicked outside
+      document.addEventListener("click", (e) => {
+        if (!marginDropdown.contains(e.target) && !marginBtn.contains(e.target)) {
+          marginDropdown.classList.add("hidden");
+        }
+      });
+    });
 
     document.addEventListener("click", () => {
       setTimeout(() => {
