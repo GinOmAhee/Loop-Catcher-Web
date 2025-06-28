@@ -870,10 +870,10 @@
 
       <!-- Margin Dropdown -->
       <div id="marginDropdown" class="dropdown hidden">
-        <label>Top: <input type="number" id="marginTopInput" value="20" /> px</label><br>
-        <label>Bottom: <input type="number" id="marginBottomInput" value="20" /> px</label><br>
-        <label>Left: <input type="number" id="marginLeftInput" value="20" /> px</label><br>
-        <label>Right: <input type="number" id="marginRightInput" value="20" /> px</label><br>
+        <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
+        <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
+        <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
+        <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
         <button id="applyMarginBtn">✅ Apply</button>
       </div>
         <!-- Icon Button -->
@@ -2189,6 +2189,25 @@
           marginDropdown.classList.add("hidden");
         }
       });
+    });
+
+    // Convert inches to pixels (1 inch = 96 pixels)
+    function inchesToPixels(inches) {
+      return inches * 96;
+    }
+
+    document.getElementById("applyMarginBtn").addEventListener("click", () => {
+      const top = inchesToPixels(document.getElementById("marginTop").value || 0);
+      const bottom = inchesToPixels(document.getElementById("marginBottom").value || 0);
+      const left = inchesToPixels(document.getElementById("marginLeft").value || 0);
+      const right = inchesToPixels(document.getElementById("marginRight").value || 0);
+
+      editor.style.paddingTop = `${top}px`;
+      editor.style.paddingBottom = `${bottom}px`;
+      editor.style.paddingLeft = `${left}px`;
+      editor.style.paddingRight = `${right}px`;
+
+      marginDropdown.classList.add("hidden");
     });
 
     document.addEventListener("click", () => {
