@@ -1311,21 +1311,23 @@
     });
 
     applyBtn.addEventListener("click", () => {
-      const size = customInput.value
-        ? `${customInput.value}pt`
-        : dropdownSelect.value;
+      const sizeValue = customInput.value.trim();
+      const finalSize = sizeValue !== "" ? `${sizeValue}pt` : dropdownSelect.value;
 
       const selection = window.getSelection();
       if (!selection.rangeCount) return;
 
       const range = selection.getRangeAt(0);
+      if (range.collapsed) return; // nothing is selected
+
       const span = document.createElement("span");
-      span.style.fontSize = size;
+      span.style.fontSize = finalSize;
       span.textContent = range.toString();
 
       range.deleteContents();
       range.insertNode(span);
 
+      // Close dropdown & reset input
       fontSizeDropdown.classList.add("hidden");
       customInput.value = '';
     });
