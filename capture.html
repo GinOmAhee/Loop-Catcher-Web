@@ -884,21 +884,10 @@
 
       <!-- ✅ Toolbar Dropdown for Paper Size -->
       <div class="toolbar-group">
-        <label for="paperSizeSelect">📄 Paper:</label>
-        <select id="paperSizeSelect">
-          <option value="A4">A4 (210mm × 297mm)</option>
-          <option value="Letter">Letter (8.5in × 11in)</option>
-        </select>
-      </div>
-
-      <!-- ✅ Inside Print Panel (Optional) -->
-      <div class="print-options">
-        <label for="printPaperSize">📄 Paper Size:</label>
-        <select id="printPaperSize">
+        <select id="paperSizeSelect" title="Paper Size">
           <option value="A4">A4</option>
           <option value="Letter">Letter</option>
         </select>
-      </div>
         
       <!-- Margin Button -->
       <button id="marginBtn" title="Set Margins">📏</button>
@@ -2257,7 +2246,7 @@
       editor.style.maxWidth = page.width + "px";
       editor.style.minHeight = page.height + "px";
 
-      // Optional: update page break rendering here if needed
+      renderPageGuides();
     }
 
     paperSizeSelect.addEventListener("change", () => {
