@@ -2122,11 +2122,8 @@
       const dropdownSelect = document.getElementById("fontSizeSelect");
       const customInput = document.getElementById("customFontSize");
 
-      // Prevent blur while allowing interaction with dropdown
-      document.getElementById("fontSizeDropdownPanel").addEventListener("mousedown", (e) => {
-        if (!["INPUT", "SELECT", "BUTTON"].includes(e.target.tagName)) {
-          e.preventDefault(); // Prevent deselection but allow interaction
-        }
+      fontSizeDropdown.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // Prevent loss of selection, regardless of element
       });
 
       fontSizeBtn.addEventListener("click", (e) => {
