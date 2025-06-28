@@ -2331,19 +2331,21 @@
 
       document.getElementById("printBtn").addEventListener("click", printNote);
 
+      document.getElementById("modeToggleBtn")?.addEventListener("click", toggleEditorMode);
+
     });
 
     let currentMode = localStorage.getItem("editorMode") || "document"; // default mode
     const modeToggleBtn = document.getElementById("modeToggleBtn");
 
     function toggleEditorMode() {
-      currentMode = currentMode === "notepad" ? "document" : "notepad";
-      localStorage.setItem("editorMode", currentMode);
-      applyEditorMode();
+      const currentMode = localStorage.getItem("editorMode") || "document";
+      const newMode = currentMode === "notepad" ? "document" : "notepad";
+      applyEditorMode(newMode);
+      localStorage.setItem("editorMode", newMode);
     }
 
     function applyEditorMode() {
-      const editor = document.getElementById("mainEditor");
       const toolbar = document.getElementById("toolbar"); // make sure you wrap formatting buttons in a container w/ this ID
       const status = document.getElementById("saveStatus");
 
