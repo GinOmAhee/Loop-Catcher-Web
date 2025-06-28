@@ -970,30 +970,33 @@
 
       <div id="editorWrapper" style="position: relative; width: 60%; margin: 0 auto;">
   
-      <!-- Margin Rulers (Top, Left, Right, Bottom) -->
-      <div id="topMarginRuler" class="margin-ruler horizontal"></div>
-      <div id="leftMarginRuler" class="margin-ruler vertical"></div>
-      <div id="rightMarginRuler" class="margin-ruler vertical"></div>
-      <div id="bottomMarginRuler" class="margin-ruler horizontal"></div>
+        <!-- TOP RULER -->
+        <div id="topMarginRuler" class="margin-ruler horizontal"></div>
 
-      <!-- 📝 Rich Text Editor -->
-      <div id="mainEditor" contenteditable="true" style="
-        min-height: 300px;
-        padding: 1rem;
-        font-size: 0.9rem;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background: var(--editor-bg);
-        color: var(--editor-text);
-        overflow-y: auto;
-      ">
-        <h1>Interactive Margin Editor</h1>
-        <p>Try dragging the rulers to adjust the margins.</p>
+        <!-- Left Ruler + Editor + Right Ruler -->
+        <div style="display: flex; width: 100%;">
+          <div id="leftMarginRuler" class="margin-ruler vertical"></div>
+          <!-- 📝 Rich Text Editor -->
+          <div id="mainEditor" contenteditable="true" style="
+            flex: 1;
+            min-height: 300px;
+            padding: 1rem;
+            font-size: 0.9rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: var(--editor-bg);
+            color: var(--editor-text);
+            overflow-y: auto;
+          ">
+           <h1>Interactive Margin Editor</h1>
+           <p>Try dragging the rulers to adjust the margins.</p>
+          </div>
+          <div id="rightMarginRuler" class="margin-ruler vertical"></div>
+        </div>
+
+        <!-- BOTTOM RULER -->
+        <div id="bottomMarginRuler" class="margin-ruler horizontal"></div>
       </div>
-    </div>
-
-    <!-- Tooltip (outside for global use) -->
-    <div id="marginTooltip"></div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
