@@ -2341,6 +2341,7 @@
     function toggleEditorMode() {
       const currentMode = localStorage.getItem("editorMode") || "document";
       const newMode = currentMode === "notepad" ? "document" : "notepad";
+      console.log(`Toggling to: ${newMode}`);
       applyEditorMode(newMode);
       localStorage.setItem("editorMode", newMode);
     }
@@ -2349,9 +2350,15 @@
       const toolbar = document.getElementById("toolbar"); // make sure you wrap formatting buttons in a container w/ this ID
       const status = document.getElementById("saveStatus");
 
-      if (currentMode === "notepad") {
+      if (!editor) {
+        console.warn("Editor element not found.");
+        return;
+      }
+
+      if (mode === "notepad") {
         // 🧠 NOTEPAD MODE
-        toolbar.style.display = "none";
+        if (toolbar) toolbar.style.display = "none";
+
         editor.style.fontFamily = "Courier, monospace";
         editor.style.fontSize = "1.2rem";
         editor.style.padding = "2rem";
@@ -2359,10 +2366,10 @@
         editor.style.boxShadow = "none";
         editor.setAttribute("data-mode", "notepad");
 
-        modeToggleBtn.innerText = "📄 Document Mode";
-        status.innerText = "🧠 Notepad Mode Active";
+        if (modeToggleBtn) modeToggleBtn.innerText = "📄 Document Mode";
+        if (status) status.innerText = "🧠 Notepad Mode Active";
 
-        // Auto-title
+        // Auto-title for notepad mode
         const now = new Date();
         const label = `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
         if (tabs[activeTabIndex]) {
@@ -2370,9 +2377,11 @@
           localStorage.setItem("tabs", JSON.stringify(tabs));
           safeRenderTabs();
         }
+
       } else {
         // 📄 DOCUMENT MODE
-        toolbar.style.display = "flex";
+        if (toolbar) toolbar.style.display = "flex";
+
         editor.style.fontFamily = "Arial, sans-serif";
         editor.style.fontSize = "1rem";
         editor.style.padding = "1in";
@@ -2380,12 +2389,10 @@
         editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
         editor.setAttribute("data-mode", "document");
 
-        modeToggleBtn.innerText = "🧠 Quick Note Mode";
-        status.innerText = "📄 Document Mode Active";
+        if (modeToggleBtn) modeToggleBtn.innerText = "🧠 Quick Note Mode";
+        if (status) status.innerText = "📄 Document Mode Active";
       }
     }
-
-    modeToggleBtn.addEventListener("click", toggleEditorMode);
 
     document.addEventListener("click", () => {
       setTimeout(() => {
