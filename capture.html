@@ -1317,18 +1317,23 @@
       document.execCommand("justifyFull", false, null);
     }
 
-    const fontSizeDropdown = document.getElementById("fontSizeDropdownPanel");
-    const customInput = document.getElementById("customFontSizeInput");
-    const dropdownSelect = document.getElementById("fontSizeDropdown");
-    const applyBtn = document.getElementById("applyFontSizeBtn");
+    document.addEventListener("DOMContentLoaded", () => {
+      const fontSizeDropdown = document.getElementById("fontSizeDropdownPanel");
+      const customInput = document.getElementById("customFontSizeInput");
+      const dropdownSelect = document.getElementById("fontSizeDropdown");
+      const applyBtn = document.getElementById("applyFontSizeBtn");
 
-    fontSizeBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      saveSelection(); // <-- Save the range before user interacts with inputs
-      fontSizeDropdown.classList.toggle("hidden");
-      const rect = fontSizeBtn.getBoundingClientRect();
-      fontSizeDropdown.style.left = `${rect.left}px`;
-      fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
+      fontSizeDropdown.addEventListener("mousedown", (e) => {
+        e.preventDefault(); // 👈 prevents editor from losing selection
+      });
+
+      fontSizeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        saveSelection(); // <-- Save the range before user interacts with inputs
+        fontSizeDropdown.classList.toggle("hidden");
+        const rect = fontSizeBtn.getBoundingClientRect();
+        fontSizeDropdown.style.left = `${rect.left}px`;
+        fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
     applyBtn.addEventListener("click", () => {
