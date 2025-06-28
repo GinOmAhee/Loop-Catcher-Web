@@ -2450,17 +2450,6 @@
       } 
     });
 
-    // ✅ Attach on DOM ready
-    window.addEventListener("DOMContentLoaded", () => {
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      applyEditorMode(savedMode);
-
-      if (modeToggleBtn) {
-        modeToggleBtn.addEventListener("click", toggleEditorMode);
-      }
-
-    });
-
     document.addEventListener("click", () => {
       setTimeout(() => {
         fontDropdown?.classList.add("hidden");
