@@ -872,6 +872,9 @@
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <!-- 🎨 Toolbar -->
+
+      <button id="printBtn" title="Print Note">🖨️ Print</button>
+    
       <div class="format-toolbar" style="margin-bottom: 1rem;">
         
       <!-- Margin Button -->
@@ -2182,6 +2185,53 @@
         }
       });
 
+    function printNote() {
+      const printWindow = window.open('', '_blank');
+      const noteContent = mainEditor.innerHTML;
+
+      const styles = `
+        <style>
+          body {
+            font-family: 'Arial', sans-serif;
+            padding: 1in;
+            font-size: 12pt;
+            color: #000;
+          }
+          ul, ol {
+            margin-left: 1.5em;
+          }
+          h1, h2, h3, h4, h5 {
+            margin: 1rem 0 0.5rem;
+          }
+          a {
+            color: #007bff;
+            text-decoration: underline;
+          }
+        </style>
+      `;
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Note</title>
+            ${styles}
+          </head>
+          <body>
+            ${noteContent}
+          </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+      printWindow.focus();
+
+      // Delay to ensure styles render
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 300);
+    }
+
     function toggleBold() {
       const selection = window.getSelection();
       if (!selection.rangeCount || selection.isCollapsed) return;
@@ -2258,6 +2308,9 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("mainEditor")?.classList.add("visible");
+
+      document.getElementById("printBtn").addEventListener("click", printNote);
+
     });
 
     document.addEventListener("click", () => {
