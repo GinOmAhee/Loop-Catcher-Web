@@ -288,16 +288,15 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
-    min-height: 400px;      /* or whatever works for you */
-    max-height: 600px;
-    overflow-y: auto;
+    width: 60%;
+    min-height: 300px;
     padding: 1rem;
     font-size: 0.9rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     background: var(--editor-bg, #fff);
     color: var(--editor-text, #000);
-    transition: all 0.2s ease-in-out; /* smooth adjustment */
+    overflow-y: auto;
   }
 
   .hidden-editor {
@@ -955,16 +954,9 @@
 
       <!-- 📝 Rich Text Editor -->
       <div id="mainEditor" class="hidden-editor" contenteditable="true">
-        width: 60%;
-        min-height: 300px;
-        padding: 1rem;
-        font-size: 0.9rem;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background: var(--editor-bg);
-        color: var(--editor-text);
-        overflow-y: auto;
-      "></div>
+        <h1>Start typing...</h1>
+        <p>This is your rich text editor.</p>
+      </div>
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -2177,12 +2169,15 @@
         marginDropdown.style.left = `${rect.left}px`;
       });
 
-      // Apply margins when user hits "Apply"
+      function inchesToPixels(inches) {
+        return parseFloat(inches) * 96;
+      }
+
       document.getElementById("applyMarginBtn").addEventListener("click", () => {
-        const top = document.getElementById("marginTop").value || 0;
-        const bottom = document.getElementById("marginBottom").value || 0;
-        const left = document.getElementById("marginLeft").value || 0;
-        const right = document.getElementById("marginRight").value || 0;
+        const top = inchesToPixels(document.getElementById("marginTop").value || 0);
+        const bottom = inchesToPixels(document.getElementById("marginBottom").value || 0);
+        const left = inchesToPixels(document.getElementById("marginLeft").value || 0);
+        const right = inchesToPixels(document.getElementById("marginRight").value || 0);
 
         editor.style.paddingTop = `${top}px`;
         editor.style.paddingBottom = `${bottom}px`;
@@ -2198,25 +2193,6 @@
           marginDropdown.classList.add("hidden");
         }
       });
-    });
-
-    // Convert inches to pixels (1 inch = 96 pixels)
-    function inchesToPixels(inches) {
-      return inches * 96;
-    }
-
-    document.getElementById("applyMarginBtn").addEventListener("click", () => {
-      const top = inchesToPixels(document.getElementById("marginTop").value || 0);
-      const bottom = inchesToPixels(document.getElementById("marginBottom").value || 0);
-      const left = inchesToPixels(document.getElementById("marginLeft").value || 0);
-      const right = inchesToPixels(document.getElementById("marginRight").value || 0);
-
-      editor.style.paddingTop = `${top}px`;
-      editor.style.paddingBottom = `${bottom}px`;
-      editor.style.paddingLeft = `${left}px`;
-      editor.style.paddingRight = `${right}px`;
-
-      marginDropdown.classList.add("hidden");
     });
 
     window.addEventListener("DOMContentLoaded", () => {
