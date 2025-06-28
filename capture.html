@@ -306,8 +306,8 @@
   }
 
   #mainEditor {
-    width: 100%;
-    min-height: 300px;
+    width: 80%;
+    min-height: 400px;
     outline: none;
     transition: all 0.2s ease;
   }
@@ -315,8 +315,10 @@
   /* Notepad Mode Styles */
   #mainEditor[data-mode="notepad"] {
     font-family: "Courier New", monospace;
-    font-size: 1.2rem;
+    font-size: 1rem;
     padding: 0.9rem;
+    max-width: 800px;
+    margin: 0 auto;
     border: none;
     box-shadow: none;
     background-color: #fffdf7;
@@ -2384,8 +2386,8 @@
           toolbar && (toolbar.style.display = "none");
           editor.setAttribute("data-mode", "notepad");
           editor.style.fontFamily = "Courier, monospace";
-          editor.style.fontSize = "1.2rem";
-          editor.style.padding = "2rem";
+          editor.style.fontSize = "0.9rem";
+          editor.style.padding = "1rem";
           editor.style.border = "none";
           editor.style.boxShadow = "none";
 
