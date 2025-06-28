@@ -2257,16 +2257,18 @@
 
           function onMouseMove(ev) {
             let value;
+
             if (position === "top" || position === "bottom") {
               const dy = ev.clientY - startY;
-              value = startMargin[position] + dy;
-              editor.style[`padding${capitalize(position)}`] = `${value}px`;
-              positionTooltip(ev.clientX, ev.clientY, `${position} margin: ${value}px`);
-            } else {
+              value = Math.max(0, startMargin[position] + dy);
+            } else if (position === "left" || position === "right") {
               const dx = ev.clientX - startX;
-              value = startMargin[position] + dx * (position === "left" ? 1 : -1);
-              editor.style[`padding${capitalize(position)}`] = `${value}px`;
-              positionTooltip(ev.clientX, ev.clientY, `${position} margin: ${value}px`);
+              value = Math.max(0, startMargin[position] + (position === "left" ? dx : -dx));
+            }
+
+            editor.style[`padding${capitalize(position)}`] = `${value}px`;
+            positionTooltip(ev.clientX, ev.clientY, `${position} padding: ${value}px`);
+
             }
           }
 
