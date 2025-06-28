@@ -288,23 +288,15 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
-    margin: 0 auto;
     width: 60%;
     min-height: 300px;
-    padding: 1in;
+    padding: 1rem;
     font-size: 0.9rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     background: var(--editor-bg, #fff);
     color: var(--editor-text, #000);
     overflow-y: auto;
-    box-shadow: 0 0 0 1px #ccc inset;
-  }
-
-  .page-break-guide {
-    border-top: 1px dotted #ccc;
-    margin: 2rem 0;
-    height: 0;
   }
 
   .hidden-editor {
@@ -881,13 +873,6 @@
       <button id="previewToggle">☰</button>
       <!-- 🎨 Toolbar -->
       <div class="format-toolbar" style="margin-bottom: 1rem;">
-
-      <!-- ✅ Toolbar Dropdown for Paper Size -->
-      <div class="toolbar-group">
-        <select id="paperSizeSelect" title="Paper Size">
-          <option value="A4">A4</option>
-          <option value="Letter">Letter</option>
-        </select>
         
       <!-- Margin Button -->
       <button id="marginBtn" title="Set Margins">📏</button>
@@ -2197,10 +2182,6 @@
         }
       });
 
-    function renderPageGuides() {
-      console.log("🧾 renderPageGuides() called — implement visual page breaks.");
-    }
-
     function toggleBold() {
       const selection = window.getSelection();
       if (!selection.rangeCount || selection.isCollapsed) return;
@@ -2235,56 +2216,11 @@
      }
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const printPaperSize = document.getElementById("printPaperSize");
-      const paperSizeSelect = document.getElementById("paperSizeSelect");
-
-      if (printPaperSize && paperSizeSelect) {
-       printPaperSize.addEventListener("change", () => {
-         const size = printPaperSize.value;
-         applyPaperSize(size);
-         paperSizeSelect.value = size;
-       });
-      }
-    });
-
-    function applyPaperSize(size) {
-      const editor = document.getElementById("mainEditor");
-      const page = pageSizeMap[size] || pageSizeMap["A4"];
-
-      editor.style.maxWidth = page.width + "px";
-      editor.style.minHeight = page.height + "px";
-
-      renderPageGuides();
-    }
-
-    paperSizeSelect.addEventListener("change", () => {
-      const size = paperSizeSelect.value;
-      applyPaperSize(size);
-      printPaperSize.value = size; // 🔁 sync to print panel
-    });
-
-    printPaperSize.addEventListener("change", () => {
-      const size = printPaperSize.value;
-      applyPaperSize(size);
-      paperSizeSelect.value = size; // 🔁 sync to toolbar
-    });
-
-    // 🪄 On load, set default
-    window.addEventListener("DOMContentLoaded", () => {
-      applyPaperSize(paperSizeSelect.value);
-    });
-
     // ✅ Margin Input UI logic
     document.addEventListener("DOMContentLoaded", () => {
       const marginBtn = document.getElementById("marginBtn");
       const marginDropdown = document.getElementById("marginDropdown");
       const editor = document.getElementById("mainEditor");
-
-      if (!marginBtn || !marginDropdown || !editor || !applyMarginBtn) {
-        console.warn("⚠️ Margin tool elements missing in DOM.");
-        return;
-      }
 
       marginBtn.addEventListener("click", (e) => {
         e.stopPropagation();
