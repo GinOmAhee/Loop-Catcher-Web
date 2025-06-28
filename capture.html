@@ -288,7 +288,6 @@
 
   /* === EDITOR & INPUT === */
   #mainEditor {
-    visibility: hidden;
     min-height: 400px;      /* or whatever works for you */
     max-height: 600px;
     overflow-y: auto;
@@ -299,6 +298,15 @@
     background: var(--editor-bg, #fff);
     color: var(--editor-text, #000);
     transition: all 0.2s ease-in-out; /* smooth adjustment */
+  }
+
+  .hidden-editor {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .hidden-editor.visible {
+    opacity: 1;
   }
 
   textarea {
@@ -325,6 +333,7 @@
     justify-content: flex-start;
     padding: 2rem;
     overflow-y: auto;
+    box-sizing: border-box;
   }
 
   /* === TABS === */
@@ -945,7 +954,7 @@
       </div>
 
       <!-- 📝 Rich Text Editor -->
-      <div id="mainEditor" contenteditable="true" style="
+      <div id="mainEditor" class="hidden-editor" contenteditable="true">
         width: 60%;
         min-height: 300px;
         padding: 1rem;
@@ -2211,7 +2220,7 @@
     });
 
     window.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("mainEditor").style.visibility = "visible";
+      document.getElementById("mainEditor")?.classList.add("visible");
     });
 
     document.addEventListener("click", () => {
