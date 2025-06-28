@@ -2260,7 +2260,7 @@
             if (position === "top" || position === "bottom") {
               const dy = ev.clientY - startY;
               value = startMargin[position] + dy;
-              editor.style[`margin${capitalize(position)}`] = `${value}px`;
+              editor.style[`padding${capitalize(position)}`] = `${value}px`;
               positionTooltip(ev.clientX, ev.clientY, `${position} margin: ${value}px`);
             } else {
               const dx = ev.clientX - startX;
