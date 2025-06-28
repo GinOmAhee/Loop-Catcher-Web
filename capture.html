@@ -1323,8 +1323,11 @@
       const dropdownSelect = document.getElementById("fontSizeDropdown");
       const applyBtn = document.getElementById("applyFontSizeBtn");
 
-      fontSizeDropdown.addEventListener("mousedown", (e) => {
-        e.preventDefault(); // 👈 prevents editor from losing selection
+      document.getElementById("fontSizeDropdown").addEventListener("mousedown", (e) => {
+        const isInput = e.target.tagName === "INPUT";
+        if (!isInput) {
+          e.preventDefault(); // 🛡️ Keep selection only if not an input
+        } 
       });
 
       fontSizeBtn.addEventListener("click", (e) => {
