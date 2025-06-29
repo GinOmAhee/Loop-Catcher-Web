@@ -325,6 +325,7 @@
   }
 
   #mainEditor {
+    margin: 1rem auto; /* Add to match document mode */
     width: 80%;
     min-height: 400px;
     max-height: calc(100vh - 5rem); /* or whatever fits below your tab bar */
@@ -363,6 +364,50 @@
       --btn-bg: #333;
       --btn-text: #fff;
     }
+  }
+
+  /* Generic inheritance-friendly rules */
+  .preview-sortbar select,
+  .preview-overlay,
+  .preview-top a,
+  .preview-settings a,
+  .preview-top a:hover,
+  .preview-settings a:hover,
+  .note-preview,
+  .preview-sortbar.bottom-searchbar,
+  #searchInput,
+  #searchInput:focus,
+  #modeToggleBtn
+  #previewToggle
+  .preview-bottom {
+    background-color: inherit;
+    color: inherit;
+    border-color: currentColor;
+    transition: all 0.3s ease;
+  }
+
+  /* Optional — link hover tweaks */
+  .preview-top a:hover,
+  .preview-settings a:hover {
+    text-decoration: underline;
+    opacity: 0.85;
+  }
+
+  /* Optional — override backgrounds for focus/input */
+  #searchInput {
+    background-color: rgba(255, 255, 255, 0.8); /* default light */
+  }
+  .theme-bold #searchInput {
+    background-color: #fff7ed;
+  }
+  .theme-playful #searchInput {
+    background-color: #fff4fa;
+  }
+
+  /* Add soft borders if needed */
+  #searchInput,
+  .preview-sortbar select {
+    border: 1px solid currentColor;
   }
 
   .page-break-line {
@@ -573,10 +618,8 @@
   .format-toolbar select,
   .preview-sortbar select {
     padding: 0.3rem;
-    font-size: 0.85rem;
+    font-size: 1rem;
     border-radius: 4px;
-    background-color: #f2f2f2;
-    color: #333;
     border: 1px solid #ccc;
     cursor: pointer;
   }
@@ -650,7 +693,6 @@
     height: 100vh;
     display: none;
     flex-direction: column;
-    background: #fff;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
@@ -664,16 +706,13 @@
     padding: 0.5rem 0.8rem;
     margin: 0.25rem 0;
     font-weight: 600;
-    color: #444;
     text-decoration: none;
     border-radius: 6px;
-    background: #fff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     transition: all 0.2s ease;
   }
   .preview-top a:hover,
   .preview-settings a:hover {
-    background-color: #f3f3f3;
     transform: translateX(2px);
   }
   .preview-middle {
@@ -699,7 +738,6 @@
     font-size: 0.95rem;
     font-family: 'Inter', sans-serif;
     line-height: 1.5;
-    color: var(--preview-text-color); /* Add fallback below */
   }
 
   #groupedNotes {
@@ -722,7 +760,6 @@
     padding: 0.6rem 1rem;
     margin-top: 0.2rem;
     border-top: 1px solid #ddd;
-    background: #fafafa;
   }
 
   .search-wrapper {
@@ -743,14 +780,12 @@
     flex: 1;
     padding: 0.6rem 0.8rem;
     border: none;
-    background: transparent;
     color: var(--text-color, #333);
     font-size: 1rem;
   }
 
   #searchInput:focus {
     outline: none;
-    border-color: #999;
     box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.1);
   }
 
