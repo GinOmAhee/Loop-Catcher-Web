@@ -2509,10 +2509,11 @@
               tabBarEl.innerText = tabs[activeTabIndex].title || `Tab ${activeTabIndex + 1}`;
             }
             safeRenderTabs();
+          
+            if (mode === "document") {
+              paperSizeSelect?.addEventListener("change", updatePaperSize);
+              updatePaperSize(); // run it once immediately
           }
-
-          updatePaperSize?.(); // ✅ Only runs in Document Mode
-
         }
         // ✏️ Ensure editor receives focus after mode switch
         setTimeout(() => editor.focus(), 0);
