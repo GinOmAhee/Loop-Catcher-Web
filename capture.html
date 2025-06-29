@@ -308,7 +308,7 @@
   #modeToggleBtn {
     position: fixed;
     bottom: 1rem;
-    right: 1rem;
+    right: 2rem;
     z-index: 1000;
     background: #fff;
     border: 1px solid #ccc;
@@ -343,14 +343,17 @@
     background-color: #fffdf7;
   }
 
-  /* Document Mode Styles */
   #mainEditor[data-mode="document"] {
+    width: 8.27in;
+    min-height: 11.69in;
+    padding: 1in;
+    margin: 1rem auto;
     font-family: "Arial", sans-serif;
     font-size: 1rem;
-    padding: 1in;
     border: 1px solid #ccc;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
+    box-sizing: border-box;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -932,11 +935,13 @@
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
       <button id="previewToggle">☰</button>
+      <div class="controls">
+       <button onclick="saveText()" title="Save">💾</button>
+       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
+       <button id="printBtn" title="Print Note">🖨️</button>
+      </div>
       <div id="toolbar">
         <!-- 🎨 Toolbar -->
-
-        <button id="printBtn" title="Print Note">🖨️</button>
-    
         <div class="format-toolbar" style="margin-bottom: 1rem;">
         
         <!-- Margin Button -->
@@ -1027,11 +1032,6 @@
 
         <!-- 📝 Rich Text Editor -->
         <div id="mainEditor" class="hidden-editor" contenteditable="true"></div>
-
-      <div class="controls">
-       <button onclick="saveText()" title="Save">💾</button>
-       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
-      </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
