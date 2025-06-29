@@ -365,6 +365,16 @@
     }
   }
 
+  .page-break-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: 1px dotted #aaa;
+    z-index: 1;
+    pointer-events: none;
+  }
+
   .hidden-editor {
     opacity: 0;
     pointer-events: none;
@@ -970,6 +980,15 @@
       <div id="toolbar">
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
+
+        <label for="paperSizeSelect">📄 Paper Size:</label>
+        <select id="paperSizeSelect">
+          <option value="letter">Letter (8.5in × 11in)</option>
+          <option value="legal">Legal (8.5in × 14in)</option>
+          <option value="a3">A3 (11.7in × 16.5in)</option>
+          <option value="a4" selected>A4 (8.3in × 11.7in)</option>
+          <option value="a5">A5 (5.8in × 8.3in)</option>
+        </select>
         
         <!-- Margin Button -->
         <button id="marginBtn" title="Set Margins">📏</button>
@@ -2491,11 +2510,51 @@
             }
             safeRenderTabs();
           }
+
+          updatePaperSize?.(); // ✅ Only runs in Document Mode
+          
         }
         // ✏️ Ensure editor receives focus after mode switch
         setTimeout(() => editor.focus(), 0);
-      } 
+      }
     });
+
+    document.getElementById("paperSizeSelect").addEventListener("change", updatePaperSize);
+
+    const paperSizes = {
+      letter: { width: 816, height: 1056 }, // 8.5in x 11in at 96dpi
+      legal: { width: 816, height: 1344 },  // 8.5in x 14in
+      a3:    { width: 1123, height: 1587 }, // 11.7in x 16.5in
+      a4:    { width: 794, height: 1123 },  // 8.3in x 11.7in
+      a5:    { width: 583, height: 823 }    // 5.8in x 8.3in
+    };
+
+    function updatePaperSize() {
+      const selected = document.getElementById("paperSizeSelect").value;
+      const size = paperSizes[selected];
+      const editor = document.getElementById("mainEditor");
+
+      if (!editor || !size) return;
+
+      // Set paper size & visual preview
+      editor.style.width = `${size.width}px`;
+      editor.style.minHeight = `${size.height}px`;
+      editor.style.maxWidth = "100%";
+
+      // Add page break lines every paper height
+      const contentHeight = editor.scrollHeight;
+      const pageHeight = size.height;
+
+      const numPages = Math.ceil(contentHeight / pageHeight);
+      document.querySelectorAll(".page-break-line").forEach(el => el.remove());
+
+      for (let i = 1; i < numPages; i++) {
+         const line = document.createElement("div");
+         line.className = "page-break-line";
+         line.style.top = `${pageHeight * i}px`;
+         editor.appendChild(line);
+      }
+    }
 
     document.addEventListener("click", () => {
       setTimeout(() => {
