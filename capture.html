@@ -405,11 +405,12 @@
   .tab-bar {
     display: flex;
     align-items: center;
-    padding-left: 0.5rem;
+    padding: 0 1rem 0 0.5rem;
     margin-bottom: 0.5rem;
     border-bottom: 2px solid #ccc;
     position: sticky;
     top: 0;
+    height: 3rem;
     z-index: 10; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
@@ -417,11 +418,13 @@
   }
 
   .tab-container {
+    flex: 1; /* 📏 Takes up only leftover space */
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
-    padding-right: 3rem; /* leaves room for the button */
-    max-width: 100%;
+    padding-right: 3rem; /* leaves space for theme toggle */
+    scrollbar-width: thin;
+    scrollbar-color: var(--tab-border) transparent;
   }
 
   .tab {
@@ -812,11 +815,11 @@
 
   /* === THEME TOGGLE SWITCH === */
   .theme-toggle {
-    position: fixed;
-    top: 1.3rem;
-    right: 2.3rem;
+    position: absolute;
+    top: 50%;
+    right: 1rem;
     transform: translateY(-50%);
-    z-index: 10001;
+    z-index: 10;
   }
   .theme-toggle input {
     display: none;
