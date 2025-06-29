@@ -415,6 +415,15 @@
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
   }
+
+  .tab-container {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-right: 3rem; /* leaves room for the button */
+    max-width: 100%;
+  }
+  
   .tab {
     display: inline-flex;
     align-items: center;
@@ -873,13 +882,6 @@
 </head>
 <body>
 
-  <div style="position: absolute; top: 1rem; right: 1rem; z-index: 9999;">
-    <label class="theme-toggle">
-      <input type="checkbox" id="themeSwitch" />
-      <span class="slider"></span>
-    </label>
-  </div>
-
   <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
   <div class="preview-overlay" id="preview">
     <div class="preview-top">
@@ -930,7 +932,18 @@
     </div>
   </div>
 
-  <div id="tabBar" class="tab-bar"></div>
+  <div id="tabBar" class="tab-bar">
+    <div class="tab-container">
+      <!-- tab elements go here -->
+    </div>
+    <!-- Floating theme toggle embedded in tab bar -->
+    <div class="tab-theme-switch">
+      <label class="theme-toggle">
+        <input type="checkbox" id="themeSwitch" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
 
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
