@@ -1357,20 +1357,19 @@
         addTabBtn.onclick = addNewTab;
         tabContainer.appendChild(addTabBtn);
 
-        // ⬇️ Add this just before renderTabs() ends:
-        const themeToggle = document.createElement("div");
-        themeToggle.className = "tab-theme-switch";
-        themeToggle.innerHTML = `
-          <label class="theme-toggle">
-            <input type="checkbox" id="themeSwitch" />
-            <span class="slider"></span>
-          </label>
-        `;
-        tabBar.appendChild(themeToggle);
-
-        // Re-bind its logic
-        initThemeToggle?.();
-    }  
+        // Only add theme toggle if it doesn’t already exist
+        if (!tabBar.querySelector("#themeSwitch")) {
+          const themeToggle = document.createElement("div");
+          themeToggle.className = "tab-theme-switch";
+          themeToggle.innerHTML = `
+            <label class="theme-toggle">
+              <input type="checkbox" id="themeSwitch" />
+              <span class="slider"></span>
+            </label>
+          `;
+          tabBar.appendChild(themeToggle);
+          initThemeToggle?.();
+        }  
 
     function markUnsaved() {
       hasUnsavedChanges = true;
