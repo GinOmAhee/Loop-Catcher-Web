@@ -990,12 +990,16 @@
   </div>
 
   <div id="tabBar" class="tab-bar">
-    <div class="tab-container"> ← all tabs + "+" go here
-      <div class="tab">Tab 1</div>
-      <div class="tab">Tab 2</div>
-      <div class="tab add-tab">+</div>
+    <div class="tab-container">
+      <!-- tab elements go here -->
     </div>
-    <div class="tab-theme-switch">🌙</div>
+    <!-- Floating theme toggle embedded in tab bar -->
+    <div class="tab-theme-switch">
+      <label class="theme-toggle">
+        <input type="checkbox" id="themeSwitch" />
+        <span class="slider"></span>
+      </label>
+    </div>
   </div>
 
   <!-- 📝 Main Editor (always visible) -->
@@ -1219,28 +1223,44 @@
     }
 
     function renderTabs() {
-      if (isRenamingTab) return;
+      if (isRenamingTab) {
+        console.warn("⛔ Skipping renderTabs(): rename input is still active");
+        return;
+      }
 
       const tabBar = document.querySelector(".tab-bar");
-      const tabContainer = tabBar.querySelector(".tab-container");
-      if (!tabBar || !tabContainer) return;
+      if (!tabBar) return;
 
-      // Clear tab container
-      tabContainer.innerHTML = "";
+      if (
+        document.activeElement &&
+        document.activeElement.classList.contains("tab-rename-input")
+      ) {
+        console.warn("⛔ Skipping render: rename input is active");
+        return;
+      }
+
+      const tabContainer = tabBar.querySelector(".tab-container");
+
+      tabBar.innerHTML = "";
 
       tabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
         tabBtn.className = "tab";
-        if (index === activeTabIndex) tabBtn.classList.add("active");
+
+        if (index === activeTabIndex) {
+          tabBtn.classList.add("active");
+        }
 
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
         tabLabel.className = "tab-label";
+        tabLabel.addEventListener("click", () => switchTab(index));
 
-        // 🖊️ Rename on double click
+        // Handle rename flow on double-click
         tabLabel.addEventListener("dblclick", (e) => {
           e.stopPropagation();
           isRenamingTab = true;
+          console.log("🖱️ Double-clicked on tab:", tab.title);
 
           const input = document.createElement("input");
           input.className = "tab-rename-input";
@@ -1253,21 +1273,38 @@
             input.style.caretColor = "hotpink";
           }
 
+          input.addEventListener("click", (e) => e.stopPropagation());
+
           input.addEventListener("keydown", (e) => {
             if (e.key === "Enter") input.blur();
             if (e.key === "Escape") renderTabs();
           });
 
-          input.addEventListener("blur", () => {
-            const newTitle = input.value.trim();
+          input.addEventListener("blur", (e) => {
+            const newTitle = e.target.value.trim();
             if (newTitle && newTitle !== tab.title) {
               tabs[index].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
-              hasUnsavedChanges = true;
+              console.log("✅ title saved:", newTitle);
+              hasUnsavedChanges = true; // <-- 🧠 this is the magic line
+            } else {
+              console.log("❌ title unchanged or empty");
             }
             isRenamingTab = false;
             setTimeout(renderTabs, 100);
           });
+
+          const observer = new MutationObserver(() => {
+            if (document.body.classList.contains("dark-theme")) {
+              input.style.background = "#1e1e1e";
+              input.style.color = "#eee";
+              input.style.border = "1px dashed hotpink";
+              input.style.caretColor = "hotpink";
+            }
+            observer.disconnect(); // Only run once
+          });
+
+          observer.observe(tabBtn, { childList: true });
 
           tabBtn.replaceChild(input, tabLabel);
           setTimeout(() => {
@@ -1276,11 +1313,8 @@
           }, 100);
         });
 
-        tabLabel.addEventListener("click", () => switchTab(index));
-        tabBtn.appendChild(tabLabel);
-
         const closeBtn = document.createElement("button");
-        closeBtn.innerText = "⨯";
+        closeBtn.innerText = "⨯"; // tight and clean
         closeBtn.className = "tab-close-btn";
         closeBtn.title = "Close Tab";
         closeBtn.onclick = (e) => {
@@ -1288,27 +1322,30 @@
           closeTab(index);
         };
 
+        tabBtn.appendChild(tabLabel);
         tabBtn.appendChild(closeBtn);
-        tabContainer.appendChild(tabBtn); // ✅ inside tabContainer now
+        tabBar.appendChild(tabBtn);
       });
 
-      // ➕ Add Tab Button
       const addTabBtn = document.createElement("div");
       addTabBtn.innerText = "+";
       addTabBtn.className = "tab add-tab";
       addTabBtn.onclick = addNewTab;
-      tabContainer.appendChild(addTabBtn); // ✅ inside scrollable area
+      tabBar.appendChild(addTabBtn);
 
-      // 🌙 Re-attach theme toggle outside tabContainer
-      const themeToggle = document.querySelector(".tab-theme-switch");
-      if (!themeToggle?.innerHTML.trim()) {
-        themeToggle.innerHTML = `
-          <label class="theme-toggle">
-            <input type="checkbox" id="themeSwitch" />
-            <span class="slider"></span>
-          </label>`;
-        initThemeToggle?.();
-      }
+      // ⬇️ Add this just before renderTabs() ends:
+      const themeToggle = document.createElement("div");
+      themeToggle.className = "tab-theme-switch";
+      themeToggle.innerHTML = `
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeSwitch" />
+          <span class="slider"></span>
+        </label>
+      `;
+      tabBar.appendChild(themeToggle);
+
+      // Re-bind its logic
+      initThemeToggle?.();
     }
 
     function markUnsaved() {
