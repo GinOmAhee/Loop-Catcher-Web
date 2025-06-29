@@ -990,16 +990,12 @@
   </div>
 
   <div id="tabBar" class="tab-bar">
-    <div class="tab-container">
-      <!-- tab elements go here -->
+    <div class="tab-container"> ← all tabs + "+" go here
+      <div class="tab">Tab 1</div>
+      <div class="tab">Tab 2</div>
+      <div class="tab add-tab">+</div>
     </div>
-    <!-- Floating theme toggle embedded in tab bar -->
-    <div class="tab-theme-switch">
-      <label class="theme-toggle">
-        <input type="checkbox" id="themeSwitch" />
-        <span class="slider"></span>
-      </label>
-    </div>
+    <div class="tab-theme-switch">🌙</div>
   </div>
 
   <!-- 📝 Main Editor (always visible) -->
@@ -1229,111 +1225,31 @@
       }
 
       const tabBar = document.querySelector(".tab-bar");
-      if (!tabBar) return;
-
-      if (
-        document.activeElement &&
-        document.activeElement.classList.contains("tab-rename-input")
-      ) {
-        console.warn("⛔ Skipping render: rename input is active");
-        return;
-      }
-
-      const tabContainer = tabBar.querySelector(".tab-container");
-
       tabBar.innerHTML = "";
 
+      // ⬇️ Create and append tab container
+      const tabContainer = document.createElement("div");
+      tabContainer.className = "tab-container";
+      tabBar.appendChild(tabContainer);
+
+      // ⬇️ Add tabs inside tabContainer
       tabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
         tabBtn.className = "tab";
-
-        if (index === activeTabIndex) {
-          tabBtn.classList.add("active");
-        }
-
-        const tabLabel = document.createElement("span");
-        tabLabel.innerText = tab.title;
-        tabLabel.className = "tab-label";
-        tabLabel.addEventListener("click", () => switchTab(index));
-
-        // Handle rename flow on double-click
-        tabLabel.addEventListener("dblclick", (e) => {
-          e.stopPropagation();
-          isRenamingTab = true;
-          console.log("🖱️ Double-clicked on tab:", tab.title);
-
-          const input = document.createElement("input");
-          input.className = "tab-rename-input";
-          input.value = tab.title;
-
-          if (document.body.classList.contains("dark-theme")) {
-            input.style.background = "#1e1e1e";
-            input.style.color = "#eee";
-            input.style.border = "1px dashed hotpink";
-            input.style.caretColor = "hotpink";
-          }
-
-          input.addEventListener("click", (e) => e.stopPropagation());
-
-          input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") input.blur();
-            if (e.key === "Escape") renderTabs();
-          });
-
-          input.addEventListener("blur", (e) => {
-            const newTitle = e.target.value.trim();
-            if (newTitle && newTitle !== tab.title) {
-              tabs[index].title = newTitle;
-              localStorage.setItem("tabs", JSON.stringify(tabs));
-              console.log("✅ title saved:", newTitle);
-              hasUnsavedChanges = true; // <-- 🧠 this is the magic line
-            } else {
-              console.log("❌ title unchanged or empty");
-            }
-            isRenamingTab = false;
-            setTimeout(renderTabs, 100);
-          });
-
-          const observer = new MutationObserver(() => {
-            if (document.body.classList.contains("dark-theme")) {
-              input.style.background = "#1e1e1e";
-              input.style.color = "#eee";
-              input.style.border = "1px dashed hotpink";
-              input.style.caretColor = "hotpink";
-            }
-            observer.disconnect(); // Only run once
-          });
-
-          observer.observe(tabBtn, { childList: true });
-
-          tabBtn.replaceChild(input, tabLabel);
-          setTimeout(() => {
-            input.focus();
-            input.select();
-          }, 100);
-        });
-
-        const closeBtn = document.createElement("button");
-        closeBtn.innerText = "⨯"; // tight and clean
-        closeBtn.className = "tab-close-btn";
-        closeBtn.title = "Close Tab";
-        closeBtn.onclick = (e) => {
-          e.stopPropagation();
-          closeTab(index);
-        };
-
+        ...
         tabBtn.appendChild(tabLabel);
         tabBtn.appendChild(closeBtn);
-        tabBar.appendChild(tabBtn);
+        tabContainer.appendChild(tabBtn); // ✅ append here
       });
 
+      // ⬇️ Add "Add Tab" button inside tabContainer too
       const addTabBtn = document.createElement("div");
       addTabBtn.innerText = "+";
       addTabBtn.className = "tab add-tab";
       addTabBtn.onclick = addNewTab;
-      tabBar.appendChild(addTabBtn);
+      tabContainer.appendChild(addTabBtn); // ✅ append inside container
 
-      // ⬇️ Add this just before renderTabs() ends:
+      // ⬇️ Add theme toggle last, outside the scrollable area
       const themeToggle = document.createElement("div");
       themeToggle.className = "tab-theme-switch";
       themeToggle.innerHTML = `
@@ -1344,7 +1260,6 @@
       `;
       tabBar.appendChild(themeToggle);
 
-      // Re-bind its logic
       initThemeToggle?.();
     }
 
