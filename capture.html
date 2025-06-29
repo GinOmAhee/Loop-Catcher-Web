@@ -722,8 +722,8 @@
 
   #previewToggle {
     position: sticky;
-    margin: 0 auto 0 1rem; /* pins it to the left */
-    top: 2.2rem; /* just below your tab bar */
+    margin: 0 0 1rem auto; /* pins it to the right */
+    top: 3.2rem; /* just below your tab bar */
     z-index: 9;
     background: var(--editor-bg);
     padding: 0.3rem 0.8rem;
@@ -1183,6 +1183,9 @@
         console.warn("⛔ Skipping render: rename input is active");
         return;
       }
+
+      const tabBar = document.querySelector(".tab-bar");
+      const tabContainer = tabBar.querySelector(".tab-container");
 
       tabBar.innerHTML = "";
 
