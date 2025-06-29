@@ -24,6 +24,8 @@
     --tab-border: #ccc;
     --tab-active-bg: #ffffff;
     --preview-text-color: #333;
+    --btn-bg: #f0f0f0;
+    --btn-text: #000;
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px;
     color: #333;
@@ -317,8 +319,9 @@
     transition: all 0.3s ease;
   }
 
-  #modeToggleBtn:hover {
-    background: #f0f0f0;
+  #modeToggleBtn {
+    background: var(--btn-bg, #f0f0f0);
+    color: var(--btn-text, #000);
   }
 
   #mainEditor {
@@ -348,6 +351,13 @@
     border: 1px solid #ccc;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --btn-bg: #333;
+      --btn-text: #fff;
+    }
   }
 
   .hidden-editor {
