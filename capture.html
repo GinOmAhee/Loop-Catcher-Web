@@ -423,7 +423,7 @@
     padding-right: 3rem; /* leaves room for the button */
     max-width: 100%;
   }
-  
+
   .tab {
     display: inline-flex;
     align-items: center;
@@ -1115,33 +1115,39 @@
     document.addEventListener('DOMContentLoaded', () => {
       const switchEl = document.getElementById('themeSwitch');
 
-      function loadTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+      function initThemeSwitcher() {
+        const switchEl = document.getElementById('themeSwitch');
+        if (!switchEl) return;
 
-        if (useDark) {
-          document.body.classList.add('dark-theme');
-          switchEl.checked = true;
-        } else {
-          document.body.classList.remove('dark-theme');
-          switchEl.checked = false;
-        }
-      }
+        function loadTheme() {
+          const savedTheme = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
 
-      switchEl.addEventListener('change', () => {
-        if (switchEl.checked) {
-          document.body.classList.add('dark-theme');
-          localStorage.setItem('theme', 'dark');
-        } else {
-          document.body.classList.remove('dark-theme');
-          localStorage.setItem('theme', 'light');
+          if (useDark) {
+            document.body.classList.add('dark-theme');
+            switchEl.checked = true;
+          } else {
+            document.body.classList.remove('dark-theme');
+            switchEl.checked = false;
+          }
         }
+
+        switchEl.addEventListener('change', () => {
+          if (switchEl.checked) {
+            document.body.classList.add('dark-theme');
+            localStorage.setItem('theme', 'dark');
+          } else {
+            document.body.classList.remove('dark-theme');
+            localStorage.setItem('theme', 'light');
+          }
+        });
+
+        applyMoodTheme(); // This should already exist globally
+        loadTheme();
+        }
+        window.addEventListener('DOMContentLoaded', initThemeSwitcher);
       });
-
-      applyMoodTheme(); // This should already exist globally
-      loadTheme();
-    });
 
     function maybeClosePreview(e) {
       if (e.target.classList.contains("tab-rename-input")) return;
