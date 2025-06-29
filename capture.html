@@ -2513,8 +2513,9 @@
             if (mode === "document") {
               paperSizeSelect?.addEventListener("change", updatePaperSize);
               updatePaperSize(); // run it once immediately
+            }
           }
-        }
+        }  
         // ✏️ Ensure editor receives focus after mode switch
         setTimeout(() => editor.focus(), 0);
       }
