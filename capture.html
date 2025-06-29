@@ -1000,6 +1000,12 @@
     font-weight: 400;
   }
 
+  body:not(.dark-theme) #previewToggle,
+  body:not(.dark-theme) .control-button {
+  background-color: var(--control-btn-bg);
+  color: var(--control-btn-text);
+  }
+
   body.dark-theme select {
     appearance: none;
     -webkit-appearance: none;
