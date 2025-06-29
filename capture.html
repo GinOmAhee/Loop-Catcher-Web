@@ -462,6 +462,18 @@
     scrollbar-color: var(--tab-border) transparent;
   }
 
+  /* Hide scrollbar for webkit browsers (optional) */
+  .tab-container::-webkit-scrollbar {
+    height: 6px;
+  }
+  .tab-container::-webkit-scrollbar-thumb {
+    background-color: #bbb;
+    border-radius: 4px;
+  }
+  .tab-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
   .tab {
     display: inline-flex;
     align-items: center;
@@ -522,17 +534,20 @@
   }
 
   .tab-label {
-    flex-grow: 1;
+    flex-grow: 0 0 auto;
     display: inline-block;
     max-width: 145px; /* or whatever size fits your layout */
+    background: var(--tab-bg, #e0e0e0);
+    border-radius: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     vertical-align: middle;
     pointer-events: auto !important;
     user-select: text !important;
-    cursor: text;
-    padding: 0.2rem;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    
   }
 
   .tab-close-btn {
