@@ -1620,7 +1620,15 @@
       if (savedTabs.length) {
         tabs = savedTabs;
         activeTabIndex = savedIndex;
-        mainEditor.innerHTML = tabs[activeTabIndex].content;
+
+        const activeTab = tabs[activeTabIndex];
+
+        if (activeTab && typeof activeTab.content === "string") {
+          mainEditor.innerHTML = activeTab.content;
+        } else {
+          console.warn("⚠️ No content found in active tab.");
+          mainEditor.innerHTML = ""; // Optional: fallback message
+        }
         safeRenderTabs();
 
       } else {
@@ -1630,7 +1638,10 @@
         safeRenderTabs(); // safely render fresh default
       }
 
-      if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+      if (lastSaved) {
+        saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+      }
+
       updateFileDisplay(attached);
     }
 
