@@ -2487,7 +2487,7 @@
         if (!editor) return;
 
         if (mode === "notepad") {
-          / Contenteditable switch
+          // Contenteditable switch
           editor.setAttribute("contenteditable", "true");
           document.getElementById("marginBox")?.removeAttribute("contenteditable");
           document.getElementById("marginBox")?.classList.add("hidden");
@@ -2512,7 +2512,7 @@
             safeRenderTabs?.();
           }
         } else {
-          / Contenteditable switch
+          // Contenteditable switch
           editor.removeAttribute("contenteditable");
           document.getElementById("marginBox")?.setAttribute("contenteditable", "true");
           document.getElementById("marginBox")?.classList.remove("hidden");
