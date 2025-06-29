@@ -2436,6 +2436,9 @@
         editor.style.paddingLeft = `${left}px`;
         editor.style.paddingRight = `${right}px`;
 
+        // ✅ Save margins only *after* user applied them
+        localStorage.setItem("customMargins", JSON.stringify({ top, bottom, left, right }));
+
         marginDropdown.classList.add("hidden");
       });
 
@@ -2484,6 +2487,7 @@
       });
 
       function applyEditorMode(mode) {
+        
         if (!editor) return;
 
         if (mode === "notepad") {
@@ -2521,12 +2525,20 @@
           editor.setAttribute("data-mode", "document");
           editor.style.fontFamily = "Arial, sans-serif";
           editor.style.fontSize = "1rem";
-          editor.style.padding = "1in";
+          editor.style.padding = ""; // ← don't set universal padding anymore
           editor.style.border = "1px solid #ccc";
           editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
 
           modeToggleBtn.innerText = "🧠 Quick Note Mode";
           status && (status.innerText = "📄 Document Mode Active");
+
+          const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
+          if (Object.keys(savedMargins).length > 0) {
+            editor.style.paddingTop = `${savedMargins.top}px`;
+            editor.style.paddingBottom = `${savedMargins.bottom}px`;
+            editor.style.paddingLeft = `${savedMargins.left}px`;
+            editor.style.paddingRight = `${savedMargins.right}px`;
+          }
 
           // 📄 Reset tab title (optional)
           // 📄 Auto-set tab title based on first line of note
