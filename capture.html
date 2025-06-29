@@ -436,9 +436,7 @@
   .tab-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 0 1rem 0 0.5rem;
-    max-width: 100%;
     margin-bottom: 0.5rem;
     border-bottom: 2px solid #ccc;
     position: sticky;
@@ -457,7 +455,8 @@
     gap: 0.5rem;
     overflow-x: auto;
     overflow-y: hidden;
-    max-width: 80%; /* ⛳ LIMIT how wide tabs can go */
+    max-width: 75vw; /* ⛳ LIMIT how wide tabs can go */
+    padding-right: 4rem; /* leaves space for theme toggle */
     scrollbar-width: thin;
     scroll-behavior: smooth;
     scrollbar-color: var(--tab-border) transparent;
@@ -993,10 +992,6 @@
   <div id="tabBar" class="tab-bar">
     <div class="tab-container">
       <!-- tab elements go here -->
-      <div class="tab-label">Tab 1</div>
-      <div class="tab-label">Tab 2</div>
-      <div class="tab add-tab">＋</div>
-      <!-- ...more tabs... -->
     </div>
     <!-- Floating theme toggle embedded in tab bar -->
     <div class="tab-theme-switch">
