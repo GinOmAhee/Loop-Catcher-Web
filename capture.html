@@ -1112,42 +1112,27 @@
       if (themeClass) document.body.classList.add(themeClass);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function initThemeToggle() {
       const switchEl = document.getElementById('themeSwitch');
+      if (!switchEl) return;
 
-      function initThemeSwitcher() {
-        const switchEl = document.getElementById('themeSwitch');
-        if (!switchEl) return;
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
 
-        function loadTheme() {
-          const savedTheme = localStorage.getItem('theme');
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+      switchEl.checked = useDark;
+      document.body.classList.toggle('dark-theme', useDark);
 
-          if (useDark) {
-            document.body.classList.add('dark-theme');
-            switchEl.checked = true;
-          } else {
-            document.body.classList.remove('dark-theme');
-            switchEl.checked = false;
-          }
-        }
-
-        switchEl.addEventListener('change', () => {
-          if (switchEl.checked) {
-            document.body.classList.add('dark-theme');
-            localStorage.setItem('theme', 'dark');
-          } else {
-            document.body.classList.remove('dark-theme');
-            localStorage.setItem('theme', 'light');
-          }
-        });
-
-        applyMoodTheme(); // This should already exist globally
-        loadTheme();
-        }
-        window.addEventListener('DOMContentLoaded', initThemeSwitcher);
+      switchEl.addEventListener('change', () => {
+        const isDark = switchEl.checked;
+        document.body.classList.toggle('dark-theme', isDark);
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
       });
+
+      applyMoodTheme?.(); // optional safety for external theme blending
+    }
+
+    window.addEventListener('DOMContentLoaded', initThemeToggle);
 
     function maybeClosePreview(e) {
       if (e.target.classList.contains("tab-rename-input")) return;
@@ -1277,6 +1262,20 @@
       addTabBtn.className = "tab add-tab";
       addTabBtn.onclick = addNewTab;
       tabBar.appendChild(addTabBtn);
+
+      // ⬇️ Add this just before renderTabs() ends:
+      const themeToggle = document.createElement("div");
+      themeToggle.className = "tab-theme-switch";
+      themeToggle.innerHTML = `
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeSwitch" />
+          <span class="slider"></span>
+        </label>
+      `;
+      tabBar.appendChild(themeToggle);
+
+      // Re-bind its logic
+      initThemeToggle?.();
     }
 
     function markUnsaved() {
