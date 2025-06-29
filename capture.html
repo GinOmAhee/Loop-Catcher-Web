@@ -1219,48 +1219,96 @@
     }
 
     function renderTabs() {
-      if (isRenamingTab) {
-        console.warn("⛔ Skipping renderTabs(): rename input is still active");
-        return;
-      }
+      if (isRenamingTab) return;
 
       const tabBar = document.querySelector(".tab-bar");
-      tabBar.innerHTML = "";
+      const tabContainer = tabBar.querySelector(".tab-container");
+      if (!tabBar || !tabContainer) return;
 
-      // ⬇️ Create and append tab container
-      const tabContainer = document.createElement("div");
-      tabContainer.className = "tab-container";
-      tabBar.appendChild(tabContainer);
+      // Clear tab container
+      tabContainer.innerHTML = "";
 
-      // ⬇️ Add tabs inside tabContainer
       tabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
         tabBtn.className = "tab";
-        ...
+        if (index === activeTabIndex) tabBtn.classList.add("active");
+
+        const tabLabel = document.createElement("span");
+        tabLabel.innerText = tab.title;
+        tabLabel.className = "tab-label";
+
+        // 🖊️ Rename on double click
+        tabLabel.addEventListener("dblclick", (e) => {
+          e.stopPropagation();
+          isRenamingTab = true;
+
+          const input = document.createElement("input");
+          input.className = "tab-rename-input";
+          input.value = tab.title;
+
+          if (document.body.classList.contains("dark-theme")) {
+            input.style.background = "#1e1e1e";
+            input.style.color = "#eee";
+            input.style.border = "1px dashed hotpink";
+            input.style.caretColor = "hotpink";
+          }
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") input.blur();
+            if (e.key === "Escape") renderTabs();
+          });
+
+          input.addEventListener("blur", () => {
+            const newTitle = input.value.trim();
+            if (newTitle && newTitle !== tab.title) {
+              tabs[index].title = newTitle;
+              localStorage.setItem("tabs", JSON.stringify(tabs));
+              hasUnsavedChanges = true;
+            }
+            isRenamingTab = false;
+            setTimeout(renderTabs, 100);
+          });
+
+          tabBtn.replaceChild(input, tabLabel);
+          setTimeout(() => {
+            input.focus();
+            input.select();
+          }, 100);
+        });
+
+        tabLabel.addEventListener("click", () => switchTab(index));
         tabBtn.appendChild(tabLabel);
+
+        const closeBtn = document.createElement("button");
+        closeBtn.innerText = "⨯";
+        closeBtn.className = "tab-close-btn";
+        closeBtn.title = "Close Tab";
+        closeBtn.onclick = (e) => {
+          e.stopPropagation();
+          closeTab(index);
+        };
+
         tabBtn.appendChild(closeBtn);
-        tabContainer.appendChild(tabBtn); // ✅ append here
+        tabContainer.appendChild(tabBtn); // ✅ inside tabContainer now
       });
 
-      // ⬇️ Add "Add Tab" button inside tabContainer too
+      // ➕ Add Tab Button
       const addTabBtn = document.createElement("div");
       addTabBtn.innerText = "+";
       addTabBtn.className = "tab add-tab";
       addTabBtn.onclick = addNewTab;
-      tabContainer.appendChild(addTabBtn); // ✅ append inside container
+      tabContainer.appendChild(addTabBtn); // ✅ inside scrollable area
 
-      // ⬇️ Add theme toggle last, outside the scrollable area
-      const themeToggle = document.createElement("div");
-      themeToggle.className = "tab-theme-switch";
-      themeToggle.innerHTML = `
-        <label class="theme-toggle">
-          <input type="checkbox" id="themeSwitch" />
-          <span class="slider"></span>
-        </label>
-      `;
-      tabBar.appendChild(themeToggle);
-
-      initThemeToggle?.();
+      // 🌙 Re-attach theme toggle outside tabContainer
+      const themeToggle = document.querySelector(".tab-theme-switch");
+      if (!themeToggle?.innerHTML.trim()) {
+        themeToggle.innerHTML = `
+          <label class="theme-toggle">
+            <input type="checkbox" id="themeSwitch" />
+            <span class="slider"></span>
+          </label>`;
+        initThemeToggle?.();
+      }
     }
 
     function markUnsaved() {
