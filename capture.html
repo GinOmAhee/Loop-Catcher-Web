@@ -805,7 +805,7 @@
   .theme-toggle {
     position: fixed;
     top: 1.3rem;
-    right: 2.4rem;
+    right: 2.3rem;
     transform: translateY(-50%);
     z-index: 10001;
   }
@@ -2459,6 +2459,8 @@
             safeRenderTabs();
           }
         }
+        // ✏️ Ensure editor receives focus after mode switch
+        setTimeout(() => editor.focus(), 0);
       } 
     });
 
