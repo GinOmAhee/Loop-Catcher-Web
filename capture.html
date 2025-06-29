@@ -2370,6 +2370,7 @@
 
       // Make sure editor is visible
       editor?.classList.add("visible");
+      editor?.focus();
 
       // Load saved mode
       const savedMode = localStorage.getItem("editorMode") || "document";
