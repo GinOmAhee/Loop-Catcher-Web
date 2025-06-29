@@ -348,7 +348,7 @@
   #mainEditor[data-mode="document"] {
     width: 8.27in;
     min-height: 11.69in;
-    padding: 1in;
+    padding: 0;
     margin: 1rem auto;
     font-family: "Arial", sans-serif;
     font-size: 1rem;
@@ -373,6 +373,25 @@
     border-top: 1px dotted #aaa;
     z-index: 1;
     pointer-events: none;
+  }
+
+  .margin-box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  .margin-box::before {
+    content: "";
+    position: absolute;
+    top: var(--margin-top, 1in);
+    right: var(--margin-right, 1in);
+    bottom: var(--margin-bottom, 1in);
+    left: var(--margin-left, 1in);
+    border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
+    pointer-events: none;
+    z-index: 2;
   }
 
   .hidden-editor {
@@ -1077,7 +1096,9 @@
       </div>
 
         <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" class="hidden-editor" contenteditable="true" tabindex="0"></div>
+        <div id="mainEditor" data-mode="document">
+          <div class="margin-box" id="marginBox" contenteditable="true" tabindex="0"></div>
+        </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
@@ -1365,7 +1386,8 @@
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
-    const mainEditor = document.getElementById("mainEditor");
+    const editor = document.getElementById("marginBox"); // now the actual editor
+    const mainEditor = document.getElementById("mainEditor"); // still used for layout
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
     const fontBtn = document.getElementById("fontMenuBtn");
@@ -2465,6 +2487,11 @@
         if (!editor) return;
 
         if (mode === "notepad") {
+          / Contenteditable switch
+          editor.setAttribute("contenteditable", "true");
+          document.getElementById("marginBox")?.removeAttribute("contenteditable");
+          document.getElementById("marginBox")?.classList.add("hidden");
+
           toolbar && (toolbar.style.display = "none");
           editor.setAttribute("data-mode", "notepad");
           editor.style.fontFamily = "Courier, monospace";
@@ -2485,6 +2512,11 @@
             safeRenderTabs?.();
           }
         } else {
+          / Contenteditable switch
+          editor.removeAttribute("contenteditable");
+          document.getElementById("marginBox")?.setAttribute("contenteditable", "true");
+          document.getElementById("marginBox")?.classList.remove("hidden");
+
           toolbar && (toolbar.style.display = "flex");
           editor.setAttribute("data-mode", "document");
           editor.style.fontFamily = "Arial, sans-serif";
