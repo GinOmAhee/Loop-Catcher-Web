@@ -15,9 +15,7 @@
 
   <style>
 
-  /* =====================================
-  🌟 BASE STYLES & ROOT VARIABLES
-  ===================================== */
+  /* === ROOT VARIABLES & BASE === */
   :root {
     --editor-bg: #ffffff;
     --editor-text: #222;
@@ -36,9 +34,6 @@
     padding: 0;
   }
 
-  /* =====================================
-  🌓 DARK THEME OVERRIDES
-  ===================================== */
   body.dark-theme {
     --editor-bg: #1a1a1a;
     --editor-text: #ffffff;
@@ -50,113 +45,310 @@
     color: #f1f1f1;
   }
 
-  body.dark-theme button,
-  body.dark-theme .floating-nudge,
+  /* === DARK MODE ADJUSTMENTS === */
+  body.dark-theme button {
+    background: #1e1e1e;
+    color: #f1f1f1;
+    border-color: #444;
+  }
+  body.dark-theme .floating-nudge {
+    background: rgba(30, 30, 30, 0.95);
+    color: #bbb;
+  }
   body.dark-theme .nudge,
-  body.dark-theme p,
-  body.dark-theme #mainEditor,
-  body.dark-theme .tab,
-  body.dark-theme .tab-rename-input,
-  body.dark-theme .preview-overlay,
-  body.dark-theme .search-wrapper,
-  body.dark-theme #searchInput,
-  body.dark-theme .search-dropdown,
-  body.dark-theme .preview-top a,
-  body.dark-theme .preview-settings a,
-  body.dark-theme .dropdown,
-  body.dark-theme .note-preview,
-  body.dark-theme .delete-notes-btn,
-  body.dark-theme select,
-  body.dark-theme .preview-sortbar,
-  body.dark-theme #groupedNotes,
-  body.dark-theme .preview-bottom {
+  body.dark-theme p {
+    color: #bbb;
+  }
+  body.dark-theme #mainEditor {
+    background: #222 !important;
+    color: #ddd !important;
+    caret-color: #eee !important;
+  }
+
+  body.dark-theme .tab {
+    background-color: transparent;
+    color: #ccc;
+  }
+
+  body.dark-theme .tab.active {
+    box-shadow: inset 0 -2px 0 hotpink;
+  }
+
+  body.dark-theme .tab-rename-input {
+    background: #1e1e1e;
+    color: #eee;
+    border: none
+    caret-color: hotpink;
+    outline: none;
+    box-shadow: inset 0 -2px 0 hotpink
+    transition: all 0.2s ease-in-out;
+
+    position: relative;
+    z-index: 9999;
+    display: block;
+  }
+
+  body.dark-theme .preview-overlay {
+    background: #1a1a1a; /* darker overlay */
+    color: #ddd; /* adjust text if needed */
+  }
+
+  body.dark-theme .preview-overlay input,
+  body.dark-theme .preview-overlay textarea {
+    background: #222;
+    color: #eee;
+    border: 1px solid #444;
+  }
+
+  body.dark-theme .preview-overlay button {
+    background-color: #333;
+    color: #181A1B;
+    border: 1px solid #555;
+  }
+
+  body.dark-theme .search-wrapper {
+    background: #1e1e1e;
+    border-color: none;
+  }
+
+  body.dark-theme #searchInput {
+    background: #1e1e1e;
+    color: #fff;
+    border-color: #555;
+  }
+
+  body.dark-theme .search-dropdown {
     background-color: #1e1e1e;
     color: #eee;
-    border-color: #444;
+    border: none;
+  }
+
+  body.dark-theme #searchInput:focus {
+    border-color: #888;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+  }
+
+  body.dark-theme .preview-top a,
+  body.dark-theme .preview-settings a {
+    background: #111; /* or #1a1a1a if you want a softer black */
+    color: #eee;
+    box-shadow: none; /* kill that light glow */
+    text-shadow: none !important;
+  }
+
+  body.dark-theme .preview-top a:hover,
+  body.dark-theme .preview-settings a:hover {
+    background-color: #222;
+    transform: translateX(2px);
+  }
+
+  body.dark-theme .dropdown,
+  body.dark-theme .dropdown div {
+    background-color: #1a1a1a;
+    color: #eee;
+  }
+
+  body.dark-theme .dropdown div:hover {
+   background-color: #333;
   }
 
   body.dark-theme select {
-    appearance: none;
     background-color: #1e1e1e;
     color: #eee;
     border: 1px solid #444;
-    padding-right: 2rem;
-    background-image: url("data:image/svg+xml,%3Csvg fill='%23ccc' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  }
+
+  body.dark-theme select option {
+    background-color: #1e1e1e;
+    color: #eee;
+  }
+
+  body.dark-theme select {
+    background-color: #1e1e1e;
+    color: #eee;
+    border: 1px solid #444;
+    padding-right: 1.5rem; /* leaves space for the arrow */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23ccc" viewBox="0 0 24 24" ... />');
     background-repeat: no-repeat;
     background-position: right 0.5rem center;
     background-size: 1rem;
-    box-shadow: inset 0 -1px 0 hotpink;
-  }
-  /* =====================================
-  📐 LAYOUT & STRUCTURE
-  ===================================== */
-  .main-container {
-    display: flex;
-    height: 100vh;
   }
 
-  .editor-area {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 100vh;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 2rem;
-    overflow-y: auto;
-    background-color: var(--editor-bg);
-    color: var(--editor-text);
-    box-sizing: border-box;
+  body.dark-theme .preview-sortbar,
+  body.dark-theme .preview-sortbar.bottom-searchbar {
+    background: transparent;
+    color: none;
+    border-top: none;
   }
 
-  .margin-box {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-  }
-  .margin-box::before {
-    content: "";
-    position: absolute;
-    top: var(--margin-top, 1in);
-    right: var(--margin-right, 1in);
-    bottom: var(--margin-bottom, 1in);
-    left: var(--margin-left, 1in);
-    border: 2px dashed rgba(0, 0, 0, 0.2);
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  .page-break-line {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 0;
-    border-top: 1px dotted #aaa;
+  .search-dropdown {
+    border: none;
+    background: transparent;
+    color: var(--text-color, #f0f0f0); /* Light text for dark background */
+    appearance: none;
+    padding: 0.6rem;
+    padding-right: 1.5rem;
+    font-size: 0.95rem;
     z-index: 1;
-    pointer-events: none;
+    cursor: pointer;
   }
 
-  /* =====================================
-  🧱 EDITOR ZONE & MODE STATES
-  ===================================== */
+  /* Optional: override the container background */
+  .preview-sortbar.bottom-searchbar {
+    background: #1e1e1e;
+    border-top: 1px solid #333;
+  }
+
+  body.dark-theme .search-wrapper::after {
+    color: var(--text-color, #f1f1f1);
+  }
+
+  body.dark-theme #groupedNotes {
+    color: #f1f1f1; /* or whatever light color suits your theme */
+  }
+
+  body.dark-theme #groupedNotes li,
+  body.dark-theme #groupedNotes div {
+    color: #f1f1f1;
+  }
+
+  body.dark-theme.theme-strategic #groupedNotes {
+    color: #eee;
+  }
+  
+  /* 💡 Dark theme override */
+  body.dark-theme .delete-notes-btn {
+    background: #aa4444;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(255,255,255,0.1);
+  }
+
+  /* 🖤 DARK THEME */
+  body.dark-theme .dropdown {
+    background: #1a1a1a;
+    border-color: #444;
+    color: #f1f1f1;
+  }
+
+  body.dark-theme .dropdown div:hover {
+    background-color: #333;
+  }
+
+  body.dark-theme .note-preview {
+    color: #ddd; /* or #f1f1f1 if you want max contrast */
+  }
+
+  #modeToggleBtn {
+    border: 1px solid
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  body.dark-mode #modeToggleBtn {
+    background: #222;
+    color: #eee;
+    border: 1px solid #555;
+  }
+
+  /* === THEME CLASSES === */
+  .theme-calm {
+    --tab-bg: #dceefb;
+    --tab-hover: #c5e1e1;
+    --tab-text: #2b6cb0;
+    --tab-active-bg: #bee3f8;
+    --tab-border: #90cdf4;
+    --editor-bg: #f3f7f4;
+    --editor-text: #4C5B52;
+    background-color: #cfe3d5;
+    color: #2f4633;
+  }
+  .theme-strategic {
+    --tab-bg: #e6fffa;
+    --tab-hover: #a2c4f5;
+    --tab-text: #2c7a7b;
+    --tab-active-bg: #b2f5ea;
+    --tab-border: #81e6d9;
+    --editor-bg: #f1f0ed;
+    --editor-text: #2E2E2E
+    background-color: #d7d7da;
+    color: #2e2e32;
+  }
+  .theme-reflective {
+    --tab-bg: #fefcbf;
+    --tab-hover: #e0d4f5;
+    --tab-text: #744210;
+    --tab-active-bg: #faf089;
+    --tab-border: #ecc94b;
+    --editor-bg: #fef6ec;
+    --editor-text: #5C2F00;
+    background-color: #e2dfc9;
+    color: #443f1d;
+  }
+  .theme-bold {
+    --tab-bg: #fed7d7;
+    --tab-hover: #f59d9d;
+    --tab-text: #9b2c2c;
+    --tab-active-bg: #feb2b2;
+    --tab-border: #fc8181;
+    background-color: #f7ddb4;
+    color: #5d3e0a;
+  }
+  .theme-playful {
+    --tab-bg: #fbd38d;
+    --tab-hover: #ffe066;
+    --tab-text: #b7791f;
+    --tab-active-bg: #f6ad55;
+    --tab-border: #f6ad55;
+    --editor-bg: #fff0f7;
+    --editor-text: #64204f;
+    background-color: #ffd6e8;
+    color: #7e2b4e;
+  }
+
+  /* === EDITOR & INPUT === */
+  #modeToggleBtn {
+    position: fixed;
+    bottom: 1rem;
+    right: 2rem;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  #modeToggleBtn {
+    background: var(--btn-bg, #f0f0f0);
+    color: var(--btn-text, #000);
+  }
+
   #mainEditor {
+    margin: 1rem auto; /* Add to match document mode */
     width: 80%;
     min-height: 400px;
-    max-height: calc(100vh - 5rem);
-    margin: 1rem auto;
-    padding: 1rem;
-    background-color: var(--editor-bg);
-    color: var(--editor-text);
+    max-height: calc(100vh - 5rem); /* or whatever fits below your tab bar */
     overflow-y: auto;
     outline: none;
     transition: all 0.2s ease;
   }
 
+  /* Notepad Mode Styles */
   #mainEditor[data-mode="notepad"] {
     font-family: "Courier New", monospace;
     font-size: 1rem;
     padding: 0.9rem;
+    max-width: 800px;
+    margin: 0 auto;
+    border: none;
+    box-shadow: none;
     background-color: #fffdf7;
   }
 
@@ -172,20 +364,173 @@
     background-color: #ffffff;
     box-sizing: border-box;
   }
-  /* =====================================
-  🗂️ TABS & TAB BAR
-  ===================================== */
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --btn-bg: #333;
+      --btn-text: #fff;
+    }
+  }
+
+  /* Generic inheritance-friendly rules */
+  .preview-sortbar select,
+  .preview-overlay,
+  .preview-top a,
+  .preview-settings a,
+  .preview-top a:hover,
+  .preview-settings a:hover,
+  .note-preview,
+  .preview-sortbar.bottom-searchbar,
+  #searchInput,
+  #searchInput:focus,
+  #modeToggleBtn
+  #previewToggle
+  .preview-bottom {
+    background-color: inherit;
+    color: inherit;
+    border-color: currentColor;
+    transition: all 0.3s ease;
+  }
+
+  /* Optional — link hover tweaks */
+  .preview-top a:hover,
+  .preview-settings a:hover {
+    text-decoration: underline;
+    opacity: 0.85;
+  }
+
+  /* Optional — override backgrounds for focus/input */
+  #searchInput {
+    background-color: rgba(255, 255, 255, 0.8); /* default light */
+  }
+  .theme-bold #searchInput {
+    background-color: #fff7ed;
+  }
+  .theme-playful #searchInput {
+    background-color: #fff4fa;
+  }
+
+  /* Add soft borders if needed */
+  #searchInput,
+  .preview-sortbar select {
+    border: 1px solid currentColor;
+  }
+
+  body.theme-calm {
+  --editor-bg: #f3f7f4;
+  --controls-btn-bg: #4C5B52;
+  --mode-toggle-bg: #dceefb;
+  --mode-toggle-text: #2b6cb0;
+  }
+
+  body.theme-bold {
+    --editor-bg: #fef6ec;
+    --controls-btn-bg: #5C2F00;
+    --mode-toggle-bg: #fed7d7;
+    --mode-toggle-text: #9b2c2c;
+  }
+
+  body.theme-reflective {
+    --editor-bg: #fffefc;
+    --controls-btn-bg: #3e3e3e;
+    --mode-toggle-bg: #fffefc;
+    --mode-toggle-text: #744210;   /* neutral dark grey for clarity */
+  }
+
+  body.theme-strategic {
+    --editor-bg: #f1f0ed;
+    --controls-btn-bg: #2e2e2e;
+    --mode-toggle-bg: #e6fffa;
+    --mode-toggle-text: #2c7a7b;   /* strong neutral for contrast */
+  }
+
+  body.theme-playful {
+    --editor-bg: #fff0f7;           /* Soft blush pink background */
+    --controls-btn-bg: #64204f; 
+    --mode-toggle-bg: #fff0f7;
+    --mode-toggle-text: #64204f;
+  }
+
+  .page-break-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: 1px dotted #aaa;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .margin-box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  .margin-box::before {
+    content: "";
+    position: absolute;
+    top: var(--margin-top, 1in);
+    right: var(--margin-right, 1in);
+    bottom: var(--margin-bottom, 1in);
+    left: var(--margin-left, 1in);
+    border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .hidden-editor {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .hidden-editor.visible {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  textarea {
+    width: 60%;
+    height: 300px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: none;
+  }
+
+  /* === LAYOUT === */
+  .main-container {
+    display: flex;
+    height: 100vh;
+  }
+  .editor-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2rem;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  /* === TABS === */
   .tab-bar {
     display: flex;
     align-items: center;
     padding: 0 1rem 0 0.5rem;
     margin-bottom: 0.5rem;
-    border-bottom: 2px solid var(--tab-border);
+    border-bottom: 2px solid #ccc;
     position: sticky;
     top: 0;
     height: 3rem;
-    z-index: 10;
+    z-index: 10; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
+    border-color: var(--tab-border);
     transition: background-color 0.3s ease;
   }
 
@@ -194,12 +539,15 @@
     flex-grow: 0;
     display: flex;
     overflow-x: auto;
-    max-width: 75vw;
-    padding-right: 4rem;
+    overflow-y: hidden;
+    max-width: 75vw; /* ⛳ LIMIT how wide tabs can go */
+    padding-right: 4rem; /* leaves space for theme toggle */
     scrollbar-width: thin;
     scroll-behavior: smooth;
     scrollbar-color: var(--tab-border) transparent;
   }
+
+  /* Hide scrollbar for webkit browsers (optional) */
   .tab-container::-webkit-scrollbar {
     height: 6px;
   }
@@ -211,92 +559,153 @@
     background: transparent;
   }
 
-  .tab,
-  .tab.add-tab {
+  .tab {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
+    gap: 3rem; /* ← this creates space between label & close button */
     min-width: 150px;
     max-width: 150px;
-    width: 150px;
+    width: 150px; /* optional for clarity */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     padding: 0.3rem 1rem;
-    margin-right: 0;
+    margin-right: 0px;
     border-radius: 8px 8px 0 0;
     font-weight: 500;
     cursor: pointer;
     background-color: var(--tab-bg);
     color: var(--tab-text);
     border: 1px solid var(--tab-border);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
-  .tab:hover,
+
+  .tab.add-tab {
+    flex-shrink: 0;
+    flex-grow: 0;
+    display: inline-flex;
+    min-width: auto; /* remove that 80px minimum */
+    width: 2.2rem;    /* small square size */
+    padding: 0.4rem;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    background-color: var(--tab-bg);
+    color: var(--tab-text);
+    border: 1px solid var(--tab-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+    
   .tab.add-tab:hover {
     background-color: var(--tab-hover);
+    border-color: var(--tab-border);
   }
+
+  .tab:hover {
+    background-color: var(--tab-hover);
+  }
+
   .tab.active {
     background-color: var(--tab-active-bg);
-    box-shadow: inset 0 -2px 0 var(--tab-border);
   }
+
+  body:not(.dark-theme) .tab-rename-input {
+    background: lightgoldenrodyellow;
+    border: 2px dashed red;
+    position: relative;
+    z-index: 9999;
+    display: block;
+  }
+
   .tab-label {
-    max-width: 145px;
+    flex-grow: 0 0 auto;
+    display: inline-block;
+    max-width: 145px; /* or whatever size fits your layout */
+    background: var(--tab-bg, #e0e0e0);
+    border-radius: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 0.4rem 0.8rem;
+    vertical-align: middle;
+    pointer-events: auto !important;
+    user-select: text !important;
     cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    
   }
+
   .tab-close-btn {
+    flex-shrink: 0;
     all: unset;
     font-size: 0.85rem;
     margin-left: 6px;
     padding: 2px 6px;
+    line-height: 1;
     border-radius: 4px;
     background: transparent;
     color: var(--tab-text);
     cursor: pointer;
+    transition: background 0.2s ease;
   }
+
   .tab button:hover {
     background: rgba(255, 255, 255, 0.1);
   }
 
-  /* Tab rename input style */
-  .tab-rename-input {
-    border: none;
-    outline: none;
-    background: var(--tab-bg);
-    color: var(--tab-text);
-    caret-color: hotpink;
-    box-shadow: inset 0 -2px 0 hotpink;
-    transition: all 0.2s ease-in-out;
-    z-index: 9999;
-    : block;
-    : 0.4rem 0.8rem;
+  /* === TOOLBAR & CONTROLS === */
+  .format-toolbar select,
+  .preview-sortbar select {
+    padding: 0.3rem;
+    font-size: 1rem;
     border-radius: 4px;
+    border: 1px solid #ccc;
+    cursor: pointer;
   }
-  /* =====================================
-  🎛 CONTROLS, BUTTONS & TOOLBAR
-  ===================================== */
+
+  .margin-dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 0.8rem;
+    border-radius: 6px;
+    z-index: 999;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .delete-notes-btn {
+    position: sticky;
+    bottom: 10px;
+    right: 10px;
+    float: right;
+    background: #d46a6a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    z-index: 999;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
   .controls {
     display: flex;
     gap: 1rem;
-    margin-top: 0.9rem;
+    margin-top: .9rem;
     align-items: center;
-    padding: 0.5rem;
+    padding: 0.5rem
   }
-  .controls button,
-  .delete-notes-btn {
-    background: var(--controls-btn-bg);
-    color: #fff;
-    border: none;
+  .controls button {
     padding: 0.5rem 1rem;
-    border-radius: 5px;
     font-size: 1rem;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s ease, color 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  }
-  .controls button:hover {
-    opacity: 0.9;
   }
   .add-tab-btn {
     margin-left: auto;
@@ -316,64 +725,7 @@
     color: #666;
   }
 
-  /* =====================================
-  🔍 SEARCH WRAPPER & INPUT FIELD
-  ===================================== */
-  .search-wrapper {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    position: relative;
-    overflow: visible;
-    border-radius: 0;
-    background: var(--input-bg, #fafafa);
-    padding: 0.2rem 0.4rem;
-    box-sizing: border-box;
-  }
-  #searchInput {
-    flex: 1;
-    padding: 0.6rem 0.8rem;
-    border: none;
-    color: var(--text-color, #333);
-    font-size: 1rem;
-     background-color: rgba(255, 255, 255, 0.8);
-  }
-  #searchInput:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.1);
-  }
-
-  /* Select dropdowns and tab selectors */
-  select,
-  .search-dropdown {
-    background-color: var(--tab-bg);
-    color: var(--tab-text);
-    border: 1px solid var(--tab-border);
-    padding: 0.4rem 0.6rem;
-    font-size: 0.95rem;
-    border-radius: 4px;
-    appearance: none;
-    background-repeat: no-repeat;
-    background-position: right 0.5rem center;
-  }
-
-  /* Shimmer highlight for playful tone or emphasis */
-  .highlight-glow {
-    display: inline-block;
-    background: linear-gradient(90deg, hotpink 0%, deeppink 50%, hotpink 100%);
-    background-size: 200% auto;
-    color: white;
-    padding: 0 2px;
-    border-radius: 3px;
-    animation: shimmerPulse 1.4s ease-in-out infinite alternate;
-  }
-  @keyframes shimmerPulse {
-    0% { background-position: 0% center; }
-    100% { background-position: 100% center; }
-  }
-  /* =====================================
-  📋 PREVIEW PANEL & OVERLAYS
-  ===================================== */
+  /* === PREVIEW PANEL === */
   .preview-overlay {
     position: fixed;
     top: 0;
@@ -382,14 +734,11 @@
     height: 100vh;
     display: none;
     flex-direction: column;
-    z-index: 999;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
-    background-color: var(--editor-bg);
-    color: var(--editor-text);
+    z-index: 999;
   }
-
   .preview-top a,
   .preview-settings a {
     display: flex;
@@ -400,16 +749,13 @@
     font-weight: 600;
     text-decoration: none;
     border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     transition: all 0.2s ease;
-    background: var(--tab-bg);
-    color: var(--tab-text);
   }
   .preview-top a:hover,
   .preview-settings a:hover {
-    background-color: var(--tab-hover);
     transform: translateX(2px);
   }
-
   .preview-middle {
     display: flex;
     flex-direction: column;
@@ -417,26 +763,92 @@
     overflow: hidden;
   }
 
-  .preview-bottom {
-    padding: 1rem;
-    border-top: 1px solid #ccc;
-    background: #fafafa;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 1.5rem; /* so arrow doesn’t overlap text */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23eee" ... />');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
   }
 
-  .preview-bottom input[type="text"] {
+  .note-preview {
+    flex: 1;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+
+  #groupedNotes {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0.8rem 1rem 0.4rem;
+  }  
+
+  .preview-sortbar {
+    margin: 0.3rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+  }
+  .preview-sortbar label {
+    font-size: 0.85rem;
+  }
+  .preview-sortbar.bottom-searchbar {
+    padding: 0.6rem 1rem;
+    margin-top: 0.2rem;
+    border-top: 1px solid #ddd;
+  }
+
+  .search-wrapper {
+    display: flex;
+    align-items: center;
     width: 100%;
-    max-width: 100%;
-    padding: 0.3rem 0.5rem;
-    font-size: 1rem;
+    position: relative;         /* Needed for ::after and input glow alignment */
+    overflow: visible;          /* Lets glow shine outside the box */
+    border: none;               /* Fixed the missing semicolon */
+    border-radius: 0;
+    background: var(--input-bg, #fafafa);
+    padding: 0.2rem 0.4rem;
     box-sizing: border-box;
   }
 
-  /* =====================================
-  📎 FILE ATTACHMENTS
-  ===================================== */
+  /* Input takes up most space */
+  #searchInput {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    border: none;
+    color: var(--text-color, #333);
+    font-size: 1rem;
+  }
+
+  #searchInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.1);
+  }
+
+  /* Dropdown styled like it's inside the same input */
+  .search-dropdown {
+    border: none;
+    padding: 0.6rem 1.5rem 0.6rem 0.6rem;
+    background: transparent;
+    color: var(--text-color, #333);
+    appearance: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  #previewToggle {
+    position: sticky;
+    margin: 0 auto 0 1rem; /* pins it to the left */
+    top: .5rem; /* just below your tab bar */
+    z-index: 9;
+    padding: 0.3rem 0.8rem;
+  }
+
   #attachedFilesList {
     margin-top: 1rem;
     max-width: 60%;
@@ -462,9 +874,76 @@
     cursor: pointer;
   }
 
-  /* =====================================
-  🔁 THEME TOGGLE SWITCH
-  ===================================== */
+  .preview-bottom {
+    padding: 1rem;
+    border-top: 1px solid #ccc;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .preview-bottom input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0.3rem 0.5rem;
+    font-size: 1rem;
+  }
+
+  .highlight-glow {
+    display: inline-block;
+    background: linear-gradient(90deg, hotpink 0%, deeppink 50%, hotpink 100%);
+    background-size: 200% auto;
+    color: white;
+    padding: 0 2px;
+    border-radius: 3px;
+    animation: shimmerPulse 1.4s ease-in-out infinite alternate;
+  }
+
+  @keyframes shimmerPulse {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 100% center;
+    }
+  }
+
+  /* === DROPDOWN MENU === */
+  .dropdown {
+    position: absolute;
+    z-index: 999;
+    padding: 0.3rem 0;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    box-shadow: none;
+    font-size: 0.85rem;
+  }
+  .dropdown div {
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+  }
+  .dropdown div:hover {
+    background-color: #eee;
+  }
+
+  #tabBar button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+  }
+  #tabBar button:hover {
+    color: #000;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  /* === THEME TOGGLE SWITCH === */
   .theme-toggle {
     position: absolute;
     top: 50%;
@@ -500,6 +979,44 @@
   }
   .theme-toggle input:checked + .slider::before {
     transform: translateX(25px);
+  }
+
+  body:not(.dark-theme) .preview-overlay,
+  body:not(.dark-theme) .preview-middle,
+  body:not(.dark-theme) .preview-sortbar,
+  body:not(.dark-theme) .preview-top a,
+  body:not(.dark-theme) .preview-settings a,
+  body:not(.dark-theme) .note-preview,
+  body:not(.dark-theme) #groupedNotes,
+  body:not(.dark-theme) #searchInput {
+    color: #222;
+    font-weight: 400;color: var(--editor-text);
+    background-color: var(--editor-bg);
+    font-weight: 400;
+  }
+
+  body:not(.dark-theme) #previewToggle,
+  body:not(.dark-theme) .controls-button {
+  background-color: var(--control-btn-bg);
+  color: var(--control-btn-text);
+  }
+
+  body.dark-theme select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #1e1e1e;
+    color: #eee;
+    border: 1px solid #444;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg fill='%23ccc' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+  }
+    
+  body.dark-theme select {
+    box-shadow: inset 0 -1px 0 hotpink;
   }
 
   </style>
