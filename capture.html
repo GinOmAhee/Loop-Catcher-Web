@@ -1212,10 +1212,8 @@
     let activeTabIndex = 0;
     let notepadCache = "";
     let documentCache = "";
-    let recognition;
-    let isRecording = false;
-    let debounceTimer;
-    let savedSelection = null;
+    
+    
     
 
     async function initializeFirebase() {
@@ -1334,6 +1332,10 @@
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
     const newThemeClass = moodThemeMap[vibe] || "theme-calm"; // Define it first
 
+    let recognition;
+    let isRecording = false;
+    let debounceTimer;
+
     mainEditor.addEventListener("input", () => {
       // Undo/redo
       undoStack.push(mainEditor.innerHTML);
@@ -1348,6 +1350,8 @@
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
     });
+
+    let savedSelection = null;
 
     function saveSelection() {
       const sel = window.getSelection();
@@ -1765,7 +1769,8 @@
       selection.selectAllChildren(li);
     }
 
-    
+    let undoStack = [];
+    let redoStack = [];
 
     function undo() {
       if (undoStack.length === 0) return;
