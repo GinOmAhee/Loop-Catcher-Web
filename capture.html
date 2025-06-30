@@ -2613,9 +2613,15 @@
           }
         }  
         // ✏️ Ensure editor receives focus after mode switch
-        setTimeout(() => editor.focus(), 0);
-      }
-    });
+        setTimeout(() => {
+          if (mode === "notepad") {
+            editor.focus();
+          } else {
+            const marginBox = document.getElementById("marginBox");
+            marginBox?.focus();
+          }
+        }, 100);
+      });
 
     const paperSizes = {
       letter: { width: 816, height: 1056 }, // 8.5in x 11in at 96dpi
