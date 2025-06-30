@@ -2616,6 +2616,7 @@
 
           const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
           if (Object.keys(savedMargins).length > 0) {
+            editor.style.margin = "0";
             editor.style.paddingTop = `${savedMargins.top}px`;
             editor.style.paddingBottom = `${savedMargins.bottom}px`;
             editor.style.paddingLeft = `${savedMargins.left}px`;
