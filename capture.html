@@ -2544,9 +2544,20 @@
         }, 100);
       });
 
+      // Add this to the top of applyEditorMode (or make it global if reused)
+      let notepadCache = "";
+      let documentCache = "";
+
       function applyEditorMode(mode) {
         
         if (!editor) return;
+
+        // ✅ PLACE THIS HERE — right before checking mode type
+        if (editor.getAttribute("data-mode") === "notepad") {
+          notepadCache = editor.innerHTML;
+        } else if (editor.getAttribute("data-mode") === "document") {
+         documentCache = editor.innerHTML;
+        }
 
         if (mode === "notepad") {
           // Contenteditable switch
@@ -2629,7 +2640,13 @@
               updatePaperSize(); // run it once immediately
             }
           }
-        }  
+        } 
+        // ✅ Restore cached content after switching
+        if (mode === "notepad") {
+          editor.innerHTML = notepadCache || "";
+        } else if (mode === "document") {
+          editor.innerHTML = documentCache || "";
+        } 
         // ✏️ Ensure editor receives focus after mode switch
         setTimeout(() => editor.focus(), 0);
       }
