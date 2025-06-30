@@ -1294,6 +1294,13 @@
         .map((tab, originalIndex) => ({ ...tab, originalIndex }))
         .filter(tab => tab.mode === currentMode);
 
+        if (filteredTabs.length > 0) {
+          activeTabIndex = filteredTabs[0].originalIndex;
+        } else {
+          addNewTab(); // this will trigger its own render + content load
+          return;
+        }
+
       filteredTabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
         tabBtn.className = "tab";
@@ -1393,6 +1400,9 @@
         `;
         tabBar.appendChild(themeToggle);
         initThemeToggle?.();
+      }
+      if (tabs[activeTabIndex]) {
+        mainEditor.innerHTML = tabs[activeTabIndex].content || "";
       }  
     }
 
@@ -1400,10 +1410,18 @@
       hasUnsavedChanges = true;
     }
 
-    function switchTab(index) {
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
-      activeTabIndex = index;
-      mainEditor.innerHTML = tabs[index].content;
+    function switchTab(originalIndex) {
+      // Save current tab content before switching
+      if (tabs[activeTabIndex]) {
+        tabs[activeTabIndex].content = mainEditor.innerHTML;
+      }
+
+      activeTabIndex = originalIndex;
+
+      // Load the new tab content
+      const tab = tabs[originalIndex];
+      mainEditor.innerHTML = tab.content || "";
+
       safeRenderTabs();
     }
 
