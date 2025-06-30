@@ -2523,12 +2523,11 @@
       applyEditorMode(savedMode);
 
       // Bind the toggle button
-      modeToggleBtn?.addEventListener("click", () => {
-        const currentMode = localStorage.getItem("editorMode") || "document";
-        const newMode = currentMode === "notepad" ? "document" : "notepad";
-        console.log(`🔁 Switching to: ${newMode}`);
-        localStorage.setItem("editorMode", newMode);
-        applyEditorMode(newMode);
+      modeToggleBtn.addEventListener("click", () => {
+        const currentMode = editor.getAttribute("data-mode");
+        const nextMode = currentMode === "notepad" ? "document" : "notepad";
+        console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
+        applyEditorMode(nextMode);
       });
 
       // Print button listener
@@ -2648,7 +2647,15 @@
           editor.innerHTML = notepadCache || "";
         } else if (mode === "document") {
           editor.innerHTML = documentCache || "";
-        } 
+
+          // And if marginBox is involved, re-append it here:
+          const marginBox = document.getElementById("marginBox");
+          if (marginBox && !editor.contains(marginBox)) {
+            editor.appendChild(marginBox);
+          }
+        }
+        editor.setAttribute("data-mode", mode);
+
         // ✏️ Ensure editor receives focus after mode switch
         setTimeout(() => editor.focus(), 0);
       }
