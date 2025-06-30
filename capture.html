@@ -2613,7 +2613,17 @@
           }
         }  
         // ✏️ Ensure editor receives focus after mode switch
-        setTimeout(() => editor.focus(), 0);
+        setTimeout(() => {
+          if (mode === "notepad") {
+            editor.focus();
+          } else {
+            const marginBox = document.getElementById("marginBox");
+            if (marginBox) {
+              marginBox.focus();
+              placeCaretAtEnd(marginBox);
+            }
+          }
+        }, 100);
       }
     });
 
