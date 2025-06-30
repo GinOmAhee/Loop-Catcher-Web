@@ -1190,6 +1190,34 @@
     let db = null;
 
     let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
+    let preview;
+    let toggleBtn;
+    let saveStatus;
+    let editor;
+    let mainEditor;
+    let attachedFilesList;
+    let groupedNotes;
+    let fontBtn;
+    let fontDropdown;
+    let fontSizeBtn;
+    let sizeDropdown;
+    let textColorBtn;
+    let textColorDropdown;
+    let justifyBtn;
+    let modeToggleBtn;
+    let toolbar;
+    let status;
+    let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
+    let activeTabIndex = 0;
+    let notepadCache = "";
+    let documentCache = "";
+    let activeTabIndex = 0;
+    let recognition;
+    let isRecording = false;
+    let debounceTimer;
+    let savedSelection = null;
+    let undoStack = [];
+    let redoStack = [];
 
     async function initializeFirebase() {
       try {
@@ -1266,8 +1294,6 @@
       }
     }
 
-    let activeTabIndex = 0;
-
     function markUnsaved() {
       hasUnsavedChanges = true;
     }
@@ -1290,11 +1316,6 @@
     const textColorDropdown = document.getElementById("textColorDropdown");
     const justifyBtn = document.getElementById("justifyBtn");
 
-    
-    let recognition;
-    let isRecording = false;
-    let debounceTimer;
-
     mainEditor.addEventListener("input", () => {
       // Undo/redo
       undoStack.push(mainEditor.innerHTML);
@@ -1309,8 +1330,6 @@
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
     });
-
-    let savedSelection = null;
 
     function saveSelection() {
       const sel = window.getSelection();
@@ -1728,8 +1747,7 @@
       selection.selectAllChildren(li);
     }
 
-    let undoStack = [];
-    let redoStack = [];
+    
 
     function undo() {
       if (undoStack.length === 0) return;
