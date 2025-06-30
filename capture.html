@@ -1290,7 +1290,7 @@
       tabContainer.innerHTML = "";
          
       const currentMode = localStorage.getItem("editorMode") || "document";
-      const filteredTabs = tabs.filter(tab => tab.mode === currentMode);
+      const filteredTabs = tabs
         .map((tab, originalIndex) => ({ ...tab, originalIndex }))
         .filter(tab => tab.mode === currentMode);
 
