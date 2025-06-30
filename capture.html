@@ -2552,11 +2552,13 @@
         
         if (!editor) return;
 
-        // ✅ PLACE THIS HERE — right before checking mode type
-        if (editor.getAttribute("data-mode") === "notepad") {
-          notepadCache = editor.innerHTML;
-        } else if (editor.getAttribute("data-mode") === "document") {
-         documentCache = editor.innerHTML;
+        // Place at the beginning of applyEditorMode():
+        if (mode !== editor.getAttribute("data-mode")) {
+          if (editor.getAttribute("data-mode") === "notepad") {
+            notepadCache = editor.innerHTML;
+          } else if (editor.getAttribute("data-mode") === "document") {
+            documentCache = editor.innerHTML;
+          }
         }
 
         if (mode === "notepad") {
