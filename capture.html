@@ -1316,6 +1316,55 @@
         redoStack = [];
       });
 
+      mainEditor.addEventListener("input", () => {
+        undoStack.push(mainEditor.innerHTML);
+        redoStack = [];
+
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          localStorage.setItem("capturedText", mainEditor.innerHTML);
+          localStorage.setItem("lastSaved", new Date().toISOString());
+          updateGrouping();
+          saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
+        }, 1000);
+      });
+
+      fontBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        fontDropdown.classList.toggle("hidden");
+        const rect = fontBtn.getBoundingClientRect();
+        fontDropdown.style.left = `${rect.left}px`;
+        fontDropdown.style.top = `${rect.bottom + 5}px`;
+      });
+
+      fontDropdown.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      textColorBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        saveSelection();
+        textColorDropdown.classList.toggle("hidden");
+
+        const rect = textColorBtn.getBoundingClientRect();
+        textColorDropdown.style.left = `${rect.left}px`;
+        textColorDropdown.style.top = `${rect.bottom + 5}px`;
+      });
+
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
+      });
+
+      highlightBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        saveSelection();
+        highlightDropdown.classList.toggle("hidden");
+        const rect = highlightBtn.getBoundingClientRect();
+        highlightDropdown.style.left = `${rect.left}px`;
+        highlightDropdown.style.top = `${rect.bottom + 5}px`;
+      });
+
       modeToggleBtn?.addEventListener("click", () => {
         const currentMode = mainEditor.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
@@ -1344,22 +1393,6 @@
     let isRecording = false;
     let debounceTimer;
 
-    
-    mainEditor.addEventListener("input", () => {
-      // Undo/redo
-      undoStack.push(mainEditor.innerHTML);
-      redoStack = [];
-
-      // Debounced auto-save
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        localStorage.setItem("capturedText", mainEditor.innerHTML);
-        localStorage.setItem("lastSaved", new Date().toISOString());
-        updateGrouping();
-        saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
-      }, 1000);
-    });
-
     let savedSelection = null;
 
     function saveSelection() {
@@ -1382,32 +1415,10 @@
       document.execCommand("justifyFull", false, null);
     }
 
-    fontBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      fontDropdown.classList.toggle("hidden");
-      const rect = fontBtn.getBoundingClientRect();
-      fontDropdown.style.left = `${rect.left}px`;
-      fontDropdown.style.top = `${rect.bottom + 5}px`;
-    });
-
-    fontDropdown.addEventListener("click", (e) => {
-    e.stopPropagation();
-    });
-
     function setFont(font) {
       document.execCommand("fontName", false, font);
       fontDropdown.classList.add("hidden");
     }
-
-    textColorBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      saveSelection();
-      textColorDropdown.classList.toggle("hidden");
-
-      const rect = textColorBtn.getBoundingClientRect();
-      textColorDropdown.style.left = `${rect.left}px`;
-      textColorDropdown.style.top = `${rect.bottom + 5}px`;
-    });
 
     function setTextColor(color) {
       mainEditor.focus();
@@ -1417,22 +1428,8 @@
       textColorDropdown.classList.add("hidden");
     }
 
-    toggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
-    });
-
     const highlightBtn = document.getElementById("highlightBtn");
     const highlightDropdown = document.getElementById("highlightDropdown");
-
-    highlightBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      saveSelection();
-      highlightDropdown.classList.toggle("hidden");
-      const rect = highlightBtn.getBoundingClientRect();
-      highlightDropdown.style.left = `${rect.left}px`;
-      highlightDropdown.style.top = `${rect.bottom + 5}px`;
-    });
 
     function setHighlightColor(color) {
       mainEditor.focus();
