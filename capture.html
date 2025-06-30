@@ -2560,10 +2560,11 @@
     let documentCache = "";
 
     window.addEventListener("DOMContentLoaded", () => {
-      const editor = document.getElementById("mainEditor");
-      const modeToggleBtn = document.getElementById("modeToggleBtn");
-      const toolbar = document.getElementById("toolbar");
-      const status = document.getElementById("saveStatus");
+      editor = document.getElementById("mainEditor");
+      toolbar = document.getElementById("toolbar");
+      modeToggleBtn = document.getElementById("modeToggleBtn");
+      status = document.getElementById("saveStatus");
+      paperSizeSelect = document.getElementById("paperSizeSelect");
 
       // Make sure editor is visible
       editor?.classList.add("visible");
@@ -2595,7 +2596,19 @@
       });
     });
 
+    let editor, toolbar, modeToggleBtn, status, paperSizeSelect;
+
     function applyEditorMode(mode) {
+      if (toolbar) {
+        toolbar.style.display = mode === "notepad" ? "none" : "flex";
+      }
+
+      if (status) {
+        status.innerText = mode === "notepad"
+        ? "🧠 Notepad Mode Active"
+        : "📄 Document Mode Active";
+      }
+
       if (!editor) return;
 
       // Place at the beginning of applyEditorMode():
@@ -2653,8 +2666,6 @@
 
         marginBox?.removeAttribute("contenteditable"); // lock marginBox
 
-        document.getElementById("marginBox")?.removeAttribute("contenteditable"); // ✅ just show margin box, not editable
-
         toolbar && (toolbar.style.display = "flex");
         editor.setAttribute("data-mode", "document");
         editor.style.fontFamily = "Arial, sans-serif";
@@ -2680,6 +2691,9 @@
         if (tabs && tabs[activeTabIndex]) {
           const text = mainEditor.innerText || "";
           tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "Untitled";
+          if (!tabs[activeTabIndex].wasRenamedManually) {
+            // update title from content
+          }
           localStorage.setItem("tabs", JSON.stringify(tabs));
 
           // ✨ Update DOM immediately
