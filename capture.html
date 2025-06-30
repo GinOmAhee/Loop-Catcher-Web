@@ -242,7 +242,9 @@
   }
 
   #modeToggleBtn {
-    border: 1px solid
+    background: #f1f1f1;
+    color: #333;
+    border: 1px solid #ccc;
     padding: 0.5rem 1rem;
     border-radius: 8px;
     cursor: pointer;
@@ -262,8 +264,6 @@
     --tab-text: #2b6cb0;
     --tab-active-bg: #bee3f8;
     --tab-border: #90cdf4;
-    --editor-bg: #f3f7f4;
-    --editor-text: #4C5B52;
     background-color: #cfe3d5;
     color: #2f4633;
   }
@@ -273,8 +273,6 @@
     --tab-text: #2c7a7b;
     --tab-active-bg: #b2f5ea;
     --tab-border: #81e6d9;
-    --editor-bg: #f1f0ed;
-    --editor-text: #2E2E2E
     background-color: #d7d7da;
     color: #2e2e32;
   }
@@ -284,8 +282,6 @@
     --tab-text: #744210;
     --tab-active-bg: #faf089;
     --tab-border: #ecc94b;
-    --editor-bg: #fef6ec;
-    --editor-text: #5C2F00;
     background-color: #e2dfc9;
     color: #443f1d;
   }
@@ -304,8 +300,6 @@
     --tab-text: #b7791f;
     --tab-active-bg: #f6ad55;
     --tab-border: #f6ad55;
-    --editor-bg: #fff0f7;
-    --editor-text: #64204f;
     background-color: #ffd6e8;
     color: #7e2b4e;
   }
@@ -414,41 +408,6 @@
   #searchInput,
   .preview-sortbar select {
     border: 1px solid currentColor;
-  }
-
-  body.theme-calm {
-  --editor-bg: #f3f7f4;
-  --controls-btn-bg: #4C5B52;
-  --mode-toggle-bg: #dceefb;
-  --mode-toggle-text: #2b6cb0;
-  }
-
-  body.theme-bold {
-    --editor-bg: #fef6ec;
-    --controls-btn-bg: #5C2F00;
-    --mode-toggle-bg: #fed7d7;
-    --mode-toggle-text: #9b2c2c;
-  }
-
-  body.theme-reflective {
-    --editor-bg: #fffefc;
-    --controls-btn-bg: #3e3e3e;
-    --mode-toggle-bg: #fffefc;
-    --mode-toggle-text: #744210;   /* neutral dark grey for clarity */
-  }
-
-  body.theme-strategic {
-    --editor-bg: #f1f0ed;
-    --controls-btn-bg: #2e2e2e;
-    --mode-toggle-bg: #e6fffa;
-    --mode-toggle-text: #2c7a7b;   /* strong neutral for contrast */
-  }
-
-  body.theme-playful {
-    --editor-bg: #fff0f7;           /* Soft blush pink background */
-    --controls-btn-bg: #64204f; 
-    --mode-toggle-bg: #fff0f7;
-    --mode-toggle-text: #64204f;
   }
 
   .page-break-line {
@@ -846,6 +805,7 @@
     margin: 0 auto 0 1rem; /* pins it to the left */
     top: .5rem; /* just below your tab bar */
     z-index: 9;
+    background: var(--editor-bg);
     padding: 0.3rem 0.8rem;
   }
 
@@ -990,15 +950,7 @@
   body:not(.dark-theme) #groupedNotes,
   body:not(.dark-theme) #searchInput {
     color: #222;
-    font-weight: 400;color: var(--editor-text);
-    background-color: var(--editor-bg);
     font-weight: 400;
-  }
-
-  body:not(.dark-theme) #previewToggle,
-  body:not(.dark-theme) .controls-button {
-  background-color: var(--control-btn-bg);
-  color: var(--control-btn-text);
   }
 
   body.dark-theme select {
@@ -2583,9 +2535,6 @@
           highlightDropdown?.classList.add("hidden");
         }, 100);
       });
-    });
-    
-      const toolbar = document.getElementById("toolbar");
 
       function applyEditorMode(mode) {
         
@@ -2662,19 +2611,11 @@
               updatePaperSize(); // run it once immediately
             }
           }
-        }
-        editor.scrollIntoView({ behavior: "smooth", block: "center" });
-        console.log(editor); // Check if null or undefined  
+        }  
         // ✏️ Ensure editor receives focus after mode switch
-        setTimeout(() => {
-          if (mode === "notepad") {
-            editor.focus();
-          } else {
-            const marginBox = document.getElementById("marginBox");
-            marginBox?.focus();
-          }
-        }, 100);
+        setTimeout(() => editor.focus(), 0);
       }
+    });
 
     const paperSizes = {
       letter: { width: 816, height: 1056 }, // 8.5in x 11in at 96dpi
@@ -2720,6 +2661,8 @@
         highlightDropdown?.classList.add("hidden");
       }, 100); // this gives time for clicks inside dropdowns to register
     });
+
   </script>
+
  </body>
 </html>
