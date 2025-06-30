@@ -1620,6 +1620,7 @@
        console.error("❌ Failed to save note to Firestore:", error);
      }
 
+      localStorage.removeItem("customMargins");
       mainEditor.innerHTML = '';
       tabs[activeTabIndex].content = '';
       tabs[activeTabIndex].title = 'Untitled';
