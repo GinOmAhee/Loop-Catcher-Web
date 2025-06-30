@@ -1407,12 +1407,22 @@
     }
 
     function switchTab(index) {
+      // 🧠 Save the current tab's content
       tabs[activeTabIndex].content = mainEditor.innerHTML;
+
+      // 🔄 Switch to the new tab
       activeTabIndex = index;
-      mainEditor.innerHTML = tabs[index].content;
+
+      // 🌗 Restore the correct editor mode before loading content
+      const tabMode = tabs[index]?.mode || "document";
+      applyEditorMode(tabMode);
+
+      // 📝 Load the new tab's content
+      mainEditor.innerHTML = tabs[index].content || "";
+
       safeRenderTabs();
     }
-
+    
     function closeTab(index) {
       if (index === activeTabIndex && hasUnsavedChanges) {
         const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
