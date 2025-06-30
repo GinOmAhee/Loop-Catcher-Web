@@ -1469,7 +1469,7 @@
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
-    const editor = document.getElementById("marginBox"); // now the actual editor
+    let editor = document.getElementById("marginBox"); // now the actual editor
     const mainEditor = document.getElementById("mainEditor"); // still used for layout
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
@@ -1485,6 +1485,7 @@
     let recognition;
     let isRecording = false;
     let debounceTimer;
+    let toolbar;
 
     editor.addEventListener("input", () => {
       // Undo/redo
