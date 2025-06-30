@@ -1342,6 +1342,7 @@
     let isRecording = false;
     let debounceTimer;
 
+    console.log("✅ mainEditor is:", mainEditor);
     mainEditor.addEventListener("input", () => {
       // Undo/redo
       undoStack.push(mainEditor.innerHTML);
