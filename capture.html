@@ -2508,6 +2508,10 @@
       });
     });
 
+    // Add this to the top of applyEditorMode (or make it global if reused)
+    let notepadCache = "";
+    let documentCache = "";
+
     window.addEventListener("DOMContentLoaded", () => {
       const editor = document.getElementById("mainEditor");
       const modeToggleBtn = document.getElementById("modeToggleBtn");
@@ -2542,10 +2546,6 @@
           highlightDropdown?.classList.add("hidden");
         }, 100);
       });
-
-      // Add this to the top of applyEditorMode (or make it global if reused)
-      let notepadCache = "";
-      let documentCache = "";
 
       function applyEditorMode(mode) {
         
