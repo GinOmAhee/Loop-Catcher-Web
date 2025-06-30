@@ -1289,15 +1289,20 @@
       // Clear only the tabs inside the scrollable container
       tabContainer.innerHTML = "";
          
-      tabs.forEach((tab, index) => {
+      const currentMode = localStorage.getItem("editorMode") || "document";
+      const filteredTabs = tabs.filter(tab => tab.mode === currentMode);
+        .map((tab, originalIndex) => ({ ...tab, originalIndex }))
+        .filter(tab => tab.mode === currentMode);
+
+      filteredTabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
         tabBtn.className = "tab";
-        if (index === activeTabIndex) tabBtn.classList.add("active");
+        if (originalIndex === activeTabIndex) tabBtn.classList.add("active");
 
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
         tabLabel.className = "tab-label";
-        tabLabel.addEventListener("click", () => switchTab(index));
+        tabLabel.addEventListener("click", () => switchTab(originalIndex));
 
         // Handle rename flow on double-click
         tabLabel.addEventListener("dblclick", (e) => {
@@ -1430,8 +1435,23 @@
     let hasUnsavedChanges = false;
 
     function addNewTab() {
-      tabs.push({ title: "Untitled", content: "" });
-      switchTab(tabs.length - 1); // Switch to new tab
+      const currentMode = localStorage.getItem("editorMode") || "document";
+
+      const title = currentMode === "notepad"
+        ? `🧠 ${new Date().toLocaleDateString()} @ ${new Date().toLocaleTimeString()}`
+        : "Untitled";
+
+      const newTab = {
+        title,
+        content: "",
+        mode: currentMode // 🔐 key to filter later
+      };
+
+      tabs.push(newTab);
+      activeTabIndex = tabs.length - 1;
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      renderTabs();
+      loadSavedText();
     }
 
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
