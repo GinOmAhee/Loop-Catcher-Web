@@ -1303,6 +1303,17 @@
       toolbar = document.getElementById("toolbar");
       status = document.getElementById("saveStatus");
 
+      if (!mainEditor) {
+        console.error("❌ mainEditor not found");
+        return;
+      }
+
+      // Attach input listener safely
+      mainEditor.addEventListener("input", () => {
+        undoStack.push(mainEditor.innerHTML);
+        redoStack = [];
+      });
+
       // Now safe to use the elements
       mainEditor?.classList.add("visible");
       mainEditor?.focus();
