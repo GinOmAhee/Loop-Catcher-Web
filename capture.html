@@ -2373,41 +2373,6 @@
 
     let modeToggleBtn, toolbar, status;
 
-    window.addEventListener("DOMContentLoaded", () => {
-      modeToggleBtn = document.getElementById("modeToggleBtn");
-      toolbar = document.getElementById("toolbar");
-      status = document.getElementById("saveStatus");
-
-      if (!mainEditor) {
-        console.error("❌ mainEditor not found!");
-        return;
-      }
-
-      mainEditor.classList.add("visible");
-      mainEditor.focus();
-
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      applyEditorMode(savedMode);
-
-      modeToggleBtn?.addEventListener("click", () => {
-        const currentMode = mainEditor.getAttribute("data-mode");
-        const nextMode = currentMode === "notepad" ? "document" : "notepad";
-        console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
-        applyEditorMode(nextMode);
-      });
-
-      document.getElementById("printBtn")?.addEventListener("click", printNote);
-
-      document.addEventListener("click", () => {
-        setTimeout(() => {
-          fontDropdown?.classList.add("hidden");
-          sizeDropdown?.classList.add("hidden");
-          textColorDropdown?.classList.add("hidden");
-          highlightDropdown?.classList.add("hidden");
-        }, 100);
-      });
-    });
-
     function applyEditorMode(mode) {
         
       if (!editor) return;
@@ -2523,6 +2488,41 @@
       // ✏️ Ensure editor receives focus after mode switch
       setTimeout(() => editor.focus(), 0);
     }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      modeToggleBtn = document.getElementById("modeToggleBtn");
+      toolbar = document.getElementById("toolbar");
+      status = document.getElementById("saveStatus");
+
+      if (!mainEditor) {
+        console.error("❌ mainEditor not found!");
+        return;
+      }
+
+      mainEditor.classList.add("visible");
+      mainEditor.focus();
+
+      const savedMode = localStorage.getItem("editorMode") || "document";
+      applyEditorMode(savedMode);
+
+      modeToggleBtn?.addEventListener("click", () => {
+        const currentMode = mainEditor.getAttribute("data-mode");
+        const nextMode = currentMode === "notepad" ? "document" : "notepad";
+        console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
+        applyEditorMode(nextMode);
+      });
+
+      document.getElementById("printBtn")?.addEventListener("click", printNote);
+
+      document.addEventListener("click", () => {
+        setTimeout(() => {
+          fontDropdown?.classList.add("hidden");
+          sizeDropdown?.classList.add("hidden");
+          textColorDropdown?.classList.add("hidden");
+          highlightDropdown?.classList.add("hidden");
+        }, 100);
+      });
+    });
 
     function safeRenderTabs() {
       if (!isRenamingTab) {
