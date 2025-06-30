@@ -1314,19 +1314,14 @@
         redoStack = [];
       });
 
-      // Now safe to use the elements
-      mainEditor?.classList.add("visible");
-      mainEditor?.focus();
-
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      applyEditorMode(savedMode);
-
       modeToggleBtn?.addEventListener("click", () => {
         const currentMode = mainEditor.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
         console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
         applyEditorMode(nextMode);
       });
+      const savedMode = localStorage.getItem("editorMode") || "document";
+      applyEditorMode(savedMode);
     });
 
     function maybeClosePreview(e) {
