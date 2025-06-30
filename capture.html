@@ -2646,8 +2646,10 @@
         // ✅ Restore cached content after switching
         if (mode === "notepad") {
           editor.innerHTML = notepadCache || "";
+          editor.innerHTML = editor.innerHTML.trim();
         } else if (mode === "document") {
           editor.innerHTML = documentCache || "";
+          editor.innerHTML = editor.innerHTML.trim();
 
           // And if marginBox is involved, re-append it here:
           const marginBox = document.getElementById("marginBox");
