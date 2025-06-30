@@ -1408,7 +1408,8 @@
 
     function switchTab(index) {
       // 🧠 Save the current tab's content
-      tabs[activeTabIndex].content = editor.innerHTML;
+      const activeEditor = getActiveEditor();
+      tabs[activeTabIndex].content = activeEditor?.innerHTML || "";
 
       // 🔄 Switch to the new tab
       activeTabIndex = index;
@@ -1678,7 +1679,9 @@
       if (!mainEditor) return;
 
       // Save current content into the active tab
-      tabs[activeTabIndex].content = editor.innerHTML;
+      if (tabs && tabs[activeTabIndex]) {
+        const activeEditor = getActiveEditor(); // your mode-aware function
+        tabs[activeTabIndex].content = activeEditor?.innerHTML || "";
 
       // Save full tabs array
       localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -1686,8 +1689,10 @@
       localStorage.setItem('lastSaved', now.toISOString());
 
       saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
-
       hasUnsavedChanges = false; // Reset after save
+      } else {
+        console.warn("⚠️ autoSave skipped — no active tab.");
+      }
     }
 
     window.addEventListener("beforeunload", (e) => {
@@ -2603,6 +2608,10 @@
         toolbar.style.display = mode === "notepad" ? "none" : "flex";
       }
 
+      if (paperSizeSelect) {
+        paperSizeSelect.style.display = mode === "document" ? "inline-block" : "none";
+      }
+
       if (status) {
         status.innerText = mode === "notepad"
         ? "🧠 Notepad Mode Active"
@@ -2730,10 +2739,11 @@
       setTimeout(() => editor.focus(), 0);
     }
 
-    function getEditorArea() {
-      return document.querySelector('[data-mode="notepad"]') 
-             ? document.getElementById("mainEditor") 
-             : document.getElementById("marginBox");
+    function getActiveEditor() {
+      const mode = editor?.getAttribute("data-mode") || "document";
+      return mode === "notepad"
+        ? document.getElementById("mainEditor")
+        : document.getElementById("marginBox");
     }
 
     const paperSizes = {
