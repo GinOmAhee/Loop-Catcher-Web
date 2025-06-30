@@ -1297,12 +1297,12 @@
       filteredTabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
         tabBtn.className = "tab";
-        if (originalIndex === activeTabIndex) tabBtn.classList.add("active");
+        if (tab.originalIndex === activeTabIndex) tabBtn.classList.add("active");
 
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
         tabLabel.className = "tab-label";
-        tabLabel.addEventListener("click", () => switchTab(originalIndex));
+        tabLabel.addEventListener("click", () => switchTab(tab.originalIndex));
 
         // Handle rename flow on double-click
         tabLabel.addEventListener("dblclick", (e) => {
@@ -1331,7 +1331,7 @@
           input.addEventListener("blur", (e) => {
             const newTitle = e.target.value.trim();
             if (newTitle && newTitle !== tab.title) {
-              tabs[index].title = newTitle;
+              tabs[tab.originalIndex].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
               console.log("✅ title saved:", newTitle);
               hasUnsavedChanges = true; // <-- 🧠 this is the magic line
@@ -1367,7 +1367,7 @@
         closeBtn.title = "Close Tab";
         closeBtn.onclick = (e) => {
           e.stopPropagation();
-          closeTab(index);
+          closeTab(tab.originalIndex); // 🔁 use originalIndex here too
         };
 
         tabBtn.appendChild(tabLabel);
