@@ -1278,10 +1278,6 @@
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
     const newThemeClass = moodThemeMap[vibe] || "theme-calm"; // Define it first
 
-    document.body.className = ""; // Remove old
-    document.body.classList.add(newThemeClass); // Add new
-    safeRenderTabs(); // Re-render tabs to refresh their classes if needed
-
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
@@ -2527,6 +2523,10 @@
         // ✏️ Ensure editor receives focus after mode switch
         setTimeout(() => editor.focus(), 0);
       }
+
+      document.body.className = ""; // Remove old
+      document.body.classList.add(newThemeClass); // Add new
+      safeRenderTabs(); // Re-render tabs to refresh their classes if needed
 
       function safeRenderTabs() {
         if (!isRenamingTab) {
