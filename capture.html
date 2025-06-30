@@ -15,10 +15,8 @@
 
   <style>
 
-  /* === ROOT VARIABLES & BASE === */
-
   /* =====================================
-   🌟 BASE STYLES & ROOT VARIABLES
+  🌟 BASE STYLES & ROOT VARIABLES
   ===================================== */
   :root {
     --editor-bg: #ffffff;
@@ -39,7 +37,7 @@
   }
 
   /* =====================================
-     🌓 DARK THEME OVERRIDES
+  🌓 DARK THEME OVERRIDES
   ===================================== */
   body.dark-theme {
     --editor-bg: #1a1a1a;
@@ -52,7 +50,6 @@
     color: #f1f1f1;
   }
 
-  /* Override dark-specific controls, search, overlay, etc. */
   body.dark-theme button,
   body.dark-theme .floating-nudge,
   body.dark-theme .nudge,
@@ -78,89 +75,21 @@
     border-color: #444;
   }
 
- /* =====================================
-    🎨 MOOD THEMES - APPLIED COLOR SCHEMES
-  ===================================== */
-
-  /* 1. Calm: Main - Midnight Teal, Accent - Soft Plum, Highlight - Muted Gold */
-  body.theme-calm {
-    --editor-bg: #2E4F4F;
-    --controls-btn-bg: #774C64;
-    --mode-toggle-bg: #774C64;
-    --mode-toggle-text: #C4A35A;
-    --tab-bg: #2E4F4F;
-    --tab-hover: #3b6262;
-    --tab-text: #C4A35A;
-    --tab-active-bg: #2E4F4F;
-    --tab-border: #C4A35A;
-    background-color: #2E4F4F;
-    color: #C4A35A;
+  body.dark-theme select {
+    appearance: none;
+    background-color: #1e1e1e;
+    color: #eee;
+    border: 1px solid #444;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg fill='%23ccc' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+    box-shadow: inset 0 -1px 0 hotpink;
   }
-
-  /* 2. Playful: Main - Warm Terracotta, Accent - Muted Gold, Highlight - Midnight Teal */
-  body.theme-playful {
-    --editor-bg: #C86B54;
-    --controls-btn-bg: #C4A35A;
-    --mode-toggle-bg: #C86B54;
-    --mode-toggle-text: #2E4F4F;
-    --tab-bg: #C86B54;
-    --tab-hover: #d07b67;
-    --tab-text: #2E4F4F;
-    --tab-active-bg: #C4A35A;
-    --tab-border: #2E4F4F;
-    background-color: #FFD6E8; /* UI base can stay light if needed */
-    color: #2E4F4F;
-  }
-
-  /* 3. Strategic: Main - Deep Earth Brown, Accent - Muted Gold, Highlight - Midnight Teal */
-  body.theme-strategic {
-    --editor-bg: #5A3E2B;
-    --controls-btn-bg: #C4A35A;
-    --mode-toggle-bg: #2E4F4F;
-    --mode-toggle-text: #C4A35A;
-    --tab-bg: #5A3E2B;
-    --tab-hover: #6b4a33;
-    --tab-text: #C4A35A;
-    --tab-active-bg: #2E4F4F;
-    --tab-border: #C4A35A;
-    background-color: #F4F1EA;
-    color: #C4A35A;
-  }
-
-  /* 4. Reflective: Main - Soft Plum, Accent - Deep Earth Brown, Highlight - Warm Terracotta */
-  body.theme-reflective {
-    --editor-bg: #774C64;
-    --controls-btn-bg: #5A3E2B;
-    --mode-toggle-bg: #774C64;
-    --mode-toggle-text: #C86B54;
-    --tab-bg: #774C64;
-    --tab-hover: #865878;
-    --tab-text: #C86B54;
-    --tab-active-bg: #5A3E2B;
-    --tab-border: #C86B54;
-    background-color: #E2DFC9;
-    color: #C86B54;
-  }
-
-  /* 5. Bold: Main - Muted Gold, Accent - Warm Terracotta, Highlight - Deep Earth Brown */
-  body.theme-bold {
-    --editor-bg: #C4A35A;
-    --controls-btn-bg: #C86B54;
-    --mode-toggle-bg: #C4A35A;
-    --mode-toggle-text: #5A3E2B;
-    --tab-bg: #C4A35A;
-    --tab-hover: #d1b671;
-    --tab-text: #5A3E2B;
-    --tab-active-bg: #C86B54;
-    --tab-border: #5A3E2B;
-    background-color: #FEF6EC;
-    color: #5A3E2B;
-  }
-
   /* =====================================
-     📐 LAYOUT & STRUCTURE
+  📐 LAYOUT & STRUCTURE
   ===================================== */
-
   .main-container {
     display: flex;
     height: 100vh;
@@ -175,6 +104,8 @@
     justify-content: flex-start;
     padding: 2rem;
     overflow-y: auto;
+    background-color: var(--editor-bg);
+    color: var(--editor-text);
     box-sizing: border-box;
   }
 
@@ -184,7 +115,6 @@
     height: 100%;
     box-sizing: border-box;
   }
-
   .margin-box::before {
     content: "";
     position: absolute;
@@ -208,45 +138,54 @@
   }
 
   /* =====================================
-    🧩 COMPONENTS – CONTROLS & INTERFACE
+  🧱 EDITOR ZONE & MODE STATES
   ===================================== */
-
-  /* 🎛 Controls, buttons, toolbar, editor config */
-  /* ... continues with detailed tab styles, rename inputs, search wrappers, toggle switch, glow styles, etc. ... */
-
-  /* =====================================
-    ⚡️ INTERACTION & FX
-  ===================================== */
-  .highlight-glow {
-    display: inline-block;
-    background: linear-gradient(90deg, hotpink 0%, deeppink 50%, hotpink 100%);
-    background-size: 200% auto;
-    color: white;
-    padding: 0 2px;
-    border-radius: 3px;
-    animation: shimmerPulse 1.4s ease-in-out infinite alternate;
+  #mainEditor {
+    width: 80%;
+    min-height: 400px;
+    max-height: calc(100vh - 5rem);
+    margin: 1rem auto;
+    padding: 1rem;
+    background-color: var(--editor-bg);
+    color: var(--editor-text);
+    overflow-y: auto;
+    outline: none;
+    transition: all 0.2s ease;
   }
 
-  @keyframes shimmerPulse {
-    0% { background-position: 0% center; }
-    100% { background-position: 100% center; }
+  #mainEditor[data-mode="notepad"] {
+    font-family: "Courier New", monospace;
+    font-size: 1rem;
+    padding: 0.9rem;
+    background-color: #fffdf7;
   }
 
+  #mainEditor[data-mode="document"] {
+    width: 8.27in;
+    min-height: 11.69in;
+    padding: 0;
+    margin: 1rem auto;
+    font-family: "Arial", sans-serif;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    box-sizing: border-box;
+  }
   /* =====================================
-    🗂️ TABS & TAB BAR
+  🗂️ TABS & TAB BAR
   ===================================== */
   .tab-bar {
     display: flex;
     align-items: center;
     padding: 0 1rem 0 0.5rem;
     margin-bottom: 0.5rem;
-    border-bottom: 2px solid #ccc;
+    border-bottom: 2px solid var(--tab-border);
     position: sticky;
     top: 0;
     height: 3rem;
     z-index: 10;
     background-color: var(--tab-bg);
-    border-color: var(--tab-border);
     transition: background-color 0.3s ease;
   }
 
@@ -255,14 +194,12 @@
     flex-grow: 0;
     display: flex;
     overflow-x: auto;
-    overflow-y: hidden;
     max-width: 75vw;
     padding-right: 4rem;
     scrollbar-width: thin;
     scroll-behavior: smooth;
     scrollbar-color: var(--tab-border) transparent;
   }
-
   .tab-container::-webkit-scrollbar {
     height: 6px;
   }
@@ -279,9 +216,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
-    gap: 3rem;
     min-width: 150px;
     max-width: 150px;
+    width: 150px;
     padding: 0.3rem 1rem;
     margin-right: 0;
     border-radius: 8px 8px 0 0;
@@ -290,7 +227,7 @@
     background-color: var(--tab-bg);
     color: var(--tab-text);
     border: 1px solid var(--tab-border);
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   .tab:hover,
   .tab.add-tab:hover {
@@ -298,6 +235,7 @@
   }
   .tab.active {
     background-color: var(--tab-active-bg);
+    box-shadow: inset 0 -2px 0 var(--tab-border);
   }
   .tab-label {
     max-width: 145px;
@@ -305,7 +243,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 0.4rem 0.8rem;
-    user-select: text !important;
     cursor: pointer;
   }
   .tab-close-btn {
@@ -322,6 +259,7 @@
     background: rgba(255, 255, 255, 0.1);
   }
 
+  /* Tab rename input style */
   .tab-rename-input {
     border: none;
     outline: none;
@@ -331,43 +269,55 @@
     box-shadow: inset 0 -2px 0 hotpink;
     transition: all 0.2s ease-in-out;
     z-index: 9999;
-    display: block;
-    padding: 0.4rem 0.8rem;
+    : block;
+    : 0.4rem 0.8rem;
     border-radius: 4px;
   }
-
   /* =====================================
-    🧪 EDITOR MODES & TOGGLE
+  🎛 CONTROLS, BUTTONS & TOOLBAR
   ===================================== */
-  #mainEditor {
-    width: 80%;
-    min-height: 400px;
-    max-height: calc(100vh - 5rem);
-    overflow-y: auto;
-    outline: none;
-    margin: 1rem auto;
-    transition: all 0.2s ease;
+  .controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.9rem;
+    align-items: center;
+    padding: 0.5rem;
   }
-  #mainEditor[data-mode="notepad"] {
-    font-family: "Courier New", monospace;
+  .controls button,
+  .delete-notes-btn {
+    background: var(--controls-btn-bg);
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
     font-size: 1rem;
-    padding: 0.9rem;
-    background-color: #fffdf7;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
-  #mainEditor[data-mode="document"] {
-    width: 8.27in;
-    min-height: 11.69in;
-    font-family: "Arial", sans-serif;
+  .controls button:hover {
+    opacity: 0.9;
+  }
+  .add-tab-btn {
+    margin-left: auto;
+    background: #fff59d;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
     font-size: 1rem;
-    padding: 0;
-    margin: 1rem auto;
-    border: 1px solid #ccc;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    background-color: #ffffff;
+    cursor: pointer;
+  }
+  .add-tab-btn:hover {
+    background: #fff176;
+  }
+  .save-time {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #666;
   }
 
   /* =====================================
-    🔎 SEARCH INPUT & WRAPPER
+  🔍 SEARCH WRAPPER & INPUT FIELD
   ===================================== */
   .search-wrapper {
     display: flex;
@@ -380,54 +330,140 @@
     padding: 0.2rem 0.4rem;
     box-sizing: border-box;
   }
-
   #searchInput {
     flex: 1;
     padding: 0.6rem 0.8rem;
     border: none;
     color: var(--text-color, #333);
     font-size: 1rem;
-    background-color: rgba(255, 255, 255, 0.8);
+     background-color: rgba(255, 255, 255, 0.8);
   }
   #searchInput:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.1);
   }
 
-  /* =====================================
-     🧱 DROPDOWN STYLING
-  ===================================== */
-  .dropdown {
-    position: absolute;
-    z-index: 999;
-    padding: 0.3rem 0;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.85rem;
-    background: transparent;
-  }
-  .dropdown div {
-    padding: 0.4rem 1rem;
-    cursor: pointer;
-  }
-  .dropdown div:hover {
-    background-color: #eee;
-  }
-  select {
+  /* Select dropdowns and tab selectors */
+  select,
+  .search-dropdown {
+    background-color: var(--tab-bg);
+    color: var(--tab-text);
+    border: 1px solid var(--tab-border);
+    padding: 0.4rem 0.6rem;
+    font-size: 0.95rem;
+    border-radius: 4px;
     appearance: none;
-    padding-right: 1.5rem;
     background-repeat: no-repeat;
     background-position: right 0.5rem center;
   }
-  body.dark-theme select {
-    background-color: #1e1e1e;
-    color: #eee;
-    border: 1px solid #444;
-    box-shadow: inset 0 -1px 0 hotpink;
+
+  /* Shimmer highlight for playful tone or emphasis */
+  .highlight-glow {
+    display: inline-block;
+    background: linear-gradient(90deg, hotpink 0%, deeppink 50%, hotpink 100%);
+    background-size: 200% auto;
+    color: white;
+    padding: 0 2px;
+    border-radius: 3px;
+    animation: shimmerPulse 1.4s ease-in-out infinite alternate;
+  }
+  @keyframes shimmerPulse {
+    0% { background-position: 0% center; }
+    100% { background-position: 100% center; }
+  }
+  /* =====================================
+  📋 PREVIEW PANEL & OVERLAYS
+  ===================================== */
+  .preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 420px;
+    height: 100vh;
+    display: none;
+    flex-direction: column;
+    z-index: 999;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    background-color: var(--editor-bg);
+    color: var(--editor-text);
+  }
+
+  .preview-top a,
+  .preview-settings a {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.8rem;
+    margin: 0.25rem 0;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    background: var(--tab-bg);
+    color: var(--tab-text);
+  }
+  .preview-top a:hover,
+  .preview-settings a:hover {
+    background-color: var(--tab-hover);
+    transform: translateX(2px);
+  }
+
+  .preview-middle {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .preview-bottom {
+    padding: 1rem;
+    border-top: 1px solid #ccc;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .preview-bottom input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+    padding: 0.3rem 0.5rem;
+    font-size: 1rem;
+    box-sizing: border-box;
   }
 
   /* =====================================
-    🧩 THEME TOGGLE
+  📎 FILE ATTACHMENTS
+  ===================================== */
+  #attachedFilesList {
+    margin-top: 1rem;
+    max-width: 60%;
+    font-size: 0.9rem;
+    color: #444;
+    word-wrap: break-word;
+  }
+  #attachedFilesList ul {
+    padding-left: 1.2rem;
+  }
+  .file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .file-item span {
+    flex: 1;
+  }
+  .file-item button {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+  }
+
+  /* =====================================
+  🔁 THEME TOGGLE SWITCH
   ===================================== */
   .theme-toggle {
     position: absolute;
