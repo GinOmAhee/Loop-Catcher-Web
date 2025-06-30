@@ -1408,7 +1408,7 @@
 
     function switchTab(index) {
       // 🧠 Save the current tab's content
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      tabs[activeTabIndex].content = editor.innerHTML;
 
       // 🔄 Switch to the new tab
       activeTabIndex = index;
@@ -1418,7 +1418,7 @@
       applyEditorMode(tabMode);
 
       // 📝 Load the new tab's content
-      mainEditor.innerHTML = tabs[index].content || "";
+      editor.innerHTML = tabs[index].content || "";
 
       safeRenderTabs();
     }
@@ -1439,7 +1439,7 @@
         activeTabIndex = Math.max(0, activeTabIndex - 1);
       }
 
-      mainEditor.innerHTML = tabs[activeTabIndex].content || "";
+      editor.innerHTML = tabs[activeTabIndex].content || "";
       hasUnsavedChanges = false;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
@@ -1486,15 +1486,15 @@
     let isRecording = false;
     let debounceTimer;
 
-    mainEditor.addEventListener("input", () => {
+    editor.addEventListener("input", () => {
       // Undo/redo
-      undoStack.push(mainEditor.innerHTML);
+      undoStack.push(editor.innerHTML);
       redoStack = [];
 
       // Debounced auto-save
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        localStorage.setItem("capturedText", mainEditor.innerHTML);
+        localStorage.setItem("capturedText", editor.innerHTML);
         localStorage.setItem("lastSaved", new Date().toISOString());
         updateGrouping();
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
@@ -1617,7 +1617,7 @@
      const now = new Date();
      const noteText = mainEditor.innerText.trim();
      const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
-     const noteHTML = mainEditor.innerHTML;
+     const noteHTML = editor.innerHTML;
      if (!noteText) return;
 
      const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
@@ -1661,7 +1661,7 @@
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      mainEditor.innerHTML = '';
+      editor.innerHTML = '';
       tabs[activeTabIndex].content = '';
       tabs[activeTabIndex].title = 'Untitled';
       localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -1677,7 +1677,7 @@
       if (!mainEditor) return;
 
       // Save current content into the active tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      tabs[activeTabIndex].content = editor.innerHTML;
 
       // Save full tabs array
       localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -1709,10 +1709,10 @@
         const activeTab = tabs[activeTabIndex];
 
         if (activeTab && typeof activeTab.content === "string") {
-          mainEditor.innerHTML = activeTab.content;
+          editor.innerHTML = activeTab.content;
         } else {
           console.warn("⚠️ No content found in active tab.");
-          mainEditor.innerHTML = ""; // Optional: fallback message
+          editor.innerHTML = ""; // Optional: fallback message
         }
         safeRenderTabs();
 
@@ -1769,7 +1769,7 @@
             transcript += text + '\n';
           }
         }
-        mainEditor.innerHTML += (mainEditor.innerHTML ? '\n' : '') + transcript.trim();
+        editor.innerHTML += (editor.innerHTML ? '\n' : '') + transcript.trim();
       };
 
       recognition.onerror = (e) => {
@@ -1924,16 +1924,16 @@
 
     function undo() {
       if (undoStack.length === 0) return;
-      redoStack.push(mainEditor.innerHTML);
+      redoStack.push(editor.innerHTML);
       const last = undoStack.pop();
-      mainEditor.innerHTML = last || '';
+      editor.innerHTML = last || '';
     }
 
     function redo() {
       if (redoStack.length === 0) return;
-      undoStack.push(mainEditor.innerHTML);
+      undoStack.push(editor.innerHTML);
       const next = redoStack.pop();
-      mainEditor.innerHTML = next || '';
+      editor.innerHTML = next || '';
     }
 
     function cleanEditor() {
@@ -2025,8 +2025,8 @@
     }
 
     function loadNoteIntoEditor(noteHTML) {
-      mainEditor.innerHTML = noteHTML;
-      mainEditor.focus();
+      editor.innerHTML = noteHTML;
+      editor.focus();
       saveStatus.innerText = "📝 Loaded note from preview";
       preview.style.display = 'none';
       undoStack.push(noteHTML);
@@ -2427,7 +2427,7 @@
 
     function printNote() {
       const printWindow = window.open('', '_blank');
-      const noteContent = mainEditor.innerHTML;
+      const noteContent = editor.innerHTML;
 
       const styles = `
         <style>
@@ -2560,7 +2560,8 @@
     let documentCache = "";
 
     window.addEventListener("DOMContentLoaded", () => {
-      editor = document.getElementById("mainEditor");
+      editor = document.getElementById("marginBox");      // ← the active contenteditable zone
+      mainEditor = document.getElementById("mainEditor");
       toolbar = document.getElementById("toolbar");
       modeToggleBtn = document.getElementById("modeToggleBtn");
       status = document.getElementById("saveStatus");
@@ -2726,6 +2727,12 @@
         
       // ✏️ Ensure editor receives focus after mode switch
       setTimeout(() => editor.focus(), 0);
+    }
+
+    function getEditorArea() {
+      return document.querySelector('[data-mode="notepad"]') 
+             ? document.getElementById("mainEditor") 
+             : document.getElementById("marginBox");
     }
 
     const paperSizes = {
