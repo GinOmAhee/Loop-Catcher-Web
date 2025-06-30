@@ -342,6 +342,17 @@
     transition: all 0.2s ease;
   }
 
+  #mainEditor::before {
+    content: "";
+    position: absolute;
+    top: var(--paddingTop);
+    bottom: var(--paddingBottom);
+    left: var(--paddingLeft);
+    right: var(--paddingRight);
+    border: 1px dashed rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+  }
+
   /* Notepad Mode Styles */
   #mainEditor[data-mode="notepad"] {
     font-family: "Courier New", monospace;
@@ -2482,6 +2493,12 @@
         const rect = marginBtn.getBoundingClientRect();
         marginDropdown.style.top = `${rect.bottom + 5}px`;
         marginDropdown.style.left = `${rect.left}px`;
+
+        const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
+        document.getElementById("marginTop").value = (savedMargins.top || 0) / 96;
+        document.getElementById("marginBottom").value = (savedMargins.bottom || 0) / 96;
+        document.getElementById("marginLeft").value = (savedMargins.left || 0) / 96;
+        document.getElementById("marginRight").value = (savedMargins.right || 0) / 96;
       });
 
       function inchesToPixels(inches) {
