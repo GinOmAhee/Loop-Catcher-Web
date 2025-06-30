@@ -1621,6 +1621,10 @@
      }
 
       localStorage.removeItem("customMargins");
+
+      editor.style.padding = "0";
+      editor.style.margin = "0";
+
       mainEditor.innerHTML = '';
       tabs[activeTabIndex].content = '';
       tabs[activeTabIndex].title = 'Untitled';
