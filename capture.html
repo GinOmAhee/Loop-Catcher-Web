@@ -2572,32 +2572,41 @@
     let notepadCache = "";
     let documentCache = "";
 
+    let mainEditor, modeToggleBtn, toolbar, status;
+    let preview, fontDropdown, sizeDropdown, textColorDropdown, highlightDropdown;
+
     window.addEventListener("DOMContentLoaded", () => {
-      const editor = document.getElementById("mainEditor");
-      const modeToggleBtn = document.getElementById("modeToggleBtn");
-      const toolbar = document.getElementById("toolbar");
-      const status = document.getElementById("saveStatus");
+      mainEditor = document.getElementById("mainEditor");
+      modeToggleBtn = document.getElementById("modeToggleBtn");
+      toolbar = document.getElementById("toolbar");
+      status = document.getElementById("saveStatus");
 
-      // Make sure editor is visible
-      editor?.classList.add("visible");
-      editor?.focus();
+      preview = document.getElementById("preview");
+      fontDropdown = document.getElementById("fontDropdown");
+      sizeDropdown = document.getElementById("sizeDropdown");
+      textColorDropdown = document.getElementById("textColorDropdown");
+      highlightDropdown = document.getElementById("highlightDropdown");
 
-      // Load saved mode
+      if (!mainEditor) {
+        console.error("❌ mainEditor not found!");
+        return;
+      }
+
+      mainEditor.classList.add("visible");
+      mainEditor.focus();
+
       const savedMode = localStorage.getItem("editorMode") || "document";
       applyEditorMode(savedMode);
 
-      // Bind the toggle button
-      modeToggleBtn.addEventListener("click", () => {
-        const currentMode = editor.getAttribute("data-mode");
+      modeToggleBtn?.addEventListener("click", () => {
+        const currentMode = mainEditor.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
         console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
         applyEditorMode(nextMode);
       });
 
-      // Print button listener
       document.getElementById("printBtn")?.addEventListener("click", printNote);
 
-      // Optional: Dropdown hiding logic
       document.addEventListener("click", () => {
         setTimeout(() => {
           fontDropdown?.classList.add("hidden");
@@ -2606,6 +2615,7 @@
           highlightDropdown?.classList.add("hidden");
         }, 100);
       });
+    
 
       function applyEditorMode(mode) {
         
