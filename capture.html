@@ -1297,17 +1297,6 @@
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
         tabLabel.className = "tab-label";
-
-        // 🌗 Mode indicator (Notepad vs Document)
-        const modeIcon = document.createElement("span");
-        modeIcon.className = "tab-mode-icon";
-        modeIcon.innerText = tab.mode === "notepad" ? "🧠" : "📄";
-        modeIcon.title = tab.mode === "notepad" ? "Notepad Mode" : "Document Mode";
-        modeIcon.style.marginLeft = "0.5ch";
-        modeIcon.style.opacity = "0.7";
-
-        tabLabel.appendChild(modeIcon);
-
         tabLabel.addEventListener("click", () => switchTab(index));
 
         // Handle rename flow on double-click
@@ -1407,20 +1396,9 @@
     }
 
     function switchTab(index) {
-      // 🧠 Save the current tab's content
-      const activeEditor = getActiveEditor();
-      tabs[activeTabIndex].content = activeEditor?.innerHTML || "";
-
-      // 🔄 Switch to the new tab
+      tabs[activeTabIndex].content = mainEditor.innerHTML;
       activeTabIndex = index;
-
-      // 🌗 Restore the correct editor mode before loading content
-      const tabMode = tabs[index]?.mode || "document";
-      applyEditorMode(tabMode);
-
-      // 📝 Load the new tab's content
-      editor.innerHTML = tabs[index].content || "";
-
+      mainEditor.innerHTML = tabs[index].content;
       safeRenderTabs();
     }
 
@@ -1440,7 +1418,7 @@
         activeTabIndex = Math.max(0, activeTabIndex - 1);
       }
 
-      editor.innerHTML = tabs[activeTabIndex].content || "";
+      mainEditor.innerHTML = tabs[activeTabIndex].content || "";
       hasUnsavedChanges = false;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
@@ -1452,11 +1430,7 @@
     let hasUnsavedChanges = false;
 
     function addNewTab() {
-      tabs.push({
-        title: "Untitled",
-        content: "",
-        mode: mainEditor.getAttribute("data-mode") || "document"
-      });
+      tabs.push({ title: "Untitled", content: "" });
       switchTab(tabs.length - 1); // Switch to new tab
     }
 
@@ -1470,8 +1444,8 @@
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
-    let editor = document.getElementById("marginBox"); // now the actual editor
-    let mainEditor = document.getElementById("mainEditor"); // still used for layout
+    const editor = document.getElementById("marginBox"); // now the actual editor
+    const mainEditor = document.getElementById("mainEditor"); // still used for layout
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
     const fontBtn = document.getElementById("fontMenuBtn");
@@ -1486,17 +1460,16 @@
     let recognition;
     let isRecording = false;
     let debounceTimer;
-    let toolbar;
 
-    editor.addEventListener("input", () => {
+    mainEditor.addEventListener("input", () => {
       // Undo/redo
-      undoStack.push(editor.innerHTML);
+      undoStack.push(mainEditor.innerHTML);
       redoStack = [];
 
       // Debounced auto-save
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        localStorage.setItem("capturedText", editor.innerHTML);
+        localStorage.setItem("capturedText", mainEditor.innerHTML);
         localStorage.setItem("lastSaved", new Date().toISOString());
         updateGrouping();
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
@@ -1619,7 +1592,7 @@
      const now = new Date();
      const noteText = mainEditor.innerText.trim();
      const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
-     const noteHTML = editor.innerHTML;
+     const noteHTML = mainEditor.innerHTML;
      if (!noteText) return;
 
      const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
@@ -1663,7 +1636,7 @@
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      editor.innerHTML = '';
+      mainEditor.innerHTML = '';
       tabs[activeTabIndex].content = '';
       tabs[activeTabIndex].title = 'Untitled';
       localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -1679,9 +1652,7 @@
       if (!mainEditor) return;
 
       // Save current content into the active tab
-      if (tabs && tabs[activeTabIndex]) {
-        const activeEditor = getActiveEditor(); // your mode-aware function
-        tabs[activeTabIndex].content = activeEditor?.innerHTML || "";
+      tabs[activeTabIndex].content = mainEditor.innerHTML;
 
       // Save full tabs array
       localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -1689,10 +1660,8 @@
       localStorage.setItem('lastSaved', now.toISOString());
 
       saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+
       hasUnsavedChanges = false; // Reset after save
-      } else {
-        console.warn("⚠️ autoSave skipped — no active tab.");
-      }
     }
 
     window.addEventListener("beforeunload", (e) => {
@@ -1715,10 +1684,10 @@
         const activeTab = tabs[activeTabIndex];
 
         if (activeTab && typeof activeTab.content === "string") {
-          editor.innerHTML = activeTab.content;
+          mainEditor.innerHTML = activeTab.content;
         } else {
           console.warn("⚠️ No content found in active tab.");
-          editor.innerHTML = ""; // Optional: fallback message
+          mainEditor.innerHTML = ""; // Optional: fallback message
         }
         safeRenderTabs();
 
@@ -1775,7 +1744,7 @@
             transcript += text + '\n';
           }
         }
-        editor.innerHTML += (editor.innerHTML ? '\n' : '') + transcript.trim();
+        mainEditor.innerHTML += (mainEditor.innerHTML ? '\n' : '') + transcript.trim();
       };
 
       recognition.onerror = (e) => {
@@ -1930,16 +1899,16 @@
 
     function undo() {
       if (undoStack.length === 0) return;
-      redoStack.push(editor.innerHTML);
+      redoStack.push(mainEditor.innerHTML);
       const last = undoStack.pop();
-      editor.innerHTML = last || '';
+      mainEditor.innerHTML = last || '';
     }
 
     function redo() {
       if (redoStack.length === 0) return;
-      undoStack.push(editor.innerHTML);
+      undoStack.push(mainEditor.innerHTML);
       const next = redoStack.pop();
-      editor.innerHTML = next || '';
+      mainEditor.innerHTML = next || '';
     }
 
     function cleanEditor() {
@@ -2031,8 +2000,8 @@
     }
 
     function loadNoteIntoEditor(noteHTML) {
-      editor.innerHTML = noteHTML;
-      editor.focus();
+      mainEditor.innerHTML = noteHTML;
+      mainEditor.focus();
       saveStatus.innerText = "📝 Loaded note from preview";
       preview.style.display = 'none';
       undoStack.push(noteHTML);
@@ -2433,7 +2402,7 @@
 
     function printNote() {
       const printWindow = window.open('', '_blank');
-      const noteContent = editor.innerHTML;
+      const noteContent = mainEditor.innerHTML;
 
       const styles = `
         <style>
@@ -2566,12 +2535,10 @@
     let documentCache = "";
 
     window.addEventListener("DOMContentLoaded", () => {
-      editor = document.getElementById("marginBox");      // ← the active contenteditable zone
-      mainEditor = document.getElementById("mainEditor");
-      toolbar = document.getElementById("toolbar");
-      modeToggleBtn = document.getElementById("modeToggleBtn");
-      status = document.getElementById("saveStatus");
-      paperSizeSelect = document.getElementById("paperSizeSelect");
+      const editor = document.getElementById("mainEditor");
+      const modeToggleBtn = document.getElementById("modeToggleBtn");
+      const toolbar = document.getElementById("toolbar");
+      const status = document.getElementById("saveStatus");
 
       // Make sure editor is visible
       editor?.classList.add("visible");
@@ -2601,150 +2568,123 @@
           highlightDropdown?.classList.add("hidden");
         }, 100);
       });
-    });
 
-    function applyEditorMode(mode) {
-      if (toolbar) {
-        toolbar.style.display = mode === "notepad" ? "none" : "flex";
-      }
-
-      if (paperSizeSelect) {
-        paperSizeSelect.style.display = mode === "document" ? "inline-block" : "none";
-      }
-
-      if (status) {
-        status.innerText = mode === "notepad"
-        ? "🧠 Notepad Mode Active"
-        : "📄 Document Mode Active";
-      }
-
-      if (!editor) return;
-
-      // Place at the beginning of applyEditorMode():
-      if (mode !== editor.getAttribute("data-mode")) {
-
-        if (tabs[activeTabIndex]) {
-          tabs[activeTabIndex].mode = mode;
-          localStorage.setItem("tabs", JSON.stringify(tabs));
-        }
-        if (editor.getAttribute("data-mode") === "notepad") {
-          notepadCache = editor.innerHTML;
-        } else if (editor.getAttribute("data-mode") === "document") {
-          documentCache = editor.innerHTML;
-        }
-      }
-
-      if (mode === "notepad") {
-        // Contenteditable switch
-        editor.setAttribute("contenteditable", "true");
-        document.getElementById("marginBox")?.removeAttribute("contenteditable");
-        document.getElementById("marginBox")?.classList.add("hidden");
-
-        toolbar && (toolbar.style.display = "none");
-        editor.setAttribute("data-mode", "notepad");
-        editor.style.fontFamily = "Courier, monospace";
-        editor.style.fontSize = "0.9rem";
-        editor.style.padding = "1rem";
-        editor.style.border = "none";
-        editor.style.boxShadow = "none";
-        editor.style.width = "";
-        editor.style.minHeight = "";
-
-        modeToggleBtn.innerText = "📄 Document Mode";
-        status && (status.innerText = "🧠 Notepad Mode Active");
-
-        // Optional: Auto-title
-        const now = new Date();
-        const label = `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-        if (typeof tabs !== "undefined" && tabs[activeTabIndex]) {
-          tabs[activeTabIndex].title = label;
-          localStorage.setItem("tabs", JSON.stringify(tabs));
-          safeRenderTabs?.();
-        }
-      } else {
-        // Contenteditable switch
-        editor.setAttribute("contenteditable", "true"); // ✅ allow typing
-        const marginBox = document.getElementById("marginBox");
-        const leftoverText = editor.textContent.replace(marginBox?.innerText || "", "").trim();
-
-        if (leftoverText && marginBox && marginBox.innerText.trim() === "") {
-          marginBox.innerText = leftoverText;
-          editor.innerHTML = ""; // clear mainEditor content
-          editor.appendChild(marginBox); // re-attach marginBox cleanly
-        }
-
-        marginBox?.removeAttribute("contenteditable"); // lock marginBox
-
-        toolbar && (toolbar.style.display = "flex");
-        editor.setAttribute("data-mode", "document");
-        editor.style.fontFamily = "Arial, sans-serif";
-        editor.style.fontSize = "1rem";
-        editor.style.padding = ""; // ← don't set universal padding anymore
-        editor.style.border = "1px solid #ccc";
-        editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
-
-        modeToggleBtn.innerText = "🧠 Quick Note Mode";
-        status && (status.innerText = "📄 Document Mode Active");
-
-        const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
-        if (Object.keys(savedMargins).length > 0) {
-          editor.style.margin = "0";
-          editor.style.paddingTop = `${savedMargins.top}px`;
-          editor.style.paddingBottom = `${savedMargins.bottom}px`;
-          editor.style.paddingLeft = `${savedMargins.left}px`;
-          editor.style.paddingRight = `${savedMargins.right}px`;
-        }
-
-        // 📄 Reset tab title (optional)
-        // 📄 Auto-set tab title based on first line of note
-        if (tabs && tabs[activeTabIndex]) {
-          const text = mainEditor.innerText || "";
-          tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "Untitled";
-          if (!tabs[activeTabIndex].wasRenamedManually) {
-            // update title from content
-          }
-          localStorage.setItem("tabs", JSON.stringify(tabs));
-
-          // ✨ Update DOM immediately
-          const tabBarEl = document.querySelectorAll(".tab-label")[activeTabIndex];
-          if (tabBarEl) {
-            tabBarEl.innerText = tabs[activeTabIndex].title || `Tab ${activeTabIndex + 1}`;
-          }
-          safeRenderTabs();
-          
-          if (mode === "document") {
-            paperSizeSelect?.addEventListener("change", updatePaperSize);
-            updatePaperSize(); // run it once immediately
-          }
-        }
-      } 
-      // ✅ Restore cached content after switching
-      if (mode === "notepad") {
-        editor.innerHTML = notepadCache || "";
-        editor.innerHTML = editor.innerHTML.trim();
-      } else if (mode === "document") {
-        editor.innerHTML = documentCache || "";
-        editor.innerHTML = editor.innerHTML.trim();
-
-        // And if marginBox is involved, re-append it here:
-        const marginBox = document.getElementById("marginBox");
-        if (marginBox && !editor.contains(marginBox)) {
-          editor.appendChild(marginBox);
-        }
-      }
-      editor.setAttribute("data-mode", mode);
-
+      function applyEditorMode(mode) {
         
-      // ✏️ Ensure editor receives focus after mode switch
-      setTimeout(() => editor.focus(), 0);
-    }
+        if (!editor) return;
 
-    function getActiveEditor() {
-      const mode = editor?.getAttribute("data-mode") || "document";
-      return mode === "notepad"
-        ? document.getElementById("mainEditor")
-        : document.getElementById("marginBox");
-    }
+        // Place at the beginning of applyEditorMode():
+        if (mode !== editor.getAttribute("data-mode")) {
+          if (editor.getAttribute("data-mode") === "notepad") {
+            notepadCache = editor.innerHTML;
+          } else if (editor.getAttribute("data-mode") === "document") {
+            documentCache = editor.innerHTML;
+          }
+        }
+
+        if (mode === "notepad") {
+          // Contenteditable switch
+          editor.setAttribute("contenteditable", "true");
+          document.getElementById("marginBox")?.removeAttribute("contenteditable");
+          document.getElementById("marginBox")?.classList.add("hidden");
+
+          toolbar && (toolbar.style.display = "none");
+          editor.setAttribute("data-mode", "notepad");
+          editor.style.fontFamily = "Courier, monospace";
+          editor.style.fontSize = "0.9rem";
+          editor.style.padding = "1rem";
+          editor.style.border = "none";
+          editor.style.boxShadow = "none";
+          editor.style.width = "";
+          editor.style.minHeight = "";
+
+          modeToggleBtn.innerText = "📄 Document Mode";
+          status && (status.innerText = "🧠 Notepad Mode Active");
+
+          // Optional: Auto-title
+          const now = new Date();
+          const label = `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+          if (typeof tabs !== "undefined" && tabs[activeTabIndex]) {
+            tabs[activeTabIndex].title = label;
+            localStorage.setItem("tabs", JSON.stringify(tabs));
+            safeRenderTabs?.();
+          }
+        } else {
+          // Contenteditable switch
+          editor.setAttribute("contenteditable", "true"); // ✅ allow typing
+          const marginBox = document.getElementById("marginBox");
+          const leftoverText = editor.textContent.replace(marginBox?.innerText || "", "").trim();
+
+          if (leftoverText && marginBox && marginBox.innerText.trim() === "") {
+            marginBox.innerText = leftoverText;
+            editor.innerHTML = ""; // clear mainEditor content
+            editor.appendChild(marginBox); // re-attach marginBox cleanly
+          }
+
+          marginBox?.removeAttribute("contenteditable"); // lock marginBox
+
+          document.getElementById("marginBox")?.removeAttribute("contenteditable"); // ✅ just show margin box, not editable
+
+          toolbar && (toolbar.style.display = "flex");
+          editor.setAttribute("data-mode", "document");
+          editor.style.fontFamily = "Arial, sans-serif";
+          editor.style.fontSize = "1rem";
+          editor.style.padding = ""; // ← don't set universal padding anymore
+          editor.style.border = "1px solid #ccc";
+          editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
+
+          modeToggleBtn.innerText = "🧠 Quick Note Mode";
+          status && (status.innerText = "📄 Document Mode Active");
+
+          const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
+          if (Object.keys(savedMargins).length > 0) {
+            editor.style.margin = "0";
+            editor.style.paddingTop = `${savedMargins.top}px`;
+            editor.style.paddingBottom = `${savedMargins.bottom}px`;
+            editor.style.paddingLeft = `${savedMargins.left}px`;
+            editor.style.paddingRight = `${savedMargins.right}px`;
+          }
+
+          // 📄 Reset tab title (optional)
+          // 📄 Auto-set tab title based on first line of note
+          if (tabs && tabs[activeTabIndex]) {
+            const text = mainEditor.innerText || "";
+            tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "Untitled";
+            localStorage.setItem("tabs", JSON.stringify(tabs));
+
+            // ✨ Update DOM immediately
+            const tabBarEl = document.querySelectorAll(".tab-label")[activeTabIndex];
+            if (tabBarEl) {
+              tabBarEl.innerText = tabs[activeTabIndex].title || `Tab ${activeTabIndex + 1}`;
+            }
+            safeRenderTabs();
+          
+            if (mode === "document") {
+              paperSizeSelect?.addEventListener("change", updatePaperSize);
+              updatePaperSize(); // run it once immediately
+            }
+          }
+        } 
+        // ✅ Restore cached content after switching
+        if (mode === "notepad") {
+          editor.innerHTML = notepadCache || "";
+          editor.innerHTML = editor.innerHTML.trim();
+        } else if (mode === "document") {
+          editor.innerHTML = documentCache || "";
+          editor.innerHTML = editor.innerHTML.trim();
+
+          // And if marginBox is involved, re-append it here:
+          const marginBox = document.getElementById("marginBox");
+          if (marginBox && !editor.contains(marginBox)) {
+            editor.appendChild(marginBox);
+          }
+        }
+        editor.setAttribute("data-mode", mode);
+
+        // ✏️ Ensure editor receives focus after mode switch
+        setTimeout(() => editor.focus(), 0);
+      }
+    });
 
     const paperSizes = {
       letter: { width: 816, height: 1056 }, // 8.5in x 11in at 96dpi
