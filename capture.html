@@ -1422,7 +1422,7 @@
 
       safeRenderTabs();
     }
-    
+
     function closeTab(index) {
       if (index === activeTabIndex && hasUnsavedChanges) {
         const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
@@ -1451,7 +1451,11 @@
     let hasUnsavedChanges = false;
 
     function addNewTab() {
-      tabs.push({ title: "Untitled", content: "" });
+      tabs.push({
+        title: "Untitled",
+        content: "",
+        mode: mainEditor.getAttribute("data-mode") || "document"
+      });
       switchTab(tabs.length - 1); // Switch to new tab
     }
 
