@@ -2579,6 +2579,15 @@
           // Contenteditable switch
           editor.setAttribute("contenteditable", "true"); // ✅ allow typing
           document.getElementById("marginBox")?.classList.remove("hidden");
+            const leftoverText = editor.innerText.trim();
+            marginBox = document.getElementById("marginBox");
+
+            if (leftoverText && marginBox && marginBox.innerText.trim() === "") {
+              marginBox.innerText = leftoverText;
+              editor.innerHTML = ""; // clear mainEditor content
+              editor.appendChild(marginBox); // re-attach marginBox cleanly
+            }
+
           document.getElementById("marginBox")?.removeAttribute("contenteditable"); // ✅ just show margin box, not editable
 
           toolbar && (toolbar.style.display = "flex");
