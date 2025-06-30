@@ -1155,8 +1155,8 @@
       </div>
 
         <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" data-mode="document">
-          <div class="margin-box" id="marginBox" contenteditable="true" tabindex="0"></div>
+        <div id="mainEditor" contenteditable="true" data-mode="document">
+          <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
         </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
@@ -2577,9 +2577,9 @@
           }
         } else {
           // Contenteditable switch
-          editor.removeAttribute("contenteditable");
-          document.getElementById("marginBox")?.setAttribute("contenteditable", "true");
+          editor.setAttribute("contenteditable", "true"); // ✅ allow typing
           document.getElementById("marginBox")?.classList.remove("hidden");
+          document.getElementById("marginBox")?.removeAttribute("contenteditable"); // ✅ just show margin box, not editable
 
           toolbar && (toolbar.style.display = "flex");
           editor.setAttribute("data-mode", "document");
