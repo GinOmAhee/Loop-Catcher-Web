@@ -2573,18 +2573,11 @@
     let documentCache = "";
 
     let modeToggleBtn, toolbar, status;
-    let preview, fontDropdown, sizeDropdown, textColorDropdown, highlightDropdown;
 
     window.addEventListener("DOMContentLoaded", () => {
       modeToggleBtn = document.getElementById("modeToggleBtn");
       toolbar = document.getElementById("toolbar");
       status = document.getElementById("saveStatus");
-
-      preview = document.getElementById("preview");
-      fontDropdown = document.getElementById("fontDropdown");
-      sizeDropdown = document.getElementById("sizeDropdown");
-      textColorDropdown = document.getElementById("textColorDropdown");
-      highlightDropdown = document.getElementById("highlightDropdown");
 
       if (!mainEditor) {
         console.error("❌ mainEditor not found!");
