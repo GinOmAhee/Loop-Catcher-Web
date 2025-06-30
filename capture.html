@@ -2528,14 +2528,6 @@
         setTimeout(() => editor.focus(), 0);
       }
 
-      function safeRenderTabs() {
-        if (!isRenamingTab) {
-          renderTabs(); // ✅ Call the real function that draws the tabs
-        } else {
-          console.warn("⛔ renderTabs() skipped due to active rename");
-        }
-      }
-
       function renderTabs() {
         if (isRenamingTab) {
           console.warn("⛔ Skipping renderTabs(): rename input is still active");
@@ -2727,6 +2719,14 @@
         loadSavedText();
       }
     });
+
+    function safeRenderTabs() {
+      if (!isRenamingTab) {
+        renderTabs(); // ✅ Call the real function that draws the tabs
+      } else {
+        console.warn("⛔ renderTabs() skipped due to active rename");
+      }
+    }
 
     const paperSizes = {
       letter: { width: 816, height: 1056 }, // 8.5in x 11in at 96dpi
