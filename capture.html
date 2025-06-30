@@ -1308,6 +1308,8 @@
         return;
       }
 
+      console.log("✅ mainEditor is:", mainEditor);
+
       // Attach input listener safely
       mainEditor.addEventListener("input", () => {
         undoStack.push(mainEditor.innerHTML);
@@ -1342,7 +1344,7 @@
     let isRecording = false;
     let debounceTimer;
 
-    console.log("✅ mainEditor is:", mainEditor);
+    
     mainEditor.addEventListener("input", () => {
       // Undo/redo
       undoStack.push(mainEditor.innerHTML);
