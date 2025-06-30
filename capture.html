@@ -2548,42 +2548,6 @@
       });
     });
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const editor = document.getElementById("mainEditor");
-      const modeToggleBtn = document.getElementById("modeToggleBtn");
-      const toolbar = document.getElementById("toolbar");
-      const status = document.getElementById("saveStatus");
-
-      // Make sure editor is visible
-      editor?.classList.add("visible");
-      editor?.focus();
-
-      // Load saved mode
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      applyEditorMode(savedMode);
-
-      // Bind the toggle button
-      modeToggleBtn?.addEventListener("click", () => {
-        const currentMode = localStorage.getItem("editorMode") || "document";
-        const newMode = currentMode === "notepad" ? "document" : "notepad";
-        console.log(`🔁 Switching to: ${newMode}`);
-        localStorage.setItem("editorMode", newMode);
-        applyEditorMode(newMode);
-      });
-
-      // Print button listener
-      document.getElementById("printBtn")?.addEventListener("click", printNote);
-
-      // Optional: Dropdown hiding logic
-      document.addEventListener("click", () => {
-        setTimeout(() => {
-          fontDropdown?.classList.add("hidden");
-          sizeDropdown?.classList.add("hidden");
-          textColorDropdown?.classList.add("hidden");
-          highlightDropdown?.classList.add("hidden");
-        }, 100);
-      });
-
       function applyEditorMode(mode) {
         
         if (!editor) return;
@@ -2709,6 +2673,43 @@
       }
     }
 
+    window.addEventListener("DOMContentLoaded", () => {
+      const editor = document.getElementById("mainEditor");
+      const modeToggleBtn = document.getElementById("modeToggleBtn");
+      const toolbar = document.getElementById("toolbar");
+      const status = document.getElementById("saveStatus");
+
+      // Make sure editor is visible
+      editor?.classList.add("visible");
+      editor?.focus();
+
+      // Load saved mode
+      const savedMode = localStorage.getItem("editorMode") || "document";
+      applyEditorMode(savedMode);
+
+      // Bind the toggle button
+      modeToggleBtn?.addEventListener("click", () => {
+        const currentMode = localStorage.getItem("editorMode") || "document";
+        const newMode = currentMode === "notepad" ? "document" : "notepad";
+        console.log(`🔁 Switching to: ${newMode}`);
+        localStorage.setItem("editorMode", newMode);
+        applyEditorMode(newMode);
+      });
+
+      // Print button listener
+      document.getElementById("printBtn")?.addEventListener("click", printNote);
+
+      // Optional: Dropdown hiding logic
+      document.addEventListener("click", () => {
+        setTimeout(() => {
+          fontDropdown?.classList.add("hidden");
+          sizeDropdown?.classList.add("hidden");
+          textColorDropdown?.classList.add("hidden");
+          highlightDropdown?.classList.add("hidden");
+        }, 100);
+      });
+    });  
+
     document.addEventListener("click", () => {
       setTimeout(() => {
         fontDropdown?.classList.add("hidden");
@@ -2717,8 +2718,6 @@
         highlightDropdown?.classList.add("hidden");
       }, 100); // this gives time for clicks inside dropdowns to register
     });
-
   </script>
-
  </body>
 </html>
