@@ -1190,6 +1190,8 @@
     let db = null;
 
     let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
+
+    let preview;
     let toggleBtn;
     let saveStatus;
     let editor;
@@ -1205,16 +1207,16 @@
     let justifyBtn;
     let modeToggleBtn;
     let toolbar;
-    let status
+
+    let status;
+    let activeTabIndex = 0;
     let notepadCache = "";
     let documentCache = "";
-    let activeTabIndex = 0;
     let recognition;
     let isRecording = false;
     let debounceTimer;
     let savedSelection = null;
-    let undoStack = [];
-    let redoStack = [];
+    
 
     async function initializeFirebase() {
       try {
@@ -1284,6 +1286,40 @@
 
     window.addEventListener('DOMContentLoaded', initThemeToggle);
 
+    window.addEventListener("DOMContentLoaded", () => {
+      preview = document.getElementById('preview');
+      toggleBtn = document.getElementById('previewToggle');
+      saveStatus = document.getElementById('saveStatus');
+      editor = document.getElementById("marginBox");
+      mainEditor = document.getElementById("mainEditor");
+      attachedFilesList = document.getElementById('attachedFilesList');
+      groupedNotes = document.getElementById('groupedNotes');
+      fontBtn = document.getElementById("fontMenuBtn");
+      fontDropdown = document.getElementById("fontDropdown");
+      fontSizeBtn = document.getElementById("fontSizeBtn");
+      sizeDropdown = document.getElementById("sizeDropdown");
+      textColorBtn = document.getElementById("textColorBtn");
+      textColorDropdown = document.getElementById("textColorDropdown");
+      justifyBtn = document.getElementById("justifyBtn");
+      modeToggleBtn = document.getElementById("modeToggleBtn");
+      toolbar = document.getElementById("toolbar");
+      status = document.getElementById("saveStatus");
+
+      // Now safe to use the elements
+      mainEditor?.classList.add("visible");
+      mainEditor?.focus();
+
+      const savedMode = localStorage.getItem("editorMode") || "document";
+      applyEditorMode(savedMode);
+
+      modeToggleBtn?.addEventListener("click", () => {
+        const currentMode = mainEditor.getAttribute("data-mode");
+        const nextMode = currentMode === "notepad" ? "document" : "notepad";
+        console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
+        applyEditorMode(nextMode);
+      });
+    });
+
     function maybeClosePreview(e) {
       if (e.target.classList.contains("tab-rename-input")) return;
       if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
@@ -1297,21 +1333,6 @@
 
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
     const newThemeClass = moodThemeMap[vibe] || "theme-calm"; // Define it first
-
-    const preview = document.getElementById('preview');
-    const toggleBtn = document.getElementById('previewToggle');
-    const saveStatus = document.getElementById('saveStatus');
-    const editor = document.getElementById("marginBox"); // now the actual editor
-    const mainEditor = document.getElementById("mainEditor"); // still used for layout
-    const attachedFilesList = document.getElementById('attachedFilesList');
-    const groupedNotes = document.getElementById('groupedNotes');
-    const fontBtn = document.getElementById("fontMenuBtn");
-    const fontDropdown = document.getElementById("fontDropdown");
-    const fontSizeBtn = document.getElementById("fontSizeBtn");
-    const sizeDropdown = document.getElementById("sizeDropdown");
-    const textColorBtn = document.getElementById("textColorBtn");
-    const textColorDropdown = document.getElementById("textColorDropdown");
-    const justifyBtn = document.getElementById("justifyBtn");
 
     mainEditor.addEventListener("input", () => {
       // Undo/redo
@@ -2378,10 +2399,6 @@
         }
       });
     });
-
-    // Add this to the top of applyEditorMode (or make it global if reused)
-    let notepadCache = "";
-    let documentCache = "";
 
     function applyEditorMode(mode) {
         
