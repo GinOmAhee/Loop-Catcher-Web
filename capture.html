@@ -1311,12 +1311,12 @@
       console.log("✅ mainEditor is:", mainEditor);
 
       mainEditor.addEventListener("input", () => {
-        undoStack.push(mainEditor.innerHTML);
+        undoStack.push(getActiveEditor()?.innerHTML);
         redoStack = [];
 
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
-          localStorage.setItem("capturedText", mainEditor.innerHTML);
+          localStorage.setItem("capturedText", getActiveEditor()?.innerHTML);
           localStorage.setItem("lastSaved", new Date().toISOString());
           updateGrouping();
           saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
@@ -1637,7 +1637,7 @@
             transcript += text + '\n';
           }
         }
-        mainEditor.innerHTML += (mainEditor.innerHTML ? '\n' : '') + transcript.trim();
+        getActiveEditor()?.innerHTML += (getActiveEditor()?.innerHTML ? '\n' : '') + transcript.trim();
       };
 
       recognition.onerror = (e) => {
@@ -1789,16 +1789,16 @@
 
     function undo() {
       if (undoStack.length === 0) return;
-      redoStack.push(mainEditor.innerHTML);
+      redoStack.push(getActiveEditor()?.innerHTML);
       const last = undoStack.pop();
-      mainEditor.innerHTML = last || '';
+      getActiveEditor()?.innerHTML = last || '';
     }
 
     function redo() {
       if (redoStack.length === 0) return;
-      undoStack.push(mainEditor.innerHTML);
+      undoStack.push(getActiveEditor()?.innerHTML);
       const next = redoStack.pop();
-      mainEditor.innerHTML = next || '';
+      getActiveEditor()?.innerHTML = next || '';
     }
 
     function cleanEditor() {
@@ -2323,7 +2323,7 @@
 
     function printNote() {
       const printWindow = window.open('', '_blank');
-      const noteContent = mainEditor.innerHTML;
+      const noteContent = getActiveEditor()?.innerHTML;
 
       const styles = `
         <style>
@@ -2617,7 +2617,7 @@
       filteredTabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
         tabBtn.className = "tab";
-        if (tab.originalIndex === activeTabIndex) tabBtn.classList.add("active");
+        if (tab.originalIndex === activeIndex) tabBtn.classList.add("active");
 
         const tabLabel = document.createElement("span");
         tabLabel.innerText = tab.title;
@@ -2720,7 +2720,7 @@
       if (activeTab && editor) {
         editor.innerHTML = activeTab.content || "";
       }
-}
+    }
 
     function switchTab(originalIndex) {
       const currentMode = localStorage.getItem("editorMode") || "document";
