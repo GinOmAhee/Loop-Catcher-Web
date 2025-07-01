@@ -1702,7 +1702,7 @@
           console.error(`❌ Failed to upload ${fileName}:`, err);
           alert(`❌ Upload failed for ${fileName}`);
         }
-    }
+      }
 
       if (duplicateCount > 0) {
         alert(`⚠️ ${duplicateCount} file(s) already attached and were skipped.`);
@@ -2876,7 +2876,7 @@
         sizeDropdown?.classList.add("hidden");
         textColorDropdown?.classList.add("hidden");
         highlightDropdown?.classList.add("hidden");
-      }, 100); // this gives time for clicks inside dropdowns to register
+      }, 100); // this gives time for clicks inside dropdowns to register;
     });
 
   </script>
