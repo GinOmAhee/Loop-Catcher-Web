@@ -1207,7 +1207,10 @@
     let toolbar;
 
     let status;
-    let activeTabIndex = 0;
+    let activeTabIndexByMode = {
+      notepad: 0,
+      document: 0
+    };
     let notepadCache = "";
     let documentCache = "";
     let hasUnsavedChanges = false;
@@ -1458,80 +1461,95 @@
       }
     }
 
-   async function saveText() {
-     const now = new Date();
-     const noteText = mainEditor.innerText.trim();
-     const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
-     const noteHTML = mainEditor.innerHTML;
-     if (!noteText) return;
+    async function saveText() {
+      const now = new Date();
+      const currentMode = localStorage.getItem("editorMode") || "document";
+      const index = activeTabIndexByMode[currentMode];
+      const tab = tabs[index];
+      const editor = getActiveEditor();
 
-     const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      if (!editor || !tab) return;
 
-     // ✅ Allow save only if different from last saved note
-     if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
-       saveStatus.innerText = `⚠️ Not saved — no changes detected`;
-       return;
-     }
+      const noteText = editor.innerText.trim();
+      const noteHTML = editor.innerHTML;
+      const currentTabTitle = tab.title || "Untitled";
 
+      if (!noteText) return;
 
-     let projectName = prompt("📌 Enter project name (optional):");
-     projectName = projectName?.trim() || "📂 Unlabeled";
+      const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
 
-     const newNote = {
-       text: noteHTML,
-       timestamp: now.toISOString(),
-       title: tabs[activeTabIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
-       project: projectName,
-       resolved: false,
-       tags: []
-     };
+      // ✅ Save only if content has changed
+      if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
+        saveStatus.innerText = `⚠️ Not saved — no changes detected`;
+        return;
+      }
 
-     existingNotes.unshift(newNote);
-     localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
+      let projectName = prompt("📌 Enter project name (optional):");
+      projectName = projectName?.trim() || "📂 Unlabeled";
 
-     try {
-       if (db && firebase.auth().currentUser) {
-         const uid = firebase.auth().currentUser.uid;
-         await db.collection("users").doc(uid).collection("notes").add(newNote);
-         console.log("✅ Note saved to Firestore under user:", uid);
-       } else {
-         console.warn("⚠️ User not logged in or Firebase not ready");
-       }
-     } catch (error) {
-       console.error("❌ Failed to save note to Firestore:", error);
-     }
+      const newNote = {
+        text: noteHTML,
+        timestamp: now.toISOString(),
+        title: currentTabTitle,
+        project: projectName,
+        resolved: false,
+        tags: []
+      };
+
+      existingNotes.unshift(newNote);
+      localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
+
+      try {
+        if (db && firebase.auth().currentUser) {
+          const uid = firebase.auth().currentUser.uid;
+          await db.collection("users").doc(uid).collection("notes").add(newNote);
+          console.log("✅ Note saved to Firestore under user:", uid);
+        } else {
+          console.warn("⚠️ User not logged in or Firebase not ready");
+        }
+      } catch (error) {
+        console.error("❌ Failed to save note to Firestore:", error);
+      }
 
       localStorage.removeItem("customMargins");
-
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      mainEditor.innerHTML = '';
-      tabs[activeTabIndex].content = '';
-      tabs[activeTabIndex].title = 'Untitled';
+      // Clear tab content & reset
+      editor.innerHTML = '';
+      tab.content = '';
+      tab.title = 'Untitled';
+
       localStorage.setItem('tabs', JSON.stringify(tabs));
+      localStorage.setItem('activeTabIndexByMode', JSON.stringify(activeTabIndexByMode));
+
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
       updateGrouping();
     }
 
+
     function autoSave() {
       console.log("✅ autoSave() was called");
       const now = new Date();
+      const currentMode = localStorage.getItem("editorMode") || "document";
 
-      if (!mainEditor) return;
+      const editor = getActiveEditor();
+      const index = activeTabIndexByMode[currentMode];
+      const tab = tabs[index];
 
-      // Save current content into the active tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      if (!editor || !tab) return;
 
-      // Save full tabs array
-      localStorage.setItem('tabs', JSON.stringify(tabs));
-      localStorage.setItem('activeTabIndex', activeTabIndex);
-      localStorage.setItem('lastSaved', now.toISOString());
+      // 🧠 Save current editor content to this mode's active tab
+      tab.content = editor.innerHTML;
+
+      // 💾 Persist everything to localStorage
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      localStorage.setItem("activeTabIndexByMode", JSON.stringify(activeTabIndexByMode));
+      localStorage.setItem("lastSaved", now.toISOString());
 
       saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
-
-      hasUnsavedChanges = false; // Reset after save
+      hasUnsavedChanges = false;
     }
 
     window.addEventListener("beforeunload", (e) => {
@@ -1543,30 +1561,35 @@
 
     function loadSavedText() {
       const savedTabs = JSON.parse(localStorage.getItem('tabs') || '[]');
-      const savedIndex = parseInt(localStorage.getItem('activeTabIndex')) || 0;
+      const savedMode = localStorage.getItem('editorMode') || 'document';
+      const savedIndexMap = JSON.parse(localStorage.getItem('activeTabIndexByMode') || '{}');
       const lastSaved = localStorage.getItem('lastSaved');
       const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
 
-      if (savedTabs.length) {
-        tabs = savedTabs;
-        activeTabIndex = savedIndex;
+      tabs = savedTabs;
+      activeTabIndexByMode = savedIndexMap;
 
-        const activeTab = tabs[activeTabIndex];
-
-        if (activeTab && typeof activeTab.content === "string") {
-          mainEditor.innerHTML = activeTab.content;
-        } else {
-          console.warn("⚠️ No content found in active tab.");
-          mainEditor.innerHTML = ""; // Optional: fallback message
-        }
+      // If no tabs exist for this mode, create a starter
+      const filtered = tabs.filter(tab => tab.mode === savedMode);
+      if (filtered.length === 0) {
+        const newTab = { title: "Note 1", content: "", mode: savedMode };
+        tabs.push(newTab);
+        activeTabIndexByMode[savedMode] = tabs.length - 1;
         safeRenderTabs();
-
-      } else {
-        // ✅ in case there's nothing saved yet
-        tabs = [{ title: "Note 1", content: "" }];
-        activeTabIndex = 0;
-        safeRenderTabs(); // safely render fresh default
+        return;
       }
+
+      // Load content into the correct editor
+      const index = activeTabIndexByMode[savedMode];
+      const tab = tabs[index];
+      const editor = getActiveEditor();
+      if (tab && editor) {
+        editor.innerHTML = tab.content || "";
+      } else {
+        console.warn("⚠️ No tab or editor found for saved mode.");
+      }
+
+      safeRenderTabs();
 
       if (lastSaved) {
         saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
@@ -2564,13 +2587,19 @@
       const filteredTabs = tabs
         .map((tab, originalIndex) => ({ ...tab, originalIndex }))
         .filter(tab => tab.mode === currentMode);
-
+      
+      // 🧠 Update active index tracker if it no longer points to a valid tab
+      const savedIndex = activeTabIndexByMode[currentMode];
+      const isValid = filteredTabs.some(tab => tab.originalIndex === savedIndex);
+      if (!isValid) {
         if (filteredTabs.length > 0) {
-          activeTabIndex = filteredTabs[0].originalIndex;
+          activeTabIndexByMode[currentMode] = filteredTabs[0].originalIndex;
         } else {
-          addNewTab(); // this will trigger its own render + content load
           return;
         }
+      }
+
+      const activeIndex = activeTabIndexByMode[currentMode];
 
       filteredTabs.forEach((tab, index) => {
         const tabBtn = document.createElement("div");
@@ -2582,7 +2611,7 @@
         tabLabel.className = "tab-label";
         tabLabel.addEventListener("click", () => switchTab(tab.originalIndex));
 
-        // Handle rename flow on double-click
+        // ⌨️ Rename flow (same as before)
         tabLabel.addEventListener("dblclick", (e) => {
           e.stopPropagation();
           isRenamingTab = true;
@@ -2600,7 +2629,6 @@
           }
 
           input.addEventListener("click", (e) => e.stopPropagation());
-
           input.addEventListener("keydown", (e) => {
             if (e.key === "Enter") input.blur();
             if (e.key === "Escape") renderTabs();
@@ -2612,7 +2640,7 @@
               tabs[tab.originalIndex].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
               console.log("✅ title saved:", newTitle);
-              hasUnsavedChanges = true; // <-- 🧠 this is the magic line
+              hasUnsavedChanges = true;
             } else {
               console.log("❌ title unchanged or empty");
             }
@@ -2627,7 +2655,7 @@
               input.style.border = "1px dashed hotpink";
               input.style.caretColor = "hotpink";
             }
-            observer.disconnect(); // Only run once
+            observer.disconnect();
           });
 
           observer.observe(tabBtn, { childList: true });
@@ -2640,12 +2668,12 @@
         });
 
         const closeBtn = document.createElement("button");
-        closeBtn.innerText = "⨯"; // tight and clean
+        closeBtn.innerText = "⨯";
         closeBtn.className = "tab-close-btn";
         closeBtn.title = "Close Tab";
         closeBtn.onclick = (e) => {
           e.stopPropagation();
-          closeTab(tab.originalIndex); // 🔁 use originalIndex here too
+          closeTab(tab.originalIndex);
         };
 
         tabBtn.appendChild(tabLabel);
@@ -2659,7 +2687,7 @@
       addTabBtn.onclick = addNewTab;
       tabContainer.appendChild(addTabBtn);
 
-      // Only add theme toggle if it doesn’t already exist
+      // 🌗 Theme toggle stays untouched
       if (!tabBar.querySelector("#themeSwitch")) {
         const themeToggle = document.createElement("div");
         themeToggle.className = "tab-theme-switch";
@@ -2672,27 +2700,43 @@
         tabBar.appendChild(themeToggle);
         initThemeToggle?.();
       }
-      if (tabs[activeTabIndex]) {
-        mainEditor.innerHTML = tabs[activeTabIndex].content || "";
-      }  
-    }
+
+      // 🔄 Only load content from current mode's active tab
+      const activeTab = tabs[activeTabIndexByMode[currentMode]];
+      const editor = getActiveEditor();
+      if (activeTab && editor) {
+        editor.innerHTML = activeTab.content || "";
+      }
+}
 
     function switchTab(originalIndex) {
-      // Save current tab content before switching
-      if (tabs[activeTabIndex]) {
-        tabs[activeTabIndex].content = mainEditor.innerHTML;
+      const currentMode = localStorage.getItem("editorMode") || "document";
+
+      // 🧠 Save content from the currently active tab of this mode
+      const previousIndex = activeTabIndexByMode[currentMode];
+      if (tabs[previousIndex]) {
+        const activeEditor = getActiveEditor(); // handles notepad/document
+        tabs[previousIndex].content = activeEditor?.innerHTML || "";
       }
 
-      activeTabIndex = originalIndex;
+      // 🔄 Update active tab index for this mode
+      activeTabIndexByMode[currentMode] = originalIndex;
 
-      // Load the new tab content
-      const tab = tabs[originalIndex];
-      mainEditor.innerHTML = tab.content || "";
+      // 📦 Load new tab content into the correct editor
+      const targetEditor = getActiveEditor();
+      const selectedTab = tabs[originalIndex];
+      if (selectedTab && targetEditor) {
+        targetEditor.innerHTML = selectedTab.content || "";
+      }
 
-      safeRenderTabs();
+      safeRenderTabs(); // 🔁 Refresh the UI view with correct active tab
     }
 
+
     function closeTab(index) {
+      const currentMode = localStorage.getItem("editorMode") || "document";
+      const currentIndex = activeTabIndexByMode[currentMode];
+
       if (index === activeTabIndex && hasUnsavedChanges) {
         const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
         if (!confirmClose) return;
@@ -2700,24 +2744,41 @@
 
       tabs.splice(index, 1);
 
-      // Always have at least one tab
-      if (tabs.length === 0) {
-        tabs.push({ title: "Untitled", content: "" });
-        activeTabIndex = 0;
-      } else if (index <= activeTabIndex) {
-        activeTabIndex = Math.max(0, activeTabIndex - 1);
+      const modeTabs = tabs
+        .map((tab, originalIndex) => ({ ...tab, originalIndex }))
+        .filter(tab => tab.mode === currentMode);
+
+      // 📎 If no tabs left for this mode, auto-create one
+      if (modeTabs.length === 0) {
+        const newTab = {
+          title: "Untitled",
+          content: "",
+          mode: currentMode
+        };
+        tabs.push(newTab);
+        activeTabIndexByMode[currentMode] = tabs.length - 1;
+      } else {
+        // Adjust active index if needed
+        if (index <= currentIndex) {
+          const newModeTabIndices = modeTabs.map(t => t.originalIndex);
+          const safeIndex = newModeTabIndices.find(i => i !== index) ?? newModeTabIndices[0];
+          activeTabIndexByMode[currentMode] = safeIndex;
+        }
       }
 
-      mainEditor.innerHTML = tabs[activeTabIndex].content || "";
+      const activeTab = getActiveTab();
+      const activeEditor = getActiveEditor();
+      if (activeTab && activeEditor) {
+        activeEditor.innerHTML = activeTab.content || "";
+      }
+
       hasUnsavedChanges = false;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
-      localStorage.setItem("activeTabIndex", activeTabIndex);
+      localStorage.setItem("activeTabIndexByMode", JSON.stringify(activeTabIndexByMode));
 
-      safeRenderTabs(); // or renderTabs(), depending on your setup
-    } 
-
-    
+      safeRenderTabs();
+    }
 
     function addNewTab() {
       const currentMode = localStorage.getItem("editorMode") || "document";
@@ -2728,10 +2789,21 @@
       };
 
       tabs.push(newTab);
-      activeTabIndex = tabs.length - 1;
+      // 🧠 Update index tracker for current mode only
+      const newTabIndex = tabs.length - 1;
+      activeTabIndexByMode[currentMode] = newTabIndex;
+
       localStorage.setItem("tabs", JSON.stringify(tabs));
+      localStorage.setItem("activeTabIndexByMode", JSON.stringify(activeTabIndexByMode));
+     
       renderTabs();
       loadSavedText();
+    }
+
+    function getActiveTab() {
+      const currentMode = localStorage.getItem("editorMode") || "document";
+      const index = activeTabIndexByMode[currentMode];
+      return tabs[index];
     }
 
     const paperSizes = {
