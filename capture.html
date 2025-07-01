@@ -1706,7 +1706,6 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
 
       const span = document.createElement("span");
@@ -1727,7 +1726,6 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       let selectedText = range.toString().trim();
 
       const a = document.createElement("a");
@@ -1758,7 +1756,6 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const contents = range.extractContents();
 
       const ul = document.createElement("ul");
@@ -1812,7 +1809,6 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const container = document.createElement("div");
       container.style.textAlign = direction;
 
@@ -1831,7 +1827,6 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const commonAncestor = range.commonAncestorContainer;
       let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
 
@@ -2043,7 +2038,6 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const commonAncestor = range.commonAncestorContainer;
       let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
 
@@ -2072,7 +2066,6 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const commonAncestor = range.commonAncestorContainer;
       let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
 
@@ -2194,7 +2187,6 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
       const el = document.createElement(tagName);
       el.appendChild(selectedText);
@@ -2210,7 +2202,6 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const content = range.cloneContents();
 
       // Extract just the text (no tags)
@@ -2277,7 +2268,6 @@
         const range = getValidSelectionRange();
         if (!range) return;
 
-        const range = selection.getRangeAt(0);
         const span = document.createElement("span");
         span.style.fontSize = fontSize;
         span.textContent = range.toString();
@@ -2348,7 +2338,6 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const commonAncestor = range.commonAncestorContainer;
       let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
 
