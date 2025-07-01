@@ -2228,8 +2228,8 @@
     document.addEventListener("selectionchange", () => {
       const range = getValidSelectionRange();
       if (!range) return;
-        savedRange = selection.getRangeAt(0).cloneRange();
-      }
+
+      savedRange = range.cloneRange();
     });
 
       const fontSizeDropdown = document.getElementById("fontSizeDropdownPanel");
