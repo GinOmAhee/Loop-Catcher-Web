@@ -1212,7 +1212,8 @@
     let documentCache = "";
     let hasUnsavedChanges = false;
     
-    
+    const editor = document.getElementById("marginBox"); // now the actual editor
+    const mainEditor = document.getElementById("mainEditor"); // still used for layout
 
     async function initializeFirebase() {
       try {
@@ -1359,25 +1360,7 @@
           highlightDropdown.style.top = `${rect.bottom + 5}px`;
         });
       }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const modeToggleBtn = document.getElementById("modeToggleBtn");
-        const editor = document.getElementById("marginBox"); // now the actual editor
-        const mainEditor = document.getElementById("mainEditor"); // still used for layout
-
-        console.log("✅ mainEditor is:", mainEditor);
-        console.log("✅ modeToggleBtn is:", modeToggleBtn);
-
-        modeToggleBtn?.addEventListener("click", () => {
-          const currentMode = mainEditor.getAttribute("data-mode");
-          const nextMode = currentMode === "notepad" ? "document" : "notepad";
-          console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
-          applyEditorMode(nextMode);
-        });
-
-        const savedMode = localStorage.getItem("editorMode") || "document";
-        applyEditorMode(savedMode);
-      });
+      setupModeToggle();
     });
 
     function maybeClosePreview(e) {
@@ -2544,6 +2527,20 @@
 
       // ✏️ Ensure editor receives focus after mode switch
       setTimeout(() => editor.focus(), 0);
+    }
+
+    function setupModeToggle() {
+      modeToggleBtn = document.getElementById("modeToggleBtn");
+
+      modeToggleBtn?.addEventListener("click", () => {
+        const currentMode = editor?.getAttribute("data-mode");
+        const nextMode = currentMode === "notepad" ? "document" : "notepad";
+        console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
+        applyEditorMode(nextMode);
+      });
+
+      const savedMode = localStorage.getItem("editorMode") || "document";
+      applyEditorMode(savedMode);
     }
 
     function safeRenderTabs() {
