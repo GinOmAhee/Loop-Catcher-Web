@@ -2245,17 +2245,17 @@
         } else {
           plainText += node.innerText || node.textContent || "";
         }
-     });
+      });
 
-     // Replace the selection with plain text
-     range.deleteContents();
-     range.insertNode(document.createTextNode(plainText));
+      // Replace the selection with plain text
+      range.deleteContents();
+      range.insertNode(document.createTextNode(plainText));
 
-     // Reset selection to end of inserted text
-     selection.removeAllRanges();
-     const newRange = document.createRange();
-     newRange.setStartAfter(range.endContainer);
-     selection.addRange(newRange);
+      // Reset selection to end of inserted text
+      selection.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.setStartAfter(range.endContainer);
+      selection.addRange(newRange);
     }
 
     document.addEventListener("selectionchange", () => {
@@ -2387,26 +2387,26 @@
       const isAlreadyBold = parentElement.closest('b, strong');
 
       if (isAlreadyBold) {
-       // 🧼 Unbold: replace <b>/<strong> with its inner content
-       const boldElement = isAlreadyBold;
-       const parent = boldElement.parentNode;
-       while (boldElement.firstChild) {
-         parent.insertBefore(boldElement.firstChild, boldElement);
-       }
-       parent.removeChild(boldElement);
-     } else {
-       // 💥 Bold: wrap in <b>
-       const contents = range.extractContents();
-       const b = document.createElement('b');
-       b.appendChild(contents);
-       range.insertNode(b);
+        // 🧼 Unbold: replace <b>/<strong> with its inner content
+        const boldElement = isAlreadyBold;
+        const parent = boldElement.parentNode;
+        while (boldElement.firstChild) {
+          parent.insertBefore(boldElement.firstChild, boldElement);
+        }
+        parent.removeChild(boldElement);
+      } else {
+        // 💥 Bold: wrap in <b>
+        const contents = range.extractContents();
+        const b = document.createElement('b');
+        b.appendChild(contents);
+        range.insertNode(b);
 
-       // Reset selection to newly inserted element
-       selection.removeAllRanges();
-       const newRange = document.createRange();
-       newRange.selectNodeContents(b);
-       selection.addRange(newRange);
-     }
+        // Reset selection to newly inserted element
+        selection.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.selectNodeContents(b);
+        selection.addRange(newRange);
+      }
     }
 
     // ✅ Margin Input UI logic
