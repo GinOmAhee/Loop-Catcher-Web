@@ -1569,6 +1569,18 @@
       tabs = savedTabs;
       activeTabIndexByMode = savedIndexMap;
 
+      console.log("📌 Saved Mode:", savedMode);
+      console.log("📁 Tab Count:", tabs.length);
+      console.log("🔢 Active Index Map:", activeTabIndexByMode);
+
+      if (!tabs.some(t => t.mode === savedMode)) {
+        const newTab = { title: "Note 1", content: "", mode: savedMode };
+        tabs.push(newTab);
+        activeTabIndexByMode[savedMode] = tabs.length - 1;
+        localStorage.setItem("tabs", JSON.stringify(tabs));
+        localStorage.setItem("activeTabIndexByMode", JSON.stringify(activeTabIndexByMode));
+      }
+
       // If no tabs exist for this mode, create a starter
       const filtered = tabs.filter(tab => tab.mode === savedMode);
       if (filtered.length === 0) {
@@ -1809,7 +1821,7 @@
         editor.innerHTML = next || '';
       }
     }
-    
+
     function cleanEditor() {
       const walker = document.createTreeWalker(mainEditor, NodeFilter.SHOW_ELEMENT, null, false);
       const toRemove = [];
@@ -2759,7 +2771,7 @@
       const currentMode = localStorage.getItem("editorMode") || "document";
       const currentIndex = activeTabIndexByMode[currentMode];
 
-      if (index === activeTabIndex && hasUnsavedChanges) {
+      if (index === activeTabIndexByMode[currentMode] && hasUnsavedChanges) {
         const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
         if (!confirmClose) return;
       }
