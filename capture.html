@@ -2101,13 +2101,6 @@
             editor.classList.add('visible');
           }
 
-          mainEditor = document.getElementById("mainEditor"); // ✅ this line is key
-
-          if (!mainEditor) {
-            console.error("❌ mainEditor not found");
-            return;
-          }
-
           loadSavedText();
 
           mainEditor.addEventListener("input", () => {
