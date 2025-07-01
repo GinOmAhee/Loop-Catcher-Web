@@ -1595,6 +1595,11 @@
       const index = activeTabIndexByMode[savedMode];
       const tab = tabs[index];
       const editor = getActiveEditor();
+
+      console.log("🔍 Trying to load index", index, "for mode", savedMode);
+      console.log("📄 Tab at index:", tabs[index]);
+      console.log("📝 Active editor:", getActiveEditor());
+      
       if (tab && editor) {
         editor.innerHTML = tab.content || "";
       } else {
@@ -2587,10 +2592,11 @@
       modeToggleBtn = document.getElementById("modeToggleBtn");
 
       modeToggleBtn?.addEventListener("click", () => {
-        const currentMode = editor?.getAttribute("data-mode");
-        const nextMode = currentMode === "notepad" ? "document" : "notepad";
+        const currentMode = localStorage.getItem("editorMode") || "document";
+        const newMode = currentMode === "document" ? "notepad" : "document";
         console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
-        applyEditorMode(nextMode);
+        localStorage.setItem("editorMode", newMode);
+        applyEditorMode(newMode);
       });
 
       const savedMode = localStorage.getItem("editorMode") || "document";
