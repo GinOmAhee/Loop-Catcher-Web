@@ -1794,14 +1794,19 @@
       if (undoStack.length === 0) return;
       redoStack.push(getActiveEditor()?.innerHTML);
       const last = undoStack.pop();
-      getActiveEditor()?.innerHTML = last || '';
+      const editor = getActiveEditor();
+      if (editor) {
+        editor.innerHTML = last || '';
+      }
     }
 
     function redo() {
       if (redoStack.length === 0) return;
       undoStack.push(getActiveEditor()?.innerHTML);
       const next = redoStack.pop();
-      getActiveEditor()?.innerHTML = next || '';
+      const editor = getActiveEditor();
+      if (editor) {
+        editor.innerHTML = next || '';
     }
 
     function cleanEditor() {
