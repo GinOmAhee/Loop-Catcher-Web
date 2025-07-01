@@ -2682,7 +2682,7 @@
     function addNewTab() {
       const currentMode = localStorage.getItem("editorMode") || "document";
       const newTab = {
-        title,
+        title: "Untitled"
         content: "",
         mode: currentMode // 🔐 key to filter later
       };
