@@ -1444,8 +1444,6 @@
     const preview = document.getElementById('preview');
     const toggleBtn = document.getElementById('previewToggle');
     const saveStatus = document.getElementById('saveStatus');
-    const editor = document.getElementById("marginBox"); // now the actual editor
-    const mainEditor = document.getElementById("mainEditor"); // still used for layout
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
     const fontBtn = document.getElementById("fontMenuBtn");
@@ -2534,10 +2532,12 @@
     let notepadCache = "";
     let documentCache = "";
 
-    let editor;
+    let editor, mainEditor;
 
     window.addEventListener("DOMContentLoaded", () => {
-      editor = document.getElementById("mainEditor"); // no const
+      editor = document.getElementById("marginBox");      // your interactive zone
+      mainEditor = document.getElementById("mainEditor"); // layout shell
+
       const modeToggleBtn = document.getElementById("modeToggleBtn");
       const toolbar = document.getElementById("toolbar");
       const status = document.getElementById("saveStatus");
@@ -2549,8 +2549,9 @@
       // Load saved mode
       const savedMode = localStorage.getItem("editorMode") || "document";
       applyEditorMode(savedMode);
-
+      
       console.log("📌 modeToggleBtn is:", modeToggleBtn);
+
       // Bind the toggle button
       modeToggleBtn.addEventListener("click", () => {
         const currentMode = editor.getAttribute("data-mode");
