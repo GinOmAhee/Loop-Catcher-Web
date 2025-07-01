@@ -1205,7 +1205,6 @@
     let textColorBtn;
     let textColorDropdown;
     let justifyBtn;
-    let modeToggleBtn;
     let toolbar;
 
     let status;
@@ -1299,7 +1298,6 @@
       textColorBtn = document.getElementById("textColorBtn");
       textColorDropdown = document.getElementById("textColorDropdown");
       justifyBtn = document.getElementById("justifyBtn");
-      modeToggleBtn = document.getElementById("modeToggleBtn");
       toolbar = document.getElementById("toolbar");
       status = document.getElementById("saveStatus");
 
@@ -1366,9 +1364,12 @@
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        const savedMode = localStorage.getItem("editorMode") || "document";
-        console.log("📦 Loading saved editor mode:", savedMode);
-        applyEditorMode(savedMode);
+        const modeToggleBtn = document.getElementById("modeToggleBtn");
+
+        if (!modeToggleBtn) {
+          console.error("❌ modeToggleBtn not found");
+          return;
+        }
 
         modeToggleBtn?.addEventListener("click", () => {
           const currentMode = mainEditor.getAttribute("data-mode");
@@ -1376,6 +1377,10 @@
           console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
           applyEditorMode(nextMode);
         });
+
+        const savedMode = localStorage.getItem("editorMode") || "document";
+        console.log("📦 Loading saved editor mode:", savedMode);
+        applyEditorMode(savedMode);
       });
     });
 
