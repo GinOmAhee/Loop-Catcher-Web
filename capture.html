@@ -2244,16 +2244,25 @@
         }
       });
 
-      fontSizeBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        saveSelection();
-        fontSizeDropdown.classList.toggle("hidden");
+      document.addEventListener("DOMContentLoaded", () => {
+        const fontSizeBtn = document.getElementById("fontSizeBtn");
 
-        const rect = fontSizeBtn.getBoundingClientRect();
-        fontSizeDropdown.style.left = `${rect.left}px`;
-        fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
+        if (!fontSizeBtn) {
+          console.warn("⛔ fontSizeBtn not found");
+          return;
+        }
 
-        setTimeout(() => customInput.focus(), 0);
+        fontSizeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          saveSelection();
+          fontSizeDropdown.classList.toggle("hidden");
+
+          const rect = fontSizeBtn.getBoundingClientRect();
+          fontSizeDropdown.style.left = `${rect.left}px`;
+          fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
+
+          setTimeout(() => customInput.focus(), 0);
+        });
       });
 
       applyBtn.addEventListener("click", () => {
