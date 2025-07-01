@@ -2865,7 +2865,7 @@
     };
 
     function updatePaperSize() {
-      if (document.getElementById("editor")?.getAttribute("data-mode") !== "document");
+      if (document.getElementById("editor")?.getAttribute("data-mode") !== "document") return;
 
       const selectedSize = paperSizeSelect.value;
       switch (selectedSize) {
