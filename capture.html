@@ -2471,7 +2471,7 @@
         if (notepadTabs.length === 0) {
           addNewTab(); // Will default to this mode
         } else {
-          activeTabIndex = docTabs[0].originalIndex;
+          activeTabIndex = notepadTabs[0].originalIndex;
           editor.innerHTML = tabs[activeTabIndex].content || "";
 
           const firstLine = editor.innerText.split("\n")[0]?.trim() || "Untitled";
