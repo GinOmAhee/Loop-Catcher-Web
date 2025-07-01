@@ -1807,8 +1807,9 @@
       const editor = getActiveEditor();
       if (editor) {
         editor.innerHTML = next || '';
+      }
     }
-
+    
     function cleanEditor() {
       const walker = document.createTreeWalker(mainEditor, NodeFilter.SHOW_ELEMENT, null, false);
       const toRemove = [];
