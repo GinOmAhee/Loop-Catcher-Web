@@ -1166,8 +1166,9 @@
       </div>
 
         <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" contenteditable="true" data-mode="document">
-          <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
+        <div id="mainEditor" tabindex="0">
+          <div id="editor" contenteditable="true" data-mode="document"></div>
+          <div id="marginBox"></div>
         </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
@@ -1303,16 +1304,17 @@
       toolbar = document.getElementById("toolbar");
       status = document.getElementById("saveStatus");
 
-      if (!mainEditor) {
-        console.error("❌ mainEditor not found");
+      if (!getActiveEditor()) {
+        console.error("❌ getActiveEditor() not found");
         return;
       }
 
-      console.log("✅ mainEditor is:", mainEditor);
+      console.log("✅ getActiveEditor() is:", getActiveEditor());
 
-      mainEditor.addEventListener("input", () => {
+      getActiveEditor()?.addEventListener("input", () => {
         undoStack.push(getActiveEditor()?.innerHTML);
         redoStack = [];
+      });
 
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
@@ -1407,7 +1409,7 @@
     }
 
     function justifyText() {
-      mainEditor.focus(); // ensure editor is active
+      getActiveEditor()?.focus(); // ensure editor is active
       document.execCommand("justifyFull", false, null);
     }
 
@@ -1417,7 +1419,7 @@
     }
 
     function setTextColor(color) {
-      mainEditor.focus();
+      getActiveEditor()?.focus();
       restoreSelection();
       document.execCommand("styleWithCSS", false, true);
       document.execCommand("foreColor", false, color);
@@ -1425,7 +1427,7 @@
     }
 
     function setHighlightColor(color) {
-      mainEditor.focus();
+      getActiveEditor()?.focus();
       restoreSelection();
       const range = getValidSelectionRange();
       if (!range) return;
@@ -1599,7 +1601,7 @@
       console.log("🔍 Trying to load index", index, "for mode", savedMode);
       console.log("📄 Tab at index:", tabs[index]);
       console.log("📝 Active editor:", getActiveEditor());
-      
+
       if (tab && editor) {
         editor.innerHTML = tab.content || "";
       } else {
@@ -2431,7 +2433,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const marginBtn = document.getElementById("marginBtn");
       const marginDropdown = document.getElementById("marginDropdown");
-      const editor = document.getElementById("mainEditor");
+      const editor = document.getElementById("getActiveEditor()");
 
       marginBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -2840,10 +2842,11 @@
       loadSavedText();
     }
 
-    function getActiveTab() {
-      const currentMode = localStorage.getItem("editorMode") || "document";
-      const index = activeTabIndexByMode[currentMode];
-      return tabs[index];
+    function getActiveEditor() {
+      const mode = localStorage.getItem("editorMode") || "document";
+      return mode === "notepad"
+        ? document.getElementById("notepadEditor")
+        : document.getElementById("editor"); // now the correct zone
     }
 
     function getActiveEditor() {
@@ -2862,29 +2865,29 @@
     };
 
     function updatePaperSize() {
-      if (mainEditor.getAttribute("data-mode") !== "document") return; // 🛑 Don't update in notepad mode
+      if (document.getElementById("editor")?.getAttribute("data-mode") !== "document")
 
       const selectedSize = paperSizeSelect.value;
       switch (selectedSize) {
         case "letter":
-          mainEditor.style.width = "8.5in";
-          mainEditor.style.minHeight = "11in";
+          getActiveEditor().style.width = "8.5in";
+          getActiveEditor().style.minHeight = "11in";
           break;
         case "legal":
-          mainEditor.style.width = "8.5in";
-          mainEditor.style.minHeight = "14in";
+          getActiveEditor().style.width = "8.5in";
+          getActiveEditor().style.minHeight = "14in";
           break;
         case "a3":
-          mainEditor.style.width = "11.7in";
-          mainEditor.style.minHeight = "16.5in";
+          getActiveEditor().style.width = "11.7in";
+          getActiveEditor().style.minHeight = "16.5in";
           break;
         case "a4":
-          mainEditor.style.width = "8.27in";
-          mainEditor.style.minHeight = "11.69in";
+          getActiveEditor().style.width = "8.27in";
+          getActiveEditor().style.minHeight = "11.69in";
           break;
         case "a5":
-          mainEditor.style.width = "5.8in";
-          mainEditor.style.minHeight = "8.3in";
+          getActiveEditor().style.width = "5.8in";
+          getActiveEditor().style.minHeight = "8.3in";
           break;
       }
     }
