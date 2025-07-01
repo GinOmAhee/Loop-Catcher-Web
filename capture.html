@@ -1603,11 +1603,7 @@
       // Load content into the correct editor
       const index = activeTabIndexByMode[savedMode];
       const tab = tabs[index];
-      const editor = getActiveEditor();
-
-      if (tab && editor) {
-        editor.innerHTML = tab.content || "";
-      }
+      editor = getActiveEditor();
 
       console.log("🔍 Trying to load index", index, "for mode", savedMode);
       console.log("📄 Tab at index:", tabs[index]);
