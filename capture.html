@@ -1212,6 +1212,8 @@
     let documentCache = "";
     let hasUnsavedChanges = false;
 
+    const marginBox = document.getElementById("marginBox"); // 💡 safe reference
+
     async function initializeFirebase() {
       try {
         const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
@@ -1371,6 +1373,10 @@
 
     function markUnsaved() {
       hasUnsavedChanges = true;
+    }
+
+    function getMarginBox() {
+      return document.getElementById("marginBox");
     }
 
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
