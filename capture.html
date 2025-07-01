@@ -1194,7 +1194,7 @@
     let preview;
     let toggleBtn;
     let saveStatus;
-    let editor;
+    let editor, maineditor
     let attachedFilesList;
     let groupedNotes;
     let fontBtn;
@@ -1211,8 +1211,6 @@
     let notepadCache = "";
     let documentCache = "";
     let hasUnsavedChanges = false;
-    
-    const mainEditor = document.getElementById("mainEditor"); // still used for 
 
     async function initializeFirebase() {
       try {
@@ -1283,6 +1281,8 @@
     window.addEventListener('DOMContentLoaded', initThemeToggle);
 
     window.addEventListener("DOMContentLoaded", () => {
+      editor = document.getElementById("marginBox");      // your interactive zone
+      mainEditor = document.getElementById("mainEditor"); // layout shell
       preview = document.getElementById('preview');
       toggleBtn = document.getElementById('previewToggle');
       saveStatus = document.getElementById('saveStatus');
