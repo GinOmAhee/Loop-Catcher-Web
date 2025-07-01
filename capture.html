@@ -2460,6 +2460,7 @@
         editor.style.width = "";
         editor.style.minHeight = "";
 
+        toolbar && (toolbar.style.display = "none");
         modeToggleBtn.innerText = "📄 Document Mode";
         status && (status.innerText = "🧠 Notepad Mode Active");
 
@@ -2473,6 +2474,12 @@
         } else {
           activeTabIndex = notepadTabs[0].originalIndex;
           editor.innerHTML = tabs[activeTabIndex].content || "";
+
+          if (tabs[activeTabIndex]) {
+            editor.innerHTML = tabs[activeTabIndex].content || "";
+          } else {
+            console.warn("❌ activeTabIndex invalid:", activeTabIndex);
+          }
 
           const firstLine = editor.innerText.split("\n")[0]?.trim() || "Untitled";
           tabs[activeTabIndex].title = firstLine;
