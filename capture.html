@@ -1195,7 +1195,6 @@
     let toggleBtn;
     let saveStatus;
     let editor;
-    let mainEditor;
     let attachedFilesList;
     let groupedNotes;
     let fontBtn;
@@ -1288,7 +1287,6 @@
       toggleBtn = document.getElementById('previewToggle');
       saveStatus = document.getElementById('saveStatus');
       editor = document.getElementById("marginBox");
-      mainEditor = document.getElementById("mainEditor");
       attachedFilesList = document.getElementById('attachedFilesList');
       groupedNotes = document.getElementById('groupedNotes');
       fontBtn = document.getElementById("fontMenuBtn");
@@ -1365,11 +1363,10 @@
 
       document.addEventListener("DOMContentLoaded", () => {
         const modeToggleBtn = document.getElementById("modeToggleBtn");
+        const mainEditor = document.getElementById("mainEditor");
 
-        if (!modeToggleBtn) {
-          console.error("❌ modeToggleBtn not found");
-          return;
-        }
+        console.log("✅ mainEditor is:", mainEditor);
+        console.log("✅ modeToggleBtn is:", modeToggleBtn);
 
         modeToggleBtn?.addEventListener("click", () => {
           const currentMode = mainEditor.getAttribute("data-mode");
@@ -1379,7 +1376,6 @@
         });
 
         const savedMode = localStorage.getItem("editorMode") || "document";
-        console.log("📦 Loading saved editor mode:", savedMode);
         applyEditorMode(savedMode);
       });
     });
