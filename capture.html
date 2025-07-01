@@ -1562,6 +1562,13 @@
     });
 
     function loadSavedText() {
+      const editor = getActiveEditor();
+        if (!editor) {
+          console.warn("⏳ Waiting for editor to become available...");
+          setTimeout(loadSavedText, 50); // try again shortly
+          return;
+        }
+        
       const savedTabs = JSON.parse(localStorage.getItem('tabs') || '[]');
       const savedMode = localStorage.getItem('editorMode') || 'document';
       const savedIndexMap = JSON.parse(localStorage.getItem('activeTabIndexByMode') || '{}');
