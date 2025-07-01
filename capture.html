@@ -1212,7 +1212,7 @@
     let activeTabIndex = 0;
     let notepadCache = "";
     let documentCache = "";
-    
+    let hasUnsavedChanges = false;
     
     
 
@@ -2677,7 +2677,7 @@
       safeRenderTabs(); // or renderTabs(), depending on your setup
     } 
 
-    let hasUnsavedChanges = false;
+    
 
     function addNewTab() {
       const currentMode = localStorage.getItem("editorMode") || "document";
