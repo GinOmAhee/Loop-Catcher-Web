@@ -1637,7 +1637,10 @@
             transcript += text + '\n';
           }
         }
-        getActiveEditor()?.innerHTML += (getActiveEditor()?.innerHTML ? '\n' : '') + transcript.trim();
+        const editor = getActiveEditor();
+        if (editor) {
+          editor.innerHTML += (editor.innerHTML ? '\n' : '') + transcript.trim();
+        }
       };
 
       recognition.onerror = (e) => {
