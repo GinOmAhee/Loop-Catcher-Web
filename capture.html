@@ -1365,14 +1365,18 @@
         });
       }
 
-      modeToggleBtn?.addEventListener("click", () => {
-        const currentMode = mainEditor.getAttribute("data-mode");
-        const nextMode = currentMode === "notepad" ? "document" : "notepad";
-        console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
-        applyEditorMode(nextMode);
+      document.addEventListener("DOMContentLoaded", () => {
+        const savedMode = localStorage.getItem("editorMode") || "document";
+        console.log("📦 Loading saved editor mode:", savedMode);
+        applyEditorMode(savedMode);
+
+        modeToggleBtn?.addEventListener("click", () => {
+          const currentMode = mainEditor.getAttribute("data-mode");
+          const nextMode = currentMode === "notepad" ? "document" : "notepad";
+          console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
+          applyEditorMode(nextMode);
+        });
       });
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      applyEditorMode(savedMode);
     });
 
     function maybeClosePreview(e) {
@@ -2512,8 +2516,7 @@
 
       // ✏️ Focus editor
       setTimeout(() => editor.focus(), 0);
-      console.log("🎯 applyEditorMode finished for:", mode);
-
+      applyEditorMode
     }
 
     function safeRenderTabs() {
