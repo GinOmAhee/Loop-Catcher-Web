@@ -1434,15 +1434,14 @@
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
-
+      
       const mark = document.createElement("mark");
       requestAnimationFrame(() => {
         mark.classList.add("highlight-glow");
       });
-      mark.appendChild(selectedText);
 
+      mark.appendChild(selectedText);
       range.insertNode(mark);
 
       const newRange = document.createRange();
