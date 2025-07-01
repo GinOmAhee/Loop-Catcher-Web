@@ -1171,6 +1171,9 @@
           <div id="marginBox"></div>
         </div>
 
+        <div id="notepadEditor" contenteditable="true" data-mode="notepad"></div>
+
+
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
       <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
@@ -1368,6 +1371,29 @@
       }
       setupModeToggle();
     });
+
+    function waitForEditorAndLoad() {
+      const editor = getActiveEditor();
+      if (!editor) {
+        console.warn("⏳ Waiting for editor to become available...");
+        return setTimeout(waitForEditorAndLoad, 50);
+      }
+
+      console.log("✅ Editor is ready:", editor);
+      loadSavedText();
+      saveText();
+      autoSave();
+      startVoiceCapture();
+      undo();
+      redo();
+      loadNoteIntoEditor(noteHTML);
+      applyEditorMode(mode);
+      renderTabs();
+      switchTab(originalIndex);
+      closeTab(index);
+    }  
+    // Put this at the bottom of your script:
+    window.addEventListener("DOMContentLoaded", waitForEditorAndLoad);
 
     function maybeClosePreview(e) {
       if (e.target.classList.contains("tab-rename-input")) return;
