@@ -2534,8 +2534,10 @@
     let notepadCache = "";
     let documentCache = "";
 
+    let editor;
+
     window.addEventListener("DOMContentLoaded", () => {
-      const editor = document.getElementById("mainEditor");
+      editor = document.getElementById("mainEditor"); // no const
       const modeToggleBtn = document.getElementById("modeToggleBtn");
       const toolbar = document.getElementById("toolbar");
       const status = document.getElementById("saveStatus");
