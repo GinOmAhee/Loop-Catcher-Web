@@ -2784,6 +2784,8 @@
         editor.innerHTML = activeTab.content || "";
       }
     }
+    
+    let originalIndex;
 
     function switchTab(originalIndex) {
       const currentMode = localStorage.getItem("editorMode") || "document";
@@ -2808,7 +2810,8 @@
       safeRenderTabs(); // 🔁 Refresh the UI view with correct active tab
     }
 
-
+    let index;
+    
     function closeTab(index) {
       const currentMode = localStorage.getItem("editorMode") || "document";
       const currentIndex = activeTabIndexByMode[currentMode];
