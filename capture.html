@@ -1542,9 +1542,17 @@
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
 
+      const mode = mainEditor.getAttribute("data-mode");
+      const isNotepad = mode === "notepad";
+      const tabs = isNotepad ? notepadTabs : documentTabs;
+      const activeIndex = isNotepad ? activeNotepadIndex : activeDocumentIndex;
+
       if (tabs[activeIndex]) {
+        const text = mainEditor.innerText || "";
+        const newTitle = text.split("\n")[0]?.trim() || "Untitled";
+
         tabs[activeIndex].title = newTitle;
-        const key = mainEditor.getAttribute("data-mode") === "notepad" ? "notepadTabs" : "documentTabs";
+        const key = isNotepad ? "notepadTabs" : "documentTabs";
         localStorage.setItem(key, JSON.stringify(tabs));
         safeRenderTabs();
       }
