@@ -1478,29 +1478,40 @@
     }
 
     function closeTab(index) {
-      if (index === activeTabIndex && hasUnsavedChanges) {
+      const mode = mainEditor.getAttribute("data-mode");
+      const currentTabs = mode === "notepad" ? notepadTabs : documentTabs;
+      let activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
+
+      if (index === activeIndex && hasUnsavedChanges) {
         const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
         if (!confirmClose) return;
       }
 
-      tabs.splice(index, 1);
+      currentTabs.splice(index, 1);
 
-      // Always have at least one tab
-      if (tabs.length === 0) {
-        tabs.push({ title: "Untitled", content: "" });
-        activeTabIndex = 0;
-      } else if (index <= activeTabIndex) {
-        activeTabIndex = Math.max(0, activeTabIndex - 1);
+      // Always keep at least one tab
+      if (currentTabs.length === 0) {
+        currentTabs.push({ title: "Untitled", content: "" });
+        activeIndex = 0;
+      } else if (index <= activeIndex) {
+        activeIndex = Math.max(0, activeIndex - 1);
       }
 
-      mainEditor.innerHTML = tabs[activeIndex].content || "";
+      // Save changes back to correct vars
+      if (mode === "notepad") {
+        activeNotepadIndex = activeIndex;
+      } else {
+        activeDocumentIndex = activeIndex;
+      }
+
+      mainEditor.innerHTML = currentTabs[activeIndex].content || "";
       hasUnsavedChanges = false;
 
-      localStorage.setItem("tabs", JSON.stringify(tabs));
-      localStorage.setItem("activeTabIndex", activeTabIndex);
+      localStorage.setItem(`${mode}Tabs`, JSON.stringify(currentTabs));
+      localStorage.setItem(`active${mode === "notepad" ? "Notepad" : "Document"}Index`, activeIndex);
 
-      safeRenderTabs(); // or renderDualTabs(), depending on your setup
-    } 
+      safeRenderTabs();
+    }
 
     let hasUnsavedChanges = false;
 
@@ -1750,16 +1761,16 @@
 
       const mode = mainEditor.getAttribute("data-mode");
       const currentTabs = mode === "notepad" ? notepadTabs : documentTabs;
+      const activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
 
-      // 🛡️ Check for valid tab + activeTabIndex
       if (
         !currentTabs ||
-        activeTabIndex == null ||
-        activeTabIndex < 0 ||
-        activeTabIndex >= currentTabs.length
+        activeIndex == null ||
+        activeIndex < 0 ||
+        activeIndex >= currentTabs.length
       ) {
-        console.warn("⚠️ autoSave() skipped — invalid tab state");
-        return;
+      console.warn("⚠️ Invalid tab state — skipping load/render");
+      return;
       }
 
       currentTabs[activeIndex].content = mainEditor.innerHTML;
@@ -2689,8 +2700,8 @@
         activeTabIndex = 0;
 
         // Load tab bar visibility
-        document.getElementById("tabBarNotepad").classList.toggle("hidden", mode !== "notepad");
-        document.getElementById("tabBarDocument").classList.toggle("hidden", mode !== "document");
+        //document.getElementById("tabBarNotepad").classList.toggle("hidden", mode !== "notepad");
+        //document.getElementById("tabBarDocument").classList.toggle("hidden", mode !== "document");
 
         safeRenderTabs(); // 🔁 Re-render tabs visually
 
