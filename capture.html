@@ -1515,17 +1515,27 @@
 
     let hasUnsavedChanges = false;
 
-    function addNewTab() {
-      const mode = mainEditor.getAttribute("data-mode");
-      const tabData = { title: "Untitled", content: "" };
+    function addNewTab(mode = "notepad") {
+      const tab = document.createElement("div");
+      tab.className = "tab";
+      tab.innerText = `New ${mode.charAt(0).toUpperCase() + mode.slice(1)} Tab`;
+      tab.setAttribute("data-mode", mode);
 
+      // Pick the correct tab bar based on mode
+      let tabBar;
       if (mode === "notepad") {
-        notepadTabs.push(tabData);
-        activeNotepadIndex = notepadTabs.length - 1;
+        tabBar = document.getElementById("tabBarNotepad");
+      } else if (mode === "document") {
+        tabBar = document.getElementById("tabBarDocument");
       } else {
-        documentTabs.push(tabData);
-        activeDocumentIndex = documentTabs.length - 1;
+        console.warn(`No tab bar found for mode: ${mode}`);
+        return;
       }
+
+      tabBar.appendChild(tab);
+   
+      // Optional: Set editor mode / focus
+      // activateTab(tab);
 
       saveTabsToStorage();
       safeRenderTabs();
