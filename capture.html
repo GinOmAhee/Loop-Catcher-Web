@@ -1600,7 +1600,12 @@
         }
 
       const savedTabs = JSON.parse(localStorage.getItem('tabs') || '[]');
-      const savedMode = localStorage.getItem('editorMode') || 'document';
+      
+      const savedMode = localStorage.getItem("editorMode");
+      const fallbackMode = (savedMode === "document" || savedMode === "notepad") ? savedMode : "document";
+      console.log("📌 Using editor mode:", fallbackMode);
+      applyEditorMode(fallbackMode);
+
       const savedIndexMap = JSON.parse(localStorage.getItem('activeTabIndexByMode') || '{}');
       const lastSaved = localStorage.getItem('lastSaved');
       const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
@@ -2641,12 +2646,15 @@
       modeToggleBtn?.addEventListener("click", () => {
         const currentMode = localStorage.getItem("editorMode") || "document";
         const newMode = currentMode === "document" ? "notepad" : "document";
-        console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
+        console.log("🌀 Toggling mode from", currentMode, "to", newMode);
         applyEditorMode(newMode);
       });
 
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      applyEditorMode(savedMode);
+      const savedMode = localStorage.getItem("editorMode");
+      const fallbackMode = (savedMode === "document" || savedMode === "notepad") ? savedMode : "document";
+      console.log("📌 Using editor mode:", fallbackMode);
+      applyEditorMode(fallbackMode);
+
     }
 
     function safeRenderTabs() {
