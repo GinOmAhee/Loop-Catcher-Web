@@ -1290,6 +1290,14 @@
 
     const mainEditor = document.getElementById("mainEditor"); // still used for layout
 
+    function safeRenderTabs() {
+      if (!isRenamingTab) {
+        renderDualTabs(); // ✅ Call the real function that draws the tabs
+      } else {
+        console.warn("⛔ renderDualTabs() skipped due to active rename");
+      }
+    }
+
     function renderDualTabs() {
       const notepadBar = document.getElementById("tabBarNotepad");
       const documentBar = document.getElementById("tabBarDocument");
@@ -1491,7 +1499,7 @@
       localStorage.setItem("tabs", JSON.stringify(tabs));
       localStorage.setItem("activeTabIndex", activeTabIndex);
 
-      safeRenderTabs(); // or renderTabs(), depending on your setup
+      safeRenderTabs(); // or renderDualTabs(), depending on your setup
     } 
 
     let hasUnsavedChanges = false;
