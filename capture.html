@@ -1270,7 +1270,8 @@
     let tabs = [
       { title: "Untitled", content: "" }
     ];
-    let activeTabIndex = 0;
+    
+    let activeIndex = 0;
 
     let notepadTabs = JSON.parse(localStorage.getItem("notepadTabs") || "[]");
     let documentTabs = JSON.parse(localStorage.getItem("documentTabs") || "[]");
@@ -1285,25 +1286,17 @@
     const mainEditor = document.getElementById("mainEditor"); // still used for layout
 
     function safeRenderTabs() {
-      const isNotepad = mainEditor.getAttribute("data-mode") === "notepad";
-      const tabBar = isNotepad ? document.getElementById("tabBarNotepad") : document.getElementById("tabBarDocument");
-      const otherTabBar = isNotepad ? document.getElementById("tabBarDocument") : document.getElementById("tabBarNotepad");
+      const mode = mainEditor.getAttribute("data-mode");
+      const tabs = mode === "notepad" ? notepadTabs : documentTabs;
+      const activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
+      const tabBar = document.getElementById("tabBar");
 
-      tabBar.innerHTML = ""; // clear
-      otherTabBar.innerHTML = ""; // just in case
-
-      tabs.forEach((tab, i) => {
-        const tabEl = document.createElement("div");
-        tabEl.className = `tab-label ${i === activeTabIndex ? "active" : ""}`;
-        tabEl.innerText = tab.title || `Tab ${i + 1}`;
-        tabEl.addEventListener("click", () => {
-          saveCurrentTab(); // 📌 Save current content before switching
-          activeTabIndex = i;
-          mainEditor.innerHTML = tabs[i].content || "";
-          safeRenderTabs();
-        });
-        tabBar.appendChild(tabEl);
-      });
+      if (!tabBar) return;
+      tabBar.innerHTML = tabs.map((tab, i) => `
+        <div class="tab-label ${i === activeIndex ? 'active' : ''}" onclick="switchTab(${i})">
+          ${tab.title || `Tab ${i + 1}`}
+        </div>
+      `).join("");
     }
 
     function renderTabs() {
@@ -1440,7 +1433,6 @@
     function switchTab(index) {
       const mode = mainEditor.getAttribute("data-mode");
       const tabs = mode === "notepad" ? notepadTabs : documentTabs;
-      const activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
 
       if (!tabs[index]) return;
       const tab = tabs[index];
@@ -1529,34 +1521,32 @@
     let debounceTimer;
 
     mainEditor.addEventListener("input", () => {
-      // Undo/redo
-      undoStack.push(mainEditor.innerHTML);
-      redoStack = [];
+    undoStack.push(mainEditor.innerHTML);
+    redoStack = [];
 
-      // Debounced auto-save
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        localStorage.setItem("capturedText", mainEditor.innerHTML);
-        localStorage.setItem("lastSaved", new Date().toISOString());
-        updateGrouping();
-        saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
-      }, 1000);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      localStorage.setItem("capturedText", mainEditor.innerHTML);
+      localStorage.setItem("lastSaved", new Date().toISOString());
+      updateGrouping();
+      saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
+    }, 1000);
 
-      const mode = mainEditor.getAttribute("data-mode");
-      const isNotepad = mode === "notepad";
-      const tabs = isNotepad ? notepadTabs : documentTabs;
-      const activeIndex = isNotepad ? activeNotepadIndex : activeDocumentIndex;
+    const mode = mainEditor.getAttribute("data-mode");
+    const isNotepad = mode === "notepad";
+    const tabs = isNotepad ? notepadTabs : documentTabs;
+    const activeIndex = isNotepad ? activeNotepadIndex : activeDocumentIndex;
 
-      if (tabs[activeIndex]) {
-        const text = mainEditor.innerText || "";
-        const newTitle = text.split("\n")[0]?.trim() || "Untitled";
+    const text = mainEditor.innerText || "";
+    const newTitle = text.split("\n")[0]?.trim() || "Untitled";
 
-        tabs[activeIndex].title = newTitle;
-        const key = isNotepad ? "notepadTabs" : "documentTabs";
-        localStorage.setItem(key, JSON.stringify(tabs));
-        safeRenderTabs();
-      }
-    });
+    if (tabs[activeIndex]) {
+      tabs[activeIndex].title = newTitle;
+    const key = isNotepad ? "notepadTabs" : "documentTabs";
+    localStorage.setItem(key, JSON.stringify(tabs));
+    safeRenderTabs();
+  }
+  });
 
     let savedSelection = null;
 
