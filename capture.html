@@ -1219,6 +1219,7 @@
     let documentCache = "";
     let hasUnsavedChanges = false;
 
+    const mode = localStorage.getItem("editorMode") || "document";
     const marginBox = document.getElementById("marginBox"); // 💡 safe reference
     marginBox?.classList.toggle("hidden", mode === "notepad");
 
