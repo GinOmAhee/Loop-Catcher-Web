@@ -1721,21 +1721,23 @@
 
     function autoSave() {
       console.log("✅ autoSave() was called");
-      const now = new Date();
 
-      if (!mainEditor) return;
+      const mode = mainEditor.getAttribute("data-mode");
+      const currentTabs = mode === "notepad" ? notepadTabs : documentTabs;
 
-      // Save current content into the active tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      // 🛡️ Check for valid tab + activeTabIndex
+      if (
+        !currentTabs ||
+        activeTabIndex == null ||
+        activeTabIndex < 0 ||
+        activeTabIndex >= currentTabs.length
+      ) {
+        console.warn("⚠️ autoSave() skipped — invalid tab state");
+        return;
+      }
 
-      // Save full tabs array
-      localStorage.setItem('tabs', JSON.stringify(tabs));
-      localStorage.setItem('activeTabIndex', activeTabIndex);
-      localStorage.setItem('lastSaved', now.toISOString());
-
-      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
-
-      hasUnsavedChanges = false; // Reset after save
+      currentTabs[activeTabIndex].content = mainEditor.innerHTML;
+      localStorage.setItem(`${mode}Tabs`, JSON.stringify(currentTabs));
     }
 
     window.addEventListener("beforeunload", (e) => {
