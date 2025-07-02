@@ -2813,7 +2813,7 @@
     let index;
     
     function closeTab(index) {
-      const currentMode = localStorage.getItem("editorMode") || "document";
+      
       const currentIndex = activeTabIndexByMode[currentMode];
 
       if (index === activeTabIndexByMode[currentMode] && hasUnsavedChanges) {
@@ -2843,6 +2843,11 @@
           const safeIndex = newModeTabIndices.find(i => i !== index) ?? newModeTabIndices[0];
           activeTabIndexByMode[currentMode] = safeIndex;
         }
+      }
+
+      const mode = localStorage.getItem("editorMode") || "document";
+      const index = activeTabIndexByMode[mode];
+      return tabs[index];
       }
 
       const activeTab = getActiveTab();
