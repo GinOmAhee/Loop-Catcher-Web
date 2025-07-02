@@ -2578,6 +2578,8 @@
           editor.appendChild(marginBox);
         }
 
+        marginBox?.removeAttribute("contenteditable");
+        
         toolbar && (toolbar.style.display = "flex");
         editor.setAttribute("data-mode", "document");
         editor.style.fontFamily = "Arial, sans-serif";
