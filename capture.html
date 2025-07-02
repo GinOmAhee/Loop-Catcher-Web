@@ -1316,8 +1316,13 @@
     }
 
     function renderDualTabs() {
-      const notepadBar = document.getElementById("tabBarNotepad");
-      const documentBar = document.getElementById("tabBarDocument");
+      const mode = mainEditor.getAttribute("data-mode"); // 'notepad' or 'document'
+
+      const noteBar = document.getElementById("tabBarNotepad");
+      const docBar = document.getElementById("tabBarDocument");
+
+      noteBar.classList.toggle("active-mode", mode === "notepad");
+      docBar.classList.toggle("active-mode", mode === "document");
 
       if (!notepadBar || !documentBar) {
         console.warn("❌ Tab bars not found in DOM");
