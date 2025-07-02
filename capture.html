@@ -1473,7 +1473,7 @@
         activeTabIndex = Math.max(0, activeTabIndex - 1);
       }
 
-      mainEditor.innerHTML = tabs[activeTabIndex].content || "";
+      mainEditor.innerHTML = tabs[activeIndex].content || "";
       hasUnsavedChanges = false;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
@@ -1542,8 +1542,8 @@
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
 
-      if (tabs[activeTabIndex]) {
-        tabs[activeTabIndex].title = newTitle;
+      if (tabs[activeIndex]) {
+        tabs[activeIndex].title = newTitle;
         const key = mainEditor.getAttribute("data-mode") === "notepad" ? "notepadTabs" : "documentTabs";
         localStorage.setItem(key, JSON.stringify(tabs));
         safeRenderTabs();
@@ -1665,7 +1665,7 @@
    async function saveText() {
      const now = new Date();
      const noteText = mainEditor.innerText.trim();
-     const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
+     const currentTabTitle = tabs[activeIndex]?.title || "Untitled";
      const noteHTML = mainEditor.innerHTML;
      if (!noteText) return;
 
@@ -1684,7 +1684,7 @@
      const newNote = {
        text: noteHTML,
        timestamp: now.toISOString(),
-       title: tabs[activeTabIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
+       title: tabs[activeIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
        project: projectName,
        resolved: false,
        tags: []
@@ -1711,8 +1711,8 @@
       editor.style.margin = "0";
 
       mainEditor.innerHTML = '';
-      tabs[activeTabIndex].content = '';
-      tabs[activeTabIndex].title = 'Untitled';
+      tabs[activeIndex].content = '';
+      tabs[activeIndex].title = 'Untitled';
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
@@ -1736,7 +1736,7 @@
         return;
       }
 
-      currentTabs[activeTabIndex].content = mainEditor.innerHTML;
+      currentTabs[activeIndex].content = mainEditor.innerHTML;
       localStorage.setItem(`${mode}Tabs`, JSON.stringify(currentTabs));
     }
 
@@ -1757,7 +1757,7 @@
         tabs = savedTabs;
         activeTabIndex = savedIndex;
 
-        const activeTab = tabs[activeTabIndex];
+        const activeTab = tabs[activeIndex];
 
         if (activeTab && typeof activeTab.content === "string") {
           mainEditor.innerHTML = activeTab.content;
@@ -2090,7 +2090,7 @@
       const titleLine = text.split("\n")[0]?.trim() || "Note";
 
       // ⬇️ INSERT THIS BLOCK HERE
-      tabs[activeTabIndex].title = titleLine;
+      tabs[activeIndex].title = titleLine;
       localStorage.setItem("tabs", JSON.stringify(tabs));
       safeRenderTabs(); // to update UI tab name
       document.title = titleLine;
@@ -2316,8 +2316,8 @@
             const newTitle = text.split("\n")[0]?.trim() || "Untitled";
 
             console.log("Updating tab title to:", newTitle);
-            if (tabs[activeTabIndex]) {
-              tabs[activeTabIndex].title = newTitle;
+            if (tabs[activeIndex]) {
+              tabs[activeIndex].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
               safeRenderTabs();
             }
@@ -2691,8 +2691,8 @@
           // Optional: Auto-title
           const now = new Date();
           const label = `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-          if (typeof tabs !== "undefined" && tabs[activeTabIndex]) {
-            tabs[activeTabIndex].title = label;
+          if (typeof tabs !== "undefined" && tabs[activeIndex]) {
+            tabs[activeIndex].title = label;
             localStorage.setItem("tabs", JSON.stringify(tabs));
             safeRenderTabs?.();
           }
@@ -2734,15 +2734,15 @@
 
           // 📄 Reset tab title (optional)
           // 📄 Auto-set tab title based on first line of note
-          if (tabs && tabs[activeTabIndex]) {
+          if (tabs && tabs[activeIndex]) {
             const text = mainEditor.innerText || "";
-            tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "Untitled";
+            tabs[activeIndex].title = text.split("\n")[0]?.trim() || "Untitled";
             localStorage.setItem("tabs", JSON.stringify(tabs));
 
             // ✨ Update DOM immediately
             const tabBarEl = document.querySelectorAll(".tab-label")[activeTabIndex];
             if (tabBarEl) {
-              tabBarEl.innerText = tabs[activeTabIndex].title || `Tab ${activeTabIndex + 1}`;
+              tabBarEl.innerText = tabs[activeIndex].title || `Tab ${activeTabIndex + 1}`;
             }
             safeRenderTabs();
           
