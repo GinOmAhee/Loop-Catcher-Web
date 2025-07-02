@@ -1044,6 +1044,9 @@
     </div>
   </div>
 
+  <div id="tabBarNotepad" class="tab-bar hidden"></div>
+  <div id="tabBarDocument" class="tab-bar hidden"></div>
+
   <div id="tabBar" class="tab-bar">
     <div class="tab-container">
       <!-- tab elements go here -->
@@ -1269,12 +1272,40 @@
     ];
     let activeTabIndex = 0;
 
+    let notepadTabs = JSON.parse(localStorage.getItem("notepadTabs") || "[]");
+    let documentTabs = JSON.parse(localStorage.getItem("documentTabs") || "[]");
+    let activeNotepadIndex = 0;
+    let activeDocumentIndex = 0;
+
+    function saveTabsToStorage() {
+      localStorage.setItem("notepadTabs", JSON.stringify(notepadTabs));
+      localStorage.setItem("documentTabs", JSON.stringify(documentTabs));
+    }
+
+    let tabs = []; // 👈 Active tab array based on mode
+    let activeTabIndex = 0;
+
+
     function safeRenderTabs() {
-      if (!isRenamingTab) {
-        renderTabs(); // ✅ Call the real function that draws the tabs
-      } else {
-        console.warn("⛔ renderTabs() skipped due to active rename");
-      }
+      const isNotepad = mainEditor.getAttribute("data-mode") === "notepad";
+      const tabBar = isNotepad ? document.getElementById("tabBarNotepad") : document.getElementById("tabBarDocument");
+      const otherTabBar = isNotepad ? document.getElementById("tabBarDocument") : document.getElementById("tabBarNotepad");
+
+      tabBar.innerHTML = ""; // clear
+      otherTabBar.innerHTML = ""; // just in case
+
+      tabs.forEach((tab, i) => {
+        const tabEl = document.createElement("div");
+        tabEl.className = `tab-label ${i === activeTabIndex ? "active" : ""}`;
+        tabEl.innerText = tab.title || `Tab ${i + 1}`;
+        tabEl.addEventListener("click", () => {
+          saveCurrentTab(); // 📌 Save current content before switching
+          activeTabIndex = i;
+          mainEditor.innerHTML = tabs[i].content || "";
+          safeRenderTabs();
+        });
+        tabBar.appendChild(tabEl);
+      });
     }
 
     function renderTabs() {
@@ -1395,11 +1426,37 @@
       hasUnsavedChanges = true;
     }
 
+    function saveCurrentTab() {
+      const mode = mainEditor.getAttribute("data-mode");
+      const content = mainEditor.innerHTML;
+
+      if (mode === "notepad") {
+        notepadTabs[activeNotepadIndex].content = content;
+      } else {
+        documentTabs[activeDocumentIndex].content = content;
+      }
+
+      saveTabsToStorage();
+    }
+
     function switchTab(index) {
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
-      activeTabIndex = index;
-      mainEditor.innerHTML = tabs[index].content;
+      const mode = mainEditor.getAttribute("data-mode");
+      const tabs = mode === "notepad" ? notepadTabs : documentTabs;
+      const activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
+
+      if (!tabs[index]) return;
+      const tab = tabs[index];
+      mainEditor.innerHTML = tab.content || "";
+
+      if (mode === "notepad") {
+        activeNotepadIndex = index;
+      } else {
+        activeDocumentIndex = index;
+      }
+
       safeRenderTabs();
+      mainEditor.focus();
+      saveStatus.innerText = `📝 Switched to tab: ${tab.title}`;
     }
 
     function closeTab(index) {
@@ -1430,8 +1487,20 @@
     let hasUnsavedChanges = false;
 
     function addNewTab() {
-      tabs.push({ title: "Untitled", content: "" });
-      switchTab(tabs.length - 1); // Switch to new tab
+      const mode = mainEditor.getAttribute("data-mode");
+      const tabData = { title: "Untitled", content: "" };
+
+      if (mode === "notepad") {
+        notepadTabs.push(tabData);
+        activeNotepadIndex = notepadTabs.length - 1;
+      } else {
+        documentTabs.push(tabData);
+        activeDocumentIndex = documentTabs.length - 1;
+      }
+
+      saveTabsToStorage();
+      safeRenderTabs();
+      switchTab(mode === "notepad" ? activeNotepadIndex : activeDocumentIndex);
     }
 
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
@@ -1474,6 +1543,13 @@
         updateGrouping();
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
       }, 1000);
+
+      if (tabs[activeTabIndex]) {
+        tabs[activeTabIndex].title = newTitle;
+        const key = mainEditor.getAttribute("data-mode") === "notepad" ? "notepadTabs" : "documentTabs";
+        localStorage.setItem(key, JSON.stringify(tabs));
+        safeRenderTabs();
+      }
     });
 
     let savedSelection = null;
@@ -2581,6 +2657,17 @@
             documentCache = editor.innerHTML;
           }
         }
+
+        // Update the active tabs reference based on mode
+        tabs = mode === "notepad" ? notepadTabs : documentTabs;
+        activeTabIndex = 0;
+
+        // Load tab bar visibility
+        document.getElementById("tabBarNotepad").classList.toggle("hidden", mode !== "notepad");
+        document.getElementById("tabBarDocument").classList.toggle("hidden", mode !== "document");
+
+        safeRenderTabs(); // 🔁 Re-render tabs visually
+
 
         if (mode === "notepad") {
           // Contenteditable switch
