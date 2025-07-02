@@ -2856,10 +2856,7 @@
       }
 
       const mode = localStorage.getItem("editorMode") || "document";
-      const index = activeTabIndexByMode[mode];
-      return tabs[index];
-      }
-
+      
       const activeTab = getActiveTab();
       const activeEditor = getActiveEditor();
       if (activeTab && activeEditor) {
