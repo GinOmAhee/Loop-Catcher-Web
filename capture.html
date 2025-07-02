@@ -1049,12 +1049,12 @@
 
     </div>
   </div>
-  <div id="tabBarNotepad" class="tab-bar">
+  <div id="tabBarNotepad" class="note-tab-bar">
     <div class="tab-container" id="tabContainerNotepad"></div>
     <div class="tab add-tab" onclick="addNewTab('notepad')">+</div>
   </div>
 
-  <div id="tabBarDocument" class="tab-bar">
+  <div id="tabBarDocument" class="doc-tab-bar">
     <div class="tab-container" id="tabContainerDocument"></div>
     <div class="tab add-tab" onclick="addNewTab('document')">+</div>
   </div>
@@ -2778,7 +2778,7 @@
                 tabBarEl.innerText = tabs[activeIndex].title || `Tab ${activeIndex + 1}`;
               }
             }
-            
+
             if (mode === "document") {
               paperSizeSelect?.addEventListener("change", updatePaperSize);
               updatePaperSize(); // run it once immediately
