@@ -1412,8 +1412,8 @@
       addNotepadTab.innerText = "+";
       addNotepadTab.className = "tab add-tab";
       addNotepadTab.onclick = () => {
-        mainEditor.setAttribute("data-mode", "notepad");
-        addNewTab();
+        applyEditorMode("notepad");  // 🔁 fully switches the mode
+        addNewTab("notepad");        // 🧱 then adds a tab in that mode
       };
       notepadBar.appendChild(addNotepadTab);
 
@@ -1421,8 +1421,8 @@
       addDocumentTab.innerText = "+";
       addDocumentTab.className = "tab add-tab";
       addDocumentTab.onclick = () => {
-        mainEditor.setAttribute("data-mode", "document");
-        addNewTab();
+        applyEditorMode("document");
+        addNewTab("document");
       };
       documentBar.appendChild(addDocumentTab);
 
