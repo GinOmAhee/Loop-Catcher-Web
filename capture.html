@@ -924,9 +924,9 @@
 
   /* === THEME TOGGLE SWITCH === */
   .theme-toggle {
-    position: absolute;
-    top: 50%;
-    right: 1rem;
+    position: sticky;
+    margin: 0 1rem 0 auto; /* ✅ pins it to the right */
+    top: .5rem; /* just below your tab bar */
     transform: translateY(-50%);
     z-index: 10;
   }
@@ -1051,19 +1051,18 @@
     <div class="tab-container">
       <!-- tab elements go here -->
     </div>
-    <!-- Floating theme toggle embedded in tab bar -->
-    <div class="tab-theme-switch">
-      <label class="theme-toggle">
-        <input type="checkbox" id="themeSwitch" />
-        <span class="slider"></span>
-      </label>
-    </div>
   </div>
 
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
       <button id="previewToggle">☰</button>
+      <div class="tab-theme-switch" style="position: absolute; top: 10px; right: 10px;">
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeSwitch" />
+          <span class="slider"></span>
+        </label>
+      </div>
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
        <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
