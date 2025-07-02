@@ -497,7 +497,8 @@
   }
 
   /* === TABS === */
-  .tab-bar {
+  #tabBarNotepad,
+  #tabBarDocument {
     display: flex;
     align-items: center;
     padding: 0 1rem 0 0.5rem;
@@ -537,7 +538,8 @@
     background: transparent;
   }
 
-  .tab {
+  .tab-tabBarNotepad,
+  .tab-tabBarDocument { 
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -559,7 +561,8 @@
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
 
-  .tab.add-tab {
+  .tab.add-tab-tabBarNotepad,
+  .tab.add-tab-tabBarDocument {
     flex-shrink: 0;
     flex-grow: 0;
     display: inline-flex;
@@ -576,17 +579,20 @@
     border: 1px solid var(--tab-border);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
-    
-  .tab.add-tab:hover {
+  
+  .tab.add-tab:hover-tabBarNotepad,
+  .tab.add-tab:hover-tabBarDocument {
     background-color: var(--tab-hover);
     border-color: var(--tab-border);
   }
 
-  .tab:hover {
+  .tab:hover-tabBarNotepad,
+  .tab:hover-tabBarDocument {
     background-color: var(--tab-hover);
   }
 
-  .tab.active {
+  .tab.active-tabBarNotepad,
+  .tab.active-tabBarDocument {
     background-color: var(--tab-active-bg);
   }
 
@@ -598,7 +604,8 @@
     display: block;
   }
 
-  .tab-label {
+  .tab-label-tabBarNotepad,
+  .tab-label-tabBarDocument {
     flex-grow: 0 0 auto;
     display: inline-block;
     max-width: 145px; /* or whatever size fits your layout */
@@ -615,7 +622,8 @@
     
   }
 
-  .tab-close-btn {
+  .tab-close-btn-tabBarNotepad,
+  .tab-close-btn-tabBarDocument {
     flex-shrink: 0;
     all: unset;
     font-size: 0.85rem;
@@ -629,7 +637,8 @@
     transition: background 0.2s ease;
   }
 
-  .tab button:hover {
+  .tab button:hover-tabBarNotepad,
+  .tab button:hover-tabBarNotepad {
     background: rgba(255, 255, 255, 0.1);
   }
 
@@ -1044,12 +1053,12 @@
     </div>
   </div>
 
-  <div id="tabBarNotepad" class="tab-bar hidden"></div>
-  <div id="tabBarDocument" class="tab-bar hidden"></div>
+  
 
-  <div id="tabBar" class="tab-bar">
+  <div id="tabBar">
     <div class="tab-container">
-      <!-- tab elements go here -->
+      <div id="tabBarNotepad" class="tab-strip"></div>
+      <div id="tabBarDocument" class="tab-strip"></div>
     </div>
   </div>
 
