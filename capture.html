@@ -868,6 +868,12 @@
     padding: 0.3rem 0.5rem;
     font-size: 1rem;
   }
+   /* 🔒 Dim + disable interaction for inactive tab bars */
+   .tab-bar.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    filter: grayscale(0.8);
+  }
 
   .highlight-glow {
     display: inline-block;
@@ -1044,8 +1050,8 @@
     </div>
   </div>
 
-  <div id="tabBarNotepad" class="tab-bar hidden"></div>
-  <div id="tabBarDocument" class="tab-bar hidden"></div>
+  <div id="tabBarNotepad" class="tab-bar"></div>
+  <div id="tabBarDocument" class="tab-bar"></div>
 
   <div id="tabBar" class="tab-bar">
     <div class="tab-container">
@@ -1286,16 +1292,29 @@
 
     function safeRenderTabs() {
       const mode = mainEditor.getAttribute("data-mode");
-      const tabs = mode === "notepad" ? notepadTabs : documentTabs;
-      const activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
-      const tabBar = document.getElementById("tabBar");
 
-      if (!tabBar) return;
-      tabBar.innerHTML = tabs.map((tab, i) => `
-        <div class="tab-label ${i === activeIndex ? 'active' : ''}" onclick="switchTab(${i})">
+      const notepadBar = document.getElementById("tabBarNotepad");
+      const documentBar = document.getElementById("tabBarDocument");
+
+      if (!notepadBar || !documentBar) return;
+
+      // 🔁 Render Notepad Tabs
+      notepadBar.innerHTML = notepadTabs.map((tab, i) => `
+        <div class="tab-label ${i === activeNotepadIndex ? 'active' : ''}" onclick="switchTab(${i})">
           ${tab.title || `Tab ${i + 1}`}
         </div>
       `).join("");
+
+      // 🔁 Render Document Tabs
+      documentBar.innerHTML = documentTabs.map((tab, i) => `
+        <div class="tab-label ${i === activeDocumentIndex ? 'active' : ''}" onclick="switchTab(${i})">
+          ${tab.title || `Tab ${i + 1}`}
+        </div>
+      `).join("");
+
+      notepadBar.classList.toggle("disabled", mode !== "notepad");
+      documentBar.classList.toggle("disabled", mode !== "document");
+
     }
 
     function renderTabs() {
