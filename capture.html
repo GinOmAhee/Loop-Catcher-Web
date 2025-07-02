@@ -1311,13 +1311,13 @@
 
       notepadBar.innerHTML = notepadTabs.map((tab, i) => `
         <div class="tab-label ${i === activeNotepadIndex ? 'active' : ''}" onclick="switchTab(${i})">
-          ${tab.title || `Tab ${i + 1}}
+          ${tab.title || `Tab ${i + 1}`}
          </div>
       `).join("");
 
       documentBar.innerHTML = documentTabs.map((tab, i) => `
         <div class="tab-label ${i === activeDocumentIndex ? 'active' : ''}" onclick="switchTab(${i})">
-          ${tab.title || `Tab ${i + 1}}
+          ${tab.title || `Tab ${i + 1}`}
         </div>
       `).join("");
 
