@@ -1063,15 +1063,14 @@
     </div>
   </div>
 
-  <div id="tabBar" class="tab-bar">
-    <div class="tab-container">
-      <div id="tabBarNotepad" class="tab-bar"></div> <!-- ✅ fix class -->
-      <div id="tabBarDocument" class="tab-bar"></div>
-    </div>
-  </div>
-
   <!-- 📝 Main Editor (always visible) -->
-  <div class="main-container" onclick="maybeClosePreview(event)">
+    <div class="main-container" onclick="maybeClosePreview(event)">
+    <div id="tabBar" class="tab-bar">
+      <div class="tab-container">
+        <div id="tabBarNotepad" class="tab-bar"></div> <!-- ✅ fix class -->
+        <div id="tabBarDocument" class="tab-bar"></div>
+      </div>
+    </div>
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <div class="tab-theme-switch" style="position: absolute; top: 10px; right: 10px;">
