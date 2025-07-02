@@ -2766,12 +2766,19 @@
             localStorage.setItem("tabs", JSON.stringify(tabs));
 
             // ✨ Update DOM immediately
-            const tabBarEl = document.querySelectorAll(".tab-label")[activeTabIndex];
-            if (tabBarEl) {
-              tabBarEl.innerText = tabs[activeIndex].title || `Tab ${activeTabIndex + 1}`;
+            const mode = mainEditor.getAttribute("data-mode");
+            const activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
+
+            const tabContainerId = mode === "notepad" ? "tabContainerNotepad" : "tabContainerDocument";
+            const tabContainer = document.getElementById(tabContainerId);
+
+            if (tabContainer) {
+              const tabBarEl = tabContainer.querySelectorAll(".tab-label")[activeIndex];
+              if (tabBarEl) {
+                tabBarEl.innerText = tabs[activeIndex].title || `Tab ${activeIndex + 1}`;
+              }
             }
-            safeRenderTabs();
-          
+            
             if (mode === "document") {
               paperSizeSelect?.addEventListener("change", updatePaperSize);
               updatePaperSize(); // run it once immediately
