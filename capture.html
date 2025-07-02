@@ -1171,8 +1171,9 @@
           <div id="marginBox"></div>
         </div>
 
-        <div id="notepadEditor" contenteditable="true" data-mode="notepad"></div>
+        <div id="notepadBox" contenteditable="true" class="editor hidden"></div>
 
+        <div id="marginBox" contenteditable="true" class="editor"></div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
@@ -2647,7 +2648,7 @@
         const currentMode = localStorage.getItem("editorMode") || "document";
         const newMode = currentMode === "document" ? "notepad" : "document";
         console.log("🌀 Toggling mode from", currentMode, "to", newMode);
-        applyEditorMode(newMode);
+        applyEditorMode();
       });
 
       const savedMode = localStorage.getItem("editorMode");
