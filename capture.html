@@ -516,6 +516,7 @@
   .tab-container {
     flex-shrink: 1;
     flex-grow: 0;
+    flex-direction: column; /* Stack vertically */
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;
@@ -525,6 +526,10 @@
     scroll-behavior: smooth;
     scrollbar-color: var(--tab-border) transparent;
   }
+  #tabBarNotepad, #tabBarDocument {
+    width: 100%;
+  }
+
 
   /* Hide scrollbar for webkit browsers (optional) */
   .tab-container::-webkit-scrollbar {
