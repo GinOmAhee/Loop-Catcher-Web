@@ -507,7 +507,7 @@
     position: sticky;
     top: 0;
     height: 3rem;
-    z-index: 10; /* Make sure it stays above other elements */
+    z-index: 999; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
@@ -581,7 +581,7 @@
     padding: 0.4rem;
     justify-content: center;
     font-size: 1.2rem;
-    font-weight: 600
+    font-weight: 600;
     border-radius: 8px 8px 0 0;
     cursor: pointer;
     background-color: var(--tab-bg);
@@ -590,14 +590,14 @@
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
   
-  .tab.add-tab:hover-tabBarNotepad,
-  .tab.add-tab:hover-tabBarDocument {
+  .tab.add-tab-tabBarNotepad:hover,
+  .tab.add-tab-tabBarDocument:hover {
     background-color: var(--tab-hover);
     border-color: var(--tab-border);
   }
 
-  .tab:hover-tabBarNotepad,
-  .tab:hover-tabBarDocument {
+  .tab-tabBarNotepad:hover,
+  .tab-tabBarDocument:hover {
     background-color: var(--tab-hover);
   }
 
