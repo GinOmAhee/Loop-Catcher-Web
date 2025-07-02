@@ -497,8 +497,7 @@
   }
 
   /* === TABS === */
-  #tabBarNotepad,
-  #tabBarDocument {
+  .tab-bar {
     display: flex;
     align-items: center;
     padding: 0 1rem 0 0.5rem;
@@ -507,7 +506,7 @@
     position: sticky;
     top: 0;
     height: 3rem;
-    z-index: 999; /* Make sure it stays above other elements */
+    z-index: 10; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
@@ -516,8 +515,6 @@
   .tab-container {
     flex-shrink: 1;
     flex-grow: 0;
-    gap: 0.25rem;
-    flex-direction: column; /* Stack vertically */
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;
@@ -526,14 +523,6 @@
     scrollbar-width: thin;
     scroll-behavior: smooth;
     scrollbar-color: var(--tab-border) transparent;
-  }
-  #tabBarNotepad {
-    width: 100%;
-    margin-bottom: 0.25rem;
-  }
-
-  #tabBarDocument {
-    width: 100%;
   }
 
   /* Hide scrollbar for webkit browsers (optional) */
@@ -548,8 +537,7 @@
     background: transparent;
   }
 
-  .tab-tabBarNotepad,
-  .tab-tabBarDocument { 
+  .tab {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -571,8 +559,7 @@
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
 
-  .tab.add-tab-tabBarNotepad,
-  .tab.add-tab-tabBarDocument {
+  .tab.add-tab {
     flex-shrink: 0;
     flex-grow: 0;
     display: inline-flex;
@@ -581,7 +568,7 @@
     padding: 0.4rem;
     justify-content: center;
     font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 600
     border-radius: 8px 8px 0 0;
     cursor: pointer;
     background-color: var(--tab-bg);
@@ -589,20 +576,17 @@
     border: 1px solid var(--tab-border);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
-  
-  .tab.add-tab-tabBarNotepad:hover,
-  .tab.add-tab-tabBarDocument:hover {
+    
+  .tab.add-tab:hover {
     background-color: var(--tab-hover);
     border-color: var(--tab-border);
   }
 
-  .tab-tabBarNotepad:hover,
-  .tab-tabBarDocument:hover {
+  .tab:hover {
     background-color: var(--tab-hover);
   }
 
-  .tab.active-tabBarNotepad,
-  .tab.active-tabBarDocument {
+  .tab.active {
     background-color: var(--tab-active-bg);
   }
 
@@ -614,8 +598,7 @@
     display: block;
   }
 
-  .tab-label-tabBarNotepad,
-  .tab-label-tabBarDocument {
+  .tab-label {
     flex-grow: 0 0 auto;
     display: inline-block;
     max-width: 145px; /* or whatever size fits your layout */
@@ -632,8 +615,7 @@
     
   }
 
-  .tab-close-btn-tabBarNotepad,
-  .tab-close-btn-tabBarDocument {
+  .tab-close-btn {
     flex-shrink: 0;
     all: unset;
     font-size: 0.85rem;
@@ -647,8 +629,7 @@
     transition: background 0.2s ease;
   }
 
-  .tab button:hover-tabBarNotepad,
-  .tab button:hover-tabBarNotepad {
+  .tab button:hover {
     background: rgba(255, 255, 255, 0.1);
   }
 
@@ -1063,14 +1044,17 @@
     </div>
   </div>
 
-  <!-- 📝 Main Editor (always visible) -->
-    <div class="main-container" onclick="maybeClosePreview(event)">
-    <div id="tabBar" class="tab-bar">
-      <div class="tab-container">
-        <div id="tabBarNotepad" class="tab-bar"></div> <!-- ✅ fix class -->
-        <div id="tabBarDocument" class="tab-bar"></div>
-      </div>
+  <div id="tabBarNotepad" class="tab-bar hidden"></div>
+  <div id="tabBarDocument" class="tab-bar hidden"></div>
+
+  <div id="tabBar" class="tab-bar">
+    <div class="tab-container">
+      <!-- tab elements go here -->
     </div>
+  </div>
+
+  <!-- 📝 Main Editor (always visible) -->
+  <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <div class="tab-theme-switch" style="position: absolute; top: 10px; right: 10px;">
@@ -2676,8 +2660,8 @@
         activeTabIndex = 0;
 
         // Load tab bar visibility
-        //document.getElementById("tabBarNotepad").classList.toggle("hidden", mode !== "notepad");
-        //document.getElementById("tabBarDocument").classList.toggle("hidden", mode !== "document");
+        document.getElementById("tabBarNotepad").classList.toggle("hidden", mode !== "notepad");
+        document.getElementById("tabBarDocument").classList.toggle("hidden", mode !== "document");
 
         safeRenderTabs(); // 🔁 Re-render tabs visually
 
