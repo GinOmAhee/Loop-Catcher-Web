@@ -497,8 +497,7 @@
   }
 
   /* === TABS === */
-  #tabBarNotepad,
-  #tabBarDocument {
+  .tab-bar {
     display: flex;
     align-items: center;
     padding: 0 1rem 0 0.5rem;
@@ -516,8 +515,6 @@
   .tab-container {
     flex-shrink: 1;
     flex-grow: 0;
-    gap: 0.25rem;
-    flex-direction: column; /* Stack vertically */
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;
@@ -526,14 +523,6 @@
     scrollbar-width: thin;
     scroll-behavior: smooth;
     scrollbar-color: var(--tab-border) transparent;
-  }
-  #tabBarNotepad {
-    width: 100%;
-    margin-bottom: 0.25rem;
-  }
-
-  #tabBarDocument {
-    width: 100%;
   }
 
   /* Hide scrollbar for webkit browsers (optional) */
@@ -548,8 +537,7 @@
     background: transparent;
   }
 
-  .tab-tabBarNotepad,
-  .tab-tabBarDocument { 
+  .tab {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -571,8 +559,7 @@
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
 
-  .tab.add-tab-tabBarNotepad,
-  .tab.add-tab-tabBarDocument {
+  .tab.add-tab {
     flex-shrink: 0;
     flex-grow: 0;
     display: inline-flex;
@@ -589,20 +576,17 @@
     border: 1px solid var(--tab-border);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
-  
-  .tab.add-tab:hover-tabBarNotepad,
-  .tab.add-tab:hover-tabBarDocument {
+    
+  .tab.add-tab:hover {
     background-color: var(--tab-hover);
     border-color: var(--tab-border);
   }
 
-  .tab:hover-tabBarNotepad,
-  .tab:hover-tabBarDocument {
+  .tab:hover {
     background-color: var(--tab-hover);
   }
 
-  .tab.active-tabBarNotepad,
-  .tab.active-tabBarDocument {
+  .tab.active {
     background-color: var(--tab-active-bg);
   }
 
@@ -614,8 +598,7 @@
     display: block;
   }
 
-  .tab-label-tabBarNotepad,
-  .tab-label-tabBarDocument {
+  .tab-label {
     flex-grow: 0 0 auto;
     display: inline-block;
     max-width: 145px; /* or whatever size fits your layout */
@@ -632,8 +615,7 @@
     
   }
 
-  .tab-close-btn-tabBarNotepad,
-  .tab-close-btn-tabBarDocument {
+  .tab-close-btn {
     flex-shrink: 0;
     all: unset;
     font-size: 0.85rem;
@@ -647,8 +629,7 @@
     transition: background 0.2s ease;
   }
 
-  .tab button:hover-tabBarNotepad,
-  .tab button:hover-tabBarNotepad {
+  .tab button:hover {
     background: rgba(255, 255, 255, 0.1);
   }
 
@@ -943,9 +924,9 @@
 
   /* === THEME TOGGLE SWITCH === */
   .theme-toggle {
-    position: sticky;
-    margin: 0 1rem 0 auto; /* ✅ pins it to the right */
-    top: .5rem; /* just below your tab bar */
+    position: absolute;
+    top: 50%;
+    right: 1rem;
     transform: translateY(-50%);
     z-index: 10;
   }
@@ -1065,8 +1046,14 @@
 
   <div id="tabBar" class="tab-bar">
     <div class="tab-container">
-      <div id="tabBarNotepad" class="tab-bar"></div> <!-- ✅ fix class -->
-      <div id="tabBarDocument" class="tab-bar"></div>
+      <!-- tab elements go here -->
+    </div>
+    <!-- Floating theme toggle embedded in tab bar -->
+    <div class="tab-theme-switch">
+      <label class="theme-toggle">
+        <input type="checkbox" id="themeSwitch" />
+        <span class="slider"></span>
+      </label>
     </div>
   </div>
 
@@ -1074,12 +1061,6 @@
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
       <button id="previewToggle">☰</button>
-      <div class="tab-theme-switch" style="position: absolute; top: 10px; right: 10px;">
-        <label class="theme-toggle">
-          <input type="checkbox" id="themeSwitch" />
-          <span class="slider"></span>
-        </label>
-      </div>
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
        <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
@@ -1208,6 +1189,31 @@
 
     let db = null;
 
+    let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
+
+    let preview;
+    let toggleBtn;
+    let saveStatus;
+    let editor, maineditor
+    let attachedFilesList;
+    let groupedNotes;
+    let fontBtn;
+    let fontDropdown;
+    let fontSizeBtn;
+    let sizeDropdown;
+    let textColorBtn;
+    let textColorDropdown;
+    let justifyBtn;
+    let toolbar;
+
+    let status;
+    let activeTabIndex = 0;
+    let notepadCache = "";
+    let documentCache = "";
+    let hasUnsavedChanges = false;
+
+    const marginBox = document.getElementById("marginBox"); // 💡 safe reference
+
     async function initializeFirebase() {
       try {
         const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
@@ -1276,6 +1282,88 @@
 
     window.addEventListener('DOMContentLoaded', initThemeToggle);
 
+    window.addEventListener("DOMContentLoaded", () => {
+      editor = document.getElementById("marginBox");      // your interactive zone
+      mainEditor = document.getElementById("mainEditor"); // layout shell
+      preview = document.getElementById('preview');
+      toggleBtn = document.getElementById('previewToggle');
+      saveStatus = document.getElementById('saveStatus');
+      attachedFilesList = document.getElementById('attachedFilesList');
+      groupedNotes = document.getElementById('groupedNotes');
+      fontBtn = document.getElementById("fontMenuBtn");
+      fontDropdown = document.getElementById("fontDropdown");
+      fontSizeBtn = document.getElementById("fontSizeBtn");
+      sizeDropdown = document.getElementById("sizeDropdown");
+      textColorBtn = document.getElementById("textColorBtn");
+      textColorDropdown = document.getElementById("textColorDropdown");
+      justifyBtn = document.getElementById("justifyBtn");
+      toolbar = document.getElementById("toolbar");
+      status = document.getElementById("saveStatus");
+
+      if (!mainEditor) {
+        console.error("❌ mainEditor not found");
+        return;
+      }
+
+      console.log("✅ mainEditor is:", mainEditor);
+
+      mainEditor.addEventListener("input", () => {
+        undoStack.push(mainEditor.innerHTML);
+        redoStack = [];
+
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          localStorage.setItem("capturedText", mainEditor.innerHTML);
+          localStorage.setItem("lastSaved", new Date().toISOString());
+          updateGrouping();
+          saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
+        }, 1000);
+      });
+
+      fontBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        fontDropdown.classList.toggle("hidden");
+        const rect = fontBtn.getBoundingClientRect();
+        fontDropdown.style.left = `${rect.left}px`;
+        fontDropdown.style.top = `${rect.bottom + 5}px`;
+      });
+
+      fontDropdown.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      textColorBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        saveSelection();
+        textColorDropdown.classList.toggle("hidden");
+
+        const rect = textColorBtn.getBoundingClientRect();
+        textColorDropdown.style.left = `${rect.left}px`;
+        textColorDropdown.style.top = `${rect.bottom + 5}px`;
+      });
+
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
+      });
+
+      const highlightBtn = document.getElementById("highlightBtn");
+      const highlightDropdown = document.getElementById("highlightDropdown");
+
+      if (highlightBtn) {
+
+        highlightBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          saveSelection();
+          highlightDropdown.classList.toggle("hidden");
+          const rect = highlightBtn.getBoundingClientRect();
+          highlightDropdown.style.left = `${rect.left}px`;
+          highlightDropdown.style.top = `${rect.bottom + 5}px`;
+        });
+      }
+      setupModeToggle();
+    });
+
     function maybeClosePreview(e) {
       if (e.target.classList.contains("tab-rename-input")) return;
       if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
@@ -1283,286 +1371,20 @@
       }
     }
 
-    let tabs = [
-      { title: "Untitled", content: "" }
-    ];
-
-    let activeIndex;
-
-    let notepadTabs = JSON.parse(localStorage.getItem("notepadTabs") || "[]");
-    let documentTabs = JSON.parse(localStorage.getItem("documentTabs") || "[]");
-    let activeNotepadIndex = 0;
-    let activeDocumentIndex = 0;
-
-    function saveTabsToStorage() {
-      localStorage.setItem("notepadTabs", JSON.stringify(notepadTabs));
-      localStorage.setItem("documentTabs", JSON.stringify(documentTabs));
-    }
-
-    const mainEditor = document.getElementById("mainEditor"); // still used for layout
-
-    function safeRenderTabs() {
-      const mode = mainEditor.getAttribute("data-mode");
-      const tabs = mode === "notepad" ? notepadTabs : documentTabs;
-      const activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
-      const tabBar = document.getElementById("tabBar");
-
-      if (!tabBar) return;
-      tabBar.innerHTML = tabs.map((tab, i) => `
-        <div class="tab-label ${i === activeIndex ? 'active' : ''}" onclick="switchTab(${i})">
-          ${tab.title || `Tab ${i + 1}`}
-        </div>
-      `).join("");
-    }
-
-    function renderTabs() {
-      if (isRenamingTab) {
-        console.warn("⛔ Skipping renderTabs(): rename input is still active");
-        return;
-      }
-      const tabBar = document.querySelector(".tab-bar");
-      const tabContainer = tabBar.querySelector(".tab-container");
-      if (!tabContainer) return;
-
-      // Clear only the tabs inside the scrollable container
-      tabContainer.innerHTML = "";
-         
-      tabs.forEach((tab, index) => {
-        const tabBtn = document.createElement("div");
-        tabBtn.className = "tab";
-        if (index === activeTabIndex) tabBtn.classList.add("active");
-
-        const tabLabel = document.createElement("span");
-        tabLabel.innerText = tab.title;
-        tabLabel.className = "tab-label";
-        tabLabel.addEventListener("click", () => switchTab(index));
-
-        // Handle rename flow on double-click
-        tabLabel.addEventListener("dblclick", (e) => {
-          e.stopPropagation();
-          isRenamingTab = true;
-          console.log("🖱️ Double-clicked on tab:", tab.title);
-
-          const input = document.createElement("input");
-          input.className = "tab-rename-input";
-          input.value = tab.title;
-
-          if (document.body.classList.contains("dark-theme")) {
-            input.style.background = "#1e1e1e";
-            input.style.color = "#eee";
-            input.style.border = "1px dashed hotpink";
-            input.style.caretColor = "hotpink";
-          }
-
-          input.addEventListener("click", (e) => e.stopPropagation());
-
-          input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") input.blur();
-            if (e.key === "Escape") renderTabs();
-          });
-
-          input.addEventListener("blur", (e) => {
-            const newTitle = e.target.value.trim();
-            if (newTitle && newTitle !== tab.title) {
-              tabs[index].title = newTitle;
-              localStorage.setItem("tabs", JSON.stringify(tabs));
-              console.log("✅ title saved:", newTitle);
-              hasUnsavedChanges = true; // <-- 🧠 this is the magic line
-            } else {
-              console.log("❌ title unchanged or empty");
-            }
-            isRenamingTab = false;
-            setTimeout(renderTabs, 100);
-          });
-
-          const observer = new MutationObserver(() => {
-            if (document.body.classList.contains("dark-theme")) {
-              input.style.background = "#1e1e1e";
-              input.style.color = "#eee";
-              input.style.border = "1px dashed hotpink";
-              input.style.caretColor = "hotpink";
-            }
-            observer.disconnect(); // Only run once
-          });
-
-          observer.observe(tabBtn, { childList: true });
-
-          tabBtn.replaceChild(input, tabLabel);
-          setTimeout(() => {
-            input.focus();
-            input.select();
-          }, 100);
-        });
-
-        const closeBtn = document.createElement("button");
-        closeBtn.innerText = "⨯"; // tight and clean
-        closeBtn.className = "tab-close-btn";
-        closeBtn.title = "Close Tab";
-        closeBtn.onclick = (e) => {
-          e.stopPropagation();
-          closeTab(index);
-        };
-
-        tabBtn.appendChild(tabLabel);
-        tabBtn.appendChild(closeBtn);
-        tabContainer.appendChild(tabBtn);
-      });
-
-      const addTabBtn = document.createElement("div");
-      addTabBtn.innerText = "+";
-      addTabBtn.className = "tab add-tab";
-      addTabBtn.onclick = addNewTab;
-      tabContainer.appendChild(addTabBtn);
-
-      // Only add theme toggle if it doesn’t already exist
-      if (!tabBar.querySelector("#themeSwitch")) {
-        const themeToggle = document.createElement("div");
-        themeToggle.className = "tab-theme-switch";
-        themeToggle.innerHTML = `
-          <label class="theme-toggle">
-            <input type="checkbox" id="themeSwitch" />
-            <span class="slider"></span>
-          </label>
-        `;
-        tabBar.appendChild(themeToggle);
-        initThemeToggle?.();
-      }  
-    }
-
     function markUnsaved() {
       hasUnsavedChanges = true;
     }
 
-    function saveCurrentTab() {
-      const mode = mainEditor.getAttribute("data-mode");
-      const content = mainEditor.innerHTML;
-
-      if (mode === "notepad") {
-        notepadTabs[activeNotepadIndex].content = content;
-      } else {
-        documentTabs[activeDocumentIndex].content = content;
-      }
-
-      saveTabsToStorage();
-    }
-
-    function switchTab(index) {
-      const mode = mainEditor.getAttribute("data-mode");
-      const tabs = mode === "notepad" ? notepadTabs : documentTabs;
-
-      if (!tabs[index]) return;
-      const tab = tabs[index];
-      mainEditor.innerHTML = tab.content || "";
-
-      if (mode === "notepad") {
-        activeNotepadIndex = index;
-      } else {
-        activeDocumentIndex = index;
-      }
-
-      safeRenderTabs();
-      mainEditor.focus();
-      saveStatus.innerText = `📝 Switched to tab: ${tab.title}`;
-    }
-
-    function closeTab(index) {
-      if (index === activeTabIndex && hasUnsavedChanges) {
-        const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
-        if (!confirmClose) return;
-      }
-
-      tabs.splice(index, 1);
-
-      // Always have at least one tab
-      if (tabs.length === 0) {
-        tabs.push({ title: "Untitled", content: "" });
-        activeTabIndex = 0;
-      } else if (index <= activeTabIndex) {
-        activeTabIndex = Math.max(0, activeTabIndex - 1);
-      }
-
-      mainEditor.innerHTML = tabs[activeIndex].content || "";
-      hasUnsavedChanges = false;
-
-      localStorage.setItem("tabs", JSON.stringify(tabs));
-      localStorage.setItem("activeTabIndex", activeTabIndex);
-
-      safeRenderTabs(); // or renderTabs(), depending on your setup
-    } 
-
-    let hasUnsavedChanges = false;
-
-    function addNewTab() {
-      const mode = mainEditor.getAttribute("data-mode");
-      const tabData = { title: "Untitled", content: "" };
-
-      if (mode === "notepad") {
-        notepadTabs.push(tabData);
-        activeNotepadIndex = notepadTabs.length - 1;
-      } else {
-        documentTabs.push(tabData);
-        activeDocumentIndex = documentTabs.length - 1;
-      }
-
-      saveTabsToStorage();
-      safeRenderTabs();
-      switchTab(mode === "notepad" ? activeNotepadIndex : activeDocumentIndex);
+    function getMarginBox() {
+      return document.getElementById("marginBox");
     }
 
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
     const newThemeClass = moodThemeMap[vibe] || "theme-calm"; // Define it first
 
-    document.body.className = ""; // Remove old
-    document.body.classList.add(newThemeClass); // Add new
-    safeRenderTabs(); // Re-render tabs to refresh their classes if needed
-
-    const preview = document.getElementById('preview');
-    const toggleBtn = document.getElementById('previewToggle');
-    const saveStatus = document.getElementById('saveStatus');
-    const editor = document.getElementById("marginBox"); // now the actual editor
-    
-    const attachedFilesList = document.getElementById('attachedFilesList');
-    const groupedNotes = document.getElementById('groupedNotes');
-    const fontBtn = document.getElementById("fontMenuBtn");
-    const fontDropdown = document.getElementById("fontDropdown");
-    const fontSizeBtn = document.getElementById("fontSizeBtn");
-    const sizeDropdown = document.getElementById("sizeDropdown");
-    const textColorBtn = document.getElementById("textColorBtn");
-    const textColorDropdown = document.getElementById("textColorDropdown");
-    const justifyBtn = document.getElementById("justifyBtn");
-
-    
     let recognition;
     let isRecording = false;
     let debounceTimer;
-
-    mainEditor.addEventListener("input", () => {
-    undoStack.push(mainEditor.innerHTML);
-    redoStack = [];
-
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      localStorage.setItem("capturedText", mainEditor.innerHTML);
-      localStorage.setItem("lastSaved", new Date().toISOString());
-      updateGrouping();
-      saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
-    }, 1000);
-
-    const mode = mainEditor.getAttribute("data-mode");
-    const isNotepad = mode === "notepad";
-    const tabs = isNotepad ? notepadTabs : documentTabs;
-    const activeIndex = isNotepad ? activeNotepadIndex : activeDocumentIndex;
-
-    const text = mainEditor.innerText || "";
-    const newTitle = text.split("\n")[0]?.trim() || "Untitled";
-
-    if (tabs[activeIndex]) {
-      tabs[activeIndex].title = newTitle;
-    const key = isNotepad ? "notepadTabs" : "documentTabs";
-    localStorage.setItem(key, JSON.stringify(tabs));
-    safeRenderTabs();
-  }
-  });
 
     let savedSelection = null;
 
@@ -1586,32 +1408,10 @@
       document.execCommand("justifyFull", false, null);
     }
 
-    fontBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      fontDropdown.classList.toggle("hidden");
-      const rect = fontBtn.getBoundingClientRect();
-      fontDropdown.style.left = `${rect.left}px`;
-      fontDropdown.style.top = `${rect.bottom + 5}px`;
-    });
-
-    fontDropdown.addEventListener("click", (e) => {
-    e.stopPropagation();
-    });
-
     function setFont(font) {
       document.execCommand("fontName", false, font);
       fontDropdown.classList.add("hidden");
     }
-
-    textColorBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      saveSelection();
-      textColorDropdown.classList.toggle("hidden");
-
-      const rect = textColorBtn.getBoundingClientRect();
-      textColorDropdown.style.left = `${rect.left}px`;
-      textColorDropdown.style.top = `${rect.bottom + 5}px`;
-    });
 
     function setTextColor(color) {
       mainEditor.focus();
@@ -1621,38 +1421,20 @@
       textColorDropdown.classList.add("hidden");
     }
 
-    toggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
-    });
-
-    const highlightBtn = document.getElementById("highlightBtn");
-    const highlightDropdown = document.getElementById("highlightDropdown");
-
-    highlightBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      saveSelection();
-      highlightDropdown.classList.toggle("hidden");
-      const rect = highlightBtn.getBoundingClientRect();
-      highlightDropdown.style.left = `${rect.left}px`;
-      highlightDropdown.style.top = `${rect.bottom + 5}px`;
-    });
-
     function setHighlightColor(color) {
       mainEditor.focus();
       restoreSelection();
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
-
+      
       const mark = document.createElement("mark");
       requestAnimationFrame(() => {
         mark.classList.add("highlight-glow");
       });
-      mark.appendChild(selectedText);
 
+      mark.appendChild(selectedText);
       range.insertNode(mark);
 
       const newRange = document.createRange();
@@ -1679,7 +1461,7 @@
    async function saveText() {
      const now = new Date();
      const noteText = mainEditor.innerText.trim();
-     const currentTabTitle = tabs[activeIndex]?.title || "Untitled";
+     const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
      const noteHTML = mainEditor.innerHTML;
      if (!noteText) return;
 
@@ -1698,7 +1480,7 @@
      const newNote = {
        text: noteHTML,
        timestamp: now.toISOString(),
-       title: tabs[activeIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
+       title: tabs[activeTabIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
        project: projectName,
        resolved: false,
        tags: []
@@ -1725,8 +1507,8 @@
       editor.style.margin = "0";
 
       mainEditor.innerHTML = '';
-      tabs[activeIndex].content = '';
-      tabs[activeIndex].title = 'Untitled';
+      tabs[activeTabIndex].content = '';
+      tabs[activeTabIndex].title = 'Untitled';
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
@@ -1735,23 +1517,21 @@
 
     function autoSave() {
       console.log("✅ autoSave() was called");
+      const now = new Date();
 
-      const mode = mainEditor.getAttribute("data-mode");
-      const currentTabs = mode === "notepad" ? notepadTabs : documentTabs;
+      if (!mainEditor) return;
 
-      // 🛡️ Check for valid tab + activeTabIndex
-      if (
-        !currentTabs ||
-        activeTabIndex == null ||
-        activeTabIndex < 0 ||
-        activeTabIndex >= currentTabs.length
-      ) {
-        console.warn("⚠️ autoSave() skipped — invalid tab state");
-        return;
-      }
+      // Save current content into the active tab
+      tabs[activeTabIndex].content = mainEditor.innerHTML;
 
-      currentTabs[activeIndex].content = mainEditor.innerHTML;
-      localStorage.setItem(`${mode}Tabs`, JSON.stringify(currentTabs));
+      // Save full tabs array
+      localStorage.setItem('tabs', JSON.stringify(tabs));
+      localStorage.setItem('activeTabIndex', activeTabIndex);
+      localStorage.setItem('lastSaved', now.toISOString());
+
+      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+
+      hasUnsavedChanges = false; // Reset after save
     }
 
     window.addEventListener("beforeunload", (e) => {
@@ -1771,7 +1551,7 @@
         tabs = savedTabs;
         activeTabIndex = savedIndex;
 
-        const activeTab = tabs[activeIndex];
+        const activeTab = tabs[activeTabIndex];
 
         if (activeTab && typeof activeTab.content === "string") {
           mainEditor.innerHTML = activeTab.content;
@@ -1916,10 +1696,9 @@
     }
 
     function applyStyle(styleProp, value) {
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
 
       const span = document.createElement("span");
@@ -1937,10 +1716,9 @@
       const url = prompt("🔗 Enter URL:");
       if (!url) return;
 
-      const selection = window.getSelection();
-      if (!selection.rangeCount) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       let selectedText = range.toString().trim();
 
       const a = document.createElement("a");
@@ -1968,10 +1746,9 @@
     }
 
     function toggleUnorderedList() {
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const contents = range.extractContents();
 
       const ul = document.createElement("ul");
@@ -2022,10 +1799,9 @@
     }
 
     function alignText(direction) {
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const container = document.createElement("div");
       container.style.textAlign = direction;
 
@@ -2041,10 +1817,9 @@
     }
 
     function toggleStrikeThrough() {
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const commonAncestor = range.commonAncestorContainer;
       let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
 
@@ -2089,8 +1864,21 @@
      `;
     }
 
+    function getValidSelectionRange() {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return null;
+      return sel.getRangeAt(0);
+    }
+
+
     function loadNoteIntoEditor(noteHTML) {
       mainEditor.innerHTML = noteHTML;
+
+      if (!mainEditor) {
+        console.error("❌ Cannot load note — editor not ready");
+        return;
+      }
+
       mainEditor.focus();
       saveStatus.innerText = "📝 Loaded note from preview";
       preview.style.display = 'none';
@@ -2104,7 +1892,7 @@
       const titleLine = text.split("\n")[0]?.trim() || "Note";
 
       // ⬇️ INSERT THIS BLOCK HERE
-      tabs[activeIndex].title = titleLine;
+      tabs[activeTabIndex].title = titleLine;
       localStorage.setItem("tabs", JSON.stringify(tabs));
       safeRenderTabs(); // to update UI tab name
       document.title = titleLine;
@@ -2240,10 +2028,9 @@
     }
 
     function toggleItalic() {
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const commonAncestor = range.commonAncestorContainer;
       let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
 
@@ -2269,10 +2056,9 @@
     }
 
     function toggleUnderline() {
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const commonAncestor = range.commonAncestorContainer;
       let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
 
@@ -2330,8 +2116,8 @@
             const newTitle = text.split("\n")[0]?.trim() || "Untitled";
 
             console.log("Updating tab title to:", newTitle);
-            if (tabs[activeIndex]) {
-              tabs[activeIndex].title = newTitle;
+            if (tabs[activeTabIndex]) {
+              tabs[activeTabIndex].title = newTitle;
               localStorage.setItem("tabs", JSON.stringify(tabs));
               safeRenderTabs();
             }
@@ -2384,10 +2170,9 @@
       const tagName = tagMap[type];
       if (!tagName) return;
 
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
       const el = document.createElement(tagName);
       el.appendChild(selectedText);
@@ -2400,10 +2185,9 @@
     }
 
     function removeFormatting() {
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const content = range.cloneContents();
 
       // Extract just the text (no tags)
@@ -2428,10 +2212,10 @@
     }
 
     document.addEventListener("selectionchange", () => {
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-        savedRange = selection.getRangeAt(0).cloneRange();
-      }
+      const range = getValidSelectionRange();
+      if (!range) return;
+
+      savedRange = range.cloneRange();
     });
 
       const fontSizeDropdown = document.getElementById("fontSizeDropdownPanel");
@@ -2446,16 +2230,25 @@
         }
       });
 
-      fontSizeBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        saveSelection();
-        fontSizeDropdown.classList.toggle("hidden");
+      document.addEventListener("DOMContentLoaded", () => {
+        const fontSizeBtn = document.getElementById("fontSizeBtn");
 
-        const rect = fontSizeBtn.getBoundingClientRect();
-        fontSizeDropdown.style.left = `${rect.left}px`;
-        fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
+        if (!fontSizeBtn) {
+          console.warn("⛔ fontSizeBtn not found");
+          return;
+        }
 
-        setTimeout(() => customInput.focus(), 0);
+        fontSizeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          saveSelection();
+          fontSizeDropdown.classList.toggle("hidden");
+
+          const rect = fontSizeBtn.getBoundingClientRect();
+          fontSizeDropdown.style.left = `${rect.left}px`;
+          fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
+
+          setTimeout(() => customInput.focus(), 0);
+        });
       });
 
       applyBtn.addEventListener("click", () => {
@@ -2467,10 +2260,9 @@
 
         if (!fontSize) return; // Nothing selected or entered
 
-        const selection = window.getSelection();
-        if (!selection.rangeCount || selection.isCollapsed) return;
+        const range = getValidSelectionRange();
+        if (!range) return;
 
-        const range = selection.getRangeAt(0);
         const span = document.createElement("span");
         span.style.fontSize = fontSize;
         span.textContent = range.toString();
@@ -2538,10 +2330,9 @@
     }
 
     function toggleBold() {
-      const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      const range = getValidSelectionRange();
+      if (!range) return;
 
-      const range = selection.getRangeAt(0);
       const commonAncestor = range.commonAncestorContainer;
       let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
 
@@ -2620,172 +2411,328 @@
       });
     });
 
-    // Add this to the top of applyEditorMode (or make it global if reused)
-    let notepadCache = "";
-    let documentCache = "";
+    function applyEditorMode(mode) {
+        
+      if (!editor) return;
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const editor = document.getElementById("mainEditor");
-      const modeToggleBtn = document.getElementById("modeToggleBtn");
-      const toolbar = document.getElementById("toolbar");
-      const status = document.getElementById("saveStatus");
+      // Place at the beginning of applyEditorMode():
+      if (mode !== editor.getAttribute("data-mode")) {
+        if (editor.getAttribute("data-mode") === "notepad") {
+          notepadCache = editor.innerHTML;
+        } else if (editor.getAttribute("data-mode") === "document") {
+          documentCache = editor.innerHTML;
+        }
+      }
 
-      // Make sure editor is visible
-      editor?.classList.add("visible");
-      editor?.focus();
+      if (mode === "notepad") {
+         // Contenteditable switch
+         editor.setAttribute("contenteditable", "true");
+        document.getElementById("marginBox")?.removeAttribute("contenteditable");
+        document.getElementById("marginBox")?.classList.add("hidden");
 
-      // Load saved mode
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      applyEditorMode(savedMode);
+        toolbar && (toolbar.style.display = "none");
+        editor.setAttribute("data-mode", "notepad");
+        editor.style.fontFamily = "Courier, monospace";
+        editor.style.fontSize = "0.9rem";
+        editor.style.padding = "1rem";
+        editor.style.border = "none";
+        editor.style.boxShadow = "none";
+        editor.style.width = "";
+        editor.style.minHeight = "";
 
-      // Bind the toggle button
-      modeToggleBtn.addEventListener("click", () => {
-        const currentMode = editor.getAttribute("data-mode");
+        modeToggleBtn.innerText = "📄 Document Mode";
+        status && (status.innerText = "🧠 Notepad Mode Active");
+
+        // Optional: Auto-title
+        const now = new Date();
+        const label = `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+        if (typeof tabs !== "undefined" && tabs[activeTabIndex]) {
+          tabs[activeTabIndex].title = label;
+          localStorage.setItem("tabs", JSON.stringify(tabs));
+          safeRenderTabs?.();
+        }
+      } else {
+        // Contenteditable switch
+        editor.setAttribute("contenteditable", "true"); // ✅ allow typing
+        const marginBox = document.getElementById("marginBox");
+        const leftoverText = editor.textContent.replace(marginBox?.innerText || "", "").trim();
+
+        if (leftoverText && marginBox && marginBox.innerText.trim() === "") {
+          marginBox.innerText = leftoverText;
+          editor.innerHTML = ""; // clear mainEditor content
+          editor.appendChild(marginBox); // re-attach marginBox cleanly
+        }
+
+        marginBox?.removeAttribute("contenteditable"); // lock marginBox
+
+        document.getElementById("marginBox")?.removeAttribute("contenteditable"); // ✅ just show margin box, not editable
+
+        toolbar && (toolbar.style.display = "flex");
+        editor.setAttribute("data-mode", "document");
+        editor.style.fontFamily = "Arial, sans-serif";
+        editor.style.fontSize = "1rem";
+        editor.style.padding = ""; // ← don't set universal padding anymore
+        editor.style.border = "1px solid #ccc";
+        editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
+
+        modeToggleBtn.innerText = "🧠 Quick Note Mode";
+        status && (status.innerText = "📄 Document Mode Active");
+
+        const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
+        if (Object.keys(savedMargins).length > 0) {
+          editor.style.margin = "0";
+          editor.style.paddingTop = `${savedMargins.top}px`;
+          editor.style.paddingBottom = `${savedMargins.bottom}px`;
+          editor.style.paddingLeft = `${savedMargins.left}px`;
+          editor.style.paddingRight = `${savedMargins.right}px`;
+        }
+
+        // 📄 Reset tab title (optional)
+        // 📄 Auto-set tab title based on first line of note
+        if (tabs && tabs[activeTabIndex]) {
+          const text = mainEditor.innerText || "";
+          tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "Untitled";
+          localStorage.setItem("tabs", JSON.stringify(tabs));
+
+          // ✨ Update DOM immediately
+          const tabBarEl = document.querySelectorAll(".tab-label")[activeTabIndex];
+          if (tabBarEl) {
+            tabBarEl.innerText = tabs[activeTabIndex].title || `Tab ${activeTabIndex + 1}`;
+          }
+          safeRenderTabs();
+          
+          if (mode === "document") {
+            paperSizeSelect?.addEventListener("change", updatePaperSize);
+            updatePaperSize(); // run it once immediately
+          }
+        }
+      } 
+      // ✅ Restore cached content after switching
+      if (mode === "notepad") {
+        editor.innerHTML = notepadCache || "";
+        editor.innerHTML = editor.innerHTML.trim();
+      } else if (mode === "document") {
+        editor.innerHTML = documentCache || "";
+        editor.innerHTML = editor.innerHTML.trim();
+
+        // And if marginBox is involved, re-append it here:
+        if (marginBox && !editor.contains(marginBox)) {
+          editor.appendChild(marginBox);
+        }
+      }
+      editor.setAttribute("data-mode", mode);
+
+      // ✏️ Ensure editor receives focus after mode switch
+      setTimeout(() => editor.focus(), 0);
+    }
+
+    function setupModeToggle() {
+      modeToggleBtn = document.getElementById("modeToggleBtn");
+
+      modeToggleBtn?.addEventListener("click", () => {
+        const currentMode = editor?.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
         console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
         applyEditorMode(nextMode);
       });
 
-      // Print button listener
-      document.getElementById("printBtn")?.addEventListener("click", printNote);
+      const savedMode = localStorage.getItem("editorMode") || "document";
+      applyEditorMode(savedMode);
+    }
 
-      // Optional: Dropdown hiding logic
-      document.addEventListener("click", () => {
-        setTimeout(() => {
-          fontDropdown?.classList.add("hidden");
-          sizeDropdown?.classList.add("hidden");
-          textColorDropdown?.classList.add("hidden");
-          highlightDropdown?.classList.add("hidden");
-        }, 100);
+    function safeRenderTabs() {
+      if (!isRenamingTab) {
+        renderTabs(); // ✅ Call the real function that draws the tabs
+      } else {
+        console.warn("⛔ renderTabs() skipped due to active rename");
+      }
+    }
+
+    function renderTabs() {
+      if (isRenamingTab) {
+        console.warn("⛔ Skipping renderTabs(): rename input is still active");
+        return;
+      }
+      const tabBar = document.querySelector(".tab-bar");
+      const tabContainer = tabBar.querySelector(".tab-container");
+      if (!tabContainer) return;
+
+      // Clear only the tabs inside the scrollable container
+      tabContainer.innerHTML = "";
+         
+      const currentMode = localStorage.getItem("editorMode") || "document";
+      const filteredTabs = tabs
+        .map((tab, originalIndex) => ({ ...tab, originalIndex }))
+        .filter(tab => tab.mode === currentMode);
+
+        if (filteredTabs.length > 0) {
+          activeTabIndex = filteredTabs[0].originalIndex;
+        } else {
+          addNewTab(); // this will trigger its own render + content load
+          return;
+        }
+
+      filteredTabs.forEach((tab, index) => {
+        const tabBtn = document.createElement("div");
+        tabBtn.className = "tab";
+        if (tab.originalIndex === activeTabIndex) tabBtn.classList.add("active");
+
+        const tabLabel = document.createElement("span");
+        tabLabel.innerText = tab.title;
+        tabLabel.className = "tab-label";
+        tabLabel.addEventListener("click", () => switchTab(tab.originalIndex));
+
+        // Handle rename flow on double-click
+        tabLabel.addEventListener("dblclick", (e) => {
+          e.stopPropagation();
+          isRenamingTab = true;
+          console.log("🖱️ Double-clicked on tab:", tab.title);
+
+          const input = document.createElement("input");
+          input.className = "tab-rename-input";
+          input.value = tab.title;
+
+          if (document.body.classList.contains("dark-theme")) {
+            input.style.background = "#1e1e1e";
+            input.style.color = "#eee";
+            input.style.border = "1px dashed hotpink";
+            input.style.caretColor = "hotpink";
+          }
+
+          input.addEventListener("click", (e) => e.stopPropagation());
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") input.blur();
+            if (e.key === "Escape") renderTabs();
+          });
+
+          input.addEventListener("blur", (e) => {
+            const newTitle = e.target.value.trim();
+            if (newTitle && newTitle !== tab.title) {
+              tabs[tab.originalIndex].title = newTitle;
+              localStorage.setItem("tabs", JSON.stringify(tabs));
+              console.log("✅ title saved:", newTitle);
+              hasUnsavedChanges = true; // <-- 🧠 this is the magic line
+            } else {
+              console.log("❌ title unchanged or empty");
+            }
+            isRenamingTab = false;
+            setTimeout(renderTabs, 100);
+          });
+
+          const observer = new MutationObserver(() => {
+            if (document.body.classList.contains("dark-theme")) {
+              input.style.background = "#1e1e1e";
+              input.style.color = "#eee";
+              input.style.border = "1px dashed hotpink";
+              input.style.caretColor = "hotpink";
+            }
+            observer.disconnect(); // Only run once
+          });
+
+          observer.observe(tabBtn, { childList: true });
+
+          tabBtn.replaceChild(input, tabLabel);
+          setTimeout(() => {
+            input.focus();
+            input.select();
+          }, 100);
+        });
+
+        const closeBtn = document.createElement("button");
+        closeBtn.innerText = "⨯"; // tight and clean
+        closeBtn.className = "tab-close-btn";
+        closeBtn.title = "Close Tab";
+        closeBtn.onclick = (e) => {
+          e.stopPropagation();
+          closeTab(tab.originalIndex); // 🔁 use originalIndex here too
+        };
+
+        tabBtn.appendChild(tabLabel);
+        tabBtn.appendChild(closeBtn);
+        tabContainer.appendChild(tabBtn);
       });
 
-      function applyEditorMode(mode) {
-        
-        if (!editor) return;
+      const addTabBtn = document.createElement("div");
+      addTabBtn.innerText = "+";
+      addTabBtn.className = "tab add-tab";
+      addTabBtn.onclick = addNewTab;
+      tabContainer.appendChild(addTabBtn);
 
-        // Place at the beginning of applyEditorMode():
-        if (mode !== editor.getAttribute("data-mode")) {
-          if (editor.getAttribute("data-mode") === "notepad") {
-            notepadCache = editor.innerHTML;
-          } else if (editor.getAttribute("data-mode") === "document") {
-            documentCache = editor.innerHTML;
-          }
-        }
-
-        // Update the active tabs reference based on mode
-        tabs = mode === "notepad" ? notepadTabs : documentTabs;
-        activeTabIndex = 0;
-
-        // Load tab bar visibility
-        //document.getElementById("tabBarNotepad").classList.toggle("hidden", mode !== "notepad");
-        //document.getElementById("tabBarDocument").classList.toggle("hidden", mode !== "document");
-
-        safeRenderTabs(); // 🔁 Re-render tabs visually
-
-
-        if (mode === "notepad") {
-          // Contenteditable switch
-          editor.setAttribute("contenteditable", "true");
-          document.getElementById("marginBox")?.removeAttribute("contenteditable");
-          document.getElementById("marginBox")?.classList.add("hidden");
-
-          toolbar && (toolbar.style.display = "none");
-          editor.setAttribute("data-mode", "notepad");
-          editor.style.fontFamily = "Courier, monospace";
-          editor.style.fontSize = "0.9rem";
-          editor.style.padding = "1rem";
-          editor.style.border = "none";
-          editor.style.boxShadow = "none";
-          editor.style.width = "";
-          editor.style.minHeight = "";
-
-          modeToggleBtn.innerText = "📄 Document Mode";
-          status && (status.innerText = "🧠 Notepad Mode Active");
-
-          // Optional: Auto-title
-          const now = new Date();
-          const label = `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-          if (typeof tabs !== "undefined" && tabs[activeIndex]) {
-            tabs[activeIndex].title = label;
-            localStorage.setItem("tabs", JSON.stringify(tabs));
-            safeRenderTabs?.();
-          }
-        } else {
-          // Contenteditable switch
-          editor.setAttribute("contenteditable", "true"); // ✅ allow typing
-          const marginBox = document.getElementById("marginBox");
-          const leftoverText = editor.textContent.replace(marginBox?.innerText || "", "").trim();
-
-          if (leftoverText && marginBox && marginBox.innerText.trim() === "") {
-            marginBox.innerText = leftoverText;
-            editor.innerHTML = ""; // clear mainEditor content
-            editor.appendChild(marginBox); // re-attach marginBox cleanly
-          }
-
-          marginBox?.removeAttribute("contenteditable"); // lock marginBox
-
-          document.getElementById("marginBox")?.removeAttribute("contenteditable"); // ✅ just show margin box, not editable
-
-          toolbar && (toolbar.style.display = "flex");
-          editor.setAttribute("data-mode", "document");
-          editor.style.fontFamily = "Arial, sans-serif";
-          editor.style.fontSize = "1rem";
-          editor.style.padding = ""; // ← don't set universal padding anymore
-          editor.style.border = "1px solid #ccc";
-          editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
-
-          modeToggleBtn.innerText = "🧠 Quick Note Mode";
-          status && (status.innerText = "📄 Document Mode Active");
-
-          const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
-          if (Object.keys(savedMargins).length > 0) {
-            editor.style.margin = "0";
-            editor.style.paddingTop = `${savedMargins.top}px`;
-            editor.style.paddingBottom = `${savedMargins.bottom}px`;
-            editor.style.paddingLeft = `${savedMargins.left}px`;
-            editor.style.paddingRight = `${savedMargins.right}px`;
-          }
-
-          // 📄 Reset tab title (optional)
-          // 📄 Auto-set tab title based on first line of note
-          if (tabs && tabs[activeIndex]) {
-            const text = mainEditor.innerText || "";
-            tabs[activeIndex].title = text.split("\n")[0]?.trim() || "Untitled";
-            localStorage.setItem("tabs", JSON.stringify(tabs));
-
-            // ✨ Update DOM immediately
-            const tabBarEl = document.querySelectorAll(".tab-label")[activeTabIndex];
-            if (tabBarEl) {
-              tabBarEl.innerText = tabs[activeIndex].title || `Tab ${activeTabIndex + 1}`;
-            }
-            safeRenderTabs();
-          
-            if (mode === "document") {
-              paperSizeSelect?.addEventListener("change", updatePaperSize);
-              updatePaperSize(); // run it once immediately
-            }
-          }
-        } 
-        // ✅ Restore cached content after switching
-        if (mode === "notepad") {
-          editor.innerHTML = notepadCache || "";
-          editor.innerHTML = editor.innerHTML.trim();
-        } else if (mode === "document") {
-          editor.innerHTML = documentCache || "";
-          editor.innerHTML = editor.innerHTML.trim();
-
-          // And if marginBox is involved, re-append it here:
-          const marginBox = document.getElementById("marginBox");
-          if (marginBox && !editor.contains(marginBox)) {
-            editor.appendChild(marginBox);
-          }
-        }
-        editor.setAttribute("data-mode", mode);
-
-        // ✏️ Ensure editor receives focus after mode switch
-        setTimeout(() => editor.focus(), 0);
+      // Only add theme toggle if it doesn’t already exist
+      if (!tabBar.querySelector("#themeSwitch")) {
+        const themeToggle = document.createElement("div");
+        themeToggle.className = "tab-theme-switch";
+        themeToggle.innerHTML = `
+          <label class="theme-toggle">
+            <input type="checkbox" id="themeSwitch" />
+            <span class="slider"></span>
+          </label>
+        `;
+        tabBar.appendChild(themeToggle);
+        initThemeToggle?.();
       }
-    });
+      if (tabs[activeTabIndex]) {
+        mainEditor.innerHTML = tabs[activeTabIndex].content || "";
+      }  
+    }
+
+    function switchTab(originalIndex) {
+      // Save current tab content before switching
+      if (tabs[activeTabIndex]) {
+        tabs[activeTabIndex].content = mainEditor.innerHTML;
+      }
+
+      activeTabIndex = originalIndex;
+
+      // Load the new tab content
+      const tab = tabs[originalIndex];
+      mainEditor.innerHTML = tab.content || "";
+
+      safeRenderTabs();
+    }
+
+    function closeTab(index) {
+      if (index === activeTabIndex && hasUnsavedChanges) {
+        const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
+        if (!confirmClose) return;
+      }
+
+      tabs.splice(index, 1);
+
+      // Always have at least one tab
+      if (tabs.length === 0) {
+        tabs.push({ title: "Untitled", content: "" });
+        activeTabIndex = 0;
+      } else if (index <= activeTabIndex) {
+        activeTabIndex = Math.max(0, activeTabIndex - 1);
+      }
+
+      mainEditor.innerHTML = tabs[activeTabIndex].content || "";
+      hasUnsavedChanges = false;
+
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      localStorage.setItem("activeTabIndex", activeTabIndex);
+
+      safeRenderTabs(); // or renderTabs(), depending on your setup
+    } 
+
+    
+
+    function addNewTab() {
+      const currentMode = localStorage.getItem("editorMode") || "document";
+      const newTab = {
+        title: "Untitled",
+        content: "",
+        mode: currentMode // 🔐 key to filter later
+      };
+
+      tabs.push(newTab);
+      activeTabIndex = tabs.length - 1;
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      renderTabs();
+      loadSavedText();
+    }
 
     const paperSizes = {
       letter: { width: 816, height: 1056 }, // 8.5in x 11in at 96dpi
