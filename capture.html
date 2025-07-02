@@ -1411,6 +1411,7 @@
       const addNotepadTab = document.createElement("div");
       addNotepadTab.innerText = "+";
       addNotepadTab.className = "tab add-tab";
+      console.log(typeof applyEditorMode);
       addNotepadTab.onclick = () => {
         applyEditorMode("notepad");  // 🔁 fully switches the mode
         addNewTab("notepad");        // 🧱 then adds a tab in that mode
@@ -1420,6 +1421,7 @@
       const addDocumentTab = document.createElement("div");
       addDocumentTab.innerText = "+";
       addDocumentTab.className = "tab add-tab";
+      console.log(typeof applyEditorMode);
       addDocumentTab.onclick = () => {
         applyEditorMode("document");
         addNewTab("document");
