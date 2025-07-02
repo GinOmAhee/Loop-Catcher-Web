@@ -2913,13 +2913,6 @@
         : document.getElementById("editor"); // now the correct zone
     }
 
-    function getActiveEditor() {
-      const mode = localStorage.getItem("editorMode") || "document";
-      return mode === "notepad"
-        ? document.getElementById("notepadEditor")
-        : document.getElementById("mainEditor");
-    }
-
     const paperSizes = {
       letter: { width: 816, height: 1056 }, // 8.5in x 11in at 96dpi
       legal: { width: 816, height: 1344 },  // 8.5in x 14in
