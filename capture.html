@@ -2578,9 +2578,6 @@
           editor.appendChild(marginBox);
         }
 
-        marginBox?.removeAttribute("contenteditable");
-        marginBox.classList.toggle("hidden", mode === "notepad");
-
         toolbar && (toolbar.style.display = "flex");
         editor.setAttribute("data-mode", "document");
         editor.style.fontFamily = "Arial, sans-serif";
