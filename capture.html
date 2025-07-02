@@ -1377,7 +1377,11 @@
       if (!editor) {
         console.warn("⏳ Waiting for editor to become available...");
         return setTimeout(waitForEditorAndLoad, 50);
+
       }
+
+      document.getElementById("mainEditor").style.display = (mode === "document") ? "block" : "none";
+      document.getElementById("notepadEditor").style.display = (mode === "notepad") ? "block" : "none";
 
       console.log("✅ Editor is ready:", editor);
       loadSavedText();
@@ -2567,6 +2571,7 @@
         }
 
         marginBox?.removeAttribute("contenteditable");
+        marginBox.classList.toggle("hidden", mode === "notepad");
 
         toolbar && (toolbar.style.display = "flex");
         editor.setAttribute("data-mode", "document");
@@ -2576,8 +2581,13 @@
         editor.style.border = "1px solid #ccc";
         editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
 
-        modeToggleBtn.innerText = "🧠 Quick Note Mode";
-        status && (status.innerText = "📄 Document Mode Active");
+        modeToggleBtn.innerText = (mode === "notepad")
+          ? "📄 Document Mode"
+          : "🧠 Quick Note Mode";
+
+        status && (status.innerText = (mode === "notepad")
+          ? "🧠 Notepad Mode Active"
+          : "📄 Document Mode Active");
 
         const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
         if (Object.keys(savedMargins).length > 0) {
@@ -2803,7 +2813,7 @@
       // 📦 Load new tab content into the correct editor
       const targetEditor = getActiveEditor();
       const selectedTab = tabs[originalIndex];
-      if (selectedTab && targetEditor) {
+      if (selectedTab && targetEditor && selectedTab.mode === currentMode) {
         targetEditor.innerHTML = selectedTab.content || "";
       }
 
@@ -2862,6 +2872,13 @@
       localStorage.setItem("activeTabIndexByMode", JSON.stringify(activeTabIndexByMode));
 
       safeRenderTabs();
+    }
+
+    function toggleEditorVisibility(mode) {
+      document.getElementById("mainEditor").style.display = (mode === "document") ? "block" : "none";
+      document.getElementById("notepadEditor").style.display = (mode === "notepad") ? "block" : "none";
+      const marginBox = document.getElementById("marginBox");
+      marginBox?.classList.toggle("hidden", mode === "notepad");
     }
 
     function addNewTab() {
