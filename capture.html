@@ -1282,10 +1282,6 @@
       localStorage.setItem("documentTabs", JSON.stringify(documentTabs));
     }
 
-    let tabs = []; // 👈 Active tab array based on mode
-    let activeTabIndex = 0;
-
-
     function safeRenderTabs() {
       const isNotepad = mainEditor.getAttribute("data-mode") === "notepad";
       const tabBar = isNotepad ? document.getElementById("tabBarNotepad") : document.getElementById("tabBarDocument");
