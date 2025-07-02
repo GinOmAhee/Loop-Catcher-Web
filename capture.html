@@ -1292,29 +1292,37 @@
 
     function safeRenderTabs() {
       const mode = mainEditor.getAttribute("data-mode");
+      const tabs = mode === "notepad" ? notepadTabs : documentTabs;
+      const activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
+
+      // ⬇️ Drop the log here
+      console.log("Rendering Tabs:", {
+        mode,
+        notepadTabs,
+        documentTabs,
+        activeNotepadIndex,
+        activeDocumentIndex
+      });
 
       const notepadBar = document.getElementById("tabBarNotepad");
       const documentBar = document.getElementById("tabBarDocument");
 
       if (!notepadBar || !documentBar) return;
 
-      // 🔁 Render Notepad Tabs
       notepadBar.innerHTML = notepadTabs.map((tab, i) => `
         <div class="tab-label ${i === activeNotepadIndex ? 'active' : ''}" onclick="switchTab(${i})">
-          ${tab.title || `Tab ${i + 1}`}
-        </div>
+          ${tab.title || `Tab ${i + 1}}
+         </div>
       `).join("");
 
-      // 🔁 Render Document Tabs
       documentBar.innerHTML = documentTabs.map((tab, i) => `
         <div class="tab-label ${i === activeDocumentIndex ? 'active' : ''}" onclick="switchTab(${i})">
-          ${tab.title || `Tab ${i + 1}`}
+          ${tab.title || `Tab ${i + 1}}
         </div>
       `).join("");
 
       notepadBar.classList.toggle("disabled", mode !== "notepad");
       documentBar.classList.toggle("disabled", mode !== "document");
-
     }
 
     function renderTabs() {
