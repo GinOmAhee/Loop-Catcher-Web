@@ -516,6 +516,7 @@
   .tab-container {
     flex-shrink: 1;
     flex-grow: 0;
+    gap: 0.25rem;
     flex-direction: column; /* Stack vertically */
     display: flex;
     overflow-x: auto;
@@ -526,10 +527,14 @@
     scroll-behavior: smooth;
     scrollbar-color: var(--tab-border) transparent;
   }
-  #tabBarNotepad, #tabBarDocument {
+  #tabBarNotepad {
     width: 100%;
+    margin-bottom: 0.25rem;
   }
 
+  #tabBarDocument {
+    width: 100%;
+  }
 
   /* Hide scrollbar for webkit browsers (optional) */
   .tab-container::-webkit-scrollbar {
@@ -1058,9 +1063,7 @@
     </div>
   </div>
 
-  
-
-  <div id="tabBar">
+  <div id="tabBar" class="tab-bar">
     <div class="tab-container">
       <div id="tabBarNotepad" class="tab-bar"></div> <!-- ✅ fix class -->
       <div id="tabBarDocument" class="tab-bar"></div>
@@ -2674,8 +2677,8 @@
         activeTabIndex = 0;
 
         // Load tab bar visibility
-        document.getElementById("tabBarNotepad").classList.toggle("hidden", mode !== "notepad");
-        document.getElementById("tabBarDocument").classList.toggle("hidden", mode !== "document");
+        //document.getElementById("tabBarNotepad").classList.toggle("hidden", mode !== "notepad");
+        //document.getElementById("tabBarDocument").classList.toggle("hidden", mode !== "document");
 
         safeRenderTabs(); // 🔁 Re-render tabs visually
 
