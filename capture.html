@@ -1049,12 +1049,12 @@
 
     </div>
   </div>
-  <div id="tabBarNotepad" class="note-tab-bar">
+  <div id="tabBarNotepad" class="tab-bar">
     <div class="tab-container" id="tabContainerNotepad"></div>
     <div class="tab add-tab" onclick="addNewTab('notepad')">+</div>
   </div>
 
-  <div id="tabBarDocument" class="doc-tab-bar">
+  <div id="tabBarDocument" class="tab-bar">
     <div class="tab-container" id="tabContainerDocument"></div>
     <div class="tab add-tab" onclick="addNewTab('document')">+</div>
   </div>
@@ -1298,8 +1298,6 @@
       }
     }
 
-    let applyEditorMode;
-
     function renderDualTabs() {
       const notepadBar = document.getElementById("tabBarNotepad");
       const documentBar = document.getElementById("tabBarDocument");
@@ -1413,20 +1411,18 @@
       const addNotepadTab = document.createElement("div");
       addNotepadTab.innerText = "+";
       addNotepadTab.className = "tab add-tab";
-      console.log(typeof applyEditorMode);
       addNotepadTab.onclick = () => {
-        applyEditorMode("notepad");  // 🔁 fully switches the mode
-        addNewTab("notepad");        // 🧱 then adds a tab in that mode
+        mainEditor.setAttribute("data-mode", "notepad");
+        addNewTab();
       };
       notepadBar.appendChild(addNotepadTab);
 
       const addDocumentTab = document.createElement("div");
       addDocumentTab.innerText = "+";
       addDocumentTab.className = "tab add-tab";
-      console.log(typeof applyEditorMode);
       addDocumentTab.onclick = () => {
-        applyEditorMode("document");
-        addNewTab("document");
+        mainEditor.setAttribute("data-mode", "document");
+        addNewTab();
       };
       documentBar.appendChild(addDocumentTab);
 
@@ -1482,64 +1478,43 @@
     }
 
     function closeTab(index) {
-      const mode = mainEditor.getAttribute("data-mode");
-      const currentTabs = mode === "notepad" ? notepadTabs : documentTabs;
-      let activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
-
-      if (index === activeIndex && hasUnsavedChanges) {
+      if (index === activeTabIndex && hasUnsavedChanges) {
         const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
         if (!confirmClose) return;
       }
 
-      currentTabs.splice(index, 1);
+      tabs.splice(index, 1);
 
-      // Always keep at least one tab
-      if (currentTabs.length === 0) {
-        currentTabs.push({ title: "Untitled", content: "" });
-        activeIndex = 0;
-      } else if (index <= activeIndex) {
-        activeIndex = Math.max(0, activeIndex - 1);
+      // Always have at least one tab
+      if (tabs.length === 0) {
+        tabs.push({ title: "Untitled", content: "" });
+        activeTabIndex = 0;
+      } else if (index <= activeTabIndex) {
+        activeTabIndex = Math.max(0, activeTabIndex - 1);
       }
 
-      // Save changes back to correct vars
-      if (mode === "notepad") {
-        activeNotepadIndex = activeIndex;
-      } else {
-        activeDocumentIndex = activeIndex;
-      }
-
-      mainEditor.innerHTML = currentTabs[activeIndex].content || "";
+      mainEditor.innerHTML = tabs[activeIndex].content || "";
       hasUnsavedChanges = false;
 
-      localStorage.setItem(`${mode}Tabs`, JSON.stringify(currentTabs));
-      localStorage.setItem(`active${mode === "notepad" ? "Notepad" : "Document"}Index`, activeIndex);
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      localStorage.setItem("activeTabIndex", activeTabIndex);
 
-      safeRenderTabs();
-    }
+      safeRenderTabs(); // or renderDualTabs(), depending on your setup
+    } 
 
     let hasUnsavedChanges = false;
 
-    function addNewTab(mode = "notepad") {
-      const tab = document.createElement("div");
-      tab.className = "tab";
-      tab.innerText = `New ${mode.charAt(0).toUpperCase() + mode.slice(1)} Tab`;
-      tab.setAttribute("data-mode", mode);
+    function addNewTab() {
+      const mode = mainEditor.getAttribute("data-mode");
+      const tabData = { title: "Untitled", content: "" };
 
-      // Pick the correct tab bar based on mode
-      let tabBar;
       if (mode === "notepad") {
-        tabBar = document.getElementById("tabBarNotepad");
-      } else if (mode === "document") {
-        tabBar = document.getElementById("tabBarDocument");
+        notepadTabs.push(tabData);
+        activeNotepadIndex = notepadTabs.length - 1;
       } else {
-        console.warn(`No tab bar found for mode: ${mode}`);
-        return;
+        documentTabs.push(tabData);
+        activeDocumentIndex = documentTabs.length - 1;
       }
-
-      tabBar.appendChild(tab);
-   
-      // Optional: Set editor mode / focus
-      // activateTab(tab);
 
       saveTabsToStorage();
       safeRenderTabs();
@@ -1775,16 +1750,16 @@
 
       const mode = mainEditor.getAttribute("data-mode");
       const currentTabs = mode === "notepad" ? notepadTabs : documentTabs;
-      const activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
 
+      // 🛡️ Check for valid tab + activeTabIndex
       if (
         !currentTabs ||
-        activeIndex == null ||
-        activeIndex < 0 ||
-        activeIndex >= currentTabs.length
+        activeTabIndex == null ||
+        activeTabIndex < 0 ||
+        activeTabIndex >= currentTabs.length
       ) {
-      console.warn("⚠️ Invalid tab state — skipping load/render");
-      return;
+        console.warn("⚠️ autoSave() skipped — invalid tab state");
+        return;
       }
 
       currentTabs[activeIndex].content = mainEditor.innerHTML;
@@ -2714,8 +2689,8 @@
         activeTabIndex = 0;
 
         // Load tab bar visibility
-        //document.getElementById("tabBarNotepad").classList.toggle("hidden", mode !== "notepad");
-        //document.getElementById("tabBarDocument").classList.toggle("hidden", mode !== "document");
+        document.getElementById("tabBarNotepad").classList.toggle("hidden", mode !== "notepad");
+        document.getElementById("tabBarDocument").classList.toggle("hidden", mode !== "document");
 
         safeRenderTabs(); // 🔁 Re-render tabs visually
 
@@ -2791,19 +2766,12 @@
             localStorage.setItem("tabs", JSON.stringify(tabs));
 
             // ✨ Update DOM immediately
-            const mode = mainEditor.getAttribute("data-mode");
-            const activeIndex = mode === "notepad" ? activeNotepadIndex : activeDocumentIndex;
-
-            const tabContainerId = mode === "notepad" ? "tabContainerNotepad" : "tabContainerDocument";
-            const tabContainer = document.getElementById(tabContainerId);
-
-            if (tabContainer) {
-              const tabBarEl = tabContainer.querySelectorAll(".tab-label")[activeIndex];
-              if (tabBarEl) {
-                tabBarEl.innerText = tabs[activeIndex].title || `Tab ${activeIndex + 1}`;
-              }
+            const tabBarEl = document.querySelectorAll(".tab-label")[activeTabIndex];
+            if (tabBarEl) {
+              tabBarEl.innerText = tabs[activeIndex].title || `Tab ${activeTabIndex + 1}`;
             }
-
+            safeRenderTabs();
+          
             if (mode === "document") {
               paperSizeSelect?.addEventListener("change", updatePaperSize);
               updatePaperSize(); // run it once immediately
