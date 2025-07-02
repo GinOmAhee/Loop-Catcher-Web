@@ -497,8 +497,7 @@
   }
 
   /* === TABS === */
-  .note-tab-bar,
-  .doc-tab-bar {
+  .tab-bar {
     display: flex;
     align-items: center;
     padding: 0 1rem 0 0.5rem;
@@ -511,21 +510,9 @@
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
-    opacity: 0.4;
-    pointer-events: none;
-    filter: grayscale(1);
-    transition: all 0.3s ease;
   }
 
-  .note-tab-bar.active-mode,
-  .doc-tab-bar.active-mode {
-    opacity: 1;
-    pointer-events: auto;
-    filter: none;
-  }
-
-  .tabContainerNotepad,
-  .tabBarDocument {
+  .tab-container {
     flex-shrink: 1;
     flex-grow: 0;
     display: flex;
@@ -539,22 +526,18 @@
   }
 
   /* Hide scrollbar for webkit browsers (optional) */
-  .tabContainerNotepad::-webkit-scrollbar,
-  .tabBarDocument::-webkit-scrollbar {
+  .tab-container::-webkit-scrollbar {
     height: 6px;
   }
-  .tabContainerNotepad::-webkit-scrollbar-thumb,
-  .tabBarDocument::-webkit-scrollbar-thumb {
+  .tab-container::-webkit-scrollbar-thumb {
     background-color: #bbb;
     border-radius: 4px;
   }
-  .tabContainerNotepad::-webkit-scrollbar-track,
-  .tabBarDocument::-webkit-scrollbar-track {
+  .tab-container::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  .note-tab-bar-tab,
-  .tabBarDocument-tab {
+  .tab {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
