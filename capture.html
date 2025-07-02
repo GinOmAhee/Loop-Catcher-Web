@@ -1412,14 +1412,10 @@
       addNotepadTab.innerText = "+";
       addNotepadTab.className = "tab add-tab";
       addNotepadTab.onclick = () => {
-        // set editor mode separately if needed
         mainEditor.setAttribute("data-mode", "notepad");
-
-        // pass the mode directly
-        addNewTab("notepad");
+        addNewTab();
       };
       notepadBar.appendChild(addNotepadTab);
-
 
       const addDocumentTab = document.createElement("div");
       addDocumentTab.innerText = "+";
@@ -1444,21 +1440,6 @@
         initThemeToggle?.();
       }
     }
-
-    function createAddTabButton(mode) {
-      const btn = document.createElement("div");
-      btn.innerText = "+";
-      btn.className = "tab add-tab";
-      btn.onclick = () => {
-        mainEditor.setAttribute("data-mode", mode);
-        addNewTab(mode);
-      };
-      return btn;
-    }
-
-    notepadBar.appendChild(createAddTabButton("notepad"));
-    htmlBar.appendChild(createAddTabButton("html"));
-
 
     function markUnsaved() {
       hasUnsavedChanges = true;
