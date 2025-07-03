@@ -2808,11 +2808,32 @@
       loadActiveTabContent();
     }
 
-    function switchTab(originalIndex) {
-      const mode = localStorage.getItem("editorMode") || "document";
-      setActiveTabIndex(mode, originalIndex);
+   function switchTab(originalIndex) {
+      if (typeof tabs[originalIndex] === "undefined") {
+        console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
+        return;
+      }
+
+      const selectedTab = tabs[originalIndex];
+
+      // Prevent switching to a tab in a different mode
+      const currentMode = localStorage.getItem("editorMode") || "document";
+      if (selectedTab.mode !== currentMode) {
+        console.warn(`🚫 Can't switch to a ${selectedTab.mode} tab while in ${currentMode} mode`);
+        return;
+      }
+
+      // If unsaved changes exist in current tab, prompt user (optional enhancement)
+      if (hasUnsavedChanges) {
+        const confirmSwitch = confirm("⚠️ You have unsaved changes. Switch tabs anyway?");
+        if (!confirmSwitch) return;
+      }
+
+      const mode = tabs[originalIndex]?.mode || "document";
+
+      setActiveTabIndex(tab.mode, originalIndex);
       loadActiveTabContent();
-      safeRenderTabs(); // ← refreshes tab bars visually
+      safeRenderTabs();
     }
 
     function closeTab(index) {
