@@ -2421,6 +2421,11 @@
       const marginDropdown = document.getElementById("marginDropdown");
       const editor = document.getElementById("mainEditor");
 
+      if (!marginBtn || !marginDropdown || !editor) {
+        console.warn("⛔ Missing margin UI elements.");
+        return;
+      }
+
       marginBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         marginDropdown.classList.toggle("hidden");
