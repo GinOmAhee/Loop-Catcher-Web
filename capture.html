@@ -2635,7 +2635,7 @@
           tabContainer.appendChild(tabBtn);
         });
       }
-      
+
       tabContainer.appendChild(createAddTabButton("document"));
     }
 
@@ -2756,11 +2756,11 @@
       document.getElementById("notepadTabContainer").classList.toggle("active", mode === "notepad");
 
       if (mode === "document") {
-        documentContainer.classList.add("active");
-        notepadContainer.classList.remove("active");
+        documentTabContainer.classList.add("active");
+        notepadTabContainer.classList.remove("active");
       } else {
-        notepadContainer.classList.add("active");
-        documentContainer.classList.remove("active");
+        notepadTabContainer.classList.add("active");
+        documentTabContainer.classList.remove("active");
       }
     }
 
