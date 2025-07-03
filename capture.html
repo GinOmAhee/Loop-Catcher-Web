@@ -2613,7 +2613,7 @@
     function setupModeToggle() {
       modeToggleBtn = document.getElementById("modeToggleBtn");
 
-      btn.addEventListener("click", () => {
+      modeToggleBtn?.addEventListener("click", () => {
         const currentMode = editor?.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
         localStorage.setItem("editorMode", newMode);
