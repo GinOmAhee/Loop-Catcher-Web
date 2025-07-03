@@ -2858,22 +2858,26 @@
         return;
       }
 
-      // Set editorMode based on the tab
       const mode = activeTab.mode || "document";
-      localStorage.setItem("editorMode", mode);
+      const currentMode = editor.getAttribute("data-mode");
 
-      // Switch the editor mode (this will apply styles + restore cached content)
-      switchEditorMode(mode);
-
-      // Load content
-      if (mode === "notepad") {
-        editor.innerHTML = activeTab.content || "";
-      } else {
-        editor.innerHTML = activeTab.content || "";
-        if (!editor.contains(marginBox)) {
-          editor.appendChild(marginBox);
-        }
+      // Only switch modes if necessary
+      if (mode !== currentMode) {
+        localStorage.setItem("editorMode", mode);
+        switchEditorMode(mode); // safe to call here now
+        return; // 💡 Exit here, switchEditorMode will handle loading
       }
+
+      // ✅ If already in correct mode, just load content
+      editor.innerHTML = activeTab.content || "";
+
+      if (mode === "document" && !editor.contains(marginBox)) {
+        editor.appendChild(marginBox);
+      }
+
+      editor.setAttribute("data-mode", mode);
+      focusEditorSafely();
+    }
 
       // Set mode attribute
       editor.setAttribute("data-mode", mode);
