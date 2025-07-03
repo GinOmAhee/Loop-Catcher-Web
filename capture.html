@@ -2459,6 +2459,9 @@
         localStorage.setItem("customMargins", JSON.stringify({ top, bottom, left, right }));
 
         marginDropdown.classList.add("hidden");
+
+        // Optional: reapply to make sure margins persist
+        applyCustomMargins();
       });
 
       // Close dropdown if clicked outside
@@ -2545,6 +2548,20 @@
 
        applyCustomMargins(); // ⬅ optional helper (see below)
       }
+    }
+
+    function applyCustomMargins() {
+      const saved = JSON.parse(localStorage.getItem("customMargins") || "{}");
+
+      const top = saved.top || 0;
+      const bottom = saved.bottom || 0;
+      const left = saved.left || 0;
+      const right = saved.right || 0;
+
+      editor.style.paddingTop = `${top}px`;
+      editor.style.paddingBottom = `${bottom}px`;
+      editor.style.paddingLeft = `${left}px`;
+      editor.style.paddingRight = `${right}px`;
     }
 
     function updateTabTitleByMode(mode) {
