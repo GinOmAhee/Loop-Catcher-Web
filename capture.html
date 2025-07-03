@@ -2658,7 +2658,7 @@
 
       if (ensureAtLeastOneTab(filteredTabs, "document")) return;
 
-      const savedIndex = getActiveTabIndex("document");
+      const savedIndex = getActiveTabIndex("notepad");
       const isValidIndex = filteredTabs.some(tab => tab.originalIndex === savedIndex);
       if (!isValidIndex && filteredTabs.length > 0) {
         setActiveTabIndex("notepad", filteredTabs[0].originalIndex);
@@ -2700,7 +2700,7 @@
         tabContainer.appendChild(tabBtn);
       });
 
-      tabContainer.appendChild(createAddTabButton("notepad"));
+      tabContainer.appendChild(createAddTabButton("document"));
     }
 
     function createTabElement(tab) {
