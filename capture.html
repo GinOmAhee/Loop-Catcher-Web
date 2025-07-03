@@ -2613,11 +2613,13 @@
     function setupModeToggle() {
       modeToggleBtn = document.getElementById("modeToggleBtn");
 
-      modeToggleBtn?.addEventListener("click", () => {
+      btn.addEventListener("click", () => {
         const currentMode = editor?.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
-        console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
-        applyEditorMode(nextMode);
+        localStorage.setItem("editorMode", newMode);
+        setActiveTabBar(newMode);        // Visually activate the tab bar
+        loadActiveTabContent();          // Load content of selected mode
+        safeRenderTabs();                // Render the tab bar with correct highlight
       });
 
       const savedMode = localStorage.getItem("editorMode") || "document";
@@ -2656,7 +2658,7 @@
 
       if (ensureAtLeastOneTab(filteredTabs, "document")) return;
 
-      const savedIndex = getActiveTabIndex("notepad");
+      const savedIndex = getActiveTabIndex("document");
       const isValidIndex = filteredTabs.some(tab => tab.originalIndex === savedIndex);
       if (!isValidIndex && filteredTabs.length > 0) {
         setActiveTabIndex("notepad", filteredTabs[0].originalIndex);
@@ -2698,7 +2700,7 @@
         tabContainer.appendChild(tabBtn);
       });
 
-      tabContainer.appendChild(createAddTabButton("document"));
+      tabContainer.appendChild(createAddTabButton("notepad"));
     }
 
     function createTabElement(tab) {
@@ -2807,31 +2809,10 @@
     }
 
     function switchTab(originalIndex) {
-      if (typeof tabs[originalIndex] === "undefined") {
-        console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
-        return;
-      }
-
-      const selectedTab = tabs[originalIndex];
-
-      // Prevent switching to a tab in a different mode
-      const currentMode = localStorage.getItem("editorMode") || "document";
-      if (selectedTab.mode !== currentMode) {
-        console.warn(`🚫 Can't switch to a ${selectedTab.mode} tab while in ${currentMode} mode`);
-        return;
-      }
-
-      // If unsaved changes exist in current tab, prompt user (optional enhancement)
-      if (hasUnsavedChanges) {
-        const confirmSwitch = confirm("⚠️ You have unsaved changes. Switch tabs anyway?");
-        if (!confirmSwitch) return;
-      }
-
-      const mode = tabs[originalIndex]?.mode || "document";
-
-      setActiveTabIndex(tab.mode, originalIndex);
+      const mode = localStorage.getItem("editorMode") || "document";
+      setActiveTabIndex(mode, originalIndex);
       loadActiveTabContent();
-      safeRenderTabs();
+      safeRenderTabs(); // ← refreshes tab bars visually
     }
 
     function closeTab(index) {
@@ -2885,30 +2866,15 @@
     }
 
     function loadActiveTabContent() {
-      const activeTab = tabs[activeTabIndex];
-      if (!activeTab) {
-        console.warn("⚠️ No active tab to load.");
-        return;
-      }
+      const mode = localStorage.getItem("editorMode") || "document";
+      const activeIndex = getActiveTabIndex(mode);
+      const tab = tabs[activeIndex];
+      if (!tab || tab.mode !== mode) return;
 
-      const mode = activeTab.mode || "document";
-      const currentMode = editor.getAttribute("data-mode");
-
-      // Only switch modes if necessary
-      if (mode !== currentMode) {
-        localStorage.setItem("editorMode", mode);
-        switchEditorMode(mode); // safe to call here now
-        return; // 💡 Exit here, switchEditorMode will handle loading
-      }
-
-      // ✅ If already in correct mode, just load content
-      editor.innerHTML = activeTab.content || "";
-
-      if (mode === "document" && !editor.contains(marginBox)) {
-        editor.appendChild(marginBox);
-      }
-
+      // Apply content
+      editor.innerHTML = tab.content || "";
       editor.setAttribute("data-mode", mode);
+      applyEditorMode(mode);
       focusEditorSafely();
     }
 
@@ -2929,8 +2895,8 @@
       // Title logic based on mode
       const title =
         mode === "notepad"
-        ? `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
-        : "Untitled";
+        ? `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
+        : "📚 EditDocs";
 
       const newTab = {
         title,
@@ -2939,7 +2905,8 @@
       };
 
       tabs.push(newTab);
-      setActiveTabIndex(mode, tabs.length - 1);
+      const newIndex = tabs.length - 1;
+      setActiveTabIndex(mode, newIndex);
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
       safeRenderTabs(); // 💡 Ensures rename-safe refresh
