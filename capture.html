@@ -2770,11 +2770,13 @@
     }
 
     function switchEditorMode(newMode) {
-      if (!["document", "notepad"].includes(newMode)) return;
+      const currentMode = getCurrentEditorMode();
+      if (newMode === currentMode) return;
 
+      applyEditorMode(newMode);
       localStorage.setItem("editorMode", newMode);
       setActiveTabBar(newMode);
-      safeRenderTabs();
+      safeRenderTabs(); // or renderAllTabs() if you don't use safeRender
       loadActiveTabContent();
     }
 
@@ -2919,7 +2921,7 @@
     }
 
     function getCurrentEditorMode() {
-      return localStorage.getItem("editorMode") || "document";
+      return editor?.getAttribute("data-mode") || "document";
     }
 
     function ensureAtLeastOneTab(filteredTabs, mode) {
