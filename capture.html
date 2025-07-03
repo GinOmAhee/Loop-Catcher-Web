@@ -1331,12 +1331,6 @@
 
     window.addEventListener("DOMContentLoaded", () => {
 
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      switchEditorMode(savedMode);
-
-      const mode = localStorage.getItem("editorMode") || "document";
-      setActiveTabBar(mode);
-
       editor = document.getElementById("marginBox");      // your interactive zone
       mainEditor = document.getElementById("mainEditor"); // layout shell
       preview = document.getElementById('preview');
@@ -1352,6 +1346,20 @@
       textColorDropdown = document.getElementById("textColorDropdown");
       justifyBtn = document.getElementById("justifyBtn");
       toolbar = document.getElementById("toolbar");
+
+      if (!mainEditor) {
+        console.error("❌ mainEditor not found");
+        return;
+      }
+
+      console.log("✅ mainEditor is:", mainEditor);
+
+      // ⬇️ NOW safe to call logic that depends on those elements
+      const savedMode = localStorage.getItem("editorMode") || "document";
+      switchEditorMode(savedMode); // this might trigger loadActiveTabContent internally
+
+      const mode = localStorage.getItem("editorMode") || "document";
+      setActiveTabBar(mode);
       
       if (!mainEditor) {
         console.error("❌ mainEditor not found");
@@ -1371,6 +1379,7 @@
           updateGrouping();
           saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
         }, 1000);
+        loadActiveTabContent();
       });
 
       fontBtn.addEventListener("click", (e) => {
