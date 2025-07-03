@@ -2866,15 +2866,30 @@
     }
 
     function loadActiveTabContent() {
-      const mode = localStorage.getItem("editorMode") || "document";
-      const activeIndex = getActiveTabIndex(mode);
-      const tab = tabs[activeIndex];
-      if (!tab || tab.mode !== mode) return;
+      const activeTab = tabs[activeTabIndex];
+      if (!activeTab) {
+        console.warn("⚠️ No active tab to load.");
+        return;
+      }
 
-      // Apply content
-      editor.innerHTML = tab.content || "";
+      const mode = activeTab.mode || "document";
+      const currentMode = editor.getAttribute("data-mode");
+
+      // Only switch modes if necessary
+      if (mode !== currentMode) {
+        localStorage.setItem("editorMode", mode);
+        switchEditorMode(mode); // safe to call here now
+        return; // 💡 Exit here, switchEditorMode will handle loading
+      }
+
+      // ✅ If already in correct mode, just load content
+      editor.innerHTML = activeTab.content || "";
+
+      if (mode === "document" && !editor.contains(marginBox)) {
+        editor.appendChild(marginBox);
+      }
+
       editor.setAttribute("data-mode", mode);
-      applyEditorMode(mode);
       focusEditorSafely();
     }
 
