@@ -2625,10 +2625,8 @@
     }
 
     function safeRenderTabs() {
-      if (abortIfRenaming()) return;
-
-      renderDocumentTabs();
-      renderNotepadTabs();
+      const mode = getCurrentEditorMode();
+      renderTabsForMode(mode);
     }
 
     function abortIfRenaming() {
@@ -2639,66 +2637,42 @@
       return false;
     }
 
-    function renderDocumentTabs() {
-      if (isRenamingTab) {
-        console.warn("⛔ Skipping renderDocumentTabs(): rename input is still active");
-        return;
-      }
-
-      const tabContainer = document.getElementById("documentTabContainer");
-      if (!tabContainer) return;
-
-      tabContainer.innerHTML = "";
-
-      const filteredTabs = tabs
-        .map((tab, i) => ({ ...tab, originalIndex: i }))
-        .filter(tab => tab.mode === "document");
-
-      if (ensureAtLeastOneTab(filteredTabs, "document")) return;
-
-      const savedIndex = getActiveTabIndex("notepad");
-      const isValidIndex = filteredTabs.some(tab => tab.originalIndex === savedIndex);
-      if (!isValidIndex && filteredTabs.length > 0) {
-        setActiveTabIndex("notepad", filteredTabs[0].originalIndex);
-
-        filteredTabs.forEach(tab => {
-          const tabBtn = createTabElement(tab);
-          tabContainer.appendChild(tabBtn);
-        });
-      }
-
-      tabContainer.appendChild(createAddTabButton("document"));
+    function getTabsByMode(mode) {
+      return tabs
+        .map((tab, index) => ({ ...tab, originalIndex: index }))
+        .filter(tab => tab.mode === mode);
     }
 
-    function renderNotepadTabs() {
+    function renderTabsForMode(mode) {
       if (isRenamingTab) {
-        console.warn("⛔ Skipping renderNotepadTabs(): rename input is still active");
+        console.warn(`⛔ Skipping renderTabsForMode("${mode}"): rename input is still active`);
         return;
       }
 
-      const tabContainer = document.getElementById("notepadTabContainer");
+      const containerId = mode === "notepad" ? "notepadTabContainer" : "documentTabContainer";
+      const tabContainer = document.getElementById(containerId);
       if (!tabContainer) return;
 
       tabContainer.innerHTML = "";
 
       const filteredTabs = tabs
         .map((tab, i) => ({ ...tab, originalIndex: i }))
-        .filter(tab => tab.mode === "notepad");
+        .filter(tab => tab.mode === mode);
 
-      if (ensureAtLeastOneTab(filteredTabs, "notepad")) return;
+      if (ensureAtLeastOneTab(filteredTabs, mode)) return;
 
-      const savedIndex = getActiveTabIndex("notepad");
+      const savedIndex = getActiveTabIndex(mode);
       const isValidIndex = filteredTabs.some(tab => tab.originalIndex === savedIndex);
       if (!isValidIndex && filteredTabs.length > 0) {
-        setActiveTabIndex("notepad", filteredTabs[0].originalIndex);
+        setActiveTabIndex(mode, filteredTabs[0].originalIndex);
       }
 
       filteredTabs.forEach(tab => {
         const tabBtn = createTabElement(tab);
         tabContainer.appendChild(tabBtn);
-      });
+      );
 
-      tabContainer.appendChild(createAddTabButton("document"));
+      tabContainer.appendChild(createAddTabButton(mode));
     }
 
     function createTabElement(tab) {
