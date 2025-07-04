@@ -2916,10 +2916,12 @@
         ? `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
         : "📚 EditDocs";
 
+      const safeMode = mode === "notepad" ? "notepad" : "documen
+
       const newTab = {
         title,
         content: "",
-        mode = mode === "notepad" ? "notepad" : "document"
+        mode: safeMode
       };
 
       tabs.push(newTab);
