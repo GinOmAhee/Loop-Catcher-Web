@@ -1453,6 +1453,11 @@
       return document.getElementById("marginBox");
     }
 
+    function getSelectedPaperSize() {
+      const paperSizeSelector = document.getElementById("paperSizeSelector");
+      return paperSizeSelector ? paperSizeSelector.value : "default-size";
+    }
+
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
     const newThemeClass = moodThemeMap[vibe] || "theme-calm"; // Define it first
 
