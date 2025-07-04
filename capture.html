@@ -334,9 +334,6 @@
 
   #mainEditor {
     margin: 0rem auto; /* Add to match document mode */
-    width: 80%;
-    min-height: 400px;
-    max-height: calc(100vh - 5rem); /* or whatever fits below your tab bar */
     overflow-y: auto;
     outline: none;
     transition: all 0.2s ease;
@@ -378,6 +375,9 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
     box-sizing: border-box;
+    width: 80%;
+    min-height: 400px;
+    max-height: calc(100vh - 5rem); /* or whatever fits below your tab bar */
   }
 
   @media (prefers-color-scheme: dark) {
