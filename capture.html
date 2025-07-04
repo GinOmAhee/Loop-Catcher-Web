@@ -2752,8 +2752,8 @@
     }
 
     function renderAllTabs() {
-      renderDocumentTabs();
-      renderNotepadTabs();
+      renderTabsForMode("document");
+      renderTabsForMode("notepad");
     }
 
     function setActiveTabBar(mode) {
@@ -2846,11 +2846,8 @@
       localStorage.setItem("tabs", JSON.stringify(tabs));
 
       // 🔁 Re-render tab bar
-      if (currentMode === "notepad") {
-        renderNotepadTabs();
-      } else {
-        renderDocumentTabs();
-      }
+      renderTabsForMode(currentMode);
+      safeRenderTabs();
 
       // 📥 Load selected tab content
       loadActiveTabContent();
@@ -2916,7 +2913,7 @@
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
       safeRenderTabs(); // 💡 Ensures rename-safe refresh
-      loadSavedText(); // ✅ Load blank or default content
+      loadActiveTabContent(); // ✅ Load blank or default content
     }
 
     function getCurrentEditorMode() {
