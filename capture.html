@@ -2919,7 +2919,7 @@
       const newTab = {
         title,
         content: "",
-        mode: mode || "document"
+        mode === "notepad" ? "notepad" : "document";
       };
 
       tabs.push(newTab);
