@@ -2022,17 +2022,17 @@
       const scope = document.getElementById("searchScope")?.value || "group";
       const groupBy = document.getElementById("groupSelector").value;
       const now = Date.now();
-      const currentMode = getCurrentEditorMode?.() || "document"; // 🧠 📄 Get mode from current UI
+      const currentMode = getCurrentEditorMode?.() || "document";
 
       if (notes.length === 0) {
         groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
         return;
       }
 
-      // 🧠 FILTER notes by current mode
+      // Filter notes by mode
       let modeFilteredNotes = notes.filter(note => (note.mode || "document") === currentMode);
 
-      // 🔍 Filter by keyword (if any)
+      // Further filter by keyword and scope
       let filteredNotes = scope === "all"
         ? keyword
           ? modeFilteredNotes.filter(({ text = "", title = "", project = "" }) =>
@@ -2046,15 +2046,15 @@
 
       const highlightText = (text, keyword) => {
         if (!keyword) return escapeHTML(text).replace(/\n/g, "<br>");
-        const safe = escapeHTML(text);
-        const regex = new RegExp(`(${keyword})`, "gi");
-        return safe.replace(regex, '<mark class="highlight-glow">$1</mark>').replace(/\n/g, "<br>");
-      };
+          const safe = escapeHTML(text);
+          const regex = new RegExp(`(${keyword})`, "gi");
+          return safe.replace(regex, '<mark class="highlight-glow">$1</mark>').replace(/\n/g, "<br>");
+        };
 
       const renderNoteItem = (note) => `
         <li style="margin-bottom:1rem; display: flex; align-items: start;">
           <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-          <div class="note-preview" onclick='loadNoteIntoPreview(decodeURIComponent("${encodeURIComponent(note.text)}"), "${note.mode || 'document'}")'>
+          <div class="note-preview" onclick='loadNoteIntoEditor(decodeURIComponent("${encodeURIComponent(note.text)}"), "${note.mode || 'document'}")'>
             ${highlightText(note.text, keyword)}
           </div>
         </li>
@@ -2071,8 +2071,7 @@
 
       if (scope === "all") {
         if (filteredNotes.length === 0) {
-          html = `<p>😶 No results found for '${escapeHTML(keyword)}'</p>`;
-          groupedNotes.innerHTML = html;
+          groupedNotes.innerHTML = `<p>😶 No results found for '${escapeHTML(keyword)}'</p>`;
           return;
         }
 
@@ -2088,7 +2087,7 @@
               grouped[date].push(note);
             });
             for (const date in grouped) {
-               html += renderGroupedSection("🗓️", date, grouped[date]);
+              html += renderGroupedSection("🗓️", date, grouped[date]);
             }
             break;
 
@@ -2125,15 +2124,15 @@
 
           case "forgotten":
             const forgotten = filteredNotes.filter(note => {
-              const age = now - new Date(note.timestamp || note.time).getTime();
-              return age > 3 * 24 * 60 * 60 * 1000;
-            });
-            if (forgotten.length === 0) {
-              groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
-              return;
-            }
-            html += renderGroupedSection("🧠", "Forgotten Ideas", forgotten);
-            break;
+            const age = now - new Date(note.timestamp || note.time).getTime();
+            return age > 3 * 24 * 60 * 60 * 1000;
+          });
+          if (forgotten.length === 0) {
+            groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
+            return;
+          }
+          html += renderGroupedSection("🧠", "Forgotten Ideas", forgotten);
+          break;
         }
 
         html += `
@@ -2146,11 +2145,12 @@
 
     function togglePreview() {
       const isVisible = preview.classList.toggle("visible");
+
       if (isVisible) {
-        renderPreview();
+        updateGrouping(); // 🧠 Show the full grouped notes list
         mainEditor.classList.add("hidden-editor");
       } else {
-        preview.innerHTML = "";
+        preview.classList.remove("visible");
         mainEditor.classList.remove("hidden-editor");
       }
     }
@@ -2174,7 +2174,7 @@
       preview.style.display = "block";
     }
 
-    function loadNoteIntoPreview(noteHTML, mode = "document") {
+    //function loadNoteIntoPreview(noteHTML, mode = "document") {
       const groupedNotesContainer = document.getElementById("groupedNotes");
       const preview = document.getElementById("preview");
 
