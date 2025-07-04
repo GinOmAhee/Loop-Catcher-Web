@@ -2617,9 +2617,7 @@
         const currentMode = editor?.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
         localStorage.setItem("editorMode", nextMode);
-        setActiveTabBar(nextMode);        // Visually activate the tab bar
-        loadActiveTabContent();          // Load content of selected mode
-        safeRenderTabs();                // Render the tab bar with correct highlight
+        applyEditorMode(nextMode); // 👈 THIS is what was missing earlier
       });
 
       const savedMode = localStorage.getItem("editorMode") || "document";
