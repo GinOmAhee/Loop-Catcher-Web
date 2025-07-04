@@ -2827,9 +2827,7 @@
         if (!confirmSwitch) return;
       }
 
-      const mode = tabs[originalIndex]?.mode || "document";
-
-      setActiveTabIndex(tab.mode, originalIndex);
+      setActiveTabIndex(selectedTab.mode, originalIndex);
       loadActiveTabContent();
       safeRenderTabs();
     }
