@@ -496,6 +496,27 @@
     box-sizing: border-box;
   }
 
+  .editor-area.notepad-mode {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--notepad-bg);
+  }
+
+  .editor-area.document-mode {
+    max-width: none;
+  }
+
+  .editor-area.document-size {
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  .editor-area.notepad-size {
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 60vh;
+  }
+
   /* === TABS === */
   .tab-bar {
     display: flex;
@@ -2529,17 +2550,27 @@
 
     function applyEditorStyles(mode) {
       const marginBox = document.getElementById("marginBox");
+      const paperSize = getSelectedPaperSize(); // assumes helper exists
+
+      if (!editor || !marginBox) return;
+
+      // Set base editor state
+      editor.setAttribute("contenteditable", "true");
+      editor.classList.remove("notepad-mode", "document-mode");
+      editor.classList.add(`${mode}-mode`);
 
       if (mode === "notepad") {
-        editor.setAttribute("contenteditable", "true");
-        marginBox?.classList.add("hidden");
+        marginBox.classList.add("hidden");
         toolbar && (toolbar.style.display = "none");
 
+        // Notepad styling
         editor.style.fontFamily = "Courier, monospace";
         editor.style.fontSize = "0.9rem";
         editor.style.padding = "1rem";
         editor.style.border = "none";
         editor.style.boxShadow = "none";
+
+        // Respect layout via CSS class (no paper sizing)
         editor.style.width = "";
         editor.style.minHeight = "";
 
@@ -2547,30 +2578,35 @@
         status && (status.innerText = "🧠 Notepad Mode Active");
 
       } else if (mode === "document") {
-        editor.setAttribute("contenteditable", "true");
+        marginBox.classList.remove("hidden");
+        toolbar && (toolbar.style.display = "flex");
 
-        // 🪄 Handle leftover text from notepad
-       const leftoverText = editor.textContent.replace(marginBox?.innerText || "", "").trim();
-       if (leftoverText && marginBox && marginBox.innerText.trim() === "") {
-         marginBox.innerText = leftoverText;
-         editor.innerHTML = "";
-         editor.appendChild(marginBox);
-       }
+        marginBox.removeAttribute("contenteditable");
 
-       marginBox?.removeAttribute("contenteditable");
-       toolbar && (toolbar.style.display = "flex");
+        // Document styling
+        editor.style.fontFamily = "Arial, sans-serif";
+        editor.style.fontSize = "1rem";
+        editor.style.padding = "";
+        editor.style.border = "1px solid #ccc";
+        editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
 
-       editor.style.fontFamily = "Arial, sans-serif";
-       editor.style.fontSize = "1rem";
-       editor.style.padding = "";
-       editor.style.border = "1px solid #ccc";
-       editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
+        // Apply selected paper dimensions
+        if (paperSizes[paperSize]) {
+          const { width, height } = paperSizes[paperSize];
+          editor.style.width = `${width}px`;
+          editor.style.minHeight = `${height}px`;
+        }
 
-       modeToggleBtn.innerText = "🧠 Notepad Mode";
-       status && (status.innerText = "📄 Document Mode Active");
+        modeToggleBtn.innerText = "🧠 Notepad Mode";
+        status && (status.innerText = "📄 Document Mode Active");
 
-       applyCustomMargins(); // ⬅ optional helper (see below)
+        applyCustomMargins?.(); // optional layout enhancement
       }
+    }
+
+    function getSelectedPaperSize() {
+      const select = document.getElementById("paperSizeSelect");
+      return select ? select.value : "letter"; // default to 'letter' if none selected
     }
 
     function applyCustomMargins() {
