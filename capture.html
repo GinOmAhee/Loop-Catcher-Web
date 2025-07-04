@@ -2913,8 +2913,8 @@
       // Title logic based on mode
       const title =
         mode === "notepad"
-        ? `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
-        : "📚 EditDocs";
+        ? "📚 EditDocs";
+        : `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
 
       const safeMode = mode === "notepad" ? "notepad" : "document"
 
