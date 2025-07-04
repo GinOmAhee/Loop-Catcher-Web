@@ -2616,8 +2616,8 @@
       modeToggleBtn?.addEventListener("click", () => {
         const currentMode = editor?.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
-        localStorage.setItem("editorMode", newMode);
-        setActiveTabBar(newMode);        // Visually activate the tab bar
+        localStorage.setItem("editorMode", nextMode);
+        setActiveTabBar(nextMode);        // Visually activate the tab bar
         loadActiveTabContent();          // Load content of selected mode
         safeRenderTabs();                // Render the tab bar with correct highlight
       });
