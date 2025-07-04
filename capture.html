@@ -499,53 +499,63 @@
   /* === TABS === */
   .tab-bar {
     display: flex;
-    flex-direction: column; /* ⬅️ THIS makes it vertical */
-    align-items: flex-start; /* Optional: align to left */
-    padding: .5rem .5rem 0.2rem 0.2rem;
+    flex-direction: row; /* ⬅️ CHANGED from column to row */
+    justify-content: space-between;
+    align-items: flex-end; /* Align bottom edge if tab heights vary */
+    padding: 0.5rem 0.5rem 0.2rem 0.2rem;
     margin-bottom: 0.5rem;
     border-bottom: 2px solid #ccc;
     position: sticky;
     top: 0;
     min-height: 8rem;
     height: auto;
-    z-index: 10; /* Make sure it stays above other elements */
+    z-index: 10;
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
+    gap: 1rem; /* Optional: space between left/right tab zones */
   }
+
+  /* Mode container shared base */
   .mode-tab-container {
     display: flex;
-    gap: 3px;
     flex-wrap: wrap;
-    margin-bottom: 0.5rem;
+    gap: 3px;
     opacity: 0.5;
     pointer-events: none;
     user-select: none;
     transition: opacity 0.2s ease;
-  }
-
-  .document-tabs {
-    border-bottom: 2px solid #4169E1;
-    padding-bottom: 4px;
-    max-width: 75vw; /* ⛳ LIMIT how wide tabs can go */
-    scrollbar-width: thin;
-    scroll-behavior: smooth;
-    scrollbar-color: var(--tab-border) transparent;
-    overflow-x: auto; 
+    max-width: 48vw;
+    overflow-x: auto;
     overflow-y: hidden;
-    padding-right: 4rem; /* leaves space for theme toggle */
+    padding-bottom: 4px;
   }
 
+  /* Active mode gets interactivity */
+  .mode-tab-container.active {
+    opacity: 1;
+    pointer-events: auto;
+    user-select: auto;
+  }
+
+  /* Notepad tabs (left-aligned) */
   .notepad-tabs {
     border-bottom: 2px dashed #FF69B4;
-    padding-bottom: 4px;
-    max-width: 75vw; /* ⛳ LIMIT how wide tabs can go */
+    justify-content: flex-start;
+    padding-right: 1rem;
+    -width: thin;
+    scroll-behavior: smooth;
+    scrollbar-color: var(--tab-border) transparent;
+  }
+
+  /* Document tabs (right-aligned) */
+  .document-tabs {
+    border-bottom: 2px solid #4169E1;
+    justify-content: flex-end;
+    padding-left: 1rem;
     scrollbar-width: thin;
     scroll-behavior: smooth;
     scrollbar-color: var(--tab-border) transparent;
-    overflow-x: auto; 
-    overflow-y: hidden;
-    padding-right: 4rem; /* leaves space for theme toggle */
   }
 
   .tab {
