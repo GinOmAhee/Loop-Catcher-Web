@@ -499,11 +499,8 @@
   /* === TABS === */
   .tab-bar {
     display: flex;
-    gap: 4px;
-    flex-direction: column;
+    flex-direction: column; /* ⬅️ THIS makes it vertical */
     align-items: flex-start; /* Optional: align to left */
-    width: 200px; /* Adjust width as needed */
-    border-right: 1px solid #ccc;
     padding: 0 1rem 0 0.5rem;
     margin-bottom: 0.5rem;
     border-bottom: 2px solid #ccc;
@@ -521,14 +518,6 @@
     gap: 4px;
     flex-wrap: wrap;
     margin-bottom: 0.5rem
-  }
-
-  .notepad-bar {
-    border-top: 2px solid hotpink;
-  }
-
-  .document-bar {
-    border-top: 2px solid royalblue;
   }
 
   .document-tabs {
@@ -2928,10 +2917,12 @@
         ? `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
         : "📚 EditDocs";
 
+      const safeMode = mode === "notepad" ? "notepad" : "document"
+
       const newTab = {
         title,
         content: "",
-        mode: mode || "document"
+        mode: safeMode
       };
 
       tabs.push(newTab);
