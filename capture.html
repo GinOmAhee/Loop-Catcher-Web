@@ -1087,16 +1087,17 @@
     </div>
   </div>
 
-  <!-- 📝 Main Editor (always visible) -->
-  <div class="main-container" onclick="maybeClosePreview(event)">
-     <div class="editor-area">
        <!-- Theme toggle stays at top level -->
        <div class="tab-theme-switch">
          <label class="theme-toggle">
            <input type="checkbox" id="themeSwitch" />
            <span class="slider"></span>
          </label>
-      </div>
+       </div>
+
+  <!-- 📝 Main Editor (always visible) -->
+  <div class="main-container" onclick="maybeClosePreview(event)">
+     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
