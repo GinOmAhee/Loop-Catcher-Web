@@ -490,20 +490,10 @@
     flex: 1;
     min-height: 100vh;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 2rem;
     overflow-y: auto;
     box-sizing: border-box;
-  }
-
-  .editor-area.notepad-mode {
-    max-width: 600px;
-    margin: 0 auto;
-    background: var(--paper-bg);
-  }
-
-  .editor-area.document-mode {
-    max-width: none;
   }
 
   /* === TABS === */
@@ -639,7 +629,7 @@
   .tab-label {
     flex-grow: 0 0 auto;
     display: inline-block;
-    max-width: 198px; /* or whatever size fits your layout */
+    max-width: 145px; /* or whatever size fits your layout */
     background: var(--tab-bg, #e0e0e0);
     border-radius: 6px;
     overflow: hidden;
@@ -962,13 +952,11 @@
 
   /* === THEME TOGGLE SWITCH === */
   .theme-toggle {
-    margin-left: auto; /* Pushes it to the right */
-    padding: 0.2rem;
-    position: absolute;
-    top: 50%;
-    right: 1rem;
+    position: sticky;
+    margin: 0 1rem 0 Auto; /* pins it to the right */
+    top: .5rem; /* just below your tab bar */
     transform: translateY(-50%);
-    z-index: 10;
+    z-index: 9;
   }
   .theme-toggle input {
     display: none;
@@ -2510,10 +2498,6 @@
     });
 
     function applyEditorMode(mode) {
-      const editor = document.querySelector(".editor-area");
-        editor.classList.remove("notepad-mode", "document-mode");
-        editor.classList.add(`${mode}-mode`);
-        
       if (!editor) return;
 
       cacheEditorContent();
@@ -2604,10 +2588,10 @@
 
       if (mode === "notepad") {
         const now = new Date();
-        tabs[activeTabIndex].title = `✏️ Scrib ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
       } else if (mode === "document") {
         const text = editor.innerText || "";
-        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDoc";
+        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
       }
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
