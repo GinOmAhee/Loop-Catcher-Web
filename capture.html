@@ -1120,7 +1120,7 @@
        </div>
 
   <!-- 📝 Main Editor (always visible) -->
-  <div class="main-container" onclick="maybeClosePreview(event)">
+  <div class="main-container">
      <div class="editor-area">
       <button id="previewToggle">☰</button>
       <div class="controls">
@@ -1469,13 +1469,6 @@
       }
       setupModeToggle();
     });
-
-    function maybeClosePreview(e) {
-      if (e.target.classList.contains("tab-rename-input")) return;
-      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
-        preview.style.display = 'none';
-      }
-    }
 
     function markUnsaved() {
       hasUnsavedChanges = true;
