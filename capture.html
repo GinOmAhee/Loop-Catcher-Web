@@ -1416,13 +1416,17 @@
         loadActiveTabContent();
       });
 
-      document.getElementById("previewToggle").addEventListener("click", () => {
-        if (preview.style.display === "block") {
-          preview.style.display = "none";
+      document.addEventListener("click", (e) => {
+        if (
+          preview.contains(e.target) ||
+          e.target.id === "previewToggle" ||
+          e.target.closest(".preview-overlay select") ||
+          e.target.closest(".preview-overlay button")
+        ) return;
+
+        if (preview.classList.contains("visible")) {
+          preview.classList.remove("visible");
           mainEditor.classList.remove("hidden-editor");
-        } else {
-          renderPreview(); // 🔁 now mode-aware
-          mainEditor.classList.add("hidden-editor");
         }
       });
 
