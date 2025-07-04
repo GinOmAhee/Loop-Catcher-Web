@@ -518,18 +518,24 @@
 
   /* Mode container shared base */
   .mode-tab-container {
+    flex-shrink: 0; /* Prevent shrinking */
     display: flex;
     flex-wrap: wrap;
     gap: 3px;
-    min-width: 0;           /* allow shrinking within flex */
+    max-height: 3rem; /* Adjust based on your needs */
+    white-space: nowrap; /* Keep tabs on one line */
     flex: 1 1 0%;            /* evenly split width */
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: auto; /* Enable horizontal scrolling */
     padding-bottom: 4px;
     opacity: 0.5;
     pointer-events: none;
     user-select: none;
     transition: opacity 0.2s ease;
+  }
+
+  .tab-bar {
+    max-height: 3.5rem; /* Adjust based on your needs */
+    display: flex;
   }
 
   /* Active mode gets interactivity */
@@ -579,12 +585,6 @@
     color: var(--tab-text);
     border: 1px solid var(--tab-border);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-  }
-
-  .mode-tab-container.active {
-    opacity: 1;
-    pointer-events: auto;
-    user-select: auto;
   }
 
   .tab.add-tab {
