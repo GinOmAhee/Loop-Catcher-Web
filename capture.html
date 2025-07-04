@@ -2174,30 +2174,6 @@
       preview.style.display = "block";
     }
 
-    //function loadNoteIntoPreview(noteHTML, mode = "document") {
-      const groupedNotesContainer = document.getElementById("groupedNotes");
-      const preview = document.getElementById("preview");
-
-      if (!preview) return;
-
-      // Add mode-aware class
-      preview.setAttribute("data-mode", mode); // ← you can style differently if needed
-
-      // Optional: Apply different fonts or styles by mode
-      preview.style.fontFamily = mode === "notepad" ? "Courier, monospace" : "Arial, sans-serif";
-      preview.style.fontSize = mode === "notepad" ? "0.9rem" : "1rem";
-
-      // Replace groupedNotes with the selected note content (just for demo, you can enhance this)
-      groupedNotesContainer.innerHTML = `
-        <div class="note-preview-mode">Previewing: <strong>${mode}</strong></div>
-        <div class="note-html-content">${noteHTML}</div>
-        <div style="margin-top:1rem;"><button onclick="updateGrouping();">🔙 Back to Grouped Notes</button></div>
-      `;
-
-      // Show preview if not already
-      preview.style.display = "block";
-    }
-
     function toggleItalic() {
       const range = getValidSelectionRange();
       if (!range) return;
