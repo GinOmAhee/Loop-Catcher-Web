@@ -1345,8 +1345,8 @@
 
     window.addEventListener("DOMContentLoaded", () => {
 
-      editor = document.getElementById("marginBox");      // your interactive zone
-      mainEditor = document.getElementById("mainEditor"); // layout shell
+      editor = document.getElementById("mainEditor");      // your interactive zone
+      mainEditor = editor; // layout shell
       preview = document.getElementById('preview');
       toggleBtn = document.getElementById('previewToggle');
       saveStatus = document.getElementById('saveStatus');
