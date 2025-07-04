@@ -2538,59 +2538,41 @@
       if (!editor) return;
 
       const marginBox = document.getElementById("marginBox");
-      const paperSize = getSelectedPaperSize?.(); // optional helper
+      const paperSize = getSelectedPaperSize?.(); // optional
       const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
 
-      // Reset shared editor base
+      // 🎨 Shared base reset
       editor.setAttribute("contenteditable", "true");
       editor.classList.remove("notepad-mode", "document-mode");
       editor.classList.add(`${mode}-mode`);
       editor.setAttribute("data-mode", mode);
 
+      // 🧠 NOTEPAD MODE
       if (mode === "notepad") {
-        // 🧠 Notepad-specific styles
         marginBox?.classList.add("hidden");
         marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "none");
 
-        editor.style.fontFamily = "Courier, monospace";
-        editor.style.fontSize = "0.9rem";
-        editor.style.padding = "1rem";
-        editor.style.border = "none";
-        editor.style.boxShadow = "none";
-        editor.style.width = "";
-        editor.style.minHeight = "";
+        // Clear any inline styles related to document layout
         editor.style.margin = "";
         editor.style.paddingTop = "";
         editor.style.paddingBottom = "";
         editor.style.paddingLeft = "";
         editor.style.paddingRight = "";
+        editor.style.width = "";
+        editor.style.minHeight = "";
 
         modeToggleBtn.innerText = "📄 Document Mode";
         status && (status.innerText = "🧠 Notepad Mode Active");
 
+      // 📄 DOCUMENT MODE
       } else if (mode === "document") {
-        // 📄 Document-specific styles
         marginBox?.classList.remove("hidden");
         marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "flex");
 
-        editor.style.fontFamily = "Arial, sans-serif";
-        editor.style.fontSize = "1rem";
-        editor.style.padding = "";
-        editor.style.border = "1px solid #ccc";
-        editor.style.boxShadow = "0 0 10px rgba(0,0,0,0.1)";
-
-        // Paper sizing via inline style or layout class
-        if (paperSizes?.[paperSize]) {
-          const { width, height } = paperSizes[paperSize];
-          editor.style.width = `${width}px`;
-          editor.style.minHeight = `${height}px`;
-        }
-
-        // Apply user-custom margins if available
+        // 📏 Apply saved margins only
         if (Object.keys(savedMargins).length > 0) {
-          editor.style.margin = "0";
           editor.style.paddingTop = `${savedMargins.top}px`;
           editor.style.paddingBottom = `${savedMargins.bottom}px`;
           editor.style.paddingLeft = `${savedMargins.left}px`;
@@ -2600,12 +2582,13 @@
         modeToggleBtn.innerText = "🧠 Notepad Mode";
         status && (status.innerText = "📄 Document Mode Active");
 
-        // Optional hook if you're using paper size dropdown
+        // Optional: paper size updates
         paperSizeSelect?.addEventListener("change", updatePaperSize);
         updatePaperSize?.();
       }
 
-      setTimeout(() => editor.focus(), 0); // ✏️ Focus restore
+      // ✏️ Refocus editor (small delay for smoother transitions)
+      setTimeout(() => editor.focus(), 0);
     }
 
     function applyCustomMargins() {
