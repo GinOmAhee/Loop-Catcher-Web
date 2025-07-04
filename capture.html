@@ -2490,6 +2490,8 @@
       // 💅 Apply mode-specific visual + structural updates
       applyEditorStyles(mode);
 
+      setActiveTabBar(mode);
+
       // 🧾 Update tab title based on mode
       updateTabTitleByMode(mode);
 
@@ -2761,6 +2763,7 @@
     }
 
     function setActiveTabBar(mode) {
+      console.log("🎯 applyEditorMode triggered with", mode);
       const notepadContainer = document.getElementById("notepadTabContainer");
       const documentContainer = document.getElementById("documentTabContainer");
 
