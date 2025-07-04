@@ -1991,11 +1991,27 @@
       const scope = document.getElementById("searchScope")?.value || "group";
       const groupBy = document.getElementById("groupSelector").value;
       const now = Date.now();
+      const currentMode = getCurrentEditorMode?.() || "document"; // 🧠 📄 Get mode from current UI
 
       if (notes.length === 0) {
         groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
         return;
       }
+
+      // 🧠 FILTER notes by current mode
+      let modeFilteredNotes = notes.filter(note => (note.mode || "document") === currentMode);
+
+      // 🔍 Filter by keyword (if any)
+      let filteredNotes = scope === "all"
+        ? keyword
+          ? modeFilteredNotes.filter(({ text = "", title = "", project = "" }) =>
+              `${text} ${title} ${project}`.toLowerCase().includes(keyword))
+          : modeFilteredNotes
+        : keyword
+          ? modeFilteredNotes.filter(n =>
+              n.text?.toLowerCase().includes(keyword) ||
+              n.project?.toLowerCase().includes(keyword))
+          : modeFilteredNotes;
 
       const highlightText = (text, keyword) => {
         if (!keyword) return escapeHTML(text).replace(/\n/g, "<br>");
@@ -2020,17 +2036,6 @@
         return section;
       };
 
-      let filteredNotes = scope === "all"
-        ? keyword
-          ? notes.filter(({ text = "", title = "", project = "" }) =>
-              `${text} ${title} ${project}`.toLowerCase().includes(keyword))
-          : notes
-        : keyword
-          ? notes.filter(n =>
-              n.text?.toLowerCase().includes(keyword) ||
-              n.project?.toLowerCase().includes(keyword))
-          : notes;
-
       let html = "";
 
       if (scope === "all") {
@@ -2052,7 +2057,7 @@
               grouped[date].push(note);
             });
             for (const date in grouped) {
-              html += renderGroupedSection("🗓️", date, grouped[date]);
+               html += renderGroupedSection("🗓️", date, grouped[date]);
             }
             break;
 
@@ -2074,7 +2079,7 @@
               grouped[project].push(note);
             });
             for (const project in grouped) {
-              html += renderGroupedSection("📁", project, grouped[project]);
+               html += renderGroupedSection("📁", project, grouped[project]);
             }
             break;
 
