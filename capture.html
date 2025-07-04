@@ -1982,31 +1982,39 @@
     }
 
 
-    function loadNoteIntoEditor(noteHTML) {
-      mainEditor.innerHTML = noteHTML;
-
-      if (!mainEditor) {
-        console.error("❌ Cannot load note — editor not ready");
+    function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
+      if (!mainEditor || !marginBox) {
+        console.error("❌ Cannot load note — editor elements missing");
         return;
-      }
+       }
 
-      mainEditor.focus();
-      saveStatus.innerText = "📝 Loaded note from preview";
-      preview.style.display = 'none';
-      undoStack.push(noteHTML);
-      redoStack = [];
+        switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
 
-      // 💡 Extract the first line to use as tab title
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = noteHTML;
-      const text = tempDiv.innerText || "";
-      const titleLine = text.split("\n")[0]?.trim() || "Note";
+        if (mode === "notepad") {
+          mainEditor.innerHTML = noteHTML; // inject into the full editor shell
+        } else if (mode === "document") {
+          marginBox.innerHTML = noteHTML; // inject only inside marginBox
+        }
 
-      // ⬇️ INSERT THIS BLOCK HERE
-      tabs[activeTabIndex].title = titleLine;
-      localStorage.setItem("tabs", JSON.stringify(tabs));
-      safeRenderTabs(); // to update UI tab name
-      document.title = titleLine;
+        setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
+
+        mainEditor.focus();
+        saveStatus.innerText = "📝 Loaded note from preview";
+        preview.style.display = 'none';
+        undoStack.push(noteHTML);
+        redoStack = [];
+
+        // 💡 Extract the first line to use as tab title
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = noteHTML;
+        const text = tempDiv.innerText || "";
+        const titleLine = text.split("\n")[0]?.trim() || "Note";
+
+        // ⬇️ INSERT THIS BLOCK HERE
+        tabs[activeTabIndex].title = titleLine;
+        localStorage.setItem("tabs", JSON.stringify(tabs));
+        safeRenderTabs(); // to update UI tab name
+        document.title = titleLine;
     }
 
     function escapeHTML(text) {
@@ -2053,7 +2061,7 @@
       const renderNoteItem = (note) => `
         <li style="margin-bottom:1rem; display: flex; align-items: start;">
           <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-          <div class="note-preview" onclick='loadNoteIntoEditor(decodeURIComponent("${encodeURIComponent(note.text)}"))'>
+          <div class="note-preview" onclick='loadNoteIntoPreview(decodeURIComponent("${encodeURIComponent(note.text)}"), "${note.mode || 'document'}")'>
             ${highlightText(note.text, keyword)}
           </div>
         </li>
@@ -2173,6 +2181,29 @@
       preview.style.display = "block";
     }
 
+    function loadNoteIntoPreview(noteHTML, mode = "document") {
+      const groupedNotesContainer = document.getElementById("groupedNotes");
+      const previewEl = document.getElementById("preview");
+
+      if (!previewEl) return;
+
+      // Add mode-aware class
+      previewEl.setAttribute("data-mode", mode); // ← you can style differently if needed
+
+      // Optional: Apply different fonts or styles by mode
+      previewEl.style.fontFamily = mode === "notepad" ? "Courier, monospace" : "Arial, sans-serif";
+      previewEl.style.fontSize = mode === "notepad" ? "0.9rem" : "1rem";
+
+      // Replace groupedNotes with the selected note content (just for demo, you can enhance this)
+      groupedNotesContainer.innerHTML = `
+        <div class="note-preview-mode">Previewing: <strong>${mode}</strong></div>
+        <div class="note-html-content">${noteHTML}</div>
+        <div style="margin-top:1rem;"><button onclick="updateGrouping();">🔙 Back to Grouped Notes</button></div>
+      `;
+
+      // Show preview if not already
+      previewEl.style.display = "block";
+    }
 
     function toggleItalic() {
       const range = getValidSelectionRange();
