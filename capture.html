@@ -490,7 +490,7 @@
     flex: 1;
     min-height: 100vh;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     padding: 2rem;
     overflow-y: auto;
     box-sizing: border-box;
@@ -952,6 +952,8 @@
 
   /* === THEME TOGGLE SWITCH === */
   .theme-toggle {
+    margin-left: auto; /* Pushes it to the right */
+    padding: 0.2rem;
     position: absolute;
     top: 50%;
     right: 1rem;
@@ -1075,14 +1077,6 @@
   <!-- Inside your existing .tab-bar -->
   <div class="tab-bar">
 
-    <!-- Theme toggle stays at top level -->
-    <div class="tab-theme-switch">
-      <label class="theme-toggle">
-        <input type="checkbox" id="themeSwitch" />
-        <span class="slider"></span>
-      </label>
-    </div>
-
     <!-- Document Mode Tabs -->
     <div id="documentTabContainer" class="tab-container mode-tab-container document-tabs">
       <!-- Document mode tabs will go here -->
@@ -1097,6 +1091,13 @@
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
+    <!-- Theme toggle stays at top level -->
+    <div class="tab-theme-switch">
+      <label class="theme-toggle">
+        <input type="checkbox" id="themeSwitch" />
+        <span class="slider"></span>
+      </label>
+    </div>
       <button id="previewToggle">☰</button>
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
