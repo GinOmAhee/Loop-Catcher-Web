@@ -496,6 +496,16 @@
     box-sizing: border-box;
   }
 
+  .editor-area.notepad-mode {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--paper-bg);
+  }
+
+  .editor-area.document-mode {
+    max-width: none;
+  }
+
   /* === TABS === */
   .tab-bar {
     display: flex;
@@ -2500,6 +2510,10 @@
     });
 
     function applyEditorMode(mode) {
+      const editor = document.querySelector(".editor-area");
+        editor.classList.remove("notepad-mode", "document-mode");
+        editor.classList.add(`${mode}-mode`);
+        
       if (!editor) return;
 
       cacheEditorContent();
