@@ -629,7 +629,7 @@
   .tab-label {
     flex-grow: 0 0 auto;
     display: inline-block;
-    max-width: 145px; /* or whatever size fits your layout */
+    max-width: 198px; /* or whatever size fits your layout */
     background: var(--tab-bg, #e0e0e0);
     border-radius: 6px;
     overflow: hidden;
@@ -2590,10 +2590,10 @@
 
       if (mode === "notepad") {
         const now = new Date();
-        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+        tabs[activeTabIndex].title = `✏️ Scrib ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
       } else if (mode === "document") {
         const text = editor.innerText || "";
-        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
+        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDoc";
       }
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
