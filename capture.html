@@ -2887,6 +2887,9 @@
 
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
+
+       // 🧠 Safely update title after content + mode have landed
+       updateTabTitleByMode(mode);
     }
 
     function getTabContainer(mode) {
