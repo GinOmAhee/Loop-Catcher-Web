@@ -2490,25 +2490,20 @@
     function applyEditorMode(mode) {
       if (!editor) return;
 
-      // 🧠 Cache previous content before mode switch
       cacheEditorContent();
-
-      // 💅 Apply mode-specific visual + structural updates
       applyEditorStyles(mode);
 
+      // 🧠 SWITCH MODE FIRST so helpers update activeTabIndex correctly
+      setEditorModeAttribute(mode);
       setActiveTabBar(mode);
 
-      // 🧾 Update tab title based on mode
-      updateTabTitleByMode(mode);
-
-      // 💾 Persist title update + re-render correct tab bar
+      // 🔁 RENDER tab buttons AND assign correct active index per mode
       safeRenderTabs();
 
-      // 🧩 Restore content from cache
-      restoreEditorContent(mode);
+      // ✅ NOW it's safe to update tab title
+      updateTabTitleByMode(mode);
 
-      // 🪄 Final touches
-      setEditorModeAttribute(mode);
+      restoreEditorContent(mode);
       focusEditorSafely();
     }
 
