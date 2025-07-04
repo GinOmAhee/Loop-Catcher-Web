@@ -747,6 +747,26 @@
     font-size: 0.85rem;
     z-index: 999;
   }
+
+  .preview-notepad {
+    font-family: Courier, monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    padding: 1rem;
+    background-color: #fefefe;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .preview-document {
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+    padding: 1rem;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  }
+
   .preview-top a,
   .preview-settings a {
     display: flex;
@@ -1394,6 +1414,16 @@
           saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
         }, 1000);
         loadActiveTabContent();
+      });
+
+      document.getElementById("previewToggle").addEventListener("click", () => {
+        if (preview.style.display === "block") {
+          preview.style.display = "none";
+          mainEditor.classList.remove("hidden-editor");
+        } else {
+          renderPreview(); // 🔁 now mode-aware
+          mainEditor.classList.add("hidden-editor");
+        }
       });
 
       fontBtn.addEventListener("click", (e) => {
@@ -2112,6 +2142,37 @@
 
       groupedNotes.innerHTML = html;
     }
+
+    function togglePreview() {
+      const isVisible = preview.classList.toggle("visible");
+      if (isVisible) {
+        renderPreview();
+        mainEditor.classList.add("hidden-editor");
+      } else {
+        preview.innerHTML = "";
+        mainEditor.classList.remove("hidden-editor");
+      }
+    }
+
+    function renderPreview() {
+      if (!preview || !mainEditor) return;
+
+      const mode = mainEditor.getAttribute("data-mode") || "document";
+      let content = "";
+
+      if (mode === "notepad") {
+        // Raw plain-text style
+        content = escapeHTML(mainEditor.innerText || "").replace(/\n/g, "<br>");
+        preview.innerHTML = `<div class="preview-notepad">${content}</div>`;
+      } else {
+        // Document mode with full HTML
+        content = mainEditor.innerHTML;
+        preview.innerHTML = `<div class="preview-document">${content}</div>`;
+      }
+
+      preview.style.display = "block";
+    }
+
 
     function toggleItalic() {
       const range = getValidSelectionRange();
