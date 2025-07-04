@@ -2680,7 +2680,7 @@
     function createTabElement(tab, activeIndexForMode) {
       const tabBtn = document.createElement("div");
       tabBtn.className = "tab";
-      if (tab.originalIndex === activeTabIndex) tabBtn.classList.add("active");
+      if (tab.originalIndex === activeIndexForMode)
 
       const tabLabel = document.createElement("span");
       tabLabel.className = "tab-label";
@@ -2843,12 +2843,12 @@
 
       // 🧠 Save new active tab index for this mode
       setActiveTabIndex(currentMode, remainingTabs[0].originalIndex);
+      activeTabIndex = remainingTabs[0].originalIndex;
 
       // 💾 Save tabs
       localStorage.setItem("tabs", JSON.stringify(tabs));
 
       // 🔁 Re-render tab bar
-      renderTabsForMode(currentMode);
       safeRenderTabs();
 
       // 📥 Load selected tab content
@@ -2912,6 +2912,7 @@
       tabs.push(newTab);
       const newIndex = tabs.length - 1;
       setActiveTabIndex(mode, newIndex);
+      activeTabIndex = newIndex;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
       safeRenderTabs(); // 💡 Ensures rename-safe refresh
