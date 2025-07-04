@@ -2183,16 +2183,16 @@
 
     function loadNoteIntoPreview(noteHTML, mode = "document") {
       const groupedNotesContainer = document.getElementById("groupedNotes");
-      const previewEl = document.getElementById("preview");
+      const preview = document.getElementById("preview");
 
-      if (!previewEl) return;
+      if (!preview) return;
 
       // Add mode-aware class
-      previewEl.setAttribute("data-mode", mode); // ← you can style differently if needed
+      preview.setAttribute("data-mode", mode); // ← you can style differently if needed
 
       // Optional: Apply different fonts or styles by mode
-      previewEl.style.fontFamily = mode === "notepad" ? "Courier, monospace" : "Arial, sans-serif";
-      previewEl.style.fontSize = mode === "notepad" ? "0.9rem" : "1rem";
+      preview.style.fontFamily = mode === "notepad" ? "Courier, monospace" : "Arial, sans-serif";
+      preview.style.fontSize = mode === "notepad" ? "0.9rem" : "1rem";
 
       // Replace groupedNotes with the selected note content (just for demo, you can enhance this)
       groupedNotesContainer.innerHTML = `
@@ -2202,7 +2202,7 @@
       `;
 
       // Show preview if not already
-      previewEl.style.display = "block";
+      preview.style.display = "block";
     }
 
     function toggleItalic() {
