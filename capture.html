@@ -2571,8 +2571,8 @@
         editor.style.boxShadow = "none";
 
         // Respect layout via CSS class (no paper sizing)
-        editor.style.width = "";
-        editor.style.minHeight = "";
+        editor.classList.remove("document-size");
+        editor.classList.add("notepad-size");
 
         modeToggleBtn.innerText = "📄 Document Mode";
         status && (status.innerText = "🧠 Notepad Mode Active");
@@ -2596,6 +2596,9 @@
           editor.style.width = `${width}px`;
           editor.style.minHeight = `${height}px`;
         }
+
+        editor.classList.remove("notepad-size");
+        editor.classList.add("document-size");
 
         modeToggleBtn.innerText = "🧠 Notepad Mode";
         status && (status.innerText = "📄 Document Mode Active");
