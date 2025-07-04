@@ -501,27 +501,31 @@
     display: flex;
     flex-direction: column; /* ⬅️ THIS makes it vertical */
     align-items: flex-start; /* Optional: align to left */
-    padding: 0 1rem 0 0.5rem;
+    padding: 1rem 1rem 0.5rem 0.5rem;
     margin-bottom: 0.5rem;
     border-bottom: 2px solid #ccc;
     position: sticky;
     top: 0;
-    height: 6rem;
+    min-height: 6rem;
+    height: auto;
     z-index: 10; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
   }
-
   .mode-tab-container {
     display: flex;
     gap: 4px;
     flex-wrap: wrap;
-    margin-bottom: 0.5rem
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+    pointer-events: none;
+    user-select: none;
+    transition: opacity 0.2s ease;
   }
 
   .document-tabs {
-    border-bottom: 2px solid #ccc;
+    border-bottom: 2px solid #4169E1;
     padding-bottom: 4px;
     max-width: 75vw; /* ⛳ LIMIT how wide tabs can go */
     scrollbar-width: thin;
@@ -533,7 +537,7 @@
   }
 
   .notepad-tabs {
-    border-bottom: 2px dashed #aaa;
+    border-bottom: 2px dashed #FF69B4;
     padding-bottom: 4px;
     max-width: 75vw; /* ⛳ LIMIT how wide tabs can go */
     scrollbar-width: thin;
@@ -564,13 +568,6 @@
     color: var(--tab-text);
     border: 1px solid var(--tab-border);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-  }
-
-  .mode-tab-container {
-    opacity: 0.5;
-    pointer-events: none;
-    user-select: none;
-    transition: opacity 0.2s ease;
   }
 
   .mode-tab-container.active {
