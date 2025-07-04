@@ -1417,15 +1417,12 @@
       });
 
       document.addEventListener("click", (e) => {
-        if (
-          preview.contains(e.target) ||
-          e.target.id === "previewToggle" ||
-          e.target.closest(".preview-overlay select") ||
-          e.target.closest(".preview-overlay button")
-        ) return;
+        if (!preview || !previewEl.classList.contains("visible")) return;
 
-        if (preview.classList.contains("visible")) {
+        // If click is outside the preview window and not on the toggle
+        if (!preview.contains(e.target) && e.target !== toggleBtn) {
           preview.classList.remove("visible");
+          preview.style.display = "none";
           mainEditor.classList.remove("hidden-editor");
         }
       });
