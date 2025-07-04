@@ -2785,15 +2785,15 @@
     }
 
     function setActiveTabBar(mode) {
-      document.getElementById("documentTabContainer").classList.toggle("active", mode === "document");
-      document.getElementById("notepadTabContainer").classList.toggle("active", mode === "notepad");
+      const notepadContainer = document.getElementById("notepadTabContainer");
+      const documentContainer = document.getElementById("documentTabContainer");
 
       if (mode === "document") {
-        documentTabContainer.classList.add("active");
-        notepadTabContainer.classList.remove("active");
+        documentContainer.classList.add("active");
+        notepadContainer.classList.remove("active");
       } else {
-        notepadTabContainer.classList.add("active");
-        documentTabContainer.classList.remove("active");
+        notepadContainer.classList.add("active");
+        documentContainer.classList.remove("active");
       }
     }
 
