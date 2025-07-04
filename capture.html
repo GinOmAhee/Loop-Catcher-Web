@@ -2667,6 +2667,8 @@
         setActiveTabIndex(mode, filteredTabs[0].originalIndex);
       }
 
+      const activeIndexForMode = getActiveTabIndex(mode);
+
       filteredTabs.forEach(tab => {
         const tabBtn = createTabElement(tab);
         tabContainer.appendChild(tabBtn);
@@ -2675,7 +2677,7 @@
       tabContainer.appendChild(createAddTabButton(mode));
     }
 
-    function createTabElement(tab) {
+    function createTabElement(tab, activeIndexForMode) {
       const tabBtn = document.createElement("div");
       tabBtn.className = "tab";
       if (tab.originalIndex === activeTabIndex) tabBtn.classList.add("active");
