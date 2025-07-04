@@ -1417,7 +1417,7 @@
       });
 
       document.addEventListener("click", (e) => {
-        if (!preview || !previewEl.classList.contains("visible")) return;
+        if (!preview || !preview.classList.contains("visible")) return;
 
         // If click is outside the preview window and not on the toggle
         if (!preview.contains(e.target) && e.target !== toggleBtn) {
