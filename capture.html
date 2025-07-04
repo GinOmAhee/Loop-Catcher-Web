@@ -2559,8 +2559,10 @@
         editor.style.paddingBottom = "";
         editor.style.paddingLeft = "";
         editor.style.paddingRight = "";
-        editor.style.width = "";
-        editor.style.minHeight = "";
+        editor.style.removeProperty("width");
+        editor.style.removeProperty("min-height");
+
+        console.log("🔍 Width after cleanup:", editor.style.width, editor.style.minHeight);
 
         modeToggleBtn.innerText = "📄 Document Mode";
         status && (status.innerText = "🧠 Notepad Mode Active");
