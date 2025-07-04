@@ -555,7 +555,7 @@
     gap: 3rem; /* ← this creates space between label & close button */
     min-width: 150px;
     max-width: 150px;
-    width: 150px; /* optional for clarity */
+    width: 200px; /* optional for clarity */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2586,10 +2586,10 @@
 
       if (mode === "notepad") {
         const now = new Date();
-        tabs[activeTabIndex].title = `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
       } else if (mode === "document") {
         const text = editor.innerText || "";
-        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "Untitled";
+        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
       }
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
