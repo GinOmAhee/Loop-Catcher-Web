@@ -2155,25 +2155,6 @@
       }
     }
 
-    function renderPreview() {
-      if (!preview || !mainEditor) return;
-
-      const mode = mainEditor.getAttribute("data-mode") || "document";
-      let content = "";
-
-      if (mode === "notepad") {
-        // Raw plain-text style
-        content = escapeHTML(mainEditor.innerText || "").replace(/\n/g, "<br>");
-        preview.innerHTML = `<div class="preview-notepad">${content}</div>`;
-      } else {
-        // Document mode with full HTML
-        content = mainEditor.innerHTML;
-        preview.innerHTML = `<div class="preview-document">${content}</div>`;
-      }
-
-      preview.style.display = "block";
-    }
-
     function toggleItalic() {
       const range = getValidSelectionRange();
       if (!range) return;
