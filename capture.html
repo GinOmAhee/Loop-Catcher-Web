@@ -1111,13 +1111,13 @@
     </div>
   </div>
 
-       <!-- Theme toggle stays at top level -->
-       <div class="tab-theme-switch">
-         <label class="theme-toggle">
-           <input type="checkbox" id="themeSwitch" />
-           <span class="slider"></span>
-         </label>
-       </div>
+  <!-- Theme toggle stays at top level -->
+  <div class="dark-theme-switch">
+     <label class="theme-toggle">
+       <input type="checkbox" id="themeSwitch" />
+       <span class="slider"></span>
+     </label>
+  </div>
 
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container">
@@ -1322,7 +1322,9 @@
     }
 
     function initThemeToggle() {
-      const switchEl = document.getElementById('themeSwitch');
+      const switchEl
+      
+      = document.getElementById('themeSwitch');
       if (!switchEl) return;
 
       const savedTheme = localStorage.getItem('theme');
@@ -1339,6 +1341,25 @@
       });
 
       applyMoodTheme?.(); // optional safety for external theme blending
+    }
+
+    function injectThemeToggle() {
+      const newContainer = document.querySelector(".sidebar"); // or whatever the new parent is
+      if (!newContainer) return;
+
+      if (newContainer.querySelector("#themeSwitch")) return;
+
+      const themeToggle = document.createElement("div");
+      themeToggle.className = "dark-theme-switch";
+      themeToggle.innerHTML = `
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeSwitch" />
+          <span class="slider"></span>
+        </label>
+      `;
+
+      newContainer.appendChild(themeToggle);
+      initThemeToggle?.();
     }
 
     window.addEventListener('DOMContentLoaded', initThemeToggle);
