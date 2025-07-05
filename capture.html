@@ -2991,6 +2991,12 @@
 
     function loadActiveTabContent() {
       console.log("📥 loadActiveTabContent() fired — activeTab.mode:", activeTab.mode, "| currentMode:", currentMode);
+
+      if (!Array.isArray(tabs) || tabs.length === 0 || typeof activeTabIndex !== "number") {
+        console.warn("⛔ loadActiveTabContent(): Tabs or index not ready.");
+        return;
+      }
+      
       const activeTab = tabs[activeTabIndex];
       if (!activeTab) {
         console.warn("⚠️ No active tab to load.");
