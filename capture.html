@@ -1439,17 +1439,24 @@
         const clickedInsideEditor = mainEditor.contains(e.target);
         const isRenaming = e.target.classList.contains("tab-rename-input");
 
-      if (
-        preview.classList.contains("preview-visible") &&
-        !clickedInsidePreview &&
-        !clickedToggle &&
-        !clickedInsideEditor &&
-        !isRenaming
-      ) {
-       preview.classList.remove("preview-visible");
-       mainEditor.classList.remove("hidden-editor");
-      }
-    });
+        console.log("Preview auto-close triggered.");
+        console.log("Clicked inside preview:", clickedInsidePreview);
+        console.log("Clicked inside editor:", clickedInsideEditor);
+        console.log("Editor was hidden:", mainEditor.classList.contains("hidden-editor"));
+
+        if (
+          preview.classList.contains("preview-visible") &&
+          !clickedInsidePreview &&
+          !clickedToggle &&
+          !clickedInsideEditor &&
+          !isRenaming
+        ) {
+         preview.classList.remove("preview-visible");
+         if (mainEditor.classList.contains("hidden-editor")) {
+           mainEditor.classList.remove("hidden-editor");
+         }
+        }
+      });
 
       fontBtn.addEventListener("click", (e) => {
         e.stopPropagation();
