@@ -1375,6 +1375,10 @@
       initThemeToggle?.();
     }
 
+    const preview = document.querySelector(".preview-overlay");
+    const previewToggle = document.getElementById("previewToggle");
+    const mainEditor = document.getElementById("mainEditor");
+
     window.addEventListener('DOMContentLoaded', initThemeToggle);
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -1431,21 +1435,26 @@
       });
 
       document.addEventListener("click", (e) => {
-       console.log("📎 Document click detected", e.target);
+        console.log("📎 Click at", e.target);
 
-       requestAnimationFrame(() => {
-         if (!preview || !preview.classList.contains("preview-visible")) return;
+        if (!preview || !preview.classList.contains("preview-visible")) {
+          console.log("⛔ Preview not visible");
+          return;
+        }
 
-         const clickedInsidePreview = preview.contains(e.target);
-         const clickedToggle = previewToggle && previewToggle.contains(e.target);
-         const isRenaming = e.target.classList.contains("tab-rename-input");
+        const clickedInsidePreview = preview.contains(e.target);
+        const clickedToggle = previewToggle.contains(e.target);
+        const clickedInsideEditor = mainEditor.contains(e.target);
+        const isRenaming = e.target.classList.contains("tab-rename-input");
 
-         if (!clickedInsidePreview && !clickedToggle && !isRenaming) {
-           preview.classList.remove("preview-visible");
-           mainEditor.classList.remove("hidden-editor");
-         }
-       });
-     });
+        if (!clickedInsidePreview && !clickedToggle && !clickedInsideEditor && !isRenaming) {
+          console.log("💣 Closing preview");
+          preview.classList.remove("preview-visible");
+          mainEditor.classList.remove("hidden-editor");
+        } else {
+          console.log("✅ Click inside UI—no close");
+        }
+      });
 
       fontBtn.addEventListener("click", (e) => {
         e.stopPropagation();
