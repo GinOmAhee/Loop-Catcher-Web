@@ -2071,10 +2071,13 @@
 
     function updateGrouping(target = groupedNotes) {
       const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+      
       const searchInputEl = document.getElementById("searchInput");
+      const searchScopeEl = document.getElementById("searchScope");
+
       const keyword = searchInputEl?.value?.toLowerCase().trim() || "";
-      const scope = document.getElementById("searchScope");
-      const keyword = searchScopeEl?.value?.toLowerCase().trim() || "";
+      const scope = searchScopeEl?.value?.toLowerCase().trim() || "group";
+
       const groupBy = document.getElementById("groupSelector").value;
       const now = Date.now();
       const currentMode = getCurrentEditorMode?.() || "notepad";
