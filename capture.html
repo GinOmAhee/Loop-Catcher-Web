@@ -1434,6 +1434,17 @@
         preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
       });
 
+      document.addEventListener("DOMContentLoaded", () => {
+        const switchEl = document.getElementById("themeSwitch");
+        if (!switchEl) return;
+
+        switchEl.addEventListener("change", () => {
+          const isDark = switchEl.checked;
+          document.body.classList.toggle("dark-mode", isDark);
+          localStorage.setItem("preferredTheme", isDark ? "dark" : "light");
+        });
+      });
+
       const highlightBtn = document.getElementById("highlightBtn");
       const highlightDropdown = document.getElementById("highlightDropdown");
 
