@@ -1426,14 +1426,11 @@
           updateGrouping();
           saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
         }, 1000);
-        loadActiveTabContent();
       });
     
       previewToggle.addEventListener("click", (e) => {
         e.stopPropagation();
-
-        const isVisible = preview.classList.toggle("preview-visible");
-        mainEditor.classList.toggle("hidden-editor", isVisible);
+        togglePreview(); // 🧠 your centralized function
       });
 
       document.addEventListener("click", (e) => {
@@ -3006,8 +3003,9 @@
         return; // 💡 Exit here, switchEditorMode will handle loading
       }
 
-      // ✅ If already in correct mode, just load content
-      editor.innerHTML = activeTab.content || "";
+      if (mode === currentMode && editor.innerHTML.trim() !== (activeTab.content || "").trim()) {
+        editor.innerHTML = activeTab.content || "";
+      }
 
       if (mode === "document" && !editor.contains(marginBox)) {
         editor.appendChild(marginBox);
