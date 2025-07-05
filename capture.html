@@ -2145,6 +2145,15 @@
     }
 
     function togglePreview() {
+      const mode = getCurrentEditorMode?.() || "document";
+
+      if (isVisible) {
+        if (mode === "notepad") {
+        updateGrouping();
+      } else if (mode === "document") {
+        updateDocumentPreview?.(); // If/when this exists
+      }
+
       const isVisible = preview.classList.toggle("visible");
 
       if (isVisible) {
