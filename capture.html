@@ -2187,9 +2187,6 @@
       }
 
       const isVisible = preview.classList.toggle("preview-visible");
-
-      // ✅ Sync display and class
-      preview.style.display = isVisible ? "block" : "none";
       mainEditor.classList.toggle("hidden-editor", isVisible);
 
       if (isVisible) {
@@ -2202,6 +2199,7 @@
 
       console.log('Preview is now', isVisible ? 'visible' : 'hidden');
     }
+
 
     function toggleItalic() {
       const range = getValidSelectionRange();
