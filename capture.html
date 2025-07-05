@@ -2990,6 +2990,7 @@
     }
 
     function loadActiveTabContent() {
+      console.log("📥 loadActiveTabContent() fired — activeTab.mode:", activeTab.mode, "| currentMode:", currentMode);
       const activeTab = tabs[activeTabIndex];
       if (!activeTab) {
         console.warn("⚠️ No active tab to load.");
