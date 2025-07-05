@@ -2073,7 +2073,7 @@
       const scope = document.getElementById("searchScope")?.value || "group";
       const groupBy = document.getElementById("groupSelector").value;
       const now = Date.now();
-      const currentMode = getCurrentEditorMode?.() || "document";
+      const currentMode = getCurrentEditorMode?.() || "notepad";
 
       if (notes.length === 0) {
         groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
@@ -2081,7 +2081,7 @@
       }
 
       // Filter notes by mode
-      let modeFilteredNotes = notes.filter(note => (note.mode || "document") === currentMode);
+      let modeFilteredNotes = notes.filter(note => note.mode === currentMode);
 
       // Further filter by keyword and scope
       let filteredNotes = scope === "all"
@@ -2235,9 +2235,26 @@
     }
 
     function updateDocumentPreview() {
-      const html = getActiveEditorContent(); // or your equivalent
-      preview.innerHTML = renderPreviewHTML(html);
+      const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+
+      const documentNotes = notes.filter(n => (n.mode || "document") === "document");
+
+      if (documentNotes.length === 0) {
+        preview.innerHTML = "<p>📭 No saved document notes found.</p>";
+        return;
+      }
+
+      const html = documentNotes.map(note => `
+        <div class="note-preview" onclick='loadNoteIntoEditor(decodeURIComponent("${encodeURIComponent(note.text)}"), "document")'>
+          <p><strong>${escapeHTML(note.title || "Untitled")}</strong></p>
+          <div>${escapeHTML(note.text || "").slice(0, 200).replace(/\n/g, "<br>")}...</div>
+          <hr>
+        </div>
+      `).join("");
+
+       preview.innerHTML = `<div class="document-preview-list">${html}</div>`;
     }
+
 
     function getActiveEditorContent() {
       return mainEditor.innerHTML; // or use .value if you're working in <textarea>
@@ -3098,7 +3115,8 @@
     }
 
     function getCurrentEditorMode() {
-      return editor?.getAttribute("data-mode") || "document";
+      const mode = editor?.getAttribute("data-mode");
+      return mode === "notepad" || mode === "document" ? mode : "unknown";
     }
 
     function ensureAtLeastOneTab(filteredTabs, mode) {
