@@ -2212,6 +2212,10 @@
       preview.innerHTML = renderPreviewHTML(html);
     }
 
+    function getActiveEditorContent() {
+      return mainEditor.innerHTML; // or use .value if you're working in <textarea>
+    }
+
     function toggleItalic() {
       const range = getValidSelectionRange();
       if (!range) return;
