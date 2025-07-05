@@ -2328,15 +2328,15 @@
       updateGrouping();
     }
 
-    window.onload = async function () {
+    document.addEventListener("DOMContentLoaded", async () => {
       await initializeFirebase();
 
       // Ensure .preview-overlay exists first
       const checkPreviewExists = setInterval(() => {
         const preview = document.querySelector(".preview-overlay");
-        if (preview) {
-          clearInterval(checkPreviewExists); // Found it, stop checking
-        }
+        if (preview) return;
+
+        clearInterval(checkPreviewExists); // Found it, stop checking
 
         firebase.auth().onAuthStateChanged(user => {
           if (user) {
@@ -2347,8 +2347,8 @@
               .then(() => {
                 console.log("✅ Signed in anonymously");
                 updateGrouping(); // Retry after sign-in
-            })
-            .catch(console.error);
+              })
+              .catch(console.error);
           }
 
           const editor = document.getElementById('mainEditor'); // ✅ consistent anchor
@@ -2372,11 +2372,11 @@
 
               console.log("📝 Updating tab title (Document):", newTitle);
 
-                if (tabs[activeTabIndex]) {
-                  tabs[activeTabIndex].title = newTitle;
-                  localStorage.setItem("tabs", JSON.stringify(tabs));
-                  safeRenderTabs();
-                }
+              if (tabs[activeTabIndex]) {
+                tabs[activeTabIndex].title = newTitle;
+                localStorage.setItem("tabs", JSON.stringify(tabs));
+                safeRenderTabs();
+              }
             } else {
               // Optional: Add a debug log or skip entirely
               console.log("✏️ Skipping title update in Notepad mode");
@@ -2385,9 +2385,12 @@
             applyMoodTheme();
             updateGrouping();
             safeRenderTabs();
-            setInterval(autoSave, 30000);
           });  
-      });
+          setInterval(autoSave, 30000);
+        });  
+
+        // ✅ This was missing: it closes `setInterval` block
+      }, 200); // check every 200ms until preview is found
 
       mainEditor.addEventListener("click", function (e) {
         const el = e.target.closest("a");
