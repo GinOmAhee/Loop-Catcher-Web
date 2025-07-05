@@ -2209,19 +2209,27 @@
       const isVisible = preview.classList.toggle("preview-visible");
       
       if (isVisible) {
-        if (mode === "notepad") {
-          updateGrouping();
-        } else if (mode === "document") {
-          try {
+        try {
+          if (mode === "notepad") {
+            updateGrouping();
+          } else if (mode === "document") {
             updateDocumentPreview?.();
-          } catch (err) {
-            console.error("❌ Failed to update preview:", err);
-            mainEditor.classList.remove("hidden-editor"); // 🛡️ recovery if the preview fails
           }
+        } catch (err) {
+          console.error("❌ Failed to update preview:", err);
+          forceEditorRecovery?.(); // optional fallback
         }
+      } else {
+        // 💡 Apply recovery logic after preview closes
+        requestAnimationFrame(() => {
+          mainEditor.classList.remove("hidden-editor");
+          mainEditor.style.display = "block";
+          mainEditor.style.opacity = "1";
+          mainEditor.style.pointerEvents = "auto";
+          mainEditor.scrollTop = 0;
+          mainEditor.offsetHeight; // force reflow
+        });
       }
-      // 🔐 Move this outside to avoid UI desync from failed preview updates
-      mainEditor.classList.toggle("hidden-editor", isVisible);
 
       console.log('Preview is now', isVisible ? 'visible' : 'hidden');
     }
