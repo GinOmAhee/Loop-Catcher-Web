@@ -1241,7 +1241,7 @@
       </div>
 
         <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" contenteditable="true" data-mode="document">
+        <div id="mainEditor" contenteditable="true" data-mode="document" onclick="maybeClosePreview(event)>
           <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
         </div>
 
@@ -2200,13 +2200,18 @@
         if (mode === "notepad") {
           updateGrouping();
         } else if (mode === "document") {
-          updateDocumentPreview?.();
+          try {
+            updateDocumentPreview?.();
+          } catch (err) {
+            console.error("❌ Failed to update preview:", err);
+            mainEditor.classList.remove("hidden-editor"); // 🛡️ recovery if the preview fails
+          }
         }
       }
 
       console.log('Preview is now', isVisible ? 'visible' : 'hidden');
     }
-
+    
     function updateDocumentPreview() {
       const html = getActiveEditorContent(); // or your equivalent
       preview.innerHTML = renderPreviewHTML(html);
@@ -2289,10 +2294,11 @@
         } else {
           console.log("✅ User is signed in:", user.email);
 
-          const editor = document.querySelector('.hidden-editor');
-          if (editor) {
-            editor.style.display = 'block'; // ensure it's in flow, if it might have been none
-            editor.getBoundingClientRect(); // force reflow
+          const editor = document.getElementById('mainEditor'); // ✅ consistent anchor
+          if (editor && editor.classList.contains('hidden-editor')) {
+            editor.classList.remove('hidden-editor');
+            editor.style.display = 'block';
+            editor.getBoundingClientRect(); // force reflow if needed
             editor.classList.add('visible');
           }
 
