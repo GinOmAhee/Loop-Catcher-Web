@@ -2146,21 +2146,16 @@
 
     function togglePreview() {
       const mode = getCurrentEditorMode?.() || "document";
+      const isVisible = preview.classList.toggle("visible");
 
       if (isVisible) {
         if (mode === "notepad") {
         updateGrouping();
       } else if (mode === "document") {
-        updateDocumentPreview?.(); // If/when this exists
+        updateDocumentPreview?.(); // You can define this next
       }
-
-      const isVisible = preview.classList.toggle("visible");
-
-      if (isVisible) {
-        updateGrouping(); // 🧠 Show the full grouped notes list
         mainEditor.classList.add("hidden-editor");
       } else {
-        preview.classList.remove("visible");
         mainEditor.classList.remove("hidden-editor");
       }
     }
