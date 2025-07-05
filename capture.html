@@ -2337,19 +2337,19 @@
         if (preview) {
           clearInterval(checkPreviewExists); // Found it, stop checking
         }
-        
-      firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-          console.log("✅ User is signed in:", user.email || user.uid);
-          updateGrouping(); // Safe to call
-        } else {
-          firebase.auth().signInAnonymously()
-            .then(() => {
-              console.log("✅ Signed in anonymously");
-              updateGrouping(); // Retry after sign-in
-          })
-          .catch(console.error);
-        }
+
+        firebase.auth().onAuthStateChanged(user => {
+          if (user) {
+            console.log("✅ User is signed in:", user.email || user.uid);
+            updateGrouping(); // Safe to call
+          } else {
+            firebase.auth().signInAnonymously()
+              .then(() => {
+                console.log("✅ Signed in anonymously");
+                updateGrouping(); // Retry after sign-in
+            })
+            .catch(console.error);
+          }
 
           const editor = document.getElementById('mainEditor'); // ✅ consistent anchor
           if (editor && editor.classList.contains('hidden-editor')) {
@@ -2367,27 +2367,26 @@
             const currentMode = getCurrentEditorMode();
             const text = mainEditor.innerText || "";
 
-              if (currentMode === "document") {
-                const newTitle = text.split("\n")[0]?.trim() || "Untitled";
+            if (currentMode === "document") {
+              const newTitle = text.split("\n")[0]?.trim() || "Untitled";
 
-                console.log("📝 Updating tab title (Document):", newTitle);
+              console.log("📝 Updating tab title (Document):", newTitle);
 
-              if (tabs[activeTabIndex]) {
-                tabs[activeTabIndex].title = newTitle;
-                localStorage.setItem("tabs", JSON.stringify(tabs));
-                safeRenderTabs();
-              }
+                if (tabs[activeTabIndex]) {
+                  tabs[activeTabIndex].title = newTitle;
+                  localStorage.setItem("tabs", JSON.stringify(tabs));
+                  safeRenderTabs();
+                }
             } else {
               // Optional: Add a debug log or skip entirely
               console.log("✏️ Skipping title update in Notepad mode");
             }
-          });
 
-          applyMoodTheme();
-          updateGrouping();
-          safeRenderTabs();
-          setInterval(autoSave, 30000);
-        }
+            applyMoodTheme();
+            updateGrouping();
+            safeRenderTabs();
+            setInterval(autoSave, 30000);
+          });  
       });
 
       mainEditor.addEventListener("click", function (e) {
