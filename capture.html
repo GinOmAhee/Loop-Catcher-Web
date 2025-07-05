@@ -2165,7 +2165,7 @@
 
     function togglePreview() {
       const mode = getCurrentEditorMode?.() || "document";
-      const isVisible = preview.classList.toggle("visible");
+      const isVisible = preview.classList.toggle("hidden-editor.visible");
 
       if (isVisible) {
         if (mode === "notepad") {
