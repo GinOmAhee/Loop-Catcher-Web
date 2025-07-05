@@ -1112,7 +1112,7 @@
   </div>
 
        <!-- Theme toggle stays at top level -->
-       <div class="tab-theme-switch">
+       <div class="theme-switch">
          <label class="theme-toggle">
            <input type="checkbox" id="themeSwitch" />
            <span class="slider"></span>
@@ -1341,15 +1341,10 @@
       applyMoodTheme?.(); // optional safety for external theme blending
     }
 
-    function injectThemeToggle() {
-      const tabBar = document.querySelector(".tab-bar");
-      if (!tabBar) return;
-
-      // Prevent duplicate switch
-      if (tabBar.querySelector("#themeSwitch")) return;
+    function ThemeToggle() {
 
       const themeToggle = document.createElement("div");
-      themeToggle.className = "tab-theme-switch";
+      themeToggle.className = "theme-switch";
       themeToggle.innerHTML = `
         <label class="theme-toggle">
           <input type="checkbox" id="themeSwitch" />
