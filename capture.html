@@ -1431,9 +1431,12 @@
       document.addEventListener("click", (e) => {
         if (!preview || !preview.classList.contains("preview-visible")) return;
 
-        // If click is outside the preview window and not on the toggle
-        if (!preview.contains(e.target) && e.target !== toggleBtn) {
+        const clickedInsidePreview = preview.contains(e.target);
+        const clickedToggle = previewToggle && previewToggle.contains(e.target);
+
+        if (!clickedInsidePreview && !clickedToggle) {
           preview.classList.remove("preview-visible");
+          preview.style.display = "none";
           mainEditor.classList.remove("hidden-editor");
         }
       });
