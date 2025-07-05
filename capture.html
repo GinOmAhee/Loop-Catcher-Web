@@ -1393,7 +1393,7 @@
       justifyBtn = document.getElementById("justifyBtn");
       toolbar = document.getElementById("toolbar");
       let preview = document.getElementById('preview')
-      
+
       if (!mainEditor) {
         console.error("❌ mainEditor not found");
         return;
@@ -1429,13 +1429,14 @@
         loadActiveTabContent();
       });
 
-      document.addEventListener("click", (e) => {
-        console.log("📎 Click at", e.target);
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        preview.classList.toggle('preview-visible');
+        mainEditor.classList.toggle('hidden-editor');
+      });
 
-        if (!preview || !preview.classList.contains("preview-visible")) {
-          console.log("⛔ Preview not visible");
-          return;
-        }
+      document.addEventListener("click", (e) => {
+        if (!preview.classList.contains("preview-visible")) return;
 
         const clickedInsidePreview = preview.contains(e.target);
         const clickedToggle = previewToggle.contains(e.target);
@@ -1443,11 +1444,8 @@
         const isRenaming = e.target.classList.contains("tab-rename-input");
 
         if (!clickedInsidePreview && !clickedToggle && !clickedInsideEditor && !isRenaming) {
-          console.log("💣 Closing preview");
           preview.classList.remove("preview-visible");
           mainEditor.classList.remove("hidden-editor");
-        } else {
-          console.log("✅ Click inside UI—no close");
         }
       });
 
@@ -1471,11 +1469,6 @@
         const rect = textColorBtn.getBoundingClientRect();
         textColorDropdown.style.left = `${rect.left}px`;
         textColorDropdown.style.top = `${rect.bottom + 5}px`;
-      });
-
-      toggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
       });
 
       document.addEventListener("DOMContentLoaded", () => {
