@@ -1709,20 +1709,20 @@
         activeTabIndex = savedIndex;
 
         const activeTab = tabs[activeTabIndex];
+        const content = activeTab?.content || "";
+        const mode = activeTab?.mode || getCurrentEditorMode?.() || "document"; // fallback chain
 
-        if (activeTab && typeof activeTab.content === "string") {
-          mainEditor.innerHTML = activeTab.content;
-        } else {
-          console.warn("⚠️ No content found in active tab.");
-          mainEditor.innerHTML = ""; // Optional: fallback message
-        }
+        mainEditor.innerHTML = content;
+        applyEditorMode?.(mode); // ✅ restore mode (sets class + data-mode)
+
         safeRenderTabs();
 
       } else {
-        // ✅ in case there's nothing saved yet
-        tabs = [{ title: "Note 1", content: "" }];
+        // ✅ First-time fallback
+        tabs = [{ title: "Note 1", content: "", mode: "document" }];
         activeTabIndex = 0;
-        safeRenderTabs(); // safely render fresh default
+        applyEditorMode?.("document");
+        safeRenderTabs();
       }
 
       if (lastSaved) {
