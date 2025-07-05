@@ -2174,7 +2174,7 @@
 
     function togglePreview() {
       console.log('Toggling preview visibility');
-  
+
       const preview = document.querySelector(".preview-overlay");
       const mainEditor = document.getElementById("mainEditor");
       const mode = getCurrentEditorMode?.() || "document";
@@ -2186,15 +2186,16 @@
 
       const isVisible = preview.classList.toggle("preview-visible");
 
+      // ✅ Sync display and class
+      preview.style.display = isVisible ? "block" : "none";
+      mainEditor.classList.toggle("hidden-editor", isVisible);
+
       if (isVisible) {
         if (mode === "notepad") {
-        updateGrouping();
+          updateGrouping();
         } else if (mode === "document") {
           updateDocumentPreview?.();
         }
-        mainEditor.classList.add("hidden-editor");
-      } else {
-        mainEditor.classList.remove("hidden-editor");
       }
 
       console.log('Preview is now', isVisible ? 'visible' : 'hidden');
