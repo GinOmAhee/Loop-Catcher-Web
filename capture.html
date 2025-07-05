@@ -1112,7 +1112,7 @@
   </div>
 
        <!-- Theme toggle stays at top level -->
-       <div class="theme-switch">
+       <div class="tab-theme-switch">
          <label class="theme-toggle">
            <input type="checkbox" id="themeSwitch" />
            <span class="slider"></span>
@@ -1227,7 +1227,7 @@
         </div>
       </div>
 
-        <div class="main-container" onclick="maybeClosePreview(event)">
+        <!-- 📝 Rich Text Editor -->
         <div id="mainEditor" contenteditable="true" data-mode="document">
           <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
         </div>
@@ -1341,10 +1341,15 @@
       applyMoodTheme?.(); // optional safety for external theme blending
     }
 
-    function ThemeToggle() {
+    function injectThemeToggle() {
+      const tabBar = document.querySelector(".tab-bar");
+      if (!tabBar) return;
+
+      // Prevent duplicate switch
+      if (tabBar.querySelector("#themeSwitch")) return;
 
       const themeToggle = document.createElement("div");
-      themeToggle.className = "theme-switch";
+      themeToggle.className = "tab-theme-switch";
       themeToggle.innerHTML = `
         <label class="theme-toggle">
           <input type="checkbox" id="themeSwitch" />
@@ -2142,29 +2147,12 @@
     function togglePreview() {
       const isVisible = preview.classList.toggle("visible");
 
-      const mode = getCurrentEditorMode?.() || "document";
-
-      if (isVisible) {
-        if (mode === "notepad") {
-        updateGrouping();
-        } else if (mode === "document") {
-          updateDocumentPreview?.(); // If/when this exists
-        }
-      }
-
       if (isVisible) {
         updateGrouping(); // 🧠 Show the full grouped notes list
         mainEditor.classList.add("hidden-editor");
       } else {
         preview.classList.remove("visible");
         mainEditor.classList.remove("hidden-editor");
-      }
-    }
-
-    function maybeClosePreview(e) {
-      if (e.target.classList.contains("tab-rename-input")) return;
-      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
-        preview.style.display = 'none';
       }
     }
 
