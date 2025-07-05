@@ -2067,7 +2067,7 @@
       return div.innerHTML;
     }
 
-    function updateGrouping() {
+    function updateGrouping(target = groupedNotes) {
       const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
       const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
       const scope = document.getElementById("searchScope")?.value || "group";
@@ -2211,7 +2211,7 @@
       if (isVisible) {
         try {
           if (mode === "notepad") {
-            updateGrouping();
+            updateGrouping(preview);
           } else if (mode === "document") {
             updateDocumentPreview?.();
           }
@@ -3115,6 +3115,7 @@
     }
 
     function getCurrentEditorMode() {
+      const editor = document.getElementById("mainEditor");
       const mode = editor?.getAttribute("data-mode");
       return mode === "notepad" || mode === "document" ? mode : "unknown";
     }
