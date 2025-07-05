@@ -2216,7 +2216,7 @@
       if (isVisible) {
         try {
           if (mode === "notepad") {
-            updateGrouping();
+            updateGrouping(preview);
           } else if (mode === "document") {
             updateDocumentPreview?.();
           }
@@ -2332,7 +2332,7 @@
       await initializeFirebase();
 
       requestAnimationFrame(() => {
-        updateGrouping(); // ✅ Called right after DOM is painted
+        updateGrouping(preview); // ✅ Called right after DOM is painted
       });
 
       // Ensure .preview-overlay exists first
