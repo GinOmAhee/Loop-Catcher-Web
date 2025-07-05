@@ -1431,19 +1431,24 @@
 
       toggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        preview.classList.toggle('preview-visible');
-        mainEditor.classList.toggle('hidden-editor');
+
+        const isVisible = preview.classList.toggle('preview-visible');
+        mainEditor.classList.toggle('hidden-editor', isVisible);
       });
 
       document.addEventListener("click", (e) => {
-        if (!preview.classList.contains("preview-visible")) return;
-
         const clickedInsidePreview = preview.contains(e.target);
-        const clickedToggle = previewToggle.contains(e.target);
+        const clickedToggle = toggleBtn.contains(e.target); // use toggleBtn instead of previewToggle
         const clickedInsideEditor = mainEditor.contains(e.target);
         const isRenaming = e.target.classList.contains("tab-rename-input");
 
-        if (!clickedInsidePreview && !clickedToggle && !clickedInsideEditor && !isRenaming) {
+        if (
+          preview.classList.contains("preview-visible") &&
+          !clickedInsidePreview &&
+          !clickedToggle &&
+          !clickedInsideEditor &&
+          !isRenaming
+        ) {
           preview.classList.remove("preview-visible");
           mainEditor.classList.remove("hidden-editor");
         }
