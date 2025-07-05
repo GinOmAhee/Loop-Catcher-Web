@@ -1425,11 +1425,11 @@
       });
 
       document.addEventListener("click", (e) => {
-        if (!preview || !preview.classList.contains(".hidden-editor.visible")) return;
+        if (!preview || !preview.classList.contains("hidden-editor.visible")) return;
 
         // If click is outside the preview window and not on the toggle
         if (!preview.contains(e.target) && e.target !== toggleBtn) {
-          preview.classList.remove(".hidden-editor.visible");
+          preview.classList.remove("hidden-editor.visible");
           preview.style.display = "none";
           mainEditor.classList.remove("hidden-editor");
         }
