@@ -983,14 +983,16 @@
     position: sticky;
     align-self: flex-end;
     margin-right: 1rem;
-    top: 2rem; /* just below your tab bar */
+    margin-left: .3rem
+    top: 5rem; /* just below your tab bar */
     z-index: 9;
   }
 
   .dark-theme-switch {
     position: fixed;
-    top: 2rem;
+    top: 5rem;
     right: 1rem;
+    left: .3rem
     z-index: 1000;
   }
 
@@ -1428,7 +1430,9 @@
         loadActiveTabContent();
       });
 
-     document.addEventListener("click", (e) => {
+      document.addEventListener("click", (e) => {
+       console.log("📎 Document click detected", e.target);
+
        requestAnimationFrame(() => {
          if (!preview || !preview.classList.contains("preview-visible")) return;
 
