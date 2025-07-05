@@ -2074,11 +2074,12 @@
       
       const searchInputEl = document.getElementById("searchInput");
       const searchScopeEl = document.getElementById("searchScope");
+      const groupBy = document.getElementById("groupSelector");
 
       const keyword = searchInputEl?.value?.toLowerCase().trim() || "";
       const scope = searchScopeEl?.value?.toLowerCase().trim() || "group";
-
-      const groupBy = document.getElementById("groupSelector").value;
+      const group = groupBy?.value?.toLowerCase().trim() || ""; // ✅ this is the fix
+      
       const now = Date.now();
       const currentMode = getCurrentEditorMode?.() || "notepad";
 
