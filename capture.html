@@ -746,6 +746,7 @@
     font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
     z-index: 999;
+    pointer-events: auto;
   }
 
   .preview-visible {
@@ -1428,17 +1429,20 @@
         loadActiveTabContent();
       });
 
-      document.addEventListener("click", (e) => {
-        if (!preview || !preview.classList.contains("preview-visible")) return;
+     document.addEventListener("click", (e) => {
+       requestAnimationFrame(() => {
+         if (!preview || !preview.classList.contains("preview-visible")) return;
 
-        const clickedInsidePreview = preview.contains(e.target);
-        const clickedToggle = previewToggle && previewToggle.contains(e.target);
+         const clickedInsidePreview = preview.contains(e.target);
+         const clickedToggle = previewToggle && previewToggle.contains(e.target);
+         const isRenaming = e.target.classList.contains("tab-rename-input");
 
-        if (!clickedInsidePreview && !clickedToggle) {
-          preview.classList.remove("preview-visible");
-          mainEditor.classList.remove("hidden-editor");
-        }
-      });
+         if (!clickedInsidePreview && !clickedToggle && !isRenaming) {
+           preview.classList.remove("preview-visible");
+           mainEditor.classList.remove("hidden-editor");
+         }
+       });
+     });
 
       fontBtn.addEventListener("click", (e) => {
         e.stopPropagation();
