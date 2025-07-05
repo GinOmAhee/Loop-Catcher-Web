@@ -2114,6 +2114,30 @@
          });
 
          notes = localNotes.filter(note => (note.mode || "notepad") === mode);
+
+         if (!notes.length) {
+           preview.innerHTML = "<p>📭 No saved notes found for this mode.</p>";
+           return;
+         }
+
+         const html = notes.map(note => {
+           const encodedText = encodeURIComponent(note.text || "");
+           const safeTitle = escapeHTML(note.title || "Untitled");
+           const safeSnippet = escapeHTML(note.text || "")
+             .slice(0, 200)
+             .replace(/\n/g, "<br>");
+
+           return `
+             <div class="note-preview" onclick='loadNoteIntoEditor(decodeURIComponent("${encodedText}"), "${mode}")'>
+               <p><strong>${safeTitle}</strong></p>
+               <div>${safeSnippet}...</div>
+               <hr>
+             </div>
+  `;
+         }).join("");
+
+         preview.innerHTML = `<div class="grouped-preview-list">${html}</div>`;
+
        }
 
        // 🧼 Step 2: Filter with keyword + scope
