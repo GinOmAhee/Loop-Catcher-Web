@@ -2331,12 +2331,24 @@
     window.onload = async function () {
       await initializeFirebase();
 
+      // Ensure .preview-overlay exists first
+      const checkPreviewExists = setInterval(() => {
+        const preview = document.querySelector(".preview-overlay");
+        if (preview) {
+          clearInterval(checkPreviewExists); // Found it, stop checking
+
       firebase.auth().onAuthStateChanged(user => {
-        if (!user) {
-          alert("Please sign in first.");
-          window.location.href = "signin.html";
+        if (user) {
+          console.log("✅ User is signed in:", user.email || user.uid);
+          updateGrouping(); // Safe to call
         } else {
-          console.log("✅ User is signed in:", user.email);
+          firebase.auth().signInAnonymously()
+            .then(() => {
+              console.log("✅ Signed in anonymously");
+              updateGrouping(); // Retry after sign-in
+          })
+          .catch(console.error);
+        }
 
           const editor = document.getElementById('mainEditor'); // ✅ consistent anchor
           if (editor && editor.classList.contains('hidden-editor')) {
