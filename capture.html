@@ -1266,7 +1266,6 @@
 
     let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
 
-    let preview;
     let toggleBtn;
     let saveStatus;
     let editor, maineditor
@@ -1381,7 +1380,6 @@
 
       editor = document.getElementById("mainEditor");      // your interactive zone
       mainEditor = editor; // layout shell
-      preview = document.getElementById('preview');
       toggleBtn = document.getElementById('previewToggle');
       saveStatus = document.getElementById('saveStatus');
       attachedFilesList = document.getElementById('attachedFilesList');
