@@ -2331,6 +2331,10 @@
     document.addEventListener("DOMContentLoaded", async () => {
       await initializeFirebase();
 
+      requestAnimationFrame(() => {
+        updateGrouping(); // ✅ Called right after DOM is painted
+      });
+
       // Ensure .preview-overlay exists first
       const checkPreviewExists = setInterval(() => {
         const preview = document.querySelector(".preview-overlay");
@@ -2398,10 +2402,6 @@
           e.preventDefault();
           window.open(el.href, "_blank", "noopener");
         }
-      });
-
-      requestAnimationFrame(() => {
-        updateGrouping(); // ✅ Called right after DOM is painted
       });
     });
 
