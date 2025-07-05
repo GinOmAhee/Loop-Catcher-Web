@@ -2207,6 +2207,10 @@
       console.log('Preview is now', isVisible ? 'visible' : 'hidden');
     }
 
+    function updateDocumentPreview() {
+      const html = getActiveEditorContent(); // or your equivalent
+      preview.innerHTML = renderPreviewHTML(html);
+    }
 
     function toggleItalic() {
       const range = getValidSelectionRange();
