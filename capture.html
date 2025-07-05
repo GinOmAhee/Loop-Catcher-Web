@@ -1375,10 +1375,6 @@
       initThemeToggle?.();
     }
 
-    const preview = document.querySelector(".preview-overlay");
-    const previewToggle = document.getElementById("previewToggle");
-    const mainEditor = document.getElementById("mainEditor");
-
     window.addEventListener('DOMContentLoaded', initThemeToggle);
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -2186,12 +2182,21 @@
 
     function togglePreview() {
       console.log('Toggling preview visibility');
+  
+      const preview = document.querySelector(".preview-overlay");
+      const mainEditor = document.getElementById("mainEditor");
       const mode = getCurrentEditorMode?.() || "document";
+
+      if (!preview || !mainEditor) {
+        console.warn("⚠️ Missing preview or mainEditor reference");
+        return;
+      }
+
       const isVisible = preview.classList.toggle("preview-visible");
 
       if (isVisible) {
         if (mode === "notepad") {
-          updateGrouping();
+        updateGrouping();
         } else if (mode === "document") {
           updateDocumentPreview?.();
         }
