@@ -2194,8 +2194,7 @@
       }
 
       const isVisible = preview.classList.toggle("preview-visible");
-      mainEditor.classList.toggle("hidden-editor", isVisible);
-
+      
       if (isVisible) {
         if (mode === "notepad") {
           updateGrouping();
@@ -2208,10 +2207,12 @@
           }
         }
       }
+      // 🔐 Move this outside to avoid UI desync from failed preview updates
+      mainEditor.classList.toggle("hidden-editor", isVisible);
 
       console.log('Preview is now', isVisible ? 'visible' : 'hidden');
     }
-    
+
     function updateDocumentPreview() {
       const html = getActiveEditorContent(); // or your equivalent
       preview.innerHTML = renderPreviewHTML(html);
