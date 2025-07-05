@@ -2399,6 +2399,10 @@
           window.open(el.href, "_blank", "noopener");
         }
       });
+
+      requestAnimationFrame(() => {
+        updateGrouping(); // ✅ Called right after DOM is painted
+      });
     });
 
     function deleteSelectedNotes() {
