@@ -1618,7 +1618,6 @@
       const noteText = mainEditor.innerText.trim();
       const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
       const noteHTML = mainEditor.innerHTML;
-      const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
       const mode = getCurrentEditorMode?.() || "document"; // ✅ get current mode
 
       if (!noteText) return;
