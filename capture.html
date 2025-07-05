@@ -748,6 +748,10 @@
     z-index: 999;
   }
 
+  .preview-visible {
+    display: flex !important;
+  }
+
   .preview-notepad {
     font-family: Courier, monospace;
     font-size: 0.9rem;
@@ -2164,21 +2168,22 @@
     }
 
     function togglePreview() {
-      const isHidden = preview.classList.toggle("hidden-editor");
+      console.log('Toggling preview visibility');
       const mode = getCurrentEditorMode?.() || "document";
-      const isVisible = preview.classList.toggle("hidden-editor.visible");
-      console.log('Preview is now', isHidden ? 'hidden' : 'visible');
+      const isVisible = preview.classList.toggle("preview-visible");
 
       if (isVisible) {
         if (mode === "notepad") {
-        updateGrouping();
-      } else if (mode === "document") {
-        updateDocumentPreview?.(); // You can define this next
-      }
+          updateGrouping();
+        } else if (mode === "document") {
+          updateDocumentPreview?.();
+        }
         mainEditor.classList.add("hidden-editor");
       } else {
         mainEditor.classList.remove("hidden-editor");
       }
+
+      console.log('Preview is now', isVisible ? 'visible' : 'hidden');
     }
 
     function toggleItalic() {
