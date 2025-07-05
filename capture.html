@@ -333,10 +333,9 @@
   }
 
   #mainEditor {
-    margin: 0rem auto; /* Add to match document mode */
-    overflow-y: auto;
-    outline: none;
-    transition: all 0.2s ease;
+    position: relative;
+    overflow: auto;
+    min-height: 100%;
   }
 
   #mainEditor::before {
@@ -442,10 +441,11 @@
   }
 
   .margin-box {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
+    position: absolute;
+    inset: var(--margin-top, 1in) var(--margin-right, 1in) var(--margin-bottom, 1in) var(--margin-left, 1in);
+    border: 2px dashed rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    z-index: 1;
   }
 
   .margin-box::before {
@@ -458,6 +458,12 @@
     border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
     pointer-events: none;
     z-index: 2;
+  }
+
+  #mainEditor:not(.hidden-editor) {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
   }
 
   .hidden-editor {
@@ -1507,6 +1513,13 @@
       }
       setupModeToggle();
     });
+
+    function forceEditorRecovery() {
+      mainEditor.classList.remove("hidden-editor");
+      mainEditor.style.opacity = '1';
+      mainEditor.style.pointerEvents = 'auto';
+      mainEditor.getBoundingClientRect(); // force repaint
+    }
 
     function markUnsaved() {
       hasUnsavedChanges = true;
