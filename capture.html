@@ -1341,26 +1341,6 @@
       applyMoodTheme?.(); // optional safety for external theme blending
     }
 
-    function injectThemeToggle() {
-      const tabBar = document.querySelector(".tab-bar");
-      if (!tabBar) return;
-
-      // Prevent duplicate switch
-      if (tabBar.querySelector("#themeSwitch")) return;
-
-      const themeToggle = document.createElement("div");
-      themeToggle.className = "tab-theme-switch";
-      themeToggle.innerHTML = `
-        <label class="theme-toggle">
-          <input type="checkbox" id="themeSwitch" />
-          <span class="slider"></span>
-        </label>
-      `;
-
-      tabBar.appendChild(themeToggle);
-      initThemeToggle?.(); // ← in case you have this logic elsewhere
-    }
-
     window.addEventListener('DOMContentLoaded', initThemeToggle);
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -1450,6 +1430,7 @@
       });
 
       toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
       });
 
