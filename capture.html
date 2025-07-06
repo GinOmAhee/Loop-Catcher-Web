@@ -3228,6 +3228,8 @@
         return;
       }
 
+      console.log("💾 Saving content before switch:", tabs[activeTabIndex].content);
+
       const selectedTab = tabs[originalIndex];
 
       // Prevent switching to a tab in a different mode
@@ -3245,9 +3247,11 @@
 
       // 💾 Preserve edits from current tab
       tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
-
+      console.log("🖊️ mainEditor.innerHTML is now:", mainEditor.innerHTML);
       setActiveTabIndex(selectedTab.mode, originalIndex);
+      console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
       loadActiveTabContent();
+      
       safeRenderTabs();
     }
 
