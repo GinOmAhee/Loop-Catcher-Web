@@ -3001,7 +3001,8 @@
       editor.style.paddingRight = `${right}px`;
     }
 
-    function updateTabTitleByMode(mode) {
+    function updateTabTitleByMode(mode = tabs[activeTabIndex]?.mode || "document") {
+      console.log("🧪 updateTabTitleByMode called with mode:", mode);
       if (!tabs[activeTabIndex]) return;
 
       const currentTitle = tabs[activeTabIndex].title?.trim();
@@ -3010,6 +3011,8 @@
         currentTitle === "Untitled" ||
         currentTitle.startsWith("✏️ Scribbles") ||
         currentTitle === "📚 EditDocs";
+
+      console.log("🔎 Title before update:", currentTitle, "| shouldOverwrite:", shouldOverwrite);
 
       if (!shouldOverwrite) return;
 
