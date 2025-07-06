@@ -1646,6 +1646,7 @@
       const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
       const noteHTML = mainEditor.innerHTML;
       const mode = getCurrentEditorMode?.() || "document"; // ✅ get current mode
+      const timestamp = now.toISOString();
 
       if (!noteText) return;
 
@@ -1660,6 +1661,7 @@
       projectName = projectName?.trim() || "📂 Unlabeled";
 
       const newNote = {
+        id: timestamp,
         text: noteHTML,
         timestamp: now.toISOString(),
         title: currentTabTitle,
@@ -1669,13 +1671,14 @@
         mode // ✅ now saving mode!
       };
 
+      tabs[activeTabIndex].id = newNote.id;
       existingNotes.unshift(newNote);
       localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
 
       try {
         if (db && firebase.auth().currentUser) {
           const uid = firebase.auth().currentUser.uid;
-          await db.collection("users").doc(uid).collection("notes").add(newNote);
+          await db.collection("users").doc(uid).collection("notes").doc(newNote.id).set(newNote);
           console.log("✅ Note saved to Firestore under user:", uid);
         } else {
           console.warn("⚠️ User not logged in or Firebase not ready");
@@ -2555,7 +2558,7 @@
       let savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       // 👇 And log what you're comparing them to
       console.log("Saved note timestamps:", savedNotes.map(n => n.timestamp));
-      
+
       const timesToDelete = Array.from(checkboxes).map(cb => Number(cb.getAttribute('data-time')));
       // 👇 Insert log here before filtering
       console.log("Timestamps to delete:", timesToDelete);
@@ -2567,14 +2570,18 @@
       // ☁️ 2. (Optional) Delete from Firebase
       const user = firebase.auth().currentUser;
       if (user) {
-        const userNotesRef = firebase.firestore().collection("users").doc(user.uid).collection("notes");
+        const notesRef = firebase.firestore()
+          .collection("users")
+          .doc(user.uid)
+          .collection("notes");
+
         timesToDelete.forEach(time => {
-          userNotesRef
-            .where("timestamp", "==", Number(time))
+          notesRef
+            .where("timestamp", "==", time)
             .get()
             .then(snapshot => {
               snapshot.forEach(doc => doc.ref.delete());
-            });
+          });
         });
       }
 
