@@ -3062,11 +3062,13 @@
       if (!shouldOverwrite) return;
 
       const now = new Date();
-      tabs[activeTabIndex].title =
-        mode === "notepad"
-          ? `🖊️ Scribs ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
-          : `📄 Drafts ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
 
+      if (mode === "notepad") {
+        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+      } else {
+        const text = editor.innerText || "";
+        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
+      }
       localStorage.setItem("tabs", JSON.stringify(tabs));
     }  
 
