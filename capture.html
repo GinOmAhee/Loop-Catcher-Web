@@ -1725,19 +1725,21 @@
       console.log("✅ autoSave() was called");
       const now = new Date();
 
-      if (!mainEditor) return;
+      if (!mainEditor || !tabs[activeTabIndex]) return;
 
-      // Save current content into the active tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      const mode = getCurrentEditorMode?.() || "document";
+      const htmlContent = mainEditor.innerHTML.trim();
 
-      // Save full tabs array
-      localStorage.setItem('tabs', JSON.stringify(tabs));
-      localStorage.setItem('activeTabIndex', activeTabIndex);
-      localStorage.setItem('lastSaved', now.toISOString());
+      // Save content and mode to the current tab
+      tabs[activeTabIndex].content = htmlContent;
+      tabs[activeTabIndex].mode = mode;
 
-      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      localStorage.setItem("activeTabIndex", activeTabIndex);
+      localStorage.setItem("lastSaved", now.toISOString());
 
-      hasUnsavedChanges = false; // Reset after save
+      saveStatus.innerText = `💾 Auto-saved (${mode}) at ${now.toLocaleTimeString()}`;
+      hasUnsavedChanges = false;
     }
 
     window.addEventListener("beforeunload", (e) => {
