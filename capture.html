@@ -2391,11 +2391,11 @@
       const filteredNotes = savedNotes.filter(note => note.mode === activeMode);
       const renderedHTML = renderNotes(filteredNotes, activeMode);
 
-      const notesContainer = document.getElementById("notesContainer");
-      if (notesContainer) {
-        notesContainer.innerHTML = renderedHTML;
+      const groupedNotes = document.getElementById("groupedNotes");
+      if (groupedNotes) {
+        groupedNotes.innerHTML = renderedHTML;
       } else {
-       console.warn("⚠️ notesContainer not found in DOM");
+       console.warn("⚠️ groupedNotes not found in DOM");
       }
     }
 
@@ -3443,7 +3443,7 @@
       // ✅ Load and render notes for this mode
       const savedNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
       const notesForMode = savedNotes.filter(note => note.mode === mode);
-      notesContainer.innerHTML = renderNotes(notesForMode, mode);
+      groupedNotes.innerHTML = renderNotes(notesForMode, mode);
 
       // Also update editor content if needed
       loadActiveTabContent();
