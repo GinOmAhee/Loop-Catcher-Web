@@ -3243,6 +3243,9 @@
         if (!confirmSwitch) return;
       }
 
+      // 💾 Preserve edits from current tab
+      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
+
       setActiveTabIndex(selectedTab.mode, originalIndex);
       loadActiveTabContent();
       safeRenderTabs();
