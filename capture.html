@@ -2310,7 +2310,7 @@
           <div class="grouped-note" data-timestamp="${note.timestamp}">
             <h4>
               <label>
-                <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" />
+                <input type="checkbox" class="note-delete-checkbox" data-time="${note.id}" />
                 <span
                   class="note-title ${isUntitled ? 'untitled-note' : ''}"
                   data-timestamp="${note.timestamp}"
@@ -2575,16 +2575,15 @@
           .doc(user.uid)
           .collection("notes");
 
-        timesToDelete.forEach(time => {
-          notesRef
-            .where("timestamp", "==", time)
-            .get()
-            .then(snapshot => {
-              snapshot.forEach(doc => doc.ref.delete());
+        timesToDelete.forEach(id => {
+          notesRef.doc(id).delete().then(() => {
+            console.log(`🗑️ Deleted note with ID: ${id} from Firestore`);
+          }).catch(err => {
+            console.error(`⚠️ Failed to delete note ${id}:`, err);
           });
         });
       }
-
+      
       // 🔄 3. Refresh preview
       const mode = getCurrentEditorMode?.() || "notepad";
       if (mode === "document") {
