@@ -1643,9 +1643,16 @@
     async function saveText() {
       const now = new Date();
       const noteText = mainEditor.innerText.trim();
-      const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
-      const noteHTML = mainEditor.innerHTML;
+
       const mode = getCurrentEditorMode?.() || "document"; // ✅ get current mode
+
+      let currentTabTitle = tabs[activeTabIndex]?.title?.trim();
+
+      if (!currentTabTitle) {
+      currentTabTitle = mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts";
+      }
+
+      const noteHTML = mainEditor.innerHTML;
       const timestamp = now.toISOString();
 
       if (!noteText) return;
@@ -1658,7 +1665,7 @@
       }
 
       let projectName = prompt("📌 Enter project name (optional):");
-      projectName = projectName?.trim() || "📂 Unlabeled";
+      projectName = projectName?.trim() || "🐣 Unnamed Bebe"; 
 
       const newNote = {
         id: timestamp,
@@ -2289,11 +2296,19 @@
         for (const note of notes) {
           let key;
           if (groupBy === "title") {
-            key = !note.title?.trim()
-              ? note.mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts"
-              : note.title;
-          } else if (groupBy === "project") {
-            key = note.project || "🐣 Unnamed Bebe";
+            const hasTitle = note.title && note.title.trim().length > 0;
+            key = hasTitle
+              ? note.title.trim()
+              : note.mode === "notepad"
+                ? "🌀 Scribstack"
+                : "📥 Draftbank";
+          }
+
+          else if (groupBy === "project") {
+            const hasProject = note.project && note.project.trim().length > 0;
+            key = hasProject
+              ? note.project.trim()
+              : "🫧 Bebepod";
           } else {
             key = new Date(note.timestamp).toLocaleDateString();
           }
