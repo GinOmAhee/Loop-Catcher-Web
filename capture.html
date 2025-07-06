@@ -1675,13 +1675,7 @@
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
-
-      const mode = getCurrentEditorMode?.() || "notepad";
-      if (mode === "document") {
-        updateDocumentPreview();
-      } else {
-        updateGrouping();
-      }; // still safe to call — now it'll work for notepad mode too
+      updatePreviewByMode()
     }    
 
     function autoSave() {
