@@ -2378,6 +2378,21 @@
       }).join("");
     }
 
+    function renderNotesForActiveTab() {
+      const activeMode = tabs[activeTabIndex]?.mode || "document";
+      const savedNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+
+      const filteredNotes = savedNotes.filter(note => note.mode === activeMode);
+      const renderedHTML = renderNotes(filteredNotes, activeMode);
+
+      const notesContainer = document.getElementById("notesContainer");
+      if (notesContainer) {
+        notesContainer.innerHTML = renderedHTML;
+      } else {
+       console.warn("⚠️ notesContainer not found in DOM");
+      }
+    }
+
     function loadNoteFromDataset(div) {
       const text = decodeURIComponent(div.dataset.text);
       const mode = div.dataset.mode;
@@ -2651,6 +2666,7 @@
             console.error(`⚠️ Failed to delete note ${id}:`, err);
           });
         });
+        
       }
       
       // 🔄 3. Refresh preview
@@ -2665,6 +2681,8 @@
       if (statusEl) {
         statusEl.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
       }
+
+      renderNotesForActiveTab()
     }
 
     function applyFormat(type) {
@@ -3346,8 +3364,11 @@
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
 
-       // 🧠 Safely update title after content + mode have landed
-       updateTabTitleByMode(mode);
+      // 🧠 Safely update title after content + mode have landed
+      updateTabTitleByMode(mode);
+
+      // ✅ Refresh notes for current tab's mode
+      renderNotesForActiveTab();
     }
 
     function getTabContainer(mode) {
@@ -3409,7 +3430,15 @@
     }
 
     function setActiveTabIndex(mode, index) {
-      localStorage.setItem(`activeTabIndex_${mode}`, index);
+      activeTabIndex = index;
+
+      // ✅ Load and render notes for this mode
+      const savedNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+      const notesForMode = savedNotes.filter(note => note.mode === mode);
+      notesContainer.innerHTML = renderNotes(notesForMode, mode);
+
+      // Also update editor content if needed
+      loadActiveTabContent();
     }
 
     const paperSizes = {
