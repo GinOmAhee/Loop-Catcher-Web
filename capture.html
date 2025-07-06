@@ -2299,6 +2299,7 @@
     }
 
     function renderNotes(notes, mode) {
+
       return notes.map(note => {
         const encoded = encodeURIComponent(note.text || "");
         const isUntitled = !note.title?.trim();
@@ -3368,6 +3369,31 @@
           mainEditor.style.minHeight = "8.3in";
           break;
       }
+    }
+
+    function migrateNotes(notes) {
+      return notes.map(note => {
+        // Add missing ID from timestamp
+        if (!note.id && note.timestamp) {
+          note.id = note.timestamp;
+        }
+
+        // Ensure mode is set
+        if (!note.mode) {
+          note.mode = "document";
+        }
+
+        // Ensure project exists
+        if (!note.project) {
+          note.project = "📂 Unlabeled";
+        }
+
+        // Ensure resolved & tags exist
+        note.resolved = note.resolved ?? false;
+        note.tags = note.tags ?? [];
+
+        return note;
+      });
     }
 
     document.addEventListener("click", () => {
