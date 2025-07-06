@@ -1447,12 +1447,13 @@
         undoStack.push(mainEditor.innerHTML);
         redoStack = [];
 
+        const currentMode = tabs[activeTabIndex]?.mode || "document"; // 💡 safer than getCurrentEditorMode
+
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
           localStorage.setItem("capturedText", mainEditor.innerHTML);
           localStorage.setItem("lastSaved", new Date().toISOString());
 
-          const mode = getCurrentEditorMode?.() || "notepad";
           if (mode === "document") {
             updateDocumentPreview();
           } else {
@@ -1644,7 +1645,7 @@
 
     async function saveText() {
       const now = new Date();
-      const mode = getCurrentEditorMode?.() || "document"; // ✅ get current mode
+      const mode = tabs[activeTabIndex]?.mode || "document"; 
 
       let currentTabTitle = tabs[activeTabIndex]?.title?.trim();
       if (!currentTabTitle) {
@@ -1759,9 +1760,11 @@
 
         const activeTab = tabs[activeTabIndex];
         const content = activeTab?.content || "";
-        const mode = activeTab?.mode || getCurrentEditorMode?.() || "document"; // fallback chain
+        const mode = activeTab?.mode || "document";
 
         mainEditor.innerHTML = content;
+        const validMode = ["notepad", "document"];
+        const mode = validMode.includes(activeTab?.mode) ? activeTab.mode : "document";
         applyEditorMode?.(mode); // ✅ restore mode (sets class + data-mode)
 
         safeRenderTabs();
@@ -2077,7 +2080,7 @@
     }
 
 
-    function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
+    function loadNoteIntoEditor(noteHTML, mode = tabs[activeTabIndex]?.mode || "document") {
       if (!mainEditor) {
         console.error("❌ Cannot load note — editor element missing");
         return;
@@ -2135,31 +2138,33 @@
     }
 
     function updatePreviewByMode() {
-      const mode = getCurrentEditorMode?.() || "notepad";
+      const mode = tabs[activeTabIndex]?.mode || "document";
       (mode === "document" ? updateDocumentPreview : updateGrouping)();
 
       const user = firebase.auth().currentUser;
       if (!user) return;
 
+      const mode = tabs[activeTabIndex]?.mode || "document";
+
       firebase.firestore()
-        .collection("users")
+        .db.collection("users")
         .doc(user.uid)
         .collection("notes")
-        .where("mode", "==", getCurrentEditorMode?.() || "document")
+        .where("mode", "==", mode)
         .get()
         .then(snapshot => {
-        const notes = [];
-        snapshot.forEach(doc => notes.push(doc.data()));
-        const html = renderNotes(migrateNotes(notes));
-        document.getElementById("groupedNotes").innerHTML = html;
+          const notes = [];
+          snapshot.forEach(doc => notes.push(doc.data()));
+          const html = renderNotes(migrateNotes(notes));
+          document.getElementById("groupedNotes").innerHTML = html;
 
-        updateSaveStatus?.();
-      });
+          updateSaveStatus?.();
+        });
 
     }
 
     function handleGroupChange() {
-      const mode = getCurrentEditorMode?.() || "notepad";
+      const mode = tabs[activeTabIndex]?.mode || "document";
       if (mode === "document") {
         updateDocumentPreview();
       } else {
@@ -2192,7 +2197,7 @@
 
       const preview = document.querySelector(".preview-overlay");
       const mainEditor = document.getElementById("mainEditor");
-      const mode = getCurrentEditorMode?.() || "document";
+      const mode = activeTab?.mode || "document";
 
       if (!preview || !mainEditor) {
         console.warn("⚠️ Missing preview or mainEditor reference");
@@ -2388,7 +2393,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("groupSelector")?.addEventListener("change", () => {
-        const mode = getCurrentEditorMode?.() || "notepad";
+        const mode = activeTab?.mode || "document";
         if (mode === "document") {
           updateDocumentPreview();
         } else {
@@ -2498,7 +2503,7 @@
       const updated = notes.filter(n => n.timestamp !== time);
       localStorage.setItem('savedNotes', JSON.stringify(updated));
 
-      const mode = getCurrentEditorMode?.() || "notepad";
+      const mode = activeTab?.mode || "document";
       if (mode === "document") {
         updateDocumentPreview();
       } else {
@@ -2525,7 +2530,7 @@
           if (user) {
             console.log("✅ User is signed in:", user.email || user.uid);
 
-            const mode = getCurrentEditorMode?.() || "notepad";
+            const mode = activeTab?.mode || "document";
             if (mode === "document") {
               updateDocumentPreview();
               } else {
@@ -2535,7 +2540,7 @@
             firebase.auth().signInAnonymously()
               .then(() => {
                 console.log("✅ Signed in anonymously");
-                const mode = getCurrentEditorMode?.() || "notepad";
+                const mode = activeTab?.mode || "document";
                   if (mode === "document") {
                   updateDocumentPreview();
                 } else {
@@ -2558,7 +2563,7 @@
           mainEditor.addEventListener("input", () => {
             hasUnsavedChanges = true; // ✅ still needed
             
-            const currentMode = getCurrentEditorMode();
+            const mode = activeTab?.mode || "document";
             const text = mainEditor.innerText || "";
 
             if (currentMode === "document") {
@@ -2578,7 +2583,7 @@
 
             applyMoodTheme();
 
-            const mode = getCurrentEditorMode?.() || "notepad";
+            const mode = activeTab?.mode || "document";
               if (mode === "document") {
                 updateDocumentPreview();
               } else {
@@ -2642,7 +2647,7 @@
       }
       
       // 🔄 3. Refresh preview
-      const mode = getCurrentEditorMode?.() || "notepad";
+      const mode = activeTab?.mode || "document";
       if (mode === "document") {
         updateDocumentPreview();
       } else {
@@ -3226,7 +3231,7 @@
     }
 
     function switchEditorMode(newMode) {
-      const currentMode = getCurrentEditorMode();
+      const mode = activeTab?.mode || "document";
       if (newMode === currentMode) return;
 
       applyEditorMode(newMode);
