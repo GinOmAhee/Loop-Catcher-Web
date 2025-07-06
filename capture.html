@@ -2548,17 +2548,33 @@
       let savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       const timesToDelete = Array.from(checkboxes).map(cb => cb.getAttribute('data-time'));
 
+      // 🚮 1. Delete from localStorage
       savedNotes = savedNotes.filter(note => !timesToDelete.includes(note.timestamp));
       localStorage.setItem('savedNotes', JSON.stringify(savedNotes));
 
-      const mode = getCurrentEditorMode?.() || "notepad";
-        if (mode === "document") {
-          updateDocumentPreview();
-        } else {
-          updateGrouping();
-        }
+      // ☁️ 2. (Optional) Delete from Firebase
+      const user = firebase.auth().currentUser;
+      if (user) {
+        const userNotesRef = firebase.firestore().collection("users").doc(user.uid).collection("notes");
+        timesToDelete.forEach(time => {
+          userNotesRef
+            .where("timestamp", "==", Number(time))
+            .get()
+            .then(snapshot => {
+              snapshot.forEach(doc => doc.ref.delete());
+            });
+        });
+      }
 
-      saveStatus.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
+      // 🔄 3. Refresh preview
+      const mode = getCurrentEditorMode?.() || "notepad";
+      if (mode === "document") {
+        updateDocumentPreview();
+      } else {
+        updateGrouping();
+      }
+
+      document.getElementById("saveStatus")?.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
     }
 
     function applyFormat(type) {
