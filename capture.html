@@ -2291,7 +2291,7 @@
           <button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>
         `;
       }
-      
+
       container.innerHTML = `<div class="grouped-preview-list">${html}</div>`;
     }
 
@@ -2553,7 +2553,12 @@
       if (!confirmDelete) return;
 
       let savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-      const timesToDelete = Array.from(checkboxes).map(cb => cb.getAttribute('data-time'));
+      // 👇 And log what you're comparing them to
+      console.log("Saved note timestamps:", savedNotes.map(n => n.timestamp));
+      
+      const timesToDelete = Array.from(checkboxes).map(cb => Number(cb.getAttribute('data-time')));
+      // 👇 Insert log here before filtering
+      console.log("Timestamps to delete:", timesToDelete);
 
       // 🚮 1. Delete from localStorage
       savedNotes = savedNotes.filter(note => !timesToDelete.includes(note.timestamp));
