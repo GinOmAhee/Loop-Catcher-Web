@@ -2559,7 +2559,7 @@
       // 👇 And log what you're comparing them to
       console.log("Saved note timestamps:", savedNotes.map(n => n.timestamp));
 
-      const timesToDelete = Array.from(checkboxes).map(cb => Number(cb.getAttribute('data-time')));
+      const timesToDelete = Array.from(checkboxes).map(cb => cb.getAttribute('data-time'));
       // 👇 Insert log here before filtering
       console.log("Timestamps to delete:", timesToDelete);
 
