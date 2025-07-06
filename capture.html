@@ -2310,7 +2310,7 @@
           <div class="grouped-note" data-timestamp="${note.timestamp}">
             <h4>
               <label>
-                <input type="checkbox" class="note-delete-checkbox" data-time="${note.id}" />
+                <input type="checkbox" class="note-delete-checkbox" data-time="${note.id || note.timestamp}" />
                 <span
                   class="note-title ${isUntitled ? 'untitled-note' : ''}"
                   data-timestamp="${note.timestamp}"
