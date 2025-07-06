@@ -3259,8 +3259,6 @@
       const content = mainEditor.innerHTML.trim();
       tabs[activeTabIndex].content = content;
       console.log("🖊️ mainEditor.innerHTML is now:", content);
-      const targetMode = selectedTab.mode || "document";
-      console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
       loadActiveTabContent();
       
       safeRenderTabs();
