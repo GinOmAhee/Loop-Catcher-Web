@@ -3246,12 +3246,8 @@
 
       const selectedTab = tabs[originalIndex];
 
-      // Prevent switching to a tab in a different mode
-      const currentMode = localStorage.getItem("editorMode") || "document";
-      if (selectedTab.mode !== currentMode) {
-        console.warn(`🚫 Can't switch to a ${selectedTab.mode} tab while in ${currentMode} mode`);
-        return;
-      }
+      const targetMode = selectedTab.mode || "document";
+      applyEditorMode(targetMode); // 🔄 Automatically apply the mode for this tab
 
       // If unsaved changes exist in current tab, prompt user (optional enhancement)
       if (hasUnsavedChanges) {
@@ -3263,7 +3259,7 @@
       const content = mainEditor.innerHTML.trim();
       tabs[activeTabIndex].content = content;
       console.log("🖊️ mainEditor.innerHTML is now:", content);
-      setActiveTabIndex(selectedTab.mode, originalIndex);
+      const targetMode = selectedTab.mode || "document";
       console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
       loadActiveTabContent();
       
