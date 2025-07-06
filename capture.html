@@ -2135,7 +2135,7 @@
         const notes = [];
         snapshot.forEach(doc => notes.push(doc.data()));
         const html = renderNotes(migrateNotes(notes));
-        document.getElementById("previewContainer").innerHTML = html;
+        document.getElementById("groupedNotes").innerHTML = html;
 
         updateSaveStatus?.();
       });
