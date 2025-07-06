@@ -1710,6 +1710,7 @@
       editor.style.margin = "0";
 
       mainEditor.innerHTML = '';
+      
       tabs[activeTabIndex].content = '';
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
@@ -2368,7 +2369,9 @@
             </h4>
             <div
               class="note-preview"
-              ondblclick='loadNoteIntoEditor(decodeURIComponent("${encoded}"), "${mode}")'
+              data-text="${encoded}"
+              data-mode="${mode}"
+              ondblclick="loadNoteFromDataset(this)"
             >
               ${snippet}...
             </div>
@@ -2376,6 +2379,27 @@
       }).join("");
     }
 
+    function renderNotesForActiveTab() {
+      const activeMode = tabs[activeTabIndex]?.mode || "document";
+      const savedNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+
+      const filteredNotes = savedNotes.filter(note => note.mode === activeMode);
+      const renderedHTML = renderNotes(filteredNotes, activeMode);
+
+      const notesContainer = document.getElementById("notesContainer");
+      if (notesContainer) {
+        notesContainer.innerHTML = renderedHTML;
+      } else {
+       console.warn("⚠️ notesContainer not found in DOM");
+      }
+    }
+
+    function loadNoteFromDataset(div) {
+      const text = decodeURIComponent(div.dataset.text);
+      const mode = div.dataset.mode;
+      loadNoteIntoEditor(text, mode);
+    }
+    
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("groupSelector")?.addEventListener("change", () => {
         const mode = getCurrentEditorMode?.() || "notepad";
@@ -2408,20 +2432,35 @@
 
     function saveEditedTitle(e) {
       const input = e.target;
-      const newTitle = input.value.trim();
+      const newTitle = input.value.trim() || "🐣 Unnamed Bebe";
       const timestamp = input.dataset.timestamp;
 
+      // Replace the input back with a <span>
+      const span = document.createElement("span");
+      span.className = "note-title";
+      span.dataset.timestamp = timestamp;
+      span.textContent = newTitle;
+      span.onclick = function () {
+        enableTitleEdit(this);
+      };
+
+      input.replaceWith(span);
+
+      // Now update the actual data in tabs/savedNotes
       const savedNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
-      const index = savedNotes.findIndex(n => n.timestamp == timestamp);
-      if (index >= 0) {
-        savedNotes[index].title = newTitle;
+      const note = savedNotes.find((n) => n.timestamp === timestamp || n.id === timestamp);
+      if (note) {
+        note.title = newTitle;
         localStorage.setItem("savedNotes", JSON.stringify(savedNotes));
       }
 
-      // Refresh to reflect changes
-      updatePreviewByMode();
+      const tab = tabs.find((t) => t.id === timestamp);
+      if (tab) {
+        tab.title = newTitle;
+        localStorage.setItem("tabs", JSON.stringify(tabs));
+        safeRenderTabs(); // Optional: refresh UI
+      }
     }
-
 
     function getActiveEditorContent() {
       return mainEditor.innerHTML; // or use .value if you're working in <textarea>
@@ -2628,6 +2667,7 @@
             console.error(`⚠️ Failed to delete note ${id}:`, err);
           });
         });
+        
       }
       
       // 🔄 3. Refresh preview
@@ -2642,6 +2682,8 @@
       if (statusEl) {
         statusEl.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
       }
+
+      renderNotesForActiveTab()
     }
 
     function applyFormat(type) {
@@ -3243,6 +3285,9 @@
         if (!confirmSwitch) return;
       }
 
+      // Save current editor content to the tab before switching
+      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
+
       setActiveTabIndex(selectedTab.mode, originalIndex);
       loadActiveTabContent();
       safeRenderTabs();
@@ -3323,8 +3368,11 @@
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
 
-       // 🧠 Safely update title after content + mode have landed
-       updateTabTitleByMode(mode);
+      // 🧠 Safely update title after content + mode have landed
+      updateTabTitleByMode(mode);
+
+      // ✅ Refresh notes for current tab's mode
+      renderNotesForActiveTab();
     }
 
     function getTabContainer(mode) {
@@ -3386,7 +3434,15 @@
     }
 
     function setActiveTabIndex(mode, index) {
-      localStorage.setItem(`activeTabIndex_${mode}`, index);
+      activeTabIndex = index;
+
+      // ✅ Load and render notes for this mode
+      const savedNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+      const notesForMode = savedNotes.filter(note => note.mode === mode);
+      notesContainer.innerHTML = renderNotes(notesForMode, mode);
+
+      // Also update editor content if needed
+      loadActiveTabContent();
     }
 
     const paperSizes = {
