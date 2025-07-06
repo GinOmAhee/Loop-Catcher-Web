@@ -1642,20 +1642,27 @@
 
     async function saveText() {
       const now = new Date();
-      const noteText = mainEditor.innerText.trim();
-
       const mode = getCurrentEditorMode?.() || "document"; // ✅ get current mode
 
       let currentTabTitle = tabs[activeTabIndex]?.title?.trim();
-
       if (!currentTabTitle) {
-      currentTabTitle = mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts";
+        currentTabTitle = mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts";
       }
 
-      const noteHTML = mainEditor.innerHTML;
+      const noteHTML = mainEditor.innerHTML.trim();
+      const temp = document.createElement("div");
+      temp.innerHTML = noteHTML;
       const timestamp = now.toISOString();
-
-      if (!noteText) return;
+      const noteText = temp.innerText.trim();
+      if (
+        !noteText ||
+        noteHTML === "<br>" ||
+        noteHTML === "&nbsp;" ||
+        noteHTML === "<div>&nbsp;</div>"
+      ) {
+        console.warn("🛑 Note has no meaningful content");
+        return;
+      }
 
       const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
 
@@ -1670,7 +1677,7 @@
       const newNote = {
         id: timestamp,
         text: noteHTML,
-        timestamp: now.toISOString(),
+        timestamp, // ✅ reuse existing timestamp
         title: currentTabTitle,
         project: projectName,
         resolved: false,
