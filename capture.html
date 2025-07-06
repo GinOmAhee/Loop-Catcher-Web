@@ -1667,21 +1667,25 @@
         return;
       }
 
-      let projectName = prompt("📌 Enter project name (optional):");
-      projectName = projectName?.trim() || "🐣 Unnamed Bebe";
+      // 🔖 Custom title per tab
+      let customTitle = prompt("📝 Enter a custom title for this note (optional):");
+      customTitle = customTitle?.trim() || (mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts");
+      tabs[activeTabIndex].title = customTitle;
+      currentTabTitle = customTitle;
 
-      tabs[activeTabIndex].title = projectName;
-      currentTabTitle = projectName; // Sync title for saving + status
+      // 📁 Project name
+      let projectName = prompt("📁 Save under project name (optional):");
+      projectName = projectName?.trim() || "🐣 Unnamed Bebe";
 
       const newNote = {
         id: timestamp,
         text: noteHTML,
-        timestamp, // ✅ reuse existing timestamp
-        title: currentTabTitle,
-        project: projectName,
+        timestamp,
+        title: customTitle,    // 📝 this note’s specific name
+        project: projectName,  // 📁 where it belongs
         resolved: false,
         tags: [],
-        mode // ✅ now saving mode!
+        mode
       };
 
       tabs[activeTabIndex].id = newNote.id;
@@ -3007,8 +3011,6 @@
       const shouldOverwrite =
         !currentTitle ||
         currentTitle === "Untitled" ||
-        currentTitle.startsWith("🖊️ Scribs") ||
-        currentTitle.startsWith("📄 Drafts");
 
       console.log("🔎 Title before update:", currentTitle, "| shouldOverwrite:", shouldOverwrite);
 
@@ -3342,8 +3344,8 @@
       // Title logic based on mode
       const title =
         mode === "notepad"
-        ? `🖊️ Scribs ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
-        : `📄 Drafts ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+        ? "🖊️ Scribs"
+        : "📄 Drafts";
 
       const safeMode = mode === "notepad" ? "notepad" : "document"
 
