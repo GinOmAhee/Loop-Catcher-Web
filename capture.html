@@ -864,6 +864,26 @@
     font-size: 1rem;
   }
 
+  .inline-title-editor {
+    font-size: 1rem;
+    padding: 3px 5px;
+    width: 100%;
+    max-width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .untitled-tag {
+    color: #aaa;
+    margin-right: 5px;
+    font-size: 0.9em;
+  }
+
+  .untitled-note {
+    font-style: italic;
+    color: #888;
+  }
+
   #searchInput:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.1);
@@ -2271,13 +2291,29 @@
     function renderNotes(notes, mode) {
       return notes.map(note => {
         const encoded = encodeURIComponent(note.text || "");
-        const safeTitle = escapeHTML(note.title || "Untitled");
+        const isUntitled = !note.title?.trim();
+        const displayTitle = isUntitled ? "Untitled" : note.title;
+        const safeTitle = escapeHTML(displayTitle);
         const snippet = escapeHTML(note.text || "").slice(0, 200).replace(/\n/g, "<br>");
 
         return `
           <div class="grouped-note" data-timestamp="${note.timestamp}">
-            <h4>${safeTitle}</h4>
-            <div class="note-preview" onclick='loadNoteIntoEditor(decodeURIComponent("${encoded}"), "${mode}")'>
+            <h4>
+              <label>
+                <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" />
+                <span
+                  class="note-title ${isUntitled ? 'untitled-note' : ''}"
+                  data-timestamp="${note.timestamp}"
+                  onclick="enableTitleEdit(this)"
+                >
+                  ${safeTitle}
+                </span>
+              </label>
+            </h4>
+            <div
+              class="note-preview"
+              ondblclick='loadNoteIntoEditor(decodeURIComponent("${encoded}"), "${mode}")'
+            >
               ${snippet}...
             </div>
           </div>`;
@@ -2294,6 +2330,42 @@
         }
       });
     });
+
+    function enableTitleEdit(span) {
+      const timestamp = span.dataset.timestamp;
+      const currentTitle = span.innerText.trim();
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = currentTitle === "Untitled" ? "" : currentTitle;
+      input.className = "inline-title-editor";
+      input.dataset.timestamp = timestamp;
+
+      input.onblur = saveEditedTitle;
+      input.onkeydown = (e) => {
+        if (e.key === "Enter") input.blur();
+        if (e.key === "Escape") span.innerText = currentTitle; // revert
+      };
+
+      span.replaceWith(input);
+      input.focus();
+    }
+
+    function saveEditedTitle(e) {
+      const input = e.target;
+      const newTitle = input.value.trim();
+      const timestamp = input.dataset.timestamp;
+
+      const savedNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+      const index = savedNotes.findIndex(n => n.timestamp == timestamp);
+      if (index >= 0) {
+        savedNotes[index].title = newTitle;
+        localStorage.setItem("savedNotes", JSON.stringify(savedNotes));
+      }
+
+      // Refresh to reflect changes
+      updatePreviewByMode();
+    }
+
 
     function getActiveEditorContent() {
       return mainEditor.innerHTML; // or use .value if you're working in <textarea>
