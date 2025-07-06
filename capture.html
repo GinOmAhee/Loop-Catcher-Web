@@ -3327,7 +3327,7 @@
       focusEditorSafely();
 
        // 🧠 Safely update title after content + mode have landed
-       function updateTabTitleByMode(mode = tabs[activeTabIndex]?.mode || "document");
+       updateTabTitleByMode(mode);
     }
 
     function getTabContainer(mode) {
