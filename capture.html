@@ -1080,7 +1080,7 @@
       <!-- 1. Top: Group selector -->
       <div class="preview-sortbar">
         <span title="Group Notes">📂</span>
-        <select id="groupSelector" onchange="updateGrouping()">
+        <select id="groupSelector">
           <option value="date">Date</option>
           <option value="title">Title</option>
           <option value="project">Project</option>
@@ -2356,6 +2356,19 @@
           }).join("");
         }
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const selector = document.getElementById("groupSelector");
+
+      selector?.addEventListener("change", () => {
+        const mode = getCurrentEditorMode?.() || "notepad";
+        if (mode === "document") {
+          updateDocumentPreview();
+        } else {
+          updateGrouping();
+        }
+      });
+    });
 
     function getActiveEditorContent() {
       return mainEditor.innerHTML; // or use .value if you're working in <textarea>
