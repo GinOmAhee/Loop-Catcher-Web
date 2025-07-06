@@ -3334,6 +3334,7 @@
     function getCurrentEditorMode() {
       const editor = document.getElementById("mainEditor");
       const mode = editor?.getAttribute("data-mode");
+      console.log("💡 Saving in mode:", mode);
       return mode === "notepad" || mode === "document" ? mode : "unknown";
     }
 
