@@ -1099,8 +1099,8 @@
             type="text"
             id="searchInput"
             placeholder="🔍 Search notes..."
-            oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
-          <select id="searchScope" onchange="updateGrouping()" ...>
+            oninput="updatePreviewByMode()" />  <!-- ← THIS LINE must be here -->
+          <select id="searchScope" onchange="updatePreviewByMode()" ...>
             <option value="group">Grouped</option>
             <option value="all">Search All</option>
           </select>
@@ -1429,7 +1429,14 @@
         debounceTimer = setTimeout(() => {
           localStorage.setItem("capturedText", mainEditor.innerHTML);
           localStorage.setItem("lastSaved", new Date().toISOString());
-          updateGrouping();
+
+          const mode = getCurrentEditorMode?.() || "notepad";
+          if (mode === "document") {
+            updateDocumentPreview();
+          } else {
+            updateGrouping();
+          };
+
           saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
         }, 1000);
       });
@@ -1669,7 +1676,12 @@
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
 
-      updateGrouping(); // still safe to call — now it'll work for notepad mode too
+      const mode = getCurrentEditorMode?.() || "notepad";
+      if (mode === "document") {
+        updateDocumentPreview();
+      } else {
+        updateGrouping();
+      }; // still safe to call — now it'll work for notepad mode too
     }    
 
     function autoSave() {
@@ -2180,12 +2192,36 @@
       target.innerHTML = html;
     }
 
+    function updatePreviewByMode() {
+      const mode = getCurrentEditorMode?.() || "notepad";
+      (mode === "document" ? updateDocumentPreview : updateGrouping)();
+    }
+
+    function handleGroupChange() {
+      const mode = getCurrentEditorMode?.() || "notepad";
+      if (mode === "document") {
+        updateDocumentPreview();
+      } else {
+        updateGrouping();
+      }
+    }
+
     function safeUpdateGrouping() {
       const interval = setInterval(() => {
         const target = document.getElementById("groupedNotes");
         if (target) {
           clearInterval(interval);
           updateGrouping(); // Now it’s safe to run
+        }
+      }, 50);
+    }
+
+    function safeUpdateDocumentPreview() {
+      const interval = setInterval(() => {
+        const target = document.getElementById("groupedNotes");
+        if (target) {
+          clearInterval(interval);
+          updateDocumentPreview(); // Now it’s safe to run
         }
       }, 50);
     }
@@ -2434,7 +2470,13 @@
       const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       const updated = notes.filter(n => n.timestamp !== time);
       localStorage.setItem('savedNotes', JSON.stringify(updated));
-      updateGrouping();
+
+      const mode = getCurrentEditorMode?.() || "notepad";
+      if (mode === "document") {
+        updateDocumentPreview();
+      } else {
+        updateGrouping();
+      }
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
@@ -2454,12 +2496,23 @@
         firebase.auth().onAuthStateChanged(user => {
           if (user) {
             console.log("✅ User is signed in:", user.email || user.uid);
-            updateGrouping(); // Safe to call
+
+            const mode = getCurrentEditorMode?.() || "notepad";
+            if (mode === "document") {
+              updateDocumentPreview();
+              } else {
+              updateGrouping();
+              } // Safe to call
           } else {
             firebase.auth().signInAnonymously()
               .then(() => {
                 console.log("✅ Signed in anonymously");
-                updateGrouping(); // Retry after sign-in
+                const mode = getCurrentEditorMode?.() || "notepad";
+                  if (mode === "document") {
+                  updateDocumentPreview();
+                } else {
+                  updateGrouping();
+                } // Retry after sign-in
               })
               .catch(console.error);
           }
@@ -2496,7 +2549,14 @@
             }
 
             applyMoodTheme();
-            updateGrouping();
+
+            const mode = getCurrentEditorMode?.() || "notepad";
+              if (mode === "document") {
+                updateDocumentPreview();
+              } else {
+                updateGrouping();
+              }
+
             safeRenderTabs();
           });  
           setInterval(autoSave, 30000);
@@ -2530,7 +2590,13 @@
       savedNotes = savedNotes.filter(note => !timesToDelete.includes(note.timestamp));
       localStorage.setItem('savedNotes', JSON.stringify(savedNotes));
 
-      updateGrouping();
+      const mode = getCurrentEditorMode?.() || "notepad";
+        if (mode === "document") {
+          updateDocumentPreview();
+        } else {
+          updateGrouping();
+        }
+
       saveStatus.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
     }
 
