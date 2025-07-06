@@ -1268,9 +1268,9 @@
         </div>
       </div>
 
-        <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" contenteditable="true" data-mode="document">
+        <div id="mainEditor" contenteditable="true">
           <div id="marginBox" class="layout-helper"></div>
+          <div id="noteContent"></div>
         </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
@@ -1711,7 +1711,9 @@
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
+      const content = mainEditor.innerHTML.trim();
+      tabs[activeTabIndex].content = content;
+
 
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
@@ -2076,38 +2078,34 @@
 
 
     function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
-      if (!mainEditor || !marginBox) {
-        console.error("❌ Cannot load note — editor elements missing");
+      if (!mainEditor) {
+        console.error("❌ Cannot load note — editor element missing");
         return;
-       }
+      }
 
-        switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
+      switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
 
-        if (mode === "notepad") {
-          mainEditor.innerHTML = noteHTML; // inject into the full editor shell
-        } else if (mode === "document") {
-          marginBox.innerHTML = noteHTML; // inject only inside marginBox
-        }
+      mainEditor.innerHTML = noteHTML;
 
-        setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
+      setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
 
-        mainEditor.focus();
-        saveStatus.innerText = "📝 Loaded note from preview";
-        preview.style.display = 'none';
-        undoStack.push(noteHTML);
-        redoStack = [];
+      mainEditor.focus();
+      saveStatus.innerText = "📝 Loaded note from preview";
+      preview.style.display = 'none';
+      undoStack.push(noteHTML);
+      redoStack = [];
 
-        // 💡 Extract the first line to use as tab title
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = noteHTML;
-        const text = tempDiv.innerText || "";
-        const titleLine = text.split("\n")[0]?.trim() || "Note";
+      // 💡 Extract the first line to use as tab title
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = noteHTML;
+      const text = tempDiv.innerText || "";
+      const titleLine = text.split("\n")[0]?.trim() || "Note";
 
-        // ⬇️ INSERT THIS BLOCK HERE
-        tabs[activeTabIndex].title = titleLine;
-        localStorage.setItem("tabs", JSON.stringify(tabs));
-        safeRenderTabs(); // to update UI tab name
-        document.title = titleLine;
+      // ⬇️ INSERT THIS BLOCK HERE
+      tabs[activeTabIndex].title = titleLine;
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      safeRenderTabs(); // to update UI tab name
+      document.title = titleLine;
     }
 
     function escapeHTML(text) {
@@ -2518,9 +2516,10 @@
       // Ensure .preview-overlay exists first
       const checkPreviewExists = setInterval(() => {
         const preview = document.querySelector(".preview-overlay");
-        if (preview) return;
-
-        clearInterval(checkPreviewExists); // Found it, stop checking
+        if (preview) {
+          clearInterval(checkPreviewExists);
+          return;
+        }
 
         firebase.auth().onAuthStateChanged(user => {
           if (user) {
@@ -2934,11 +2933,11 @@
     }
 
     function cacheEditorContent() {
-      const currentMode = editor.getAttribute("data-mode");
+      const currentMode = mainEditor.getAttribute("data-mode");
       if (currentMode === "notepad") {
-        notepadCache = editor.innerHTML;
+        notepadCache = mainEditor.innerHTML;
       } else if (currentMode === "document") {
-        documentCache = editor.innerHTML;
+        documentCache = mainEditor.innerHTML;
       }
     }
 
@@ -3041,15 +3040,18 @@
       const marginBox = document.getElementById("marginBox");
 
       if (mode === "notepad") {
-        editor.innerHTML = notepadCache || "";
+        mainEditor.innerHTML = notepadCache || "";
       } else if (mode === "document") {
-        editor.innerHTML = documentCache || "";
-        if (marginBox && !editor.contains(marginBox)) {
-          editor.appendChild(marginBox);
+        mainEditor.innerHTML = documentCache || "";
+
+        // 🧱 Re-attach marginBox if needed
+        if (marginBox && !mainEditor.contains(marginBox)) {
+          mainEditor.appendChild(marginBox);
         }
       }
 
-      editor.innerHTML = editor.innerHTML.trim();
+      // 🧹 Trim whitespace once from mainEditor
+      mainEditor.innerHTML = mainEditor.innerHTML.trim();
     }
 
     function setEditorModeAttribute(mode) {
@@ -3258,8 +3260,9 @@
       }
 
       // 💾 Preserve edits from current tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
-      console.log("🖊️ mainEditor.innerHTML is now:", mainEditor.innerHTML);
+      const content = mainEditor.innerHTML.trim();
+      tabs[activeTabIndex].content = content;
+      console.log("🖊️ mainEditor.innerHTML is now:", content);
       setActiveTabIndex(selectedTab.mode, originalIndex);
       console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
       loadActiveTabContent();
