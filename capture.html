@@ -3004,10 +3004,19 @@
     function updateTabTitleByMode(mode) {
       if (!tabs[activeTabIndex]) return;
 
+      const currentTitle = tabs[activeTabIndex].title?.trim();
+      const shouldOverwrite =
+        !currentTitle ||
+        currentTitle === "Untitled" ||
+        currentTitle.startsWith("✏️ Scribbles") ||
+        currentTitle === "📚 EditDocs";
+
+      if (!shouldOverwrite) return;
+
       if (mode === "notepad") {
         const now = new Date();
         tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-      } else if (mode === "document") {
+      } else {
         const text = editor.innerText || "";
         tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
       }
