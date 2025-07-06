@@ -2289,9 +2289,11 @@
         for (const note of notes) {
           let key;
           if (groupBy === "title") {
-            key = note.title || "Untitled";
+            key = !note.title?.trim()
+              ? note.mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts"
+              : note.title;
           } else if (groupBy === "project") {
-            key = note.project || "📂 Unlabeled";
+            key = note.project || "🐣 Unnamed Bebe";
           } else {
             key = new Date(note.timestamp).toLocaleDateString();
           }
