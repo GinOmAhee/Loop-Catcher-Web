@@ -1111,6 +1111,8 @@
 
       <!-- 2. Scrollable notes area -->
       <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
+        <div class="grouped-preview-list"></div>
+      </div>  
 
       <!-- 3. Bottom: search input anchored in its own bar -->
       <div class="preview-sortbar bottom-searchbar">
@@ -1268,7 +1270,7 @@
 
         <!-- 📝 Rich Text Editor -->
         <div id="mainEditor" contenteditable="true" data-mode="document">
-          <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
+          <div id="marginBox" class="layout-helper"></div>
         </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
@@ -1710,7 +1712,7 @@
       editor.style.margin = "0";
 
       tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
-      
+
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${currentTabTitle} at ${now.toLocaleTimeString()}`;
@@ -2169,12 +2171,22 @@
 
     function safePreviewUpdate(mode = "notepad") {
       const containerSelector = mode === "document" ? ".preview-overlay" : "#groupedNotes";
-      const interval = setInterval(() => {
-        if (document.querySelector(containerSelector)) {
-          clearInterval(interval);
-          updatePreviewByMode();
-        }
-      }, 50);
+      const previewListSelector = `${containerSelector} .grouped-preview-list`;
+
+      const container = document.querySelector(previewListSelector);
+
+      if (!container) {
+        console.warn(`⚠️ Could not find container for preview: ${previewListSelector}`);
+        return;
+      }
+
+      if (!html?.trim()) {
+        console.info("ℹ️ Empty preview HTML — skipping render.");
+        container.innerHTML = "<p style='opacity:0.6;'>No previews available</p>"; // optional fallback
+        return;
+      }
+
+       container.innerHTML = html; // 💯 safely overwrite only the content section
     }
 
     function togglePreview() {
