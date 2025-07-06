@@ -1708,7 +1708,7 @@
 
       mainEditor.innerHTML = '';
       tabs[activeTabIndex].content = '';
-      updateTabTitleByMode();
+      tabs[activeTabIndex].title = 'Untitled';
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
@@ -2151,7 +2151,7 @@
         const html = renderNotes(migrateNotes(notes));
         document.getElementById("groupedNotes").innerHTML = html;
 
-        saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
+        updateSaveStatus?.();
       });
 
     }
@@ -3221,7 +3221,6 @@
       localStorage.setItem("editorMode", newMode);
       setActiveTabBar(newMode);
       safeRenderTabs(); // or renderAllTabs() if you don't use safeRender
-      updateTabTitleByMode(newMode)
       loadActiveTabContent();
     }
 
@@ -3366,8 +3365,6 @@
       localStorage.setItem("tabs", JSON.stringify(tabs));
       safeRenderTabs(); // 💡 Ensures rename-safe refresh
       loadActiveTabContent(); // ✅ Load blank or default content
-
-      updateTabTitleByMode(mode)
     }
 
     function getCurrentEditorMode() {
