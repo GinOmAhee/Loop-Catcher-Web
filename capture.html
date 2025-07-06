@@ -2069,134 +2069,125 @@
       return div.innerHTML;
     }
 
-    async function updateGrouping(mode = getCurrentEditorMode?.() || "notepad") {
+    async function updateGrouping() {
+      const mode = getCurrentEditorMode?.() || "notepad";
       const target = document.getElementById("groupedNotes");
+
       if (!target) {
-        console.warn("❌ No preview container found");
+        console.warn("❌ Missing #groupedNotes container. Aborting update.");
         return;
       }
 
-      const searchInputEl = document.getElementById("searchInput");
-      const searchScopeEl = document.getElementById("searchScope");
-      const groupByEl = document.getElementById("groupSelector");
-
-      const keyword = searchInputEl?.value?.toLowerCase().trim() || "";
-      const scope = searchScopeEl?.value?.toLowerCase().trim() || "group";
-      const groupBy = groupByEl?.value?.toLowerCase().trim() || "";
+      const keyword = document.getElementById("searchInput")?.value?.toLowerCase().trim() || "";
+      const scope = document.getElementById("searchScope")?.value || "group";
+      const groupBy = document.getElementById("groupSelector")?.value || "project";
+      const now = Date.now();
 
       let notes = [];
 
-      // 🔍 Step 1: Try Firebase first
+      // 🔌 1. Try pulling from Firebase
       try {
-         const user = firebase.auth().currentUser;
-         if (user) {
-           const snapshot = await db.collection("users")
-           .doc(user.uid)
-           .collection("notes")
-           .where("mode", "==", mode)
-           .orderBy("timestamp", "desc")
-           .get();
+        const user = firebase.auth().currentUser;
+        if (!user) throw new Error("No Firebase user");
 
-           notes = snapshot.docs.map(doc => doc.data());
-           console.log(`✅ Pulled ${notes.length} "${mode}" notes from Firebase`);
-         } else {
-           throw new Error("No Firebase user");
-         }
+        const snapshot = await db
+          .collection("users")
+          .doc(user.uid)
+          .collection("notes")
+          .where("mode", "==", mode)
+          .orderBy("timestamp", "desc")
+          .get();
 
-       } catch (err) {
-         console.warn("⚠️ Firebase failed — using localStorage:", err);
-         const localNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+        notes = snapshot.docs.map(doc => doc.data());
+        console.log(`✅ Pulled ${notes.length} notes from Firebase (${mode})`);
+      } catch (err) {
+        console.warn("⚠️ Firebase failed, falling back to localStorage:", err);
+        const localNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
 
-         // ✅ FIX: fallback for notes without mode
-         notes = localNotes.filter(note => {
-           const noteMode = note.mode || "notepad";
-           return noteMode === mode;
-         });
+        notes = localNotes.filter(note => (note.mode || "notepad") === mode);
+      }
 
-         notes = localNotes.filter(note => (note.mode || "notepad") === mode);
+      // 🧼 2. Filter notes
+      if (keyword) {
+        notes = notes.filter(note => {
+          const content = `${note.title || ""} ${note.text || ""} ${note.project || ""}`.toLowerCase();
+          return content.includes(keyword);
+        });
+      }
 
-         if (!notes.length) {
-           preview.innerHTML = "<p>📭 No saved notes found for this mode.</p>";
-           return;
-         }
+      // 🫥 3. Empty state
+      if (!notes.length) {
+        target.innerHTML = `<p>📭 No notes found for <strong>${mode}</strong>.</p>`;
+        return;
+      }
 
-         const html = notes.map(note => {
-           const encodedText = encodeURIComponent(note.text || "");
+      // 🧩 4. Grouping logic
+      const groups = {};
+
+      if (groupBy === "unresolved") {
+        const unresolved = notes.filter(n => n.resolved === false);
+        if (!unresolved.length) {
+          target.innerHTML = "<p>✅ No unresolved notes!</p>";
+          return;
+        }
+        groups["🧩 Unresolved Ideas"] = unresolved;
+      } else if (groupBy === "forgotten") {
+        const forgotten = notes.filter(n => {
+          const age = now - new Date(n.timestamp).getTime();
+          return age > 3 * 24 * 60 * 60 * 1000; // 3 days
+        });
+        if (!forgotten.length) {
+          target.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
+          return;
+        }
+        groups["🧠 Forgotten Ideas"] = forgotten;
+      } else {
+        // 🧱 Standard groupings: title, project, date
+        for (const note of notes) {
+          let key;
+          if (groupBy === "title") {
+            key = note.title || "Untitled";
+          } else if (groupBy === "project") {
+            key = note.project || "📂 Unlabeled";
+          } else {
+            key = new Date(note.timestamp).toLocaleDateString();
+          }
+
+          if (!groups[key]) groups[key] = [];
+          groups[key].push(note);
+        }
+      }
+
+      // 🎨 5. Render grouped notes
+      let html = "";
+      for (const [label, items] of Object.entries(groups)) {
+         html += `<h3 class="group-heading">📁 ${escapeHTML(label)}</h3>`;
+         html += items.map(note => {
+           const encoded = encodeURIComponent(note.text || "");
            const safeTitle = escapeHTML(note.title || "Untitled");
-           const safeSnippet = escapeHTML(note.text || "")
-             .slice(0, 200)
-             .replace(/\n/g, "<br>");
-
+           const snippet = escapeHTML(note.text || "").slice(0, 200).replace(/\n/g, "<br>");
            return `
-             <div class="note-preview" onclick='loadNoteIntoEditor(decodeURIComponent("${encodedText}"), "${mode}")'>
-               <p><strong>${safeTitle}</strong></p>
-               <div>${safeSnippet}...</div>
-               <hr>
-             </div>
-  `;
+             <div class="grouped-note" data-timestamp="${note.timestamp}">
+               <h4>${safeTitle}</h4>
+               <div class="note-preview" onclick='loadNoteIntoEditor(decodeURIComponent("${encoded}"), "${mode}")'>
+                 ${snippet}...
+               </div>
+             </div>`;
          }).join("");
+      }
 
-         preview.innerHTML = `<div class="grouped-preview-list">${html}</div>`;
+      html += `<button class="delete-notes-btn" onclick="deleteSelectedNotes()">🗑️</button>`;
+      target.innerHTML = html;
+    }
 
-       }
-
-       // 🧼 Step 2: Filter with keyword + scope
-       if (keyword) {
-         notes = notes.filter(note => {
-           if (scope === "project") return note.project?.toLowerCase().includes(keyword);
-           if (scope === "title") return note.title?.toLowerCase().includes(keyword);
-           if (scope === "content") return note.text?.toLowerCase().includes(keyword);
-           return (
-             note.title?.toLowerCase().includes(keyword) ||
-             note.project?.toLowerCase().includes(keyword) ||
-             note.text?.toLowerCase().includes(keyword)
-           );
-         });
-       }
-
-       // 🚫 Step 3: Empty state
-       if (notes.length === 0) {
-         target.innerHTML = "<p>📭 No notes found.</p>";
-         return;
-       }
-
-       // 🧩 Step 4: Group notes
-       const groups = {};
-       notes.forEach(note => {
-         let groupKey;
-         switch (groupBy) {
-           case "title":
-             groupKey = note.title || "Untitled";
-             break;
-           case "project":
-             groupKey = note.project || "📂 Unlabeled";
-             break;
-           case "date":
-             groupKey = new Date(note.timestamp).toLocaleDateString();
-             break;
-           default:
-             groupKey = "Ungrouped";
-         }
-
-         if (!groups[groupKey]) groups[groupKey] = [];
-         groups[groupKey].push(note);
-       });
-
-       // 🖼️ Step 5: Render groups
-       let html = "";
-       for (const [group, items] of Object.entries(groups)) {
-         html += `<h3 class="group-heading">📁 ${group}</h3>`;
-         html += items.map(note => `
-           <div class="grouped-note">
-             <h4>${note.title || "Untitled"}</h4>
-             <div class="note-preview" data-timestamp="${note.timestamp}">
-               ${highlightText(note.text, keyword)}
-             </div>
-           </div>
-         `).join("");
-       }
-
-       target.innerHTML = html;
+    function safeUpdateGrouping() {
+      const interval = setInterval(() => {
+        const target = document.getElementById("groupedNotes");
+        if (target) {
+          clearInterval(interval);
+          updateGrouping(); // Now it’s safe to run
+        }
+      }, 50);
     }
 
     function togglePreview() {
