@@ -1709,8 +1709,12 @@
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      mainEditor.innerHTML = '';
-      tabs[activeTabIndex].content = '';
+      
+      tabs[activeTabIndex].content = noteHTML;
+      tabs[activeTabIndex].mode = mode;
+      tabs[activeTabIndex].title = customTitle;
+      tabs[activeTabIndex].id = newNote.id;
+      
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${currentTabTitle} at ${now.toLocaleTimeString()}`;
