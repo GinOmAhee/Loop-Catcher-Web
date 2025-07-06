@@ -2574,7 +2574,10 @@
         updateGrouping();
       }
 
-      document.getElementById("saveStatus")?.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
+      const statusEl = document.getElementById("saveStatus");
+      if (statusEl) {
+        statusEl.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
+      }
     }
 
     function applyFormat(type) {
