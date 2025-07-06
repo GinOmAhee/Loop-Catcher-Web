@@ -2285,6 +2285,12 @@
         html += renderNotes(items, mode);
       }
 
+      // ✅ Inject delete button only if there are notes
+      if (Object.keys(groups).length > 0) {
+        html += `
+          <button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>
+        `;
+
       container.innerHTML = `<div class="grouped-preview-list">${html}</div>`;
     }
 
