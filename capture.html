@@ -1708,7 +1708,7 @@
 
       mainEditor.innerHTML = '';
       tabs[activeTabIndex].content = '';
-      tabs[activeTabIndex].title = 'Untitled';
+      updateTabTitleByMode();
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
@@ -3221,6 +3221,7 @@
       localStorage.setItem("editorMode", newMode);
       setActiveTabBar(newMode);
       safeRenderTabs(); // or renderAllTabs() if you don't use safeRender
+      updateTabTitleByMode(newMode)
       loadActiveTabContent();
     }
 
@@ -3326,7 +3327,7 @@
       focusEditorSafely();
 
        // 🧠 Safely update title after content + mode have landed
-       updateTabTitleByMode(mode);
+       function updateTabTitleByMode(mode = tabs[activeTabIndex]?.mode || "document");
     }
 
     function getTabContainer(mode) {
@@ -3365,6 +3366,8 @@
       localStorage.setItem("tabs", JSON.stringify(tabs));
       safeRenderTabs(); // 💡 Ensures rename-safe refresh
       loadActiveTabContent(); // ✅ Load blank or default content
+
+      updateTabTitleByMode(mode)
     }
 
     function getCurrentEditorMode() {
