@@ -2151,7 +2151,7 @@
         const html = renderNotes(migrateNotes(notes));
         document.getElementById("groupedNotes").innerHTML = html;
 
-        updateSaveStatus?.();
+        saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
       });
 
     }
