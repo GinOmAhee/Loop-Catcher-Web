@@ -3319,23 +3319,24 @@
       // Only switch modes if necessary
       if (mode !== currentMode) {
         localStorage.setItem("editorMode", mode);
-        switchEditorMode(mode); // safe to call here now
-        return; // 💡 Exit here, switchEditorMode will handle loading
+        switchEditorMode(mode); // this will trigger content reload
+        return;
       }
 
-      if (mode === currentMode && editor.innerHTML.trim() !== (activeTab.content || "").trim()) {
-        editor.innerHTML = activeTab.content || "";
-      }
+      // 🧼 Clean existing editor content
+      editor.innerHTML = "";
 
+      // 📝 Load saved content
+      editor.innerHTML = activeTab.content || "";
+
+      // 📦 Only append marginBox in document mode
       if (mode === "document" && !editor.contains(marginBox)) {
         editor.appendChild(marginBox);
       }
 
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
-
-       // 🧠 Safely update title after content + mode have landed
-       updateTabTitleByMode(mode);
+      updateTabTitleByMode(mode);
     }
 
     function getTabContainer(mode) {
