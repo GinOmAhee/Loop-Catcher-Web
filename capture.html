@@ -2087,6 +2087,7 @@
         }
         mainEditor.innerHTML = noteHTML;
         mainEditor.appendChild(marginBox); // 🔁 Re-append original
+        console.log("🧩 marginBox is now in editor:", mainEditor.contains(marginBox));
         marginBox.classList.add("hidden");
       } else if (mode === "document") {
         marginBox.innerHTML = noteHTML;
