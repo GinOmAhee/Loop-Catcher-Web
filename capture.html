@@ -2082,18 +2082,19 @@
       switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
 
       if (mode === "notepad") {
-        // 🛡️ Preserve marginBox before overwrite
-        const preservedMarginBox = marginBox.cloneNode(true);
+        if (mainEditor.contains(marginBox)) {
+          mainEditor.removeChild(marginBox); // 🧼 Temporarily remove
+        }
         mainEditor.innerHTML = noteHTML;
-        mainEditor.appendChild(preservedMarginBox); // keep it in DOM for later
-        preservedMarginBox.classList.add("hidden"); // hide it in notepad mode
+        mainEditor.appendChild(marginBox); // 🔁 Re-append original
+        marginBox.classList.add("hidden");
       } else if (mode === "document") {
         marginBox.innerHTML = noteHTML;
         if (!mainEditor.contains(marginBox)) {
           mainEditor.appendChild(marginBox);
         }
         marginBox.classList.remove("hidden");
-      }
+      } 
 
       setTimeout(() => focusEditorSafely(), 0);
       mainEditor.focus();
