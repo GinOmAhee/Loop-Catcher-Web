@@ -3040,6 +3040,8 @@
         .filter(tab => tab.mode === mode);
     }
 
+    let isRenderingTabs = false;
+
     function renderTabsForMode(mode) {
       if (isRenamingTab) {
         console.warn(`⛔ Skipping renderTabsForMode("${mode}"): rename input is still active`);
@@ -3072,7 +3074,11 @@
       });
 
       tabContainer.appendChild(createAddTabButton(mode));
+
+    } finally {
+        isRenderingTabs = false;
     }
+    
 
     function createTabElement(tab, activeIndexForMode) {
       const tabBtn = document.createElement("div");
