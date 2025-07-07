@@ -3128,45 +3128,56 @@
 
       tabLabel.addEventListener("dblclick", (e) => {
         e.stopPropagation();
+
+        // Prevent renaming if already active
+        if (isRenamingTab) return;
         isRenamingTab = true;
 
+        // Create rename input
         const input = document.createElement("input");
         input.className = "tab-rename-input";
         input.value = tab.title;
 
+        // Apply theme class
         if (document.body.classList.contains("dark-theme")) {
-          input.style.background = "#1e1e1e";
-          input.style.color = "#eee";
-          input.style.border = "1px dashed hotpink";
-          input.style.caretColor = "hotpink";
+          input.classList.add("dark-theme-input");
         }
 
-        input.addEventListener("click", e => e.stopPropagation());
+        // Stop clicks from bubbling (e.g. triggering select tab)
+        input.addEventListener("click", (e) => e.stopPropagation());
 
-        input.addEventListener("keydown", e => {
-          if (e.key === "Enter") input.blur();
-          if (e.key === "Escape") {
+        // Key handling
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            input.blur(); // Trigger save
+          } else if (e.key === "Escape") {
             isRenamingTab = false;
-            renderAllTabs();
+            renderAllTabs(); // Cancel edit
           }
         });
 
-        input.addEventListener("blur", e => {
-          const newTitle = e.target.value.trim();
-          if (newTitle && newTitle !== tab.title) {
-            tabs[tab.originalIndex].title = newTitle;
-            localStorage.setItem("tabs", JSON.stringify(tabs));
-            hasUnsavedChanges = true;
-          }
-          isRenamingTab = false;
-          renderAllTabs();
-        });
+        // Blur (finish editing)
+        input.addEventListener("blur", (e) => {
+        const newTitle = e.target.value.trim();
+        const isDuplicate = tabs.some(t => t.title === newTitle && t.originalIndex !== tab.originalIndex);
 
-        tabBtn.replaceChild(input, tabLabel);
-        setTimeout(() => {
-          input.focus();
-          input.select();
-        }, 0);
+        if (newTitle && newTitle !== tab.title && !isDuplicate) {
+          tabs[tab.originalIndex].title = newTitle;
+          localStorage.setItem("tabs", JSON.stringify(tabs));
+          hasUnsavedChanges = true;
+        }
+
+        isRenamingTab = false;
+        renderAllTabs();
+      });
+
+      // Replace tab label with input
+      tabBtn.replaceChild(input, tabLabel);
+
+      // Focus/select input using requestAnimationFrame
+      requestAnimationFrame(() => {
+        input.focus();
+        input.select();
       });
 
       const closeBtn = document.createElement("button");
