@@ -3030,7 +3030,17 @@
       editor.style.paddingRight = `${right}px`;
     }
 
+    console.log("🧪 updateTabTitleByMode triggered during:", performance.now());
+
     function updateTabTitleByMode(mode = tabs[activeTabIndex]?.mode || "document") {
+      const renameInput = document.querySelector(".tab-rename-input");
+      const isUserRenaming = renameInput && document.activeElement === renameInput;
+
+      if (isUserRenaming) {
+        console.log("✋ Skipping title update — user is renaming");
+        return;
+      }
+
       console.log("🧪 updateTabTitleByMode called with mode:", mode);
       if (!tabs[activeTabIndex]) return;
 
@@ -3362,7 +3372,10 @@
 
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
-      updateTabTitleByMode(mode);
+      // ✅ Only update tab title if it's empty or still generic
+      if (!tabs[activeTabIndex].title || tabs[activeTabIndex].title === "Untitled") {
+        updateTabTitleByMode(mode);
+      }
     }
 
     function getTabContainer(mode) {
