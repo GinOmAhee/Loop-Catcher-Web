@@ -1248,7 +1248,7 @@
       </div>
 
         <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" contenteditable="true" data-mode="document">
+      <div id="mainEditor" contenteditable="true" data-mode=""></div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
@@ -1274,7 +1274,7 @@
     let toggleBtn;
     let saveStatus;
     let editor, maineditor
-    let currentEditorMode = null;
+    let currentEditorMode = "document";
     let lastSavedContent = "";
     let attachedFilesList;
     let groupedNotes;
@@ -1440,6 +1440,13 @@
 
           saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
         }, 1000);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const editor = document.getElementById("mainEditor");
+        if (editor && typeof currentEditorMode !== 'undefined') {
+          editor.dataset.mode = currentEditorMode;
+        }
       });
     
       previewToggle.addEventListener("click", (e) => {
@@ -3344,6 +3351,17 @@
       const mode = editor?.getAttribute("data-mode");
       console.log("💡 Saving in mode:", mode);
       return mode === "notepad" || mode === "document" ? mode : "unknown";
+    }
+
+    function setCurrentEditorMode(mode) {
+      const editor = document.getElementById("mainEditor");
+      if (editor && (mode === "document" || mode === "notepad")) {
+        currentEditorMode = mode;
+        editor.dataset.mode = mode; // update DOM
+        console.log("🔄 Updated mode to:", mode);
+      } else {
+        console.warn("⚠️ Invalid or missing editor/mode");
+      }
     }
 
     function ensureAtLeastOneTab(filteredTabs, mode) {
