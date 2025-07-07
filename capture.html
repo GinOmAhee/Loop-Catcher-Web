@@ -2224,6 +2224,15 @@
       console.log('Preview is now', isVisible ? 'visible' : 'hidden');
     }
 
+    let previewOpen = true;
+
+    function closePreview() {
+      if (!previewOpen) return;
+        preview.style.display = 'none';
+        previewOpen = false;
+        console.log("👋 Preview closed");
+    }
+
     async function renderPreview({
       mode = "notepad",
       containerId = "#groupedNotes",
@@ -2594,21 +2603,18 @@
         });  
 
         document.addEventListener("click", (e) => {
-          setTimeout(() => {
-            console.log("🖱️ Click target:", e.target);
-            console.log("📦 In mainEditor:", mainEditor.contains(e.target));
-            console.log("📦 In marginBox:", marginBox.contains(e.target));
-            console.log("📦 In preview:", preview.contains(e.target));
+          const clickedInsideEditor =
+            mainEditor.contains(e.target) || marginBox.contains(e.target);
+          const clickedInsidePreview = preview.contains(e.target);
 
-            const clickedInsideEditor =
-              mainEditor.contains(e.target) || marginBox.contains(e.target);
-            const clickedInsidePreview = preview.contains(e.target);
+          console.log("🖱️ Click target:", e.target);
+          console.log("📦 In mainEditor:", clickedInsideEditor);
+          console.log("📦 In preview:", clickedInsidePreview);
 
-            if (!clickedInsideEditor && !clickedInsidePreview) {
-              preview.style.display = "none";
-              console.log("👋 Preview closed by outside click");
-            }
-          }, 0); // Let DOM mutations complete
+          if (!clickedInsideEditor && !clickedInsidePreview) {
+            preview.style.display = 'none';
+            console.log("👋 Preview closed by outside click");
+          }
         });
 
         // ✅ This was missing: it closes `setInterval` block
