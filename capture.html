@@ -2905,18 +2905,15 @@
     });
 
     function applyEditorMode(mode) {
+
+      if (currentEditorMode === mode) return;
+      console.log("🎯 applyEditorMode triggered with", mode);
+      currentEditorMode = mode;
       if (!editor) return;
 
       cacheEditorContent();
       applyEditorStyles(mode);
-
-      // 🧠 SWITCH MODE FIRST so helpers update activeTabIndex correctly
-      setEditorModeAttribute(mode);
-      setActiveTabBar(mode);
-
-      // 🔁 RENDER tab buttons AND assign correct active index per mode
       safeRenderTabs();
-
       restoreEditorContent(mode);
       focusEditorSafely();
     }
