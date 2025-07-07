@@ -2347,6 +2347,13 @@
         `;
       }
 
+      const renameInput = document.querySelector(".tab-rename-input");
+        if (renameInput) {
+          console.log("🧼 Removing stuck rename input before preview render");
+          renameInput.remove();
+          isRenamingTab = false; // if you're using a flag
+        }
+
       container.innerHTML = `<div class="grouped-preview-list">${html}</div>`;
     }
 
