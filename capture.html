@@ -2593,6 +2593,19 @@
           setInterval(autoSave, 30000);
         });  
 
+        document.addEventListener("click", (e) => {
+          setTimeout(() => {
+            const clickedInsideEditor =
+              mainEditor.contains(e.target) || marginBox.contains(e.target);
+            const clickedInsidePreview = preview.contains(e.target);
+
+            if (!clickedInsideEditor && !clickedInsidePreview) {
+              preview.style.display = "none";
+              console.log("👋 Preview closed by outside click");
+            }
+          }, 0); // Let DOM mutations complete
+        });
+
         // ✅ This was missing: it closes `setInterval` block
       }, 200); // check every 200ms until preview is found
 
@@ -3325,22 +3338,26 @@
       const mode = activeTab.mode || "document";
       const currentMode = editor.getAttribute("data-mode");
 
-      // Only switch modes if necessary
       if (mode !== currentMode) {
         localStorage.setItem("editorMode", mode);
-        switchEditorMode(mode); // this will trigger content reload
+        switchEditorMode(mode);
         return;
       }
 
-      // 🧼 Clean existing editor content
-      editor.innerHTML = "";
+      // 🛡️ Temporarily remove marginBox if present
+      const marginBoxWasInside = editor.contains(marginBox);
+      if (marginBoxWasInside) editor.removeChild(marginBox);
 
-      // 📝 Load saved content
       editor.innerHTML = activeTab.content || "";
 
-      // 📦 Only append marginBox in document mode
-      if (mode === "document" && !editor.contains(marginBox)) {
-        editor.appendChild(marginBox);
+      // 📦 Re-append marginBox if needed
+      if (mode === "document") {
+        if (!editor.contains(marginBox)) {
+          editor.appendChild(marginBox);
+        }
+        marginBox.classList.remove("hidden");
+      } else {
+        marginBox.classList.add("hidden");
       }
 
       editor.setAttribute("data-mode", mode);
