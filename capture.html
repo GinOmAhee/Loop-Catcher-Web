@@ -2528,19 +2528,19 @@
           setInterval(autoSave, 30000);
         });  
 
-        document.addEventListener("click", (e) => {
-          const clickedInsideEditor =
-          const clickedInsidePreview = preview.contains(e.target);
+      document.addEventListener("click", (e) => {
+        const clickedInsideEditor = editor.contains(e.target); // ✅ FIXED
+        const clickedInsidePreview = preview.contains(e.target);
 
-          console.log("🖱️ Click target:", e.target);
-          console.log("📦 In mainEditor:", clickedInsideEditor);
-          console.log("📦 In preview:", clickedInsidePreview);
+        console.log("🖱️ Click target:", e.target);
+        console.log("📦 In mainEditor:", clickedInsideEditor);
+        console.log("📦 In preview:", clickedInsidePreview);
 
-          if (!clickedInsideEditor && !clickedInsidePreview) {
-            preview.style.display = 'none';
-            console.log("👋 Preview closed by outside click");
-          }
-        });
+        if (!clickedInsideEditor && !clickedInsidePreview) {
+          preview.style.display = 'none';
+          console.log("👋 Preview closed by outside click");
+        }
+      });
 
         // ✅ This was missing: it closes `setInterval` block
       }, 200); // check every 200ms until preview is found
