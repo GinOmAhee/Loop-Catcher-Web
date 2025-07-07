@@ -2595,6 +2595,11 @@
 
         document.addEventListener("click", (e) => {
           setTimeout(() => {
+            console.log("🖱️ Click target:", e.target);
+            console.log("📦 In mainEditor:", mainEditor.contains(e.target));
+            console.log("📦 In marginBox:", marginBox.contains(e.target));
+            console.log("📦 In preview:", preview.contains(e.target));
+
             const clickedInsideEditor =
               mainEditor.contains(e.target) || marginBox.contains(e.target);
             const clickedInsidePreview = preview.contains(e.target);
