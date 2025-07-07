@@ -1642,13 +1642,23 @@
 
     async function saveText() {
       const now = new Date();
-      const noteText = mainEditor.innerText.trim();
-      const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
-      const noteHTML = mainEditor.innerHTML;
       const mode = getCurrentEditorMode?.() || "document"; // ✅ get current mode
-      const timestamp = now.toISOString();
 
-      if (!noteText) return;
+      let currentTabTitle = tabs[activeTabIndex]?.title?.trim();
+      if (!currentTabTitle) {
+        currentTabTitle = mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts";
+      }
+
+      const noteHTML = mainEditor.innerHTML.trim();
+      const temp = document.createElement("div");
+      temp.innerHTML = noteHTML;
+      const timestamp = now.toISOString();
+      const noteText = temp.innerText.trim();
+
+      if (!noteText || noteText.replace(/\s/g, '') === '') {
+        console.warn("🛑 Note has no meaningful content");
+        return;
+      }
 
       const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
 
@@ -1657,18 +1667,25 @@
         return;
       }
 
-      let projectName = prompt("📌 Enter project name (optional):");
-      projectName = projectName?.trim() || "📂 Unlabeled";
+      // 🔖 Custom title per tab
+      let customTitle = prompt("📝 Enter a custom title for this note (optional):");
+      customTitle = customTitle?.trim() || (mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts");
+      tabs[activeTabIndex].title = customTitle;
+      currentTabTitle = customTitle;
+
+      // 📁 Project name
+      let projectName = prompt("📁 Save under project name (optional):");
+      projectName = projectName?.trim() || "🐣 Unnamed Bebe";
 
       const newNote = {
         id: timestamp,
         text: noteHTML,
-        timestamp: now.toISOString(),
-        title: currentTabTitle,
-        project: projectName,
+        timestamp,
+        title: customTitle,    // 📝 this note’s specific name
+        project: projectName,  // 📁 where it belongs
         resolved: false,
         tags: [],
-        mode // ✅ now saving mode!
+        mode
       };
 
       tabs[activeTabIndex].id = newNote.id;
@@ -1694,10 +1711,9 @@
 
       mainEditor.innerHTML = '';
       tabs[activeTabIndex].content = '';
-      tabs[activeTabIndex].title = 'Untitled';
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
-      saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
+      saveStatus.innerText = `✅ Saved to ${currentTabTitle} at ${now.toLocaleTimeString()}`;
       updatePreviewByMode()
     }    
 
@@ -2289,9 +2305,19 @@
         for (const note of notes) {
           let key;
           if (groupBy === "title") {
-            key = note.title || "Untitled";
-          } else if (groupBy === "project") {
-            key = note.project || "📂 Unlabeled";
+            const hasTitle = note.title && note.title.trim().length > 0;
+            key = hasTitle
+              ? note.title.trim()
+              : note.mode === "notepad"
+                ? "🌀 Scribstack"
+                : "📥 Draftbank";
+          }
+
+          else if (groupBy === "project") {
+            const hasProject = note.project && note.project.trim().length > 0;
+            key = hasProject
+              ? note.project.trim()
+              : "🫧 Bebepod";
           } else {
             key = new Date(note.timestamp).toLocaleDateString();
           }
@@ -2977,19 +3003,27 @@
       editor.style.paddingRight = `${right}px`;
     }
 
-    function updateTabTitleByMode(mode) {
+    function updateTabTitleByMode(mode = tabs[activeTabIndex]?.mode || "document") {
+      console.log("🧪 updateTabTitleByMode called with mode:", mode);
       if (!tabs[activeTabIndex]) return;
 
-      if (mode === "notepad") {
-        const now = new Date();
-        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-      } else if (mode === "document") {
-        const text = editor.innerText || "";
-        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
-      }
+      const currentTitle = tabs[activeTabIndex].title?.trim();
+      const shouldOverwrite =
+        !currentTitle ||
+        currentTitle === "Untitled" 
+
+      console.log("🔎 Title before update:", currentTitle, "| shouldOverwrite:", shouldOverwrite);
+
+      if (!shouldOverwrite) return;
+
+      const now = new Date();
+      tabs[activeTabIndex].title =
+        mode === "notepad"
+          ? `🖊️ Scribs ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
+          : `📄 Drafts ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
-    }
+    }  
 
     function restoreEditorContent(mode) {
       const marginBox = document.getElementById("marginBox");
@@ -3194,6 +3228,8 @@
         return;
       }
 
+      console.log("💾 Saving content before switch:", tabs[activeTabIndex].content);
+
       const selectedTab = tabs[originalIndex];
 
       // Prevent switching to a tab in a different mode
@@ -3209,8 +3245,13 @@
         if (!confirmSwitch) return;
       }
 
+      // 💾 Preserve edits from current tab
+      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
+      console.log("🖊️ mainEditor.innerHTML is now:", mainEditor.innerHTML);
       setActiveTabIndex(selectedTab.mode, originalIndex);
+      console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
       loadActiveTabContent();
+      
       safeRenderTabs();
     }
 
@@ -3310,8 +3351,8 @@
       // Title logic based on mode
       const title =
         mode === "notepad"
-        ? `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
-        : "📚 EditDocs";
+        ? "🖊️ Scribs"
+        : "📄 Drafts";
 
       const safeMode = mode === "notepad" ? "notepad" : "document"
 
