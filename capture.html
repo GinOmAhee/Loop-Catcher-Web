@@ -3102,6 +3102,16 @@
         input.addEventListener("click", e => e.stopPropagation());
 
         input.addEventListener("keydown", e => {
+          const newTitle = input.value.trim();
+            if (newTitle && newTitle !== tab.title) {
+              tab.title = newTitle;
+              localStorage.setItem("tabs", JSON.stringify(tabs));
+            }
+
+            isRenamingTab = false;
+            renderAllTabs();
+          });
+          
           if (e.key === "Enter") input.blur();
           if (e.key === "Escape") {
             isRenamingTab = false;
