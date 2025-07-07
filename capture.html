@@ -3029,7 +3029,7 @@
       const marginBox = document.getElementById("marginBox");
 
       if (mode === "notepad") {
-        getCleanEditorContent() = notepadCache || "";
+        editor.innerHTML = notepadCache || "";
       } else if (mode === "document") {
         editor.innerHTML = documentCache || "";
         if (marginBox && !editor.contains(marginBox)) {
