@@ -440,26 +440,6 @@
     pointer-events: none;
   }
 
-  .margin-box {
-    position: absolute;
-    inset: var(--margin-top, 1in) var(--margin-right, 1in) var(--margin-bottom, 1in) var(--margin-left, 1in);
-    border: 2px dashed rgba(0, 0, 0, 0.2);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .margin-box::before {
-    content: "";
-    position: absolute;
-    top: var(--margin-top, 1in);
-    right: var(--margin-right, 1in);
-    bottom: var(--margin-bottom, 1in);
-    left: var(--margin-left, 1in);
-    border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
-    pointer-events: none;
-    z-index: 2;
-  }
-
   #editor:not(.hidden-editor) {
     opacity: 1;
     pointer-events: auto;
@@ -1158,6 +1138,7 @@
      </label>
   </div>
 
+  
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container">
      <div class="editor-area">
@@ -1551,10 +1532,6 @@
 
     function markUnsaved() {
       hasUnsavedChanges = true;
-    }
-
-    function getMarginBox() {
-      return document.getElementById("marginBox");
     }
 
     function getSelectedPaperSize() {
@@ -2081,7 +2058,7 @@
         if (mode === "notepad") {
           editor.innerHTML = noteHTML; // inject into the full editor shell
         } else if (mode === "document") {
-          marginBox.innerHTML = noteHTML; // inject only inside marginBox
+          editor.innerHTML = noteHTML; // 
         }
 
         setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
@@ -2927,7 +2904,6 @@
     function applyEditorStyles(mode) {
       if (!editor) return;
 
-      const marginBox = document.getElementById("marginBox");
       const paperSize = getSelectedPaperSize?.(); // optional
       const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
 
@@ -2939,8 +2915,6 @@
 
       // 🧠 NOTEPAD MODE
       if (mode === "notepad") {
-        marginBox?.classList.add("hidden");
-        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "none");
 
         // Clear any inline styles related to document layout
@@ -2959,8 +2933,6 @@
 
       // 📄 DOCUMENT MODE
       } else if (mode === "document") {
-        marginBox?.classList.remove("hidden");
-        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "flex");
 
         // 📏 Apply saved margins only
@@ -3020,17 +2992,6 @@
     }  
 
     function restoreEditorContent(mode) {
-      const marginBox = document.getElementById("marginBox");
-
-      if (mode === "notepad") {
-        editor.innerHTML = notepadCache || "";
-      } else if (mode === "document") {
-        editor.innerHTML = documentCache || "";
-        if (marginBox && !editor.contains(marginBox)) {
-          editor.appendChild(marginBox);
-        }
-      }
-
       editor.innerHTML = editor.innerHTML.trim();
     }
 
@@ -3333,10 +3294,6 @@
 
       if (mode === currentMode && editor.innerHTML.trim() !== (activeTab.content || "").trim()) {
         editor.innerHTML = activeTab.content || "";
-      }
-
-      if (mode === "document" && !editor.contains(marginBox)) {
-        editor.appendChild(marginBox);
       }
 
       editor.setAttribute("data-mode", mode);
