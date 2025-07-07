@@ -2079,8 +2079,6 @@
         return;
       }
 
-      switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
-
       if (mode === "notepad") {
         if (mainEditor.contains(marginBox)) {
           mainEditor.removeChild(marginBox); // 🧼 Temporarily remove
@@ -2096,13 +2094,6 @@
         }
         marginBox.classList.remove("hidden");
       } 
-
-      setTimeout(() => focusEditorSafely(), 0);
-      mainEditor.focus();
-      saveStatus.innerText = "📝 Loaded note from preview";
-      preview.style.display = 'none';
-      undoStack.push(noteHTML);
-      redoStack = [];
 
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = noteHTML;
