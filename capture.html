@@ -2077,35 +2077,40 @@
       if (!mainEditor || !marginBox) {
         console.error("❌ Cannot load note — editor elements missing");
         return;
-       }
+      }
 
-        switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
+      switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
 
-        if (mode === "notepad") {
-          mainEditor.innerHTML = noteHTML; // inject into the full editor shell
-        } else if (mode === "document") {
-          marginBox.innerHTML = noteHTML; // inject only inside marginBox
+      if (mode === "notepad") {
+        // 🛡️ Preserve marginBox before overwrite
+        const preservedMarginBox = marginBox.cloneNode(true);
+        mainEditor.innerHTML = noteHTML;
+        mainEditor.appendChild(preservedMarginBox); // keep it in DOM for later
+        preservedMarginBox.classList.add("hidden"); // hide it in notepad mode
+      } else if (mode === "document") {
+        marginBox.innerHTML = noteHTML;
+        if (!mainEditor.contains(marginBox)) {
+          mainEditor.appendChild(marginBox);
         }
+        marginBox.classList.remove("hidden");
+      }
 
-        setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
+      setTimeout(() => focusEditorSafely(), 0);
+      mainEditor.focus();
+      saveStatus.innerText = "📝 Loaded note from preview";
+      preview.style.display = 'none';
+      undoStack.push(noteHTML);
+      redoStack = [];
 
-        mainEditor.focus();
-        saveStatus.innerText = "📝 Loaded note from preview";
-        preview.style.display = 'none';
-        undoStack.push(noteHTML);
-        redoStack = [];
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = noteHTML;
+      const text = tempDiv.innerText || "";
+      const titleLine = text.split("\n")[0]?.trim() || "Note";
 
-        // 💡 Extract the first line to use as tab title
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = noteHTML;
-        const text = tempDiv.innerText || "";
-        const titleLine = text.split("\n")[0]?.trim() || "Note";
-
-        // ⬇️ INSERT THIS BLOCK HERE
-        tabs[activeTabIndex].title = titleLine;
-        localStorage.setItem("tabs", JSON.stringify(tabs));
-        safeRenderTabs(); // to update UI tab name
-        document.title = titleLine;
+      tabs[activeTabIndex].title = titleLine;
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      safeRenderTabs();
+      document.title = titleLine;
     }
 
     function escapeHTML(text) {
