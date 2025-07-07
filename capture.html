@@ -3264,34 +3264,26 @@
     }
 
     function switchTab(originalIndex) {
-      const selectedTab = tabs[originalIndex];
-      const currentMode = localStorage.getItem("editorMode") || "document";
-      const activeTab = tabs[activeTabIndex];
+      cacheEditorContent(); // 💾 Save before switching
 
-      if (!selectedTab) {
+      if (typeof tabs[originalIndex] === "undefined") {
         console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
         return;
       }
 
-      // ❌ Prevent switching to tab of different mode
+      const selectedTab = tabs[originalIndex];
+      const currentMode = getCurrentEditorMode();
+
       if (selectedTab.mode !== currentMode) {
         console.warn(`🚫 Can't switch to a ${selectedTab.mode} tab while in ${currentMode} mode`);
         return;
       }
 
-      // ✅ Only save content if activeTab is of same mode
-      if (activeTab && activeTab.mode === currentMode) {
-        const cleanContent = getCleanEditorContent();
-        activeTab.content = cleanContent;
-        console.log("💾 Saving content before switch:", cleanContent);
-      }
-
-      // ✅ Proceed with switch
+      tabs[activeTabIndex].content = getCleanEditorContent();
       setActiveTabIndex(selectedTab.mode, originalIndex);
-      console.log("📥 Loaded content for new tab:", selectedTab.content);
       loadActiveTabContent();
       safeRenderTabs();
-    }
+    }   
 
     function closeTab(index) {
       const currentMode = localStorage.getItem("editorMode") || "document";
@@ -3350,12 +3342,6 @@
       const mode = activeTab.mode || "document";
       const currentMode = editor.getAttribute("data-mode");
 
-      if (mode !== currentMode) {
-        localStorage.setItem("editorMode", mode);
-        switchEditorMode(mode);
-        return;
-      }
-
       // 🛡️ Temporarily remove marginBox if present
       const marginBoxWasInside = editor.contains(marginBox);
       if (marginBoxWasInside) editor.removeChild(marginBox);
@@ -3392,6 +3378,13 @@
     }
 
     function addNewTab(mode) {
+
+      const currentMode = getCurrentEditorMode();
+        if (mode !== currentMode) {
+          console.warn(`🚫 Can't add a "${mode}" tab while in "${currentMode}" mode`);
+          return; // 💥 Cancel tab creation if modes don't match
+        }
+
       const now = new Date();
 
       // Title logic based on mode
