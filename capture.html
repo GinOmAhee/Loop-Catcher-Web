@@ -3121,45 +3121,50 @@
         tabBtn.classList.add("active");
       }
 
-      const tabLabel = document.createElement("span");
-      tabLabel.className = "tab-label";
-      tabLabel.innerText = tab.title;
-      tabLabel.addEventListener("click", () => switchTab(tab.originalIndex));
+      const tabLabel = createTabLabel(tab);
+      const closeBtn = createTabCloseButton(tab);
 
-      tabLabel.addEventListener("dblclick", (e) => {
+      tabBtn.appendChild(tabLabel);
+      tabBtn.appendChild(closeBtn);
+
+      return tabBtn;
+    }
+
+    function createTabLabel(tab) {
+      const label = document.createElement("span");
+      label.className = "tab-label";
+      label.innerText = tab.title;
+
+      label.addEventListener("click", () => switchTab(tab.originalIndex));
+
+      label.addEventListener("dblclick", (e) => {
         e.stopPropagation();
-
-        // Prevent renaming if already active
         if (isRenamingTab) return;
         isRenamingTab = true;
 
-        // Create rename input
         const input = document.createElement("input");
         input.className = "tab-rename-input";
         input.value = tab.title;
 
-        // Apply theme class
         if (document.body.classList.contains("dark-theme")) {
           input.classList.add("dark-theme-input");
         }
 
-        // Stop clicks from bubbling (e.g. triggering select tab)
         input.addEventListener("click", (e) => e.stopPropagation());
 
-        // Key handling
         input.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
-            input.blur(); // Trigger save
-          } else if (e.key === "Escape") {
-            isRenamingTab = false;
-            renderAllTabs(); // Cancel edit
-          }
-        });
+          if (e.key === "Enter") input.blur();
+            else if (e.key === "Escape") {
+              isRenamingTab = false;
+              renderAllTabs();
+            }
+          });
 
-        // Blur (finish editing)
-        input.addEventListener("blur", (e) => {
+          input.addEventListener("blur", (e) => {
           const newTitle = e.target.value.trim();
-          const isDuplicate = tabs.some(t => t.title === newTitle && t.originalIndex !== tab.originalIndex);
+          const isDuplicate = tabs.some(
+            (t) => t.title === newTitle && t.originalIndex !== tab.originalIndex
+          );
 
           if (newTitle && newTitle !== tab.title && !isDuplicate) {
             tabs[tab.originalIndex].title = newTitle;
@@ -3171,30 +3176,32 @@
           renderAllTabs();
         });
 
-        // Replace tab label with input
-        tabBtn.replaceChild(input, tabLabel);
+        const tabBtn = label.parentElement;
+        tabBtn.replaceChild(input, label);
 
-        // Focus/select input using requestAnimationFrame
         requestAnimationFrame(() => {
           input.focus();
           input.select();
         });
+      });
 
-        const closeBtn = document.createElement("button");
-        closeBtn.innerText = "⨯";
-        closeBtn.className = "tab-close-btn";
-        closeBtn.title = "Close Tab";
-        closeBtn.onclick = (e) => {
-          e.stopPropagation();
-          closeTab(tab.originalIndex);
-        };
-
-        tabBtn.appendChild(tabLabel);
-        tabBtn.appendChild(closeBtn);
-
-        return tabBtn;
-      }
+      return label;
     }
+
+    function createTabCloseButton(tab) {
+      const closeBtn = document.createElement("button");
+      closeBtn.innerText = "⨯";
+      closeBtn.className = "tab-close-btn";
+      closeBtn.title = "Close Tab";
+
+      closeBtn.onclick = (e) => {
+        e.stopPropagation();
+        closeTab(tab.originalIndex);
+      };
+
+      return closeBtn;
+    }
+
     function createAddTabButton(mode) {
       const addTabBtn = document.createElement("div");
       addTabBtn.innerText = "+";
