@@ -3225,37 +3225,32 @@
     }
 
     function switchTab(originalIndex) {
-      cacheEditorContent(); // 💾 Save before switching
+      const selectedTab = tabs[originalIndex];
+      const currentMode = localStorage.getItem("editorMode") || "document";
+      const activeTab = tabs[activeTabIndex];
 
-      if (typeof tabs[originalIndex] === "undefined") {
+      if (!selectedTab) {
         console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
         return;
       }
 
-      console.log("💾 Saving content before switch:", tabs[activeTabIndex].content);
-
-      const selectedTab = tabs[originalIndex];
-
-      // Prevent switching to a tab in a different mode
-      const currentMode = localStorage.getItem("editorMode") || "document";
+      // ❌ Prevent cross-mode tab switches directly
       if (selectedTab.mode !== currentMode) {
         console.warn(`🚫 Can't switch to a ${selectedTab.mode} tab while in ${currentMode} mode`);
         return;
       }
 
-      // If unsaved changes exist in current tab, prompt user (optional enhancement)
-      if (hasUnsavedChanges) {
-        const confirmSwitch = confirm("⚠️ You have unsaved changes. Switch tabs anyway?");
-        if (!confirmSwitch) return;
+      // ✅ Save only if active tab's mode matches current editor mode
+      if (activeTab && activeTab.mode === currentMode) {
+        const cleanContent = getCleanEditorContent();
+        activeTab.content = cleanContent;
+        console.log("💾 Saving content before switch:", cleanContent);
       }
 
-      // 💾 Preserve edits from current tab
-      tabs[activeTabIndex].content = getCleanEditorContent();
-      console.log("🖊️ getCleanEditorContent() is now:", getCleanEditorContent());
+      // 🖊️ Continue tab switch
       setActiveTabIndex(selectedTab.mode, originalIndex);
-      console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
+      console.log("📥 Loaded content for new tab:", selectedTab.content);
       loadActiveTabContent();
-      
       safeRenderTabs();
     }
 
