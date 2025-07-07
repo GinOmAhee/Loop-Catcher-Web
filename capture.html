@@ -1471,25 +1471,24 @@
       document.addEventListener("click", (e) => {
         const clickedInsidePreview = preview.contains(e.target);
         const clickedToggle = previewToggle.contains(e.target);
-        const clickedInsideEditor = mainEditor.contains(e.target);
         const isRenaming = e.target.classList.contains("tab-rename-input");
-
-        console.log("Preview auto-close triggered.");
-        console.log("Clicked inside preview:", clickedInsidePreview);
-        console.log("Clicked inside editor:", clickedInsideEditor);
-        console.log("Editor was hidden:", mainEditor.classList.contains("hidden-editor"));
 
         if (
           preview.classList.contains("preview-visible") &&
           !clickedInsidePreview &&
           !clickedToggle &&
-          !clickedInsideEditor &&
           !isRenaming
         ) {
-         preview.classList.remove("preview-visible");
-         if (mainEditor.classList.contains("hidden-editor")) {
-           mainEditor.classList.remove("hidden-editor");
-         }
+          console.log("🧨 Preview auto-close triggered.");
+          preview.classList.remove("preview-visible");
+
+          requestAnimationFrame(() => {
+            mainEditor.classList.remove("hidden-editor");
+            mainEditor.style.display = "block";
+            mainEditor.style.opacity = "1";
+            mainEditor.style.pointerEvents = "auto";
+            mainEditor.scrollTop = 0;
+          });
         }
       });
 
