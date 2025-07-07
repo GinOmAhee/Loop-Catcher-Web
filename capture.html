@@ -3332,6 +3332,10 @@
       loadActiveTabContent();
     }
 
+    if (mode !== getCurrentEditorMode()) {
+      console.warn("💥 Editor mode mismatch — something is triggering an invalid switch!");
+    }
+
     function loadActiveTabContent() {
       const activeTab = tabs[activeTabIndex];
       if (!activeTab) {
