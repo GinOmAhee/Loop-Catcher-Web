@@ -440,43 +440,6 @@
     pointer-events: none;
   }
 
-  .margin-box {
-    position: absolute;
-    inset: var(--margin-top, 1in) var(--margin-right, 1in) var(--margin-bottom, 1in) var(--margin-left, 1in);
-    border: 2px dashed rgba(0, 0, 0, 0.2);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .margin-box::before {
-    content: "";
-    position: absolute;
-    top: var(--margin-top, 1in);
-    right: var(--margin-right, 1in);
-    bottom: var(--margin-bottom, 1in);
-    left: var(--margin-left, 1in);
-    border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  #mainEditor:not(.hidden-editor) {
-    opacity: 1;
-    pointer-events: auto;
-    visibility: visible;
-  }
-
-  .hidden-editor {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-  
-  .hidden-editor.visible {
-    visibility: visible;
-    opacity: 1;
-  }
-
   textarea {
     width: 60%;
     height: 300px;
@@ -1268,8 +1231,6 @@
 
         <!-- 📝 Rich Text Editor -->
         <div id="mainEditor" contenteditable="true" data-mode="document">
-          <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
-        </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
@@ -1310,8 +1271,6 @@
     let notepadCache = "";
     let documentCache = "";
     let hasUnsavedChanges = false;
-
-    const marginBox = document.getElementById("marginBox"); // 💡 safe reference
 
     async function initializeFirebase() {
       try {
@@ -1550,10 +1509,6 @@
 
     function markUnsaved() {
       hasUnsavedChanges = true;
-    }
-
-    function getMarginBox() {
-      return document.getElementById("marginBox");
     }
 
     function getSelectedPaperSize() {
@@ -2074,27 +2029,7 @@
 
 
     function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
-      if (!mainEditor || !marginBox) {
-        console.error("❌ Cannot load note — editor elements missing");
-        return;
-      }
-
-      if (mode === "notepad") {
-        if (mainEditor.contains(marginBox)) {
-          mainEditor.removeChild(marginBox); // 🧼 Temporarily remove
-        }
-        mainEditor.innerHTML = noteHTML;
-        mainEditor.appendChild(marginBox); // 🔁 Re-append original
-        console.log("🧩 marginBox is now in editor:", mainEditor.contains(marginBox));
-        marginBox.classList.add("hidden");
-      } else if (mode === "document") {
-        marginBox.innerHTML = noteHTML;
-        if (!mainEditor.contains(marginBox)) {
-          mainEditor.appendChild(marginBox);
-        }
-        marginBox.classList.remove("hidden");
-      } 
-
+      
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = noteHTML;
       const text = tempDiv.innerText || "";
@@ -2595,7 +2530,6 @@
 
         document.addEventListener("click", (e) => {
           const clickedInsideEditor =
-            mainEditor.contains(e.target) || marginBox.contains(e.target);
           const clickedInsidePreview = preview.contains(e.target);
 
           console.log("🖱️ Click target:", e.target);
@@ -2962,7 +2896,6 @@
     function applyEditorStyles(mode) {
       if (!editor) return;
 
-      const marginBox = document.getElementById("marginBox");
       const paperSize = getSelectedPaperSize?.(); // optional
       const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
 
@@ -2974,8 +2907,6 @@
 
       // 🧠 NOTEPAD MODE
       if (mode === "notepad") {
-        marginBox?.classList.add("hidden");
-        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "none");
 
         // Clear any inline styles related to document layout
@@ -2994,8 +2925,6 @@
 
       // 📄 DOCUMENT MODE
       } else if (mode === "document") {
-        marginBox?.classList.remove("hidden");
-        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "flex");
 
         // 📏 Apply saved margins only
@@ -3064,20 +2993,6 @@
       localStorage.setItem("tabs", JSON.stringify(tabs));
     }  
 
-    function restoreEditorContent(mode) {
-      const marginBox = document.getElementById("marginBox");
-
-      if (mode === "notepad") {
-        editor.innerHTML = notepadCache || "";
-      } else if (mode === "document") {
-        editor.innerHTML = documentCache || "";
-        if (marginBox && !editor.contains(marginBox)) {
-          editor.appendChild(marginBox);
-        }
-      }
-
-      editor.innerHTML = editor.innerHTML.trim();
-    }
 
     function setEditorModeAttribute(mode) {
       editor.setAttribute("data-mode", mode);
@@ -3346,21 +3261,7 @@
       const mode = activeTab.mode || "document";
       const currentMode = editor.getAttribute("data-mode");
 
-      // 🛡️ Temporarily remove marginBox if present
-      const marginBoxWasInside = editor.contains(marginBox);
-      if (marginBoxWasInside) editor.removeChild(marginBox);
-
       editor.innerHTML = activeTab.content || "";
-
-      // 📦 Re-append marginBox if needed
-      if (mode === "document") {
-        if (!editor.contains(marginBox)) {
-          editor.appendChild(marginBox);
-        }
-        marginBox.classList.remove("hidden");
-      } else {
-        marginBox.classList.add("hidden");
-      }
 
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
@@ -3401,7 +3302,7 @@
 
       const newTab = {
         title,
-        content: "", // content = marginBox.innerHTML (document) or editor.innerHTML (notepad)
+        content: "",
         mode: safeMode
       };
 
@@ -3479,13 +3380,6 @@
           mainEditor.style.minHeight = "8.3in";
           break;
       }
-    }
-
-    function getCleanEditorContent() {
-      const editorClone = editor.cloneNode(true);
-      const margin = editorClone.querySelector('#marginBox');
-      if (margin) margin.remove();
-      return editorClone.innerHTML.trim();
     }
 
     function migrateNotes(notes) {
