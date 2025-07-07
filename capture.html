@@ -2867,6 +2867,10 @@
       });
     });
 
+    function getCleanEditorContent() {
+      return editor.innerHTML.trim();
+    }
+
     function applyEditorMode(mode) {
       if (!editor) return;
 
