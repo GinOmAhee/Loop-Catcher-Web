@@ -3234,20 +3234,20 @@
         return;
       }
 
-      // ❌ Prevent cross-mode tab switches directly
+      // ❌ Prevent switching to tab of different mode
       if (selectedTab.mode !== currentMode) {
         console.warn(`🚫 Can't switch to a ${selectedTab.mode} tab while in ${currentMode} mode`);
         return;
       }
 
-      // ✅ Save only if active tab's mode matches current editor mode
+      // ✅ Only save content if activeTab is of same mode
       if (activeTab && activeTab.mode === currentMode) {
         const cleanContent = getCleanEditorContent();
         activeTab.content = cleanContent;
         console.log("💾 Saving content before switch:", cleanContent);
       }
 
-      // 🖊️ Continue tab switch
+      // ✅ Proceed with switch
       setActiveTabIndex(selectedTab.mode, originalIndex);
       console.log("📥 Loaded content for new tab:", selectedTab.content);
       loadActiveTabContent();
