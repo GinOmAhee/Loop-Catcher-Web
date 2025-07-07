@@ -3075,10 +3075,12 @@
 
       tabContainer.appendChild(createAddTabButton(mode));
 
-    } finally {
+      try {
+      // render logic
+      } finally {
         isRenderingTabs = false;
+      }
     }
-    
 
     function createTabElement(tab, activeIndexForMode) {
       const tabBtn = document.createElement("div");
