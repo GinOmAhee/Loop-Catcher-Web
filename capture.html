@@ -3404,18 +3404,24 @@
 
       const newTab = {
         title,
-        content: "",
+        content: "", // content = marginBox.innerHTML (document) or editor.innerHTML (notepad)
         mode: safeMode
       };
 
       tabs.push(newTab);
       const newIndex = tabs.length - 1;
-      setActiveTabIndex(mode, newIndex);
-      activeTabIndex = newIndex;
+
+      // Optional: mode safety check before switching
+      if (getCurrentEditorMode() !== mode) {
+      switchEditorMode(mode); // Trigger mode switch
+      }
+
+      // Set and load the new tab
+      setActiveTabIndex(mode, newIndex); // This handles activeTabIndex internally
+      loadActiveTabContent(); // Ensure content loads
+      safeRenderTabs();       // Re-render the tab UI
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
-      safeRenderTabs(); // 💡 Ensures rename-safe refresh
-      loadActiveTabContent(); // ✅ Load blank or default content
     }
 
     function getCurrentEditorMode() {
