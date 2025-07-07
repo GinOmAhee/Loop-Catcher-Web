@@ -3128,14 +3128,13 @@
           }
           isRenamingTab = false;
           renderAllTabs();
-        });
 
-        tabBtn.replaceChild(input, tabLabel);
-        setTimeout(() => {
-          input.focus();
-          input.select();
-        }, 0);
-      });
+          tabBtn.replaceChild(input, tabLabel);
+          setTimeout(() => {
+            input.focus();
+            input.select();
+          }, 0);
+        });
 
       const closeBtn = document.createElement("button");
       closeBtn.innerText = "⨯";
