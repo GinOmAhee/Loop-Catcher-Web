@@ -440,6 +440,43 @@
     pointer-events: none;
   }
 
+  .margin-box {
+    position: absolute;
+    inset: var(--margin-top, 1in) var(--margin-right, 1in) var(--margin-bottom, 1in) var(--margin-left, 1in);
+    border: 2px dashed rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .margin-box::before {
+    content: "";
+    position: absolute;
+    top: var(--margin-top, 1in);
+    right: var(--margin-right, 1in);
+    bottom: var(--margin-bottom, 1in);
+    left: var(--margin-left, 1in);
+    border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  #mainEditor:not(.hidden-editor) {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  .hidden-editor {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .hidden-editor.visible {
+    visibility: visible;
+    opacity: 1;
+  }
+
   textarea {
     width: 60%;
     height: 300px;
@@ -1231,6 +1268,8 @@
 
         <!-- 📝 Rich Text Editor -->
         <div id="mainEditor" contenteditable="true" data-mode="document">
+          <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
+        </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
@@ -1271,6 +1310,8 @@
     let notepadCache = "";
     let documentCache = "";
     let hasUnsavedChanges = false;
+
+    const marginBox = document.getElementById("marginBox"); // 💡 safe reference
 
     async function initializeFirebase() {
       try {
@@ -1511,6 +1552,10 @@
       hasUnsavedChanges = true;
     }
 
+    function getMarginBox() {
+      return document.getElementById("marginBox");
+    }
+
     function getSelectedPaperSize() {
       const paperSizeSelector = document.getElementById("paperSizeSelector");
       return paperSizeSelector ? paperSizeSelector.value : "default-size";
@@ -1664,8 +1709,8 @@
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      getCleanEditorContent()= '';
-      tabs[activeTabIndex].content = '';
+      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
+      
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
       saveStatus.innerText = `✅ Saved to ${currentTabTitle} at ${now.toLocaleTimeString()}`;
@@ -1679,7 +1724,7 @@
       if (!mainEditor) return;
 
       // Save current content into the active tab
-      tabs[activeTabIndex].content = getCleanEditorContent();
+      tabs[activeTabIndex].content = mainEditor.innerHTML;
 
       // Save full tabs array
       localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -2029,16 +2074,38 @@
 
 
     function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
-      
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = noteHTML;
-      const text = tempDiv.innerText || "";
-      const titleLine = text.split("\n")[0]?.trim() || "Note";
+      if (!mainEditor || !marginBox) {
+        console.error("❌ Cannot load note — editor elements missing");
+        return;
+       }
 
-      tabs[activeTabIndex].title = titleLine;
-      localStorage.setItem("tabs", JSON.stringify(tabs));
-      safeRenderTabs();
-      document.title = titleLine;
+        switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
+
+        if (mode === "notepad") {
+          mainEditor.innerHTML = noteHTML; // inject into the full editor shell
+        } else if (mode === "document") {
+          marginBox.innerHTML = noteHTML; // inject only inside marginBox
+        }
+
+        setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
+
+        mainEditor.focus();
+        saveStatus.innerText = "📝 Loaded note from preview";
+        preview.style.display = 'none';
+        undoStack.push(noteHTML);
+        redoStack = [];
+
+        // 💡 Extract the first line to use as tab title
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = noteHTML;
+        const text = tempDiv.innerText || "";
+        const titleLine = text.split("\n")[0]?.trim() || "Note";
+
+        // ⬇️ INSERT THIS BLOCK HERE
+        tabs[activeTabIndex].title = titleLine;
+        localStorage.setItem("tabs", JSON.stringify(tabs));
+        safeRenderTabs(); // to update UI tab name
+        document.title = titleLine;
     }
 
     function escapeHTML(text) {
@@ -2148,15 +2215,6 @@
       }
 
       console.log('Preview is now', isVisible ? 'visible' : 'hidden');
-    }
-
-    let previewOpen = true;
-
-    function closePreview() {
-      if (!previewOpen) return;
-        preview.style.display = 'none';
-        previewOpen = false;
-        console.log("👋 Preview closed");
     }
 
     async function renderPreview({
@@ -2281,13 +2339,6 @@
           <button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>
         `;
       }
-
-      const renameInput = document.querySelector(".tab-rename-input");
-        if (renameInput) {
-          console.log("🧼 Removing stuck rename input before preview render");
-          renameInput.remove();
-          isRenamingTab = false; // if you're using a flag
-        }
 
       container.innerHTML = `<div class="grouped-preview-list">${html}</div>`;
     }
@@ -2527,20 +2578,6 @@
           });  
           setInterval(autoSave, 30000);
         });  
-
-      document.addEventListener("click", (e) => {
-        const clickedInsideEditor = editor.contains(e.target); // ✅ FIXED
-        const clickedInsidePreview = preview.contains(e.target);
-
-        console.log("🖱️ Click target:", e.target);
-        console.log("📦 In mainEditor:", clickedInsideEditor);
-        console.log("📦 In preview:", clickedInsidePreview);
-
-        if (!clickedInsideEditor && !clickedInsidePreview) {
-          preview.style.display = 'none';
-          console.log("👋 Preview closed by outside click");
-        }
-      });
 
         // ✅ This was missing: it closes `setInterval` block
       }, 200); // check every 200ms until preview is found
@@ -2867,10 +2904,6 @@
       });
     });
 
-    function getCleanEditorContent() {
-      return editor.innerHTML.trim();
-    }
-
     function applyEditorMode(mode) {
       if (!editor) return;
 
@@ -2891,7 +2924,7 @@
     function cacheEditorContent() {
       const currentMode = editor.getAttribute("data-mode");
       if (currentMode === "notepad") {
-        notepadCache = getCleanEditorContent();
+        notepadCache = editor.innerHTML;
       } else if (currentMode === "document") {
         documentCache = editor.innerHTML;
       }
@@ -2900,6 +2933,7 @@
     function applyEditorStyles(mode) {
       if (!editor) return;
 
+      const marginBox = document.getElementById("marginBox");
       const paperSize = getSelectedPaperSize?.(); // optional
       const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
 
@@ -2911,6 +2945,8 @@
 
       // 🧠 NOTEPAD MODE
       if (mode === "notepad") {
+        marginBox?.classList.add("hidden");
+        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "none");
 
         // Clear any inline styles related to document layout
@@ -2929,6 +2965,8 @@
 
       // 📄 DOCUMENT MODE
       } else if (mode === "document") {
+        marginBox?.classList.remove("hidden");
+        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "flex");
 
         // 📏 Apply saved margins only
@@ -2965,17 +3003,7 @@
       editor.style.paddingRight = `${right}px`;
     }
 
-    console.log("🧪 updateTabTitleByMode triggered during:", performance.now());
-
     function updateTabTitleByMode(mode = tabs[activeTabIndex]?.mode || "document") {
-      const renameInput = document.querySelector(".tab-rename-input");
-      const isUserRenaming = renameInput && document.activeElement === renameInput;
-
-      if (isUserRenaming) {
-        console.log("✋ Skipping title update — user is renaming");
-        return;
-      }
-
       console.log("🧪 updateTabTitleByMode called with mode:", mode);
       if (!tabs[activeTabIndex]) return;
 
@@ -2997,6 +3025,20 @@
       localStorage.setItem("tabs", JSON.stringify(tabs));
     }  
 
+    function restoreEditorContent(mode) {
+      const marginBox = document.getElementById("marginBox");
+
+      if (mode === "notepad") {
+        editor.innerHTML = notepadCache || "";
+      } else if (mode === "document") {
+        editor.innerHTML = documentCache || "";
+        if (marginBox && !editor.contains(marginBox)) {
+          editor.appendChild(marginBox);
+        }
+      }
+
+      editor.innerHTML = editor.innerHTML.trim();
+    }
 
     function setEditorModeAttribute(mode) {
       editor.setAttribute("data-mode", mode);
@@ -3102,16 +3144,6 @@
         input.addEventListener("click", e => e.stopPropagation());
 
         input.addEventListener("keydown", e => {
-          const newTitle = input.value.trim();
-            if (newTitle && newTitle !== tab.title) {
-              tab.title = newTitle;
-              localStorage.setItem("tabs", JSON.stringify(tabs));
-            }
-
-            isRenamingTab = false;
-            renderAllTabs();
-        });
-
           if (e.key === "Enter") input.blur();
           if (e.key === "Escape") {
             isRenamingTab = false;
@@ -3128,13 +3160,14 @@
           }
           isRenamingTab = false;
           renderAllTabs();
-
-          tabBtn.replaceChild(input, tabLabel);
-          setTimeout(() => {
-            input.focus();
-            input.select();
-          }, 0);
         });
+
+        tabBtn.replaceChild(input, tabLabel);
+        setTimeout(() => {
+          input.focus();
+          input.select();
+        }, 0);
+      });
 
       const closeBtn = document.createElement("button");
       closeBtn.innerText = "⨯";
@@ -3179,8 +3212,6 @@
     }
 
     function switchEditorMode(newMode) {
-      cacheEditorContent(); // 💾 Save before switching
-
       const currentMode = getCurrentEditorMode();
       if (newMode === currentMode) return;
 
@@ -3192,26 +3223,37 @@
     }
 
     function switchTab(originalIndex) {
-      cacheEditorContent(); // 💾 Save before switching
-
       if (typeof tabs[originalIndex] === "undefined") {
         console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
         return;
       }
 
-      const selectedTab = tabs[originalIndex];
-      const currentMode = getCurrentEditorMode();
+      console.log("💾 Saving content before switch:", tabs[activeTabIndex].content);
 
+      const selectedTab = tabs[originalIndex];
+
+      // Prevent switching to a tab in a different mode
+      const currentMode = localStorage.getItem("editorMode") || "document";
       if (selectedTab.mode !== currentMode) {
         console.warn(`🚫 Can't switch to a ${selectedTab.mode} tab while in ${currentMode} mode`);
         return;
       }
 
-      tabs[activeTabIndex].content = getCleanEditorContent();
+      // If unsaved changes exist in current tab, prompt user (optional enhancement)
+      if (hasUnsavedChanges) {
+        const confirmSwitch = confirm("⚠️ You have unsaved changes. Switch tabs anyway?");
+        if (!confirmSwitch) return;
+      }
+
+      // 💾 Preserve edits from current tab
+      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
+      console.log("🖊️ mainEditor.innerHTML is now:", mainEditor.innerHTML);
       setActiveTabIndex(selectedTab.mode, originalIndex);
+      console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
       loadActiveTabContent();
+      
       safeRenderTabs();
-    }   
+    }
 
     function closeTab(index) {
       const currentMode = localStorage.getItem("editorMode") || "document";
@@ -3260,10 +3302,6 @@
       loadActiveTabContent();
     }
 
-    if (mode !== getCurrentEditorMode()) {
-      console.warn("💥 Editor mode mismatch — something is triggering an invalid switch!");
-    }
-
     function loadActiveTabContent() {
       const activeTab = tabs[activeTabIndex];
       if (!activeTab) {
@@ -3274,14 +3312,26 @@
       const mode = activeTab.mode || "document";
       const currentMode = editor.getAttribute("data-mode");
 
-      editor.innerHTML = activeTab.content || "";
+      // Only switch modes if necessary
+      if (mode !== currentMode) {
+        localStorage.setItem("editorMode", mode);
+        switchEditorMode(mode); // safe to call here now
+        return; // 💡 Exit here, switchEditorMode will handle loading
+      }
+
+      if (mode === currentMode && editor.innerHTML.trim() !== (activeTab.content || "").trim()) {
+        editor.innerHTML = activeTab.content || "";
+      }
+
+      if (mode === "document" && !editor.contains(marginBox)) {
+        editor.appendChild(marginBox);
+      }
 
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
-      // ✅ Only update tab title if it's empty or still generic
-      if (!tabs[activeTabIndex].title || tabs[activeTabIndex].title === "Untitled") {
-        updateTabTitleByMode(mode);
-      }
+
+       // 🧠 Safely update title after content + mode have landed
+       updateTabTitleByMode(mode);
     }
 
     function getTabContainer(mode) {
@@ -3296,13 +3346,6 @@
     }
 
     function addNewTab(mode) {
-
-      const currentMode = getCurrentEditorMode();
-        if (mode !== currentMode) {
-          console.warn(`🚫 Can't add a "${mode}" tab while in "${currentMode}" mode`);
-          return; // 💥 Cancel tab creation if modes don't match
-        }
-
       const now = new Date();
 
       // Title logic based on mode
@@ -3321,18 +3364,12 @@
 
       tabs.push(newTab);
       const newIndex = tabs.length - 1;
-
-      // Optional: mode safety check before switching
-      if (getCurrentEditorMode() !== mode) {
-      switchEditorMode(mode); // Trigger mode switch
-      }
-
-      // Set and load the new tab
-      setActiveTabIndex(mode, newIndex); // This handles activeTabIndex internally
-      loadActiveTabContent(); // Ensure content loads
-      safeRenderTabs();       // Re-render the tab UI
+      setActiveTabIndex(mode, newIndex);
+      activeTabIndex = newIndex;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
+      safeRenderTabs(); // 💡 Ensures rename-safe refresh
+      loadActiveTabContent(); // ✅ Load blank or default content
     }
 
     function getCurrentEditorMode() {
