@@ -338,7 +338,7 @@
     min-height: 100%;
   }
 
-  #mainEditor::before {
+  #editor::before {
     content: "";
     position: absolute;
     top: var(--paddingTop);
@@ -350,7 +350,7 @@
   }
 
   /* Notepad Mode Styles */
-  #mainEditor[data-mode="notepad"] {
+  #editor[data-mode="notepad"] {
     font-family: "Courier New", monospace;
     font-size: 1rem;
     padding: 0.9rem;
@@ -363,7 +363,7 @@
     overflow-y: auto; /* Optional: adds scroll if content overflows */
   }
 
-  #mainEditor[data-mode="document"] {
+  #editor[data-mode="document"] {
     width: 8.27in;
     min-height: 11.69in;
     padding: 0;
@@ -460,7 +460,7 @@
     z-index: 2;
   }
 
-  #mainEditor:not(.hidden-editor) {
+  #editor:not(.hidden-editor) {
     opacity: 1;
     pointer-events: auto;
     visibility: visible;
@@ -1268,7 +1268,7 @@
 
         <!-- 📝 Rich Text Editor -->
         <div id="mainEditor" contenteditable="true" data-mode="document">
-          <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
+          <div class="margin-box" id="marginBox" contenteditable="false"></div>
         </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
@@ -1422,12 +1422,12 @@
       toolbar = document.getElementById("toolbar");
       let preview = document.getElementById('preview')
 
-      if (!mainEditor) {
-        console.error("❌ mainEditor not found");
+      if (!editor) {
+        console.error("❌ editor not found");
         return;
       }
 
-      console.log("✅ mainEditor is:", mainEditor);
+      console.log("✅ editor is:", editor);
 
       // ⬇️ NOW safe to call logic that depends on those elements
       const savedMode = localStorage.getItem("editorMode") || "document";
@@ -1436,20 +1436,20 @@
       const mode = localStorage.getItem("editorMode") || "document";
       setActiveTabBar(mode);
       
-      if (!mainEditor) {
-        console.error("❌ mainEditor not found");
+      if (!editor) {
+        console.error("❌ editor not found");
         return;
       }
 
-      console.log("✅ mainEditor is:", mainEditor);
+      console.log("✅ editor is:", editor);
 
-      mainEditor.addEventListener("input", () => {
-        undoStack.push(mainEditor.innerHTML);
+      editor.addEventListener("input", () => {
+        undoStack.push(editor.innerHTML);
         redoStack = [];
 
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
-          localStorage.setItem("capturedText", mainEditor.innerHTML);
+          localStorage.setItem("capturedText", editor.innerHTML);
           localStorage.setItem("lastSaved", new Date().toISOString());
 
           const mode = getCurrentEditorMode?.() || "notepad";
@@ -1483,11 +1483,11 @@
           preview.classList.remove("preview-visible");
 
           requestAnimationFrame(() => {
-            mainEditor.classList.remove("hidden-editor");
-            mainEditor.style.display = "block";
-            mainEditor.style.opacity = "1";
-            mainEditor.style.pointerEvents = "auto";
-            mainEditor.scrollTop = 0;
+            editor.classList.remove("hidden-editor");
+            editor.style.display = "block";
+            editor.style.opacity = "1";
+            editor.style.pointerEvents = "auto";
+            editor.scrollTop = 0;
           });
         }
       });
@@ -1543,10 +1543,10 @@
     });
 
     function forceEditorRecovery() {
-      mainEditor.classList.remove("hidden-editor");
-      mainEditor.style.opacity = '1';
-      mainEditor.style.pointerEvents = 'auto';
-      mainEditor.getBoundingClientRect(); // force repaint
+      editor.classList.remove("hidden-editor");
+      editor.style.opacity = '1';
+      editor.style.pointerEvents = 'auto';
+      editor.getBoundingClientRect(); // force repaint
     }
 
     function markUnsaved() {
@@ -1587,7 +1587,7 @@
     }
 
     function justifyText() {
-      mainEditor.focus(); // ensure editor is active
+      editor.focus(); // ensure editor is active
       document.execCommand("justifyFull", false, null);
     }
 
@@ -1597,7 +1597,7 @@
     }
 
     function setTextColor(color) {
-      mainEditor.focus();
+      editor.focus();
       restoreSelection();
       document.execCommand("styleWithCSS", false, true);
       document.execCommand("foreColor", false, color);
@@ -1605,7 +1605,7 @@
     }
 
     function setHighlightColor(color) {
-      mainEditor.focus();
+      editor.focus();
       restoreSelection();
       const range = getValidSelectionRange();
       if (!range) return;
@@ -1650,7 +1650,7 @@
         currentTabTitle = mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts";
       }
 
-      const noteHTML = mainEditor.innerHTML.trim();
+      const noteHTML = editor.innerHTML.trim();
       const temp = document.createElement("div");
       temp.innerHTML = noteHTML;
       const timestamp = now.toISOString();
@@ -1710,7 +1710,7 @@
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
+      tabs[activeTabIndex].content = editor.innerHTML.trim();
       
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
@@ -1722,10 +1722,10 @@
       console.log("✅ autoSave() was called");
       const now = new Date();
 
-      if (!mainEditor) return;
+      if (!editor) return;
 
       // Save current content into the active tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      tabs[activeTabIndex].content = editor.innerHTML;
 
       // Save full tabs array
       localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -1758,7 +1758,7 @@
         const content = activeTab?.content || "";
         const mode = activeTab?.mode || getCurrentEditorMode?.() || "document"; // fallback chain
 
-        mainEditor.innerHTML = content;
+        editor.innerHTML = content;
         applyEditorMode?.(mode); // ✅ restore mode (sets class + data-mode)
 
         safeRenderTabs();
@@ -1817,7 +1817,7 @@
             transcript += text + '\n';
           }
         }
-        mainEditor.innerHTML += (mainEditor.innerHTML ? '\n' : '') + transcript.trim();
+        editor.innerHTML += (editor.innerHTML ? '\n' : '') + transcript.trim();
       };
 
       recognition.onerror = (e) => {
@@ -1969,20 +1969,20 @@
 
     function undo() {
       if (undoStack.length === 0) return;
-      redoStack.push(mainEditor.innerHTML);
+      redoStack.push(editor.innerHTML);
       const last = undoStack.pop();
-      mainEditor.innerHTML = last || '';
+      editor.innerHTML = last || '';
     }
 
     function redo() {
       if (redoStack.length === 0) return;
-      undoStack.push(mainEditor.innerHTML);
+      undoStack.push(editor.innerHTML);
       const next = redoStack.pop();
-      mainEditor.innerHTML = next || '';
+      editor.innerHTML = next || '';
     }
 
     function cleanEditor() {
-      const walker = document.createTreeWalker(mainEditor, NodeFilter.SHOW_ELEMENT, null, false);
+      const walker = document.createTreeWalker(editor, NodeFilter.SHOW_ELEMENT, null, false);
       const toRemove = [];
 
       while (walker.nextNode()) {
@@ -2075,22 +2075,18 @@
 
 
     function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
-      if (!mainEditor || !marginBox) {
-        console.error("❌ Cannot load note — editor elements missing");
-        return;
-       }
 
         switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
 
         if (mode === "notepad") {
-          mainEditor.innerHTML = noteHTML; // inject into the full editor shell
+          editor.innerHTML = noteHTML; // inject into the full editor shell
         } else if (mode === "document") {
           marginBox.innerHTML = noteHTML; // inject only inside marginBox
         }
 
         setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
 
-        mainEditor.focus();
+        editor.focus();
         saveStatus.innerText = "📝 Loaded note from preview";
         preview.style.display = 'none';
         undoStack.push(noteHTML);
@@ -2182,11 +2178,11 @@
       console.log('Toggling preview visibility');
 
       const preview = document.querySelector(".preview-overlay");
-      const mainEditor = document.getElementById("mainEditor");
+      const editor = document.getElementById("editor");
       const mode = getCurrentEditorMode?.() || "document";
 
-      if (!preview || !mainEditor) {
-        console.warn("⚠️ Missing preview or mainEditor reference");
+      if (!preview || !editor) {
+        console.warn("⚠️ Missing preview or editor reference");
         return;
       }
 
@@ -2206,12 +2202,12 @@
       } else {
         // 💡 Apply recovery logic after preview closes
         requestAnimationFrame(() => {
-          mainEditor.classList.remove("hidden-editor");
-          mainEditor.style.display = "block";
-          mainEditor.style.opacity = "1";
-          mainEditor.style.pointerEvents = "auto";
-          mainEditor.scrollTop = 0;
-          mainEditor.offsetHeight; // force reflow
+          editor.classList.remove("hidden-editor");
+          editor.style.display = "block";
+          editor.style.opacity = "1";
+          editor.style.pointerEvents = "auto";
+          editor.scrollTop = 0;
+          editor.offsetHeight; // force reflow
         });
       }
 
@@ -2425,7 +2421,7 @@
 
 
     function getActiveEditorContent() {
-      return mainEditor.innerHTML; // or use .value if you're working in <textarea>
+      return editor.innerHTML; // or use .value if you're working in <textarea>
     }
 
     function toggleItalic() {
@@ -2535,7 +2531,7 @@
               .catch(console.error);
           }
 
-          const editor = document.getElementById('mainEditor'); // ✅ consistent anchor
+          const editor = document.getElementById('editor'); // ✅ consistent anchor
           if (editor && editor.classList.contains('hidden-editor')) {
             editor.classList.remove('hidden-editor');
             editor.style.display = 'block';
@@ -2545,11 +2541,11 @@
 
           loadSavedText();
 
-          mainEditor.addEventListener("input", () => {
+          editor.addEventListener("input", () => {
             hasUnsavedChanges = true; // ✅ still needed
             
             const currentMode = getCurrentEditorMode();
-            const text = mainEditor.innerText || "";
+            const text = editor.innerText || "";
 
             if (currentMode === "document") {
               const newTitle = text.split("\n")[0]?.trim() || "Untitled";
@@ -2583,7 +2579,7 @@
         // ✅ This was missing: it closes `setInterval` block
       }, 200); // check every 200ms until preview is found
 
-      mainEditor.addEventListener("click", function (e) {
+      editor.addEventListener("click", function (e) {
         const el = e.target.closest("a");
         if (el && el.href) {
           e.preventDefault();
@@ -2770,7 +2766,7 @@
 
     function printNote() {
       const printWindow = window.open('', '_blank');
-      const noteContent = mainEditor.innerHTML;
+      const noteContent = editor.innerHTML;
 
       const styles = `
         <style>
@@ -2852,7 +2848,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const marginBtn = document.getElementById("marginBtn");
       const marginDropdown = document.getElementById("marginDropdown");
-      const editor = document.getElementById("mainEditor");
+      const editor = document.getElementById("editor");
 
       if (!marginBtn || !marginDropdown || !editor) {
         console.warn("⛔ Missing margin UI elements.");
@@ -3262,8 +3258,8 @@
       }
 
       // 💾 Preserve edits from current tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
-      console.log("🖊️ mainEditor.innerHTML is now:", mainEditor.innerHTML);
+      tabs[activeTabIndex].content = editor.innerHTML.trim();
+      console.log("🖊️ editor.innerHTML is now:", editor.innerHTML);
       setActiveTabIndex(selectedTab.mode, originalIndex);
       console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
       loadActiveTabContent();
@@ -3389,7 +3385,7 @@
     }
 
     function getCurrentEditorMode() {
-      const editor = document.getElementById("mainEditor");
+      const editor = document.getElementById("editor");
       const mode = editor?.getAttribute("data-mode");
       console.log("💡 Saving in mode:", mode);
       return mode === "notepad" || mode === "document" ? mode : "unknown";
@@ -3421,29 +3417,29 @@
     };
 
     function updatePaperSize() {
-      if (mainEditor.getAttribute("data-mode") !== "document") return; // 🛑 Don't update in notepad mode
+      if (editor.getAttribute("data-mode") !== "document") return; // 🛑 Don't update in notepad mode
 
       const selectedSize = paperSizeSelect.value;
       switch (selectedSize) {
         case "letter":
-          mainEditor.style.width = "8.5in";
-          mainEditor.style.minHeight = "11in";
+          editor.style.width = "8.5in";
+          editor.style.minHeight = "11in";
           break;
         case "legal":
-          mainEditor.style.width = "8.5in";
-          mainEditor.style.minHeight = "14in";
+          editor.style.width = "8.5in";
+          editor.style.minHeight = "14in";
           break;
         case "a3":
-          mainEditor.style.width = "11.7in";
-          mainEditor.style.minHeight = "16.5in";
+          editor.style.width = "11.7in";
+          editor.style.minHeight = "16.5in";
           break;
         case "a4":
-          mainEditor.style.width = "8.27in";
-          mainEditor.style.minHeight = "11.69in";
+          editor.style.width = "8.27in";
+          editor.style.minHeight = "11.69in";
           break;
         case "a5":
-          mainEditor.style.width = "5.8in";
-          mainEditor.style.minHeight = "8.3in";
+          editor.style.width = "5.8in";
+          editor.style.minHeight = "8.3in";
           break;
       }
     }
