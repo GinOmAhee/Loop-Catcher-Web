@@ -1444,8 +1444,8 @@
 
       document.addEventListener("DOMContentLoaded", () => {
         const editor = document.getElementById("mainEditor");
-        if (editor && typeof currentEditorMode !== 'undefined') {
-          editor.dataset.mode = currentEditorMode;
+        if (editor) {
+          editor.setAttribute("data-mode", currentEditorMode); // 🔒 Lock it in early
         }
       });
     
@@ -3191,13 +3191,13 @@
 
     function switchEditorMode(newMode) {
       const currentMode = getCurrentEditorMode();
+      console.log("🌀 switchEditorMode called with:", newMode);
       if (newMode === currentMode) return;
 
       applyEditorMode(newMode);
       localStorage.setItem("editorMode", newMode);
       setActiveTabBar(newMode);
       safeRenderTabs(); // or renderAllTabs() if you don't use safeRender
-      loadActiveTabContent();
     }
 
     function switchTab(originalIndex) {
