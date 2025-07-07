@@ -1295,8 +1295,6 @@
     let toggleBtn;
     let saveStatus;
     let editor, maineditor
-    let currentEditorMode = null;
-    let lastSavedContent = "";
     let attachedFilesList;
     let groupedNotes;
     let fontBtn;
@@ -1471,24 +1469,25 @@
       document.addEventListener("click", (e) => {
         const clickedInsidePreview = preview.contains(e.target);
         const clickedToggle = previewToggle.contains(e.target);
+        const clickedInsideEditor = mainEditor.contains(e.target);
         const isRenaming = e.target.classList.contains("tab-rename-input");
+
+        console.log("Preview auto-close triggered.");
+        console.log("Clicked inside preview:", clickedInsidePreview);
+        console.log("Clicked inside editor:", clickedInsideEditor);
+        console.log("Editor was hidden:", mainEditor.classList.contains("hidden-editor"));
 
         if (
           preview.classList.contains("preview-visible") &&
           !clickedInsidePreview &&
           !clickedToggle &&
+          !clickedInsideEditor &&
           !isRenaming
         ) {
-          console.log("🧨 Preview auto-close triggered.");
-          preview.classList.remove("preview-visible");
-
-          requestAnimationFrame(() => {
-            mainEditor.classList.remove("hidden-editor");
-            mainEditor.style.display = "block";
-            mainEditor.style.opacity = "1";
-            mainEditor.style.pointerEvents = "auto";
-            mainEditor.scrollTop = 0;
-          });
+         preview.classList.remove("preview-visible");
+         if (mainEditor.classList.contains("hidden-editor")) {
+           mainEditor.classList.remove("hidden-editor");
+         }
         }
       });
 
@@ -1643,23 +1642,13 @@
 
     async function saveText() {
       const now = new Date();
+      const noteText = mainEditor.innerText.trim();
+      const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
+      const noteHTML = mainEditor.innerHTML;
       const mode = getCurrentEditorMode?.() || "document"; // ✅ get current mode
-
-      let currentTabTitle = tabs[activeTabIndex]?.title?.trim();
-      if (!currentTabTitle) {
-        currentTabTitle = mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts";
-      }
-
-      const noteHTML = mainEditor.innerHTML.trim();
-      const temp = document.createElement("div");
-      temp.innerHTML = noteHTML;
       const timestamp = now.toISOString();
-      const noteText = temp.innerText.trim();
 
-      if (!noteText || noteText.replace(/\s/g, '') === '') {
-        console.warn("🛑 Note has no meaningful content");
-        return;
-      }
+      if (!noteText) return;
 
       const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
 
@@ -1668,25 +1657,18 @@
         return;
       }
 
-      // 🔖 Custom title per tab
-      let customTitle = prompt("📝 Enter a custom title for this note (optional):");
-      customTitle = customTitle?.trim() || (mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts");
-      tabs[activeTabIndex].title = customTitle;
-      currentTabTitle = customTitle;
-
-      // 📁 Project name
-      let projectName = prompt("📁 Save under project name (optional):");
-      projectName = projectName?.trim() || "🐣 Unnamed Bebe";
+      let projectName = prompt("📌 Enter project name (optional):");
+      projectName = projectName?.trim() || "📂 Unlabeled";
 
       const newNote = {
         id: timestamp,
         text: noteHTML,
-        timestamp,
-        title: customTitle,    // 📝 this note’s specific name
-        project: projectName,  // 📁 where it belongs
+        timestamp: now.toISOString(),
+        title: currentTabTitle,
+        project: projectName,
         resolved: false,
         tags: [],
-        mode
+        mode // ✅ now saving mode!
       };
 
       tabs[activeTabIndex].id = newNote.id;
@@ -1710,11 +1692,12 @@
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
-      
+      mainEditor.innerHTML = '';
+      tabs[activeTabIndex].content = '';
+      tabs[activeTabIndex].title = 'Untitled';
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
-      saveStatus.innerText = `✅ Saved to ${currentTabTitle} at ${now.toLocaleTimeString()}`;
+      saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
       updatePreviewByMode()
     }    
 
@@ -2306,19 +2289,9 @@
         for (const note of notes) {
           let key;
           if (groupBy === "title") {
-            const hasTitle = note.title && note.title.trim().length > 0;
-            key = hasTitle
-              ? note.title.trim()
-              : note.mode === "notepad"
-                ? "🌀 Scribstack"
-                : "📥 Draftbank";
-          }
-
-          else if (groupBy === "project") {
-            const hasProject = note.project && note.project.trim().length > 0;
-            key = hasProject
-              ? note.project.trim()
-              : "🫧 Bebepod";
+            key = note.title || "Untitled";
+          } else if (groupBy === "project") {
+            key = note.project || "📂 Unlabeled";
           } else {
             key = new Date(note.timestamp).toLocaleDateString();
           }
@@ -2906,15 +2879,18 @@
     });
 
     function applyEditorMode(mode) {
-
-      if (currentEditorMode === mode) return;
-      console.log("🎯 applyEditorMode triggered with", mode);
-      currentEditorMode = mode;
       if (!editor) return;
 
       cacheEditorContent();
       applyEditorStyles(mode);
+
+      // 🧠 SWITCH MODE FIRST so helpers update activeTabIndex correctly
+      setEditorModeAttribute(mode);
+      setActiveTabBar(mode);
+
+      // 🔁 RENDER tab buttons AND assign correct active index per mode
       safeRenderTabs();
+
       restoreEditorContent(mode);
       focusEditorSafely();
     }
@@ -3001,27 +2977,19 @@
       editor.style.paddingRight = `${right}px`;
     }
 
-    function updateTabTitleByMode(mode = tabs[activeTabIndex]?.mode || "document") {
-      console.log("🧪 updateTabTitleByMode called with mode:", mode);
+    function updateTabTitleByMode(mode) {
       if (!tabs[activeTabIndex]) return;
 
-      const currentTitle = tabs[activeTabIndex].title?.trim();
-      const shouldOverwrite =
-        !currentTitle ||
-        currentTitle === "Untitled" 
-
-      console.log("🔎 Title before update:", currentTitle, "| shouldOverwrite:", shouldOverwrite);
-
-      if (!shouldOverwrite) return;
-
-      const now = new Date();
-      tabs[activeTabIndex].title =
-        mode === "notepad"
-          ? `🖊️ Scribs ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
-          : `📄 Drafts ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+      if (mode === "notepad") {
+        const now = new Date();
+        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+      } else if (mode === "document") {
+        const text = editor.innerText || "";
+        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
+      }
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
-    }  
+    }
 
     function restoreEditorContent(mode) {
       const marginBox = document.getElementById("marginBox");
@@ -3119,25 +3087,13 @@
         tabBtn.classList.add("active");
       }
 
-      const tabLabel = createTabLabel(tab);
-      const closeBtn = createTabCloseButton(tab);
+      const tabLabel = document.createElement("span");
+      tabLabel.className = "tab-label";
+      tabLabel.innerText = tab.title;
+      tabLabel.addEventListener("click", () => switchTab(tab.originalIndex));
 
-      tabBtn.appendChild(tabLabel);
-      tabBtn.appendChild(closeBtn);
-
-      return tabBtn;
-    }
-
-    function createTabLabel(tab) {
-      const label = document.createElement("span");
-      label.className = "tab-label";
-      label.innerText = tab.title;
-
-      label.addEventListener("click", () => switchTab(tab.originalIndex));
-
-      label.addEventListener("dblclick", (e) => {
+      tabLabel.addEventListener("dblclick", (e) => {
         e.stopPropagation();
-        if (isRenamingTab) return;
         isRenamingTab = true;
 
         const input = document.createElement("input");
@@ -3145,59 +3101,53 @@
         input.value = tab.title;
 
         if (document.body.classList.contains("dark-theme")) {
-          input.classList.add("dark-theme-input");
+          input.style.background = "#1e1e1e";
+          input.style.color = "#eee";
+          input.style.border = "1px dashed hotpink";
+          input.style.caretColor = "hotpink";
         }
 
-        input.addEventListener("click", (e) => e.stopPropagation());
+        input.addEventListener("click", e => e.stopPropagation());
 
-        input.addEventListener("keydown", (e) => {
+        input.addEventListener("keydown", e => {
           if (e.key === "Enter") input.blur();
-            else if (e.key === "Escape") {
-              isRenamingTab = false;
-              renderAllTabs();
-            }
-          });
+          if (e.key === "Escape") {
+            isRenamingTab = false;
+            renderAllTabs();
+          }
+        });
 
-          input.addEventListener("blur", (e) => {
+        input.addEventListener("blur", e => {
           const newTitle = e.target.value.trim();
-          const isDuplicate = tabs.some(
-            (t) => t.title === newTitle && t.originalIndex !== tab.originalIndex
-          );
-
-          if (newTitle && newTitle !== tab.title && !isDuplicate) {
+          if (newTitle && newTitle !== tab.title) {
             tabs[tab.originalIndex].title = newTitle;
             localStorage.setItem("tabs", JSON.stringify(tabs));
             hasUnsavedChanges = true;
           }
-
           isRenamingTab = false;
           renderAllTabs();
         });
 
-        const tabBtn = label.parentElement;
-        tabBtn.replaceChild(input, label);
-
-        requestAnimationFrame(() => {
+        tabBtn.replaceChild(input, tabLabel);
+        setTimeout(() => {
           input.focus();
           input.select();
-        });
+        }, 0);
       });
 
-      return label;
-    }
-
-    function createTabCloseButton(tab) {
       const closeBtn = document.createElement("button");
       closeBtn.innerText = "⨯";
       closeBtn.className = "tab-close-btn";
       closeBtn.title = "Close Tab";
-
       closeBtn.onclick = (e) => {
         e.stopPropagation();
         closeTab(tab.originalIndex);
       };
 
-      return closeBtn;
+      tabBtn.appendChild(tabLabel);
+      tabBtn.appendChild(closeBtn);
+
+      return tabBtn;
     }
 
     function createAddTabButton(mode) {
@@ -3244,8 +3194,6 @@
         return;
       }
 
-      console.log("💾 Saving content before switch:", tabs[activeTabIndex].content);
-
       const selectedTab = tabs[originalIndex];
 
       // Prevent switching to a tab in a different mode
@@ -3261,13 +3209,8 @@
         if (!confirmSwitch) return;
       }
 
-      // 💾 Preserve edits from current tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
-      console.log("🖊️ mainEditor.innerHTML is now:", mainEditor.innerHTML);
       setActiveTabIndex(selectedTab.mode, originalIndex);
-      console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
       loadActiveTabContent();
-      
       safeRenderTabs();
     }
 
@@ -3367,8 +3310,8 @@
       // Title logic based on mode
       const title =
         mode === "notepad"
-        ? "🖊️ Scribs"
-        : "📄 Drafts";
+        ? `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
+        : "📚 EditDocs";
 
       const safeMode = mode === "notepad" ? "notepad" : "document"
 
