@@ -1709,7 +1709,7 @@
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      mainEditor.innerHTML = '';
+      getCleanEditorContent()= '';
       tabs[activeTabIndex].content = '';
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
@@ -1724,7 +1724,7 @@
       if (!mainEditor) return;
 
       // Save current content into the active tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      tabs[activeTabIndex].content = getCleanEditorContent();
 
       // Save full tabs array
       localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -2924,7 +2924,7 @@
     function cacheEditorContent() {
       const currentMode = editor.getAttribute("data-mode");
       if (currentMode === "notepad") {
-        notepadCache = editor.innerHTML;
+        notepadCache = getCleanEditorContent();
       } else if (currentMode === "document") {
         documentCache = editor.innerHTML;
       }
@@ -3029,7 +3029,7 @@
       const marginBox = document.getElementById("marginBox");
 
       if (mode === "notepad") {
-        editor.innerHTML = notepadCache || "";
+        getCleanEditorContent() = notepadCache || "";
       } else if (mode === "document") {
         editor.innerHTML = documentCache || "";
         if (marginBox && !editor.contains(marginBox)) {
@@ -3212,6 +3212,8 @@
     }
 
     function switchEditorMode(newMode) {
+      cacheEditorContent(); // 💾 Save before switching
+
       const currentMode = getCurrentEditorMode();
       if (newMode === currentMode) return;
 
@@ -3223,6 +3225,8 @@
     }
 
     function switchTab(originalIndex) {
+      cacheEditorContent(); // 💾 Save before switching
+
       if (typeof tabs[originalIndex] === "undefined") {
         console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
         return;
@@ -3246,8 +3250,8 @@
       }
 
       // 💾 Preserve edits from current tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML.trim();
-      console.log("🖊️ mainEditor.innerHTML is now:", mainEditor.innerHTML);
+      tabs[activeTabIndex].content = getCleanEditorContent();
+      console.log("🖊️ getCleanEditorContent() is now:", getCleanEditorContent());
       setActiveTabIndex(selectedTab.mode, originalIndex);
       console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
       loadActiveTabContent();
@@ -3430,6 +3434,13 @@
           mainEditor.style.minHeight = "8.3in";
           break;
       }
+    }
+
+    function getCleanEditorContent() {
+      const editorClone = editor.cloneNode(true);
+      const margin = editorClone.querySelector('#marginBox');
+      if (margin) margin.remove();
+      return editorClone.innerHTML.trim();
     }
 
     function migrateNotes(notes) {
