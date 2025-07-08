@@ -2558,7 +2558,6 @@
           }
         });
       }, 250);
-    });
 
           const ed = getActiveEditor(); // ✅ consistent anchor
           if (ed && ed.classList.contains('hidden-editor')) {
@@ -2603,8 +2602,8 @@
 
           setInterval(autoSave, 30000);
 
-          // ✅ This was missing: it closes `setInterval` block
-          }, 200); // check every 200ms until preview is found
+    // ✅ This was missing: it closes `setInterval` block
+    }, 200); // check every 200ms until preview is found
 
           getActiveEditor().addEventListener("click", function (e) {
             const el = e.target.closest("a");
