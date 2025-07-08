@@ -1290,6 +1290,8 @@
     let documentCache = "";
     let hasUnsavedChanges = false;
     let isRenderingTabs = false;
+    let currentEditorMode = getCurrentEditorMode(); // or "notepad" as fallback
+
 
     const marginBox = document.getElementById("marginBox"); // 💡 safe reference
 
@@ -2931,8 +2933,13 @@
     });
 
     function applyEditorMode(mode) {
-      if (currentEditorMode === mode) return;
+      if (currentEditorMode === mode) {
+        console.log("🧩 Already in requested mode, skipping apply.");
+        return;
+      }
+
       console.log("🎯 applyEditorMode triggered with", mode);
+      currentEditorMode = mode;
 
       const editor = document.getElementById(mode === "notepad" ? "notepadEditor" : "documentEditor");
       if (!editor) return;
