@@ -2154,9 +2154,7 @@
 
     function handleGroupChange() {
       const documentEditor = document.getElementById("documentEditor");
-      const mode = documentEditor && !documentEditor.classList.contains("hidden-editor") 
-        ? "document" 
-        : "notepad";
+      const mode = documentEditor?.style.display !== "none" ? "document" : "notepad";
 
       if (mode === "document") {
         updateDocumentPreview();
@@ -2182,9 +2180,8 @@
       const editor = document.getElementById("mainEditor");
 
       const documentEditor = document.getElementById("documentEditor");
-      const mode = documentEditor && !documentEditor.classList.contains("hidden-editor")
-        ? "document"
-        : "notepad";
+      const mode = documentEditor?.style.display !== "none" ? "document" : "notepad";
+
 
       if (!preview || !editor) {
         console.warn("⚠️ Missing preview or editor reference");
@@ -2383,9 +2380,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("groupSelector")?.addEventListener("change", () => {
         const documentEditor = document.getElementById("documentEditor");
-        const mode = documentEditor && !documentEditor.classList.contains("hidden-editor")
-          ? "document"
-          : "notepad";
+        const mode = documentEditor?.style.display !== "none" ? "document" : "notepad";
 
         if (mode === "document") {
           updateDocumentPreview();
@@ -2513,9 +2508,7 @@
       localStorage.setItem('savedNotes', JSON.stringify(updated));
 
       const documentEditor = document.getElementById("documentEditor");
-      const mode = documentEditor && !documentEditor.classList.contains("hidden-editor")
-        ? "document"
-        : "notepad";
+      const mode = documentEditor?.style.display !== "none" ? "document" : "notepad";
 
       if (mode === "document") {
         updateDocumentPreview();
@@ -2540,9 +2533,7 @@
 
       firebase.auth().onAuthStateChanged(user => {
         const documentEditor = document.getElementById("documentEditor");
-        const mode = documentEditor && !documentEditor.classList.contains("hidden-editor")
-          ? "document"
-          : "notepad";
+        const mode = documentEditor?.style.display !== "none" ? "document" : "notepad";
 
         if (user) {
           console.log("✅ User is signed in:", user.email || user.uid);
