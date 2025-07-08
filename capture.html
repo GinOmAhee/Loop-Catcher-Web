@@ -1950,7 +1950,7 @@
     function undo() {
       if (undoStack.length === 0) return;
       const editor = getActiveEditor();
-      redoStack.push(ed.innerHTML);
+      redoStack.push(editor.innerHTML);
       const last = undoStack.pop();
       editor.innerHTML = last || '';
     }
@@ -1958,14 +1958,14 @@
     function redo() {
       if (redoStack.length === 0) return;
       const editor = getActiveEditor();
-      undoStack.push(ed.innerHTML);
+      undoStack.push(editor.innerHTML);
       const next = redoStack.pop();
       editor.innerHTML = next || '';
     }
 
     function cleanEditor() {
       const editor = getActiveEditor();
-      const walker = document.createTreeWalker(ed, NodeFilter.SHOW_ELEMENT, null, false);
+      const walker = document.createTreeWalker(editor, NodeFilter.SHOW_ELEMENT, null, false);
       const toRemove = [];
 
       while (walker.nextNode()) {
@@ -2560,7 +2560,7 @@
       }, 250);
 
           const editor = getActiveEditor(); // ✅ consistent anchor
-          if (ed && ed.classList.contains('hidden-editor')) {
+          if (editor && editor.classList.contains('hidden-editor')) {
             editor.classList.remove('hidden-editor');
             editor.style.display = 'block';
             editor.getBoundingClientRect(); // force reflow if needed
@@ -2978,7 +2978,7 @@
         editor.style.removeProperty("width");
         editor.style.removeProperty("min-height");
 
-        console.log("🔍 Width after cleanup:", ed.style.width, ed.style.minHeight);
+        console.log("🔍 Width after cleanup:", editor.style.width, editor.style.minHeight);
 
         modeToggleBtn.innerText = "📄 Document Mode";
         status && (status.innerText = "🧠 Notepad Mode Active");
@@ -3004,7 +3004,7 @@
       }
 
       // ✏️ Refocus editor (small delay for smoother transitions)
-      setTimeout(() => ed.focus(), 0);
+      setTimeout(() => editor.focus(), 0);
     }
 
     function applyCustomMargins() {
