@@ -1406,12 +1406,11 @@
       console.log("✅ editor is:", editor);
 
       // ⬇️ NOW safe to call logic that depends on those elements
-        const savedMode = localStorage.getItem("editorMode") || "document";
-        switchEditorMode(savedMode);
+      const savedMode = localStorage.getItem("editorMode") || "document";
+      switchEditorMode(savedMode);
 
-        const mode = localStorage.getItem("editorMode") || "document";
-        setActiveTabBar(mode);
-      });
+      const mode = localStorage.getItem("editorMode") || "document";
+      setActiveTabBar(mode);
 
       console.log("✅ editor is:", editor);
 
