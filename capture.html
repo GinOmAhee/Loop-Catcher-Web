@@ -2392,14 +2392,15 @@
       const notepadEditor = document.getElementById("notepadEditor");
       const documentEditor = document.getElementById("documentEditor");
 
-      if (notepadEditor && !notepadEditor.classList.contains("hidden-editor")) {
+      // Check actual visibility (ignores class name, looks at layout presence)
+      if (notepadEditor && notepadEditor.offsetParent !== null) {
         return notepadEditor;
       }
-      if (documentEditor && !documentEditor.classList.contains("hidden-editor")) {
+      if (documentEditor && documentEditor.offsetParent !== null) {
         return documentEditor;
       }
 
-      // fallback: default to documentEditor if both are hidden or unavailable
+      // Fallback: return document editor as default
       return documentEditor || notepadEditor || null;
     }
 
@@ -2929,18 +2930,35 @@
     });
 
     function applyEditorMode(mode) {
-
       if (currentEditorMode === mode) return;
       console.log("🎯 applyEditorMode triggered with", mode);
-      currentEditorMode = mode;
-      const editor = getActiveEditor();
+
+      const editor = document.getElementById(mode === "notepad" ? "notepadEditor" : "documentEditor");
       if (!editor) return;
 
-      cacheEditorContent();
+      cacheEditorContent();          // Still safe to read from current editor
+      toggleEditorVisibility(mode); // ⬅️ This is where you add a helper function below
       applyEditorStyles(mode);
       safeRenderTabs();
-      restoreEditorContent(mode);
-      focusEditorSafely();
+
+      editor.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
+      editor.setAttribute("data-mode", mode);
+      currentEditorMode = mode;
+
+      setTimeout(() => editor.focus(), 0);
+    }
+
+    function toggleEditorVisibility(targetMode) {
+      const notepadEditor = document.getElementById("notepadEditor");
+      const documentEditor = document.getElementById("documentEditor");
+
+      if (targetMode === "notepad") {
+        notepadEditor.style.display = "block";
+        documentEditor.style.display = "none";
+      } else {
+        documentEditor.style.display = "block";
+        notepadEditor.style.display = "none";
+      }
     }
 
     function cacheEditorContent() {
@@ -3270,6 +3288,7 @@
 
       const selectedTab = tabs[originalIndex];
 
+      const selectedMode = selectedTab?.mode || "document"; // fallback to document
       if (selectedMode !== currentMode) {
         switchEditorMode(selectedMode);
       }
