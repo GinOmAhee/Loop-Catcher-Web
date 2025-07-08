@@ -3270,13 +3270,10 @@
 
       const selectedTab = tabs[originalIndex];
 
-      // Prevent switching to a tab in a different mode
-      const currentMode = localStorage.getItem("editorMode") || "document";
-      if (selectedTab.mode !== currentMode) {
-        console.warn(`🚫 Can't switch to a ${selectedTab.mode} tab while in ${currentMode} mode`);
-        return;
+      if (selectedMode !== currentMode) {
+        switchEditorMode(selectedMode);
       }
-
+      
       // If unsaved changes exist in current tab, prompt user (optional enhancement)
       if (hasUnsavedChanges) {
         const confirmSwitch = confirm("⚠️ You have unsaved changes. Switch tabs anyway?");
