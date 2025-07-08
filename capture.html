@@ -2927,32 +2927,36 @@
       });
     });
 
+    function getVisibleEditorMode() {
+      const isNotepadVisible = !document.getElementById("notepadEditor")?.classList.contains("hidden-editor");
+      const isDocumentVisible = !document.getElementById("documentEditor")?.classList.contains("hidden-editor");
+
+      if (isNotepadVisible) return "notepad";
+      if (isDocumentVisible) return "document";
+        return "document"; // default fallback
+      }
+
     function applyEditorMode(mode) {
-      if (currentEditorMode === mode) {
-        console.log("🧩 Already in requested mode, skipping apply.");
-        return;
+      const notepad = document.getElementById("notepadEditor");
+      const documentEd = document.getElementById("documentEditor");
+
+      if (mode === "notepad") {
+        notepad.classList.remove("hidden-editor");
+        notepad.style.display = "block";
+
+        documentEd.classList.add("hidden-editor");
+        documentEd.style.display = "none";
+      } else {
+        documentEd.classList.remove("hidden-editor");
+        documentEd.style.display = "block";
+
+        notepad.classList.add("hidden-editor");
+        notepad.style.display = "none";
       }
 
       console.log("🎯 applyEditorMode triggered with", mode);
-      currentEditorMode = mode;
-
-      const editor = document.getElementById(mode === "notepad" ? "notepadEditor" : "documentEditor");
-      if (!editor) return;
-
-      cacheEditorContent();          // Still safe to read from current editor
-      toggleEditorVisibility(mode); // ⬅️ This is where you add a helper function below
-
-      const active = getActiveEditor();
-      console.log("👀 New active editor is:", active?.id);
-
-      applyEditorStyles(mode);
-      safeRenderTabs();
-
-      editor.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
-      editor.setAttribute("data-mode", mode);
-      currentEditorMode = mode;
-
-      setTimeout(() => editor.focus(), 0);
+      console.log("📺 notepadEditor display:", notepad.style.display);
+      console.log("📺 documentEditor display:", documentEd.style.display);
     }
 
     function toggleEditorVisibility(targetMode) {
@@ -2973,11 +2977,11 @@
 
     function cacheEditorContent() {
       const editor = getActiveEditor();
-      const currentMode = editor.getAttribute("data-mode");
-      if (currentMode === "notepad") {
-        notepadCache = editor.innerHTML;
-      } else if (currentMode === "document") {
-        documentCache = editor.innerHTML;
+      const id = editor?.id;
+        if (id === "notepadEditor") {
+          notepadCache = editor.innerHTML;
+        } else if (id === "documentEditor") {
+         documentCache = editor.innerHTML;
       }
     }
 
@@ -3092,8 +3096,7 @@
 
       modeToggleBtn?.addEventListener("click", () => {
         console.log("🎯 Toggle button clicked");
-        const editor = getActiveEditor();
-        const currentMode = editor?.dataset.mode || "document"; // 👈 grab from editor directly
+        const currentMode = getVisibleEditorMode(); // ✅ not localStorage
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
         console.log("🌀 Requesting mode switch to:", nextMode);
 
