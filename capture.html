@@ -434,24 +434,6 @@
     pointer-events: none;
   }
 
-  #mainEditor:not(.hidden-editor) {
-    opacity: 1;
-    pointer-events: auto;
-    visibility: visible;
-  }
-
-  .hidden-editor {
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden; /* 👈 THIS was missing */
-    transition: opacity 0.3s ease;
-  }
-
-  .hidden-editor.visible {
-    visibility: visible;
-    opacity: 1;
-  }
-
   textarea {
     width: 60%;
     height: 300px;
@@ -972,10 +954,6 @@
   }
   #tabBar button:hover {
     color: #000;
-  }
-
-  .hidden {
-    display: none;
   }
 
   /* === THEME TOGGLE SWITCH === */
@@ -2380,7 +2358,8 @@
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("groupSelector")?.addEventListener("change", () => {
         const documentEditor = document.getElementById("documentEditor");
-        const mode = documentEditor?.style.display !== "none" ? "document" : "notepad";
+        const isDocumentVisible = !documentEditor?.classList.contains("hidden-editor");
+        const mode = isDocumentVisible ? "document" : "notepad";
 
         if (mode === "document") {
           updateDocumentPreview();
@@ -2508,7 +2487,8 @@
       localStorage.setItem('savedNotes', JSON.stringify(updated));
 
       const documentEditor = document.getElementById("documentEditor");
-      const mode = documentEditor?.style.display !== "none" ? "document" : "notepad";
+      const isDocumentVisible = !documentEditor?.classList.contains("hidden-editor");
+      const mode = isDocumentVisible ? "document" : "notepad";
 
       if (mode === "document") {
         updateDocumentPreview();
@@ -2533,7 +2513,8 @@
 
       firebase.auth().onAuthStateChanged(user => {
         const documentEditor = document.getElementById("documentEditor");
-        const mode = documentEditor?.style.display !== "none" ? "document" : "notepad";
+        const isDocumentVisible = !documentEditor?.classList.contains("hidden-editor");
+        const mode = isDocumentVisible ? "document" : "notepad";
 
         if (user) {
           console.log("✅ User is signed in:", user.email || user.uid);
