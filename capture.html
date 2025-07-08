@@ -2562,7 +2562,7 @@
         // ✅ This was missing: it closes `setInterval` block
       }, 200); // check every 200ms until preview is found
 
-      editor.addEventListener("click", function (e) {
+      mainEditor.addEventListener("click", function (e) {
         const el = e.target.closest("a");
         if (el && el.href) {
           e.preventDefault();
