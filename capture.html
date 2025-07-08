@@ -443,9 +443,10 @@
   .hidden-editor {
     opacity: 0;
     pointer-events: none;
+    visibility: hidden; /* 👈 THIS was missing */
     transition: opacity 0.3s ease;
   }
-  
+
   .hidden-editor.visible {
     visibility: visible;
     opacity: 1;
@@ -3062,14 +3063,15 @@
       modeToggleBtn = document.getElementById("modeToggleBtn");
 
       modeToggleBtn?.addEventListener("click", () => {
-      const editor = getActiveEditor();
-      const currentMode = editor?.dataset.mode || "document"; // 👈 grab from editor directly
-      const nextMode = currentMode === "notepad" ? "document" : "notepad";
+        const editor = getActiveEditor();
+        const currentMode = editor?.dataset.mode || "document"; // 👈 grab from editor directly
+        const nextMode = currentMode === "notepad" ? "document" : "notepad";
 
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      applyEditorMode(savedMode);
+        const savedMode = localStorage.getItem("editorMode") || "document";
+        applyEditorMode(savedMode);
+      }
     }
-
+    
     function safeRenderTabs() {
       ["notepad", "document"].forEach(mode => renderTabsForMode(mode));
     }
