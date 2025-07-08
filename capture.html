@@ -2126,7 +2126,8 @@
     }
 
     function updatePreviewByMode() {
-      const documentEditorVisible = !document.getElementById("documentEditor")?.classList.contains("hidden-editor");
+      const documentEditor = document.getElementById("documentEditor");
+      const documentEditorVisible = documentEditor?.style.display !== "none";
       const mode = documentEditorVisible ? "document" : "notepad";
 
       // 🧠 Call mode-specific update function
