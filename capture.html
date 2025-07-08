@@ -1381,8 +1381,7 @@
     window.addEventListener('DOMContentLoaded', initThemeToggle);
 
     window.addEventListener("DOMContentLoaded", () => {
-
-      mainEditor = document.getElementById("mainEditor"); // this is fine to keep
+      mainEditor = document.getElementById("mainEditor"); // ✅ keep
       toggleBtn = document.getElementById('previewToggle');
       saveStatus = document.getElementById('saveStatus');
       attachedFilesList = document.getElementById('attachedFilesList');
@@ -1395,7 +1394,9 @@
       textColorDropdown = document.getElementById("textColorDropdown");
       justifyBtn = document.getElementById("justifyBtn");
       toolbar = document.getElementById("toolbar");
-      let preview = document.getElementById('preview')
+      let preview = document.getElementById('preview');
+
+      const editor = getActiveEditor(); // ✅ use the helper safely
 
       if (!editor) {
         console.error("❌ editor not found");
@@ -1405,16 +1406,12 @@
       console.log("✅ editor is:", editor);
 
       // ⬇️ NOW safe to call logic that depends on those elements
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      switchEditorMode(savedMode); // this might trigger loadActiveTabContent internally
+        const savedMode = localStorage.getItem("editorMode") || "document";
+        switchEditorMode(savedMode);
 
-      const mode = localStorage.getItem("editorMode") || "document";
-      setActiveTabBar(mode);
-      
-      if (!editor) {
-        console.error("❌ editor not found");
-        return;
-      }
+        const mode = localStorage.getItem("editorMode") || "document";
+        setActiveTabBar(mode);
+      });
 
       console.log("✅ editor is:", editor);
 
