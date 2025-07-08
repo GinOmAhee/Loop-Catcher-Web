@@ -440,7 +440,7 @@
     pointer-events: none;
   }
 
-  #editor:not(.hidden-editor) {
+  #mainEditor:not(.hidden-editor) {
     opacity: 1;
     pointer-events: auto;
     visibility: visible;
@@ -1248,7 +1248,7 @@
       </div>
 
         <!-- 📝 Rich Text Editor -->
-      <div id="editor" contenteditable="true" data-mode="document"></div>
+      <div id="mainEditor" contenteditable="true" data-mode="document"></div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
@@ -2514,7 +2514,7 @@
               .catch(console.error);
           }
 
-          const editor = document.getElementById('editor'); // ✅ consistent anchor
+          const editor = document.getElementById('mainEditor'); // ✅ consistent anchor
           if (editor && editor.classList.contains('hidden-editor')) {
             editor.classList.remove('hidden-editor');
             editor.style.display = 'block';
@@ -2831,7 +2831,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const marginBtn = document.getElementById("marginBtn");
       const marginDropdown = document.getElementById("marginDropdown");
-      const editor = document.getElementById("editor");
+      const editor = document.getElementById("mainEditor");
 
       if (!marginBtn || !marginDropdown || !editor) {
         console.warn("⛔ Missing margin UI elements.");
@@ -3356,7 +3356,7 @@
     }
 
     function getCurrentEditorMode() {
-      const editor = document.getElementById("editor");
+      const editor = document.getElementById("mainEditor");
       const mode = editor?.getAttribute("data-mode");
       console.log("💡 Saving in mode:", mode);
       return mode === "notepad" || mode === "document" ? mode : "unknown";
