@@ -2929,6 +2929,7 @@
       });
     });
 
+    console.log("🔍 Calling applyEditorMode with:", newMode);
     function applyEditorMode(mode) {
       if (currentEditorMode === mode) return;
       console.log("🎯 applyEditorMode triggered with", mode);
@@ -2938,6 +2939,10 @@
 
       cacheEditorContent();          // Still safe to read from current editor
       toggleEditorVisibility(mode); // ⬅️ This is where you add a helper function below
+
+      const active = getActiveEditor();
+      console.log("👀 New active editor is:", active?.id);
+      
       applyEditorStyles(mode);
       safeRenderTabs();
 
@@ -2959,6 +2964,9 @@
         documentEditor.style.display = "block";
         notepadEditor.style.display = "none";
       }
+
+      console.log("📺 notepadEditor display:", notepadEditor.style.display);
+      console.log("📺 documentEditor display:", documentEditor.style.display);
     }
 
     function cacheEditorContent() {
@@ -3081,9 +3089,11 @@
       modeToggleBtn = document.getElementById("modeToggleBtn");
 
       modeToggleBtn?.addEventListener("click", () => {
+        console.log("🎯 Toggle button clicked");
         const editor = getActiveEditor();
         const currentMode = editor?.dataset.mode || "document"; // 👈 grab from editor directly
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
+        console.log("🌀 Requesting mode switch to:", nextMode);
 
         const savedMode = localStorage.getItem("editorMode") || "document";
         applyEditorMode(savedMode);
@@ -3269,7 +3279,7 @@
       const isDocVisible = document.getElementById("documentEditor")?.offsetParent !== null;
       const currentMode = isDocVisible ? "document" : "notepad";
 
-      console.log("🌀 switchEditorMode called with:", newMode);
+      console.log("🔄 switchEditorMode called. New mode:", newMode);
       if (newMode === currentMode) return;
 
       applyEditorMode(newMode);
@@ -3308,6 +3318,17 @@
       loadActiveTabContent();
       
       safeRenderTabs();
+    }
+
+    function getCurrentEditorMode() {
+      const notepadEditor = document.getElementById("notepadEditor");
+      const documentEditor = document.getElementById("documentEditor");
+
+      if (notepadEditor && notepadEditor.offsetParent !== null) return "notepad";
+      if (documentEditor && documentEditor.offsetParent !== null) return "document";
+
+      // fallback
+      return localStorage.getItem("editorMode") || "document";
     }
 
     function closeTab(index) {
