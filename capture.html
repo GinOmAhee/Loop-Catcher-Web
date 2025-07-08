@@ -332,7 +332,8 @@
     color: var(--btn-text, #000);
   }
 
-  #editor::before {
+  #notepadEditor::before,
+  #documentEditor::before {
     content: "";
     position: absolute;
     top: var(--paddingTop);
@@ -343,8 +344,7 @@
     pointer-events: none;
   }
 
-  /* Notepad Mode Styles */
-  #editor[data-mode="notepad"] {
+  #notepadEditor {
     font-family: "Courier New", monospace;
     font-size: 1rem;
     padding: 0.9rem;
@@ -353,15 +353,15 @@
     border: none;
     box-shadow: none;
     background-color: #fffdf7;
-    height: 300px; /* ← Add your preferred height */
-    overflow-y: auto; /* Optional: adds scroll if content overflows */
+    height: 300px;
+    overflow-y: auto;
   }
 
-  #editor[data-mode="document"] {
+  #documentEditor {
     width: 8.27in;
     min-height: 11.69in;
     padding: 0;
-    margin: 0rem auto;
+    margin: 0 auto;
     font-family: "Arial", sans-serif;
     font-size: 1rem;
     border: 1px solid #ccc;
@@ -370,7 +370,7 @@
     box-sizing: border-box;
     width: 80%;
     min-height: 400px;
-    max-height: calc(100vh - 5rem); /* or whatever fits below your tab bar */
+    max-height: calc(100vh - 5rem);
   }
 
   @media (prefers-color-scheme: dark) {
