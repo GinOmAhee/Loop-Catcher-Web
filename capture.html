@@ -3062,11 +3062,9 @@
       modeToggleBtn = document.getElementById("modeToggleBtn");
 
       modeToggleBtn?.addEventListener("click", () => {
-        const editor = getActiveEditor();
-        const nextMode = currentMode === "notepad" ? "document" : "notepad";
-        localStorage.setItem("editorMode", nextMode);
-        applyEditorMode(nextMode); // 👈 THIS is what was missing earlier
-      });
+      const editor = getActiveEditor();
+      const currentMode = editor?.dataset.mode || "document"; // 👈 grab from editor directly
+      const nextMode = currentMode === "notepad" ? "document" : "notepad";
 
       const savedMode = localStorage.getItem("editorMode") || "document";
       applyEditorMode(savedMode);
