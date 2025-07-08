@@ -1402,6 +1402,9 @@
 
       const editor = getActiveEditor(); // ✅ use the helper safely
 
+      const defaultMode = localStorage.getItem("editorMode") || "notepad";
+      toggleEditorVisibility(defaultMode); // 👈 shows correct editor on page load
+
       if (!editor) {
         console.error("❌ editor not found");
         return;
@@ -3329,14 +3332,14 @@
     }
 
     function getCurrentEditorMode() {
-      const notepadEditor = document.getElementById("notepadEditor");
       const documentEditor = document.getElementById("documentEditor");
 
-      if (notepadEditor && notepadEditor.offsetParent !== null) return "notepad";
-      if (documentEditor && documentEditor.offsetParent !== null) return "document";
+      // Check if documentEditor is currently visible
+      if (documentEditor?.style.display !== "none") {
+        return "document";
+      }
 
-      // fallback
-      return localStorage.getItem("editorMode") || "document";
+      return "notepad";
     }
 
     function closeTab(index) {
