@@ -1289,6 +1289,7 @@
     let notepadCache = "";
     let documentCache = "";
     let hasUnsavedChanges = false;
+    let isRenderingTabs = false;
 
     const marginBox = document.getElementById("marginBox"); // 💡 safe reference
 
@@ -2929,7 +2930,6 @@
       });
     });
 
-    console.log("🔍 Calling applyEditorMode with:", newMode);
     function applyEditorMode(mode) {
       if (currentEditorMode === mode) return;
       console.log("🎯 applyEditorMode triggered with", mode);
@@ -2942,7 +2942,7 @@
 
       const active = getActiveEditor();
       console.log("👀 New active editor is:", active?.id);
-      
+
       applyEditorStyles(mode);
       safeRenderTabs();
 
@@ -3118,7 +3118,7 @@
         .filter(tab => tab.mode === mode);
     }
 
-    let isRenderingTabs = false;
+    
 
     function renderTabsForMode(mode) {
       if (isRenamingTab) {
@@ -3276,6 +3276,7 @@
     }
 
     function switchEditorMode(newMode) {
+      console.log("🔍 Calling applyEditorMode with:", newMode); // ← safe here
       const isDocVisible = document.getElementById("documentEditor")?.offsetParent !== null;
       const currentMode = isDocVisible ? "document" : "notepad";
 
