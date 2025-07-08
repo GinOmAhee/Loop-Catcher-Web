@@ -3069,9 +3069,9 @@
 
         const savedMode = localStorage.getItem("editorMode") || "document";
         applyEditorMode(savedMode);
-      }
+      })
     }
-    
+
     function safeRenderTabs() {
       ["notepad", "document"].forEach(mode => renderTabsForMode(mode));
     }
