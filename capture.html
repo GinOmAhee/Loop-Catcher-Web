@@ -332,12 +332,6 @@
     color: var(--btn-text, #000);
   }
 
-  #mainEditor {
-    position: relative;
-    overflow: auto;
-    min-height: 100%;
-  }
-
   #editor::before {
     content: "";
     position: absolute;
@@ -2366,8 +2360,18 @@
     });
 
     function getActiveEditor() {
-      const mode = getCurrentEditorMode?.() || "document";
-      return document.getElementById(mode === "notepad" ? "notepadEditor" : "documentEditor");
+      const notepadEditor = document.getElementById("notepadEditor");
+      const documentEditor = document.getElementById("documentEditor");
+
+      if (notepadEditor && !notepadEditor.classList.contains("hidden-editor")) {
+        return notepadEditor;
+      }
+      if (documentEditor && !documentEditor.classList.contains("hidden-editor")) {
+        return documentEditor;
+      }
+
+      // fallback: default to documentEditor if both are hidden or unavailable
+      return documentEditor || notepadEditor || null;
     }
 
     function enableTitleEdit(span) {
