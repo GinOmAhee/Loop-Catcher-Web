@@ -1687,7 +1687,6 @@
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      const editor = getActiveEditor();
       tabs[activeTabIndex].content = editor?.innerHTML?.trim() || "";
       
       localStorage.setItem('tabs', JSON.stringify(tabs));
