@@ -333,13 +333,12 @@
   }
 
   #mainEditor {
-    margin: 0rem auto; /* Add to match document mode */
-    overflow-y: auto;
-    outline: none;
-    transition: all 0.2s ease;
+    position: relative;
+    overflow: auto;
+    min-height: 100%;
   }
 
-  #mainEditor::before {
+  #editor::before {
     content: "";
     position: absolute;
     top: var(--paddingTop);
@@ -351,7 +350,7 @@
   }
 
   /* Notepad Mode Styles */
-  #mainEditor[data-mode="notepad"] {
+  #editor[data-mode="notepad"] {
     font-family: "Courier New", monospace;
     font-size: 1rem;
     padding: 0.9rem;
@@ -364,7 +363,7 @@
     overflow-y: auto; /* Optional: adds scroll if content overflows */
   }
 
-  #mainEditor[data-mode="document"] {
+  #editor[data-mode="document"] {
     width: 8.27in;
     min-height: 11.69in;
     padding: 0;
@@ -441,23 +440,10 @@
     pointer-events: none;
   }
 
-  .margin-box {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-  }
-
-  .margin-box::before {
-    content: "";
-    position: absolute;
-    top: var(--margin-top, 1in);
-    right: var(--margin-right, 1in);
-    bottom: var(--margin-bottom, 1in);
-    left: var(--margin-left, 1in);
-    border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
-    pointer-events: none;
-    z-index: 2;
+  #editor:not(.hidden-editor) {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
   }
 
   .hidden-editor {
@@ -746,7 +732,32 @@
     font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
     z-index: 999;
+    pointer-events: auto;
   }
+
+  .preview-visible {
+    display: flex !important;
+  }
+
+  .preview-notepad {
+    font-family: Courier, monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    padding: 1rem;
+    background-color: #fefefe;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .preview-document {
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+    padding: 1rem;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  }
+
   .preview-top a,
   .preview-settings a {
     display: flex;
@@ -831,6 +842,26 @@
     border: none;
     color: var(--text-color, #333);
     font-size: 1rem;
+  }
+
+  .inline-title-editor {
+    font-size: 1rem;
+    padding: 3px 5px;
+    width: 100%;
+    max-width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .untitled-tag {
+    color: #aaa;
+    margin-right: 5px;
+    font-size: 0.9em;
+  }
+
+  .untitled-note {
+    font-style: italic;
+    color: #888;
   }
 
   #searchInput:focus {
@@ -957,12 +988,20 @@
     display: block;
     position: sticky;
     align-self: flex-end;
-    margin-left: 1rem;
-    margin-right: .2rem;
-    top: .3rem; /* just below your tab bar */
+    margin-right: 1rem;
+    margin-left: .3rem
+    top: 5rem; /* just below your tab bar */
     z-index: 9;
   }
-  
+
+  .dark-theme-switch {
+    position: fixed;
+    top: 5rem;
+    right: 1rem;
+    left: .3rem
+    z-index: 1000;
+  }
+
   .theme-toggle input {
     display: none;
   }
@@ -1041,7 +1080,7 @@
       <!-- 1. Top: Group selector -->
       <div class="preview-sortbar">
         <span title="Group Notes">📂</span>
-        <select id="groupSelector" onchange="updateGrouping()">
+        <select id="groupSelector">
           <option value="date">Date</option>
           <option value="title">Title</option>
           <option value="project">Project</option>
@@ -1060,8 +1099,8 @@
             type="text"
             id="searchInput"
             placeholder="🔍 Search notes..."
-            oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
-          <select id="searchScope" onchange="updateGrouping()" ...>
+            oninput="updatePreviewByMode()" />  <!-- ← THIS LINE must be here -->
+          <select id="searchScope" onchange="updatePreviewByMode()" ...>
             <option value="group">Grouped</option>
             <option value="all">Search All</option>
           </select>
@@ -1091,16 +1130,17 @@
     </div>
   </div>
 
-       <!-- Theme toggle stays at top level -->
-       <div class="tab-theme-switch">
-         <label class="theme-toggle">
-           <input type="checkbox" id="themeSwitch" />
-           <span class="slider"></span>
-         </label>
-       </div>
+  <!-- Theme toggle stays at top level -->
+  <div class="dark-theme-switch">
+     <label class="theme-toggle">
+       <input type="checkbox" id="themeSwitch" />
+       <span class="slider"></span>
+     </label>
+  </div>
 
+  
   <!-- 📝 Main Editor (always visible) -->
-  <div class="main-container" onclick="maybeClosePreview(event)">
+  <div class="main-container">
      <div class="editor-area">
       <button id="previewToggle">☰</button>
       <div class="controls">
@@ -1208,9 +1248,7 @@
       </div>
 
         <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" contenteditable="true" data-mode="document">
-          <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
-        </div>
+      <div id="editor" contenteditable="true" data-mode="document"></div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
@@ -1233,10 +1271,11 @@
 
     let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
 
-    let preview;
     let toggleBtn;
     let saveStatus;
     let editor, maineditor
+    let currentEditorMode = "document";
+    let lastSavedContent = "";
     let attachedFilesList;
     let groupedNotes;
     let fontBtn;
@@ -1302,7 +1341,9 @@
     }
 
     function initThemeToggle() {
-      const switchEl = document.getElementById('themeSwitch');
+      const switchEl
+      
+      = document.getElementById('themeSwitch');
       if (!switchEl) return;
 
       const savedTheme = localStorage.getItem('theme');
@@ -1322,14 +1363,13 @@
     }
 
     function injectThemeToggle() {
-      const tabBar = document.querySelector(".tab-bar");
-      if (!tabBar) return;
+      const newContainer = document.querySelector(".sidebar"); // or whatever the new parent is
+      if (!newContainer) return;
 
-      // Prevent duplicate switch
-      if (tabBar.querySelector("#themeSwitch")) return;
+      if (newContainer.querySelector("#themeSwitch")) return;
 
       const themeToggle = document.createElement("div");
-      themeToggle.className = "tab-theme-switch";
+      themeToggle.className = "dark-theme-switch";
       themeToggle.innerHTML = `
         <label class="theme-toggle">
           <input type="checkbox" id="themeSwitch" />
@@ -1337,8 +1377,8 @@
         </label>
       `;
 
-      tabBar.appendChild(themeToggle);
-      initThemeToggle?.(); // ← in case you have this logic elsewhere
+      newContainer.appendChild(themeToggle);
+      initThemeToggle?.();
     }
 
     window.addEventListener('DOMContentLoaded', initThemeToggle);
@@ -1347,7 +1387,6 @@
 
       editor = document.getElementById("mainEditor");      // your interactive zone
       mainEditor = editor; // layout shell
-      preview = document.getElementById('preview');
       toggleBtn = document.getElementById('previewToggle');
       saveStatus = document.getElementById('saveStatus');
       attachedFilesList = document.getElementById('attachedFilesList');
@@ -1360,13 +1399,14 @@
       textColorDropdown = document.getElementById("textColorDropdown");
       justifyBtn = document.getElementById("justifyBtn");
       toolbar = document.getElementById("toolbar");
+      let preview = document.getElementById('preview')
 
-      if (!mainEditor) {
-        console.error("❌ mainEditor not found");
+      if (!editor) {
+        console.error("❌ editor not found");
         return;
       }
 
-      console.log("✅ mainEditor is:", mainEditor);
+      console.log("✅ editor is:", editor);
 
       // ⬇️ NOW safe to call logic that depends on those elements
       const savedMode = localStorage.getItem("editorMode") || "document";
@@ -1375,25 +1415,67 @@
       const mode = localStorage.getItem("editorMode") || "document";
       setActiveTabBar(mode);
       
-      if (!mainEditor) {
-        console.error("❌ mainEditor not found");
+      if (!editor) {
+        console.error("❌ editor not found");
         return;
       }
 
-      console.log("✅ mainEditor is:", mainEditor);
+      console.log("✅ editor is:", editor);
 
-      mainEditor.addEventListener("input", () => {
-        undoStack.push(mainEditor.innerHTML);
+      editor.addEventListener("input", () => {
+        undoStack.push(editor.innerHTML);
         redoStack = [];
 
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
-          localStorage.setItem("capturedText", mainEditor.innerHTML);
+          localStorage.setItem("capturedText", editor.innerHTML);
           localStorage.setItem("lastSaved", new Date().toISOString());
-          updateGrouping();
+
+          const mode = getCurrentEditorMode?.() || "notepad";
+          if (mode === "document") {
+            updateDocumentPreview();
+          } else {
+            updateGrouping();
+          };
+
           saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
         }, 1000);
-        loadActiveTabContent();
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const editor = document.getElementById("mainEditor");
+        if (editor) {
+          editor.setAttribute("data-mode", currentEditorMode); // 🔒 Lock it in early
+        }
+      });
+    
+      previewToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        togglePreview(); // 🧠 your centralized function
+      });
+
+      document.addEventListener("click", (e) => {
+        const clickedInsidePreview = preview.contains(e.target);
+        const clickedToggle = previewToggle.contains(e.target);
+        const isRenaming = e.target.classList.contains("tab-rename-input");
+
+        if (
+          preview.classList.contains("preview-visible") &&
+          !clickedInsidePreview &&
+          !clickedToggle &&
+          !isRenaming
+        ) {
+          console.log("🧨 Preview auto-close triggered.");
+          preview.classList.remove("preview-visible");
+
+          requestAnimationFrame(() => {
+            editor.classList.remove("hidden-editor");
+            editor.style.display = "block";
+            editor.style.opacity = "1";
+            editor.style.pointerEvents = "auto";
+            editor.scrollTop = 0;
+          });
+        }
       });
 
       fontBtn.addEventListener("click", (e) => {
@@ -1418,9 +1500,15 @@
         textColorDropdown.style.top = `${rect.bottom + 5}px`;
       });
 
-      toggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
+      document.addEventListener("DOMContentLoaded", () => {
+        const switchEl = document.getElementById("themeSwitch");
+        if (!switchEl) return;
+
+        switchEl.addEventListener("change", () => {
+          const isDark = switchEl.checked;
+          document.body.classList.toggle("dark-mode", isDark);
+          localStorage.setItem("preferredTheme", isDark ? "dark" : "light");
+        });
       });
 
       const highlightBtn = document.getElementById("highlightBtn");
@@ -1440,19 +1528,15 @@
       setupModeToggle();
     });
 
-    function maybeClosePreview(e) {
-      if (e.target.classList.contains("tab-rename-input")) return;
-      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
-        preview.style.display = 'none';
-      }
+    function forceEditorRecovery() {
+      editor.classList.remove("hidden-editor");
+      editor.style.opacity = '1';
+      editor.style.pointerEvents = 'auto';
+      editor.getBoundingClientRect(); // force repaint
     }
 
     function markUnsaved() {
       hasUnsavedChanges = true;
-    }
-
-    function getMarginBox() {
-      return document.getElementById("marginBox");
     }
 
     function getSelectedPaperSize() {
@@ -1485,7 +1569,7 @@
     }
 
     function justifyText() {
-      mainEditor.focus(); // ensure editor is active
+      editor.focus(); // ensure editor is active
       document.execCommand("justifyFull", false, null);
     }
 
@@ -1495,7 +1579,7 @@
     }
 
     function setTextColor(color) {
-      mainEditor.focus();
+      editor.focus();
       restoreSelection();
       document.execCommand("styleWithCSS", false, true);
       document.execCommand("foreColor", false, color);
@@ -1503,7 +1587,7 @@
     }
 
     function setHighlightColor(color) {
-      mainEditor.focus();
+      editor.focus();
       restoreSelection();
       const range = getValidSelectionRange();
       if (!range) return;
@@ -1539,71 +1623,91 @@
       }
     }
 
-   async function saveText() {
-     const now = new Date();
-     const noteText = mainEditor.innerText.trim();
-     const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
-     const noteHTML = mainEditor.innerHTML;
-     if (!noteText) return;
+    async function saveText() {
+      const now = new Date();
+      const mode = getCurrentEditorMode?.() || "document"; // ✅ get current mode
 
-     const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      let currentTabTitle = tabs[activeTabIndex]?.title?.trim();
+      if (!currentTabTitle) {
+        currentTabTitle = mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts";
+      }
 
-     // ✅ Allow save only if different from last saved note
-     if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
-       saveStatus.innerText = `⚠️ Not saved — no changes detected`;
-       return;
-     }
+      const noteHTML = editor.innerHTML.trim();
+      const temp = document.createElement("div");
+      temp.innerHTML = noteHTML;
+      const timestamp = now.toISOString();
+      const noteText = temp.innerText.trim();
 
+      if (!noteText || noteText.replace(/\s/g, '') === '') {
+        console.warn("🛑 Note has no meaningful content");
+        return;
+      }
 
-     let projectName = prompt("📌 Enter project name (optional):");
-     projectName = projectName?.trim() || "📂 Unlabeled";
+      const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
 
-     const newNote = {
-       text: noteHTML,
-       timestamp: now.toISOString(),
-       title: tabs[activeTabIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
-       project: projectName,
-       resolved: false,
-       tags: []
-     };
+      if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
+        saveStatus.innerText = `⚠️ Not saved — no changes detected`;
+        return;
+      }
 
-     existingNotes.unshift(newNote);
-     localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
+      // 🔖 Custom title per tab
+      let customTitle = prompt("📝 Enter a custom title for this note (optional):");
+      customTitle = customTitle?.trim() || (mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts");
+      tabs[activeTabIndex].title = customTitle;
+      currentTabTitle = customTitle;
 
-     try {
-       if (db && firebase.auth().currentUser) {
-         const uid = firebase.auth().currentUser.uid;
-         await db.collection("users").doc(uid).collection("notes").add(newNote);
-         console.log("✅ Note saved to Firestore under user:", uid);
-       } else {
-         console.warn("⚠️ User not logged in or Firebase not ready");
-       }
-     } catch (error) {
-       console.error("❌ Failed to save note to Firestore:", error);
-     }
+      // 📁 Project name
+      let projectName = prompt("📁 Save under project name (optional):");
+      projectName = projectName?.trim() || "🐣 Unnamed Bebe";
+
+      const newNote = {
+        id: timestamp,
+        text: noteHTML,
+        timestamp,
+        title: customTitle,    // 📝 this note’s specific name
+        project: projectName,  // 📁 where it belongs
+        resolved: false,
+        tags: [],
+        mode
+      };
+
+      tabs[activeTabIndex].id = newNote.id;
+      existingNotes.unshift(newNote);
+      localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
+
+      try {
+        if (db && firebase.auth().currentUser) {
+          const uid = firebase.auth().currentUser.uid;
+          await db.collection("users").doc(uid).collection("notes").doc(newNote.id).set(newNote);
+          console.log("✅ Note saved to Firestore under user:", uid);
+        } else {
+          console.warn("⚠️ User not logged in or Firebase not ready");
+        }
+      } catch (error) {
+        console.error("❌ Failed to save note to Firestore:", error);
+      }
 
       localStorage.removeItem("customMargins");
 
       editor.style.padding = "0";
       editor.style.margin = "0";
 
-      mainEditor.innerHTML = '';
-      tabs[activeTabIndex].content = '';
-      tabs[activeTabIndex].title = 'Untitled';
+      tabs[activeTabIndex].content = editor.innerHTML.trim();
+      
       localStorage.setItem('tabs', JSON.stringify(tabs));
       safeRenderTabs();
-      saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
-      updateGrouping();
-    }
+      saveStatus.innerText = `✅ Saved to ${currentTabTitle} at ${now.toLocaleTimeString()}`;
+      updatePreviewByMode()
+    }    
 
     function autoSave() {
       console.log("✅ autoSave() was called");
       const now = new Date();
 
-      if (!mainEditor) return;
+      if (!editor) return;
 
       // Save current content into the active tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      tabs[activeTabIndex].content = editor.innerHTML;
 
       // Save full tabs array
       localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -1633,20 +1737,20 @@
         activeTabIndex = savedIndex;
 
         const activeTab = tabs[activeTabIndex];
+        const content = activeTab?.content || "";
+        const mode = activeTab?.mode || getCurrentEditorMode?.() || "document"; // fallback chain
 
-        if (activeTab && typeof activeTab.content === "string") {
-          mainEditor.innerHTML = activeTab.content;
-        } else {
-          console.warn("⚠️ No content found in active tab.");
-          mainEditor.innerHTML = ""; // Optional: fallback message
-        }
+        editor.innerHTML = content;
+        applyEditorMode?.(mode); // ✅ restore mode (sets class + data-mode)
+
         safeRenderTabs();
 
       } else {
-        // ✅ in case there's nothing saved yet
-        tabs = [{ title: "Note 1", content: "" }];
+        // ✅ First-time fallback
+        tabs = [{ title: "Note 1", content: "", mode: "document" }];
         activeTabIndex = 0;
-        safeRenderTabs(); // safely render fresh default
+        applyEditorMode?.("document");
+        safeRenderTabs();
       }
 
       if (lastSaved) {
@@ -1695,7 +1799,7 @@
             transcript += text + '\n';
           }
         }
-        mainEditor.innerHTML += (mainEditor.innerHTML ? '\n' : '') + transcript.trim();
+        editor.innerHTML += (editor.innerHTML ? '\n' : '') + transcript.trim();
       };
 
       recognition.onerror = (e) => {
@@ -1847,20 +1951,20 @@
 
     function undo() {
       if (undoStack.length === 0) return;
-      redoStack.push(mainEditor.innerHTML);
+      redoStack.push(editor.innerHTML);
       const last = undoStack.pop();
-      mainEditor.innerHTML = last || '';
+      editor.innerHTML = last || '';
     }
 
     function redo() {
       if (redoStack.length === 0) return;
-      undoStack.push(mainEditor.innerHTML);
+      undoStack.push(editor.innerHTML);
       const next = redoStack.pop();
-      mainEditor.innerHTML = next || '';
+      editor.innerHTML = next || '';
     }
 
     function cleanEditor() {
-      const walker = document.createTreeWalker(mainEditor, NodeFilter.SHOW_ELEMENT, null, false);
+      const walker = document.createTreeWalker(editor, NodeFilter.SHOW_ELEMENT, null, false);
       const toRemove = [];
 
       while (walker.nextNode()) {
@@ -1952,31 +2056,36 @@
     }
 
 
-    function loadNoteIntoEditor(noteHTML) {
-      mainEditor.innerHTML = noteHTML;
+    function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
 
-      if (!mainEditor) {
-        console.error("❌ Cannot load note — editor not ready");
-        return;
-      }
+        const resolvedMode = mode || getCurrentEditorMode();
+          if (resolvedMode) {
+            switchEditorMode(resolvedMode);
+          }
 
-      mainEditor.focus();
-      saveStatus.innerText = "📝 Loaded note from preview";
-      preview.style.display = 'none';
-      undoStack.push(noteHTML);
-      redoStack = [];
+        if (resolvedMode === "notepad" || resolvedMode === "document") {
+          editor.innerHTML = noteHTML;
+        }
 
-      // 💡 Extract the first line to use as tab title
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = noteHTML;
-      const text = tempDiv.innerText || "";
-      const titleLine = text.split("\n")[0]?.trim() || "Note";
+        setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
 
-      // ⬇️ INSERT THIS BLOCK HERE
-      tabs[activeTabIndex].title = titleLine;
-      localStorage.setItem("tabs", JSON.stringify(tabs));
-      safeRenderTabs(); // to update UI tab name
-      document.title = titleLine;
+        editor.focus();
+        saveStatus.innerText = "📝 Loaded note from preview";
+        preview.style.display = 'none';
+        undoStack.push(noteHTML);
+        redoStack = [];
+
+        // 💡 Extract the first line to use as tab title
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = noteHTML;
+        const text = tempDiv.innerText || "";
+        const titleLine = text.split("\n")[0]?.trim() || "Note";
+
+        // ⬇️ INSERT THIS BLOCK HERE
+        tabs[activeTabIndex].title = titleLine;
+        localStorage.setItem("tabs", JSON.stringify(tabs));
+        safeRenderTabs(); // to update UI tab name
+        document.title = titleLine;
     }
 
     function escapeHTML(text) {
@@ -1986,126 +2095,316 @@
     }
 
     function updateGrouping() {
-      const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
-      const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
-      const scope = document.getElementById("searchScope")?.value || "group";
-      const groupBy = document.getElementById("groupSelector").value;
-      const now = Date.now();
+      renderPreview({
+        mode: "notepad",
+        containerId: "#groupedNotes",
+        keywordInputId: "searchInput",
+        scopeInputId: "searchScope",
+        groupSelectorId: "groupSelector"
+      });
+    }
 
-      if (notes.length === 0) {
-        groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
+    function updateDocumentPreview() {
+      renderPreview({
+        mode: "document",
+        containerId: "#groupedNotes",
+        keywordInputId: "searchInput",
+        scopeInputId: "searchScope",
+        groupSelectorId: "groupSelector"
+      });
+    }
+
+    function updatePreviewByMode() {
+      const mode = getCurrentEditorMode?.() || "notepad";
+      (mode === "document" ? updateDocumentPreview : updateGrouping)();
+
+      const user = firebase.auth().currentUser;
+      if (!user) return;
+
+      firebase.firestore()
+        .collection("users")
+        .doc(user.uid)
+        .collection("notes")
+        .where("mode", "==", getCurrentEditorMode?.() || "document")
+        .get()
+        .then(snapshot => {
+        const notes = [];
+        snapshot.forEach(doc => notes.push(doc.data()));
+        const html = renderNotes(migrateNotes(notes));
+        document.getElementById("groupedNotes").innerHTML = html;
+
+        updateSaveStatus?.();
+      });
+
+    }
+
+    function handleGroupChange() {
+      const mode = getCurrentEditorMode?.() || "notepad";
+      if (mode === "document") {
+        updateDocumentPreview();
+      } else {
+        updateGrouping();
+      }
+    }
+
+    function safePreviewUpdate(mode = "notepad") {
+      const containerSelector = mode === "document" ? ".preview-overlay" : "#groupedNotes";
+      const interval = setInterval(() => {
+        if (document.querySelector(containerSelector)) {
+          clearInterval(interval);
+          updatePreviewByMode();
+        }
+      }, 50);
+    }
+
+    function togglePreview() {
+      console.log('Toggling preview visibility');
+
+      const preview = document.querySelector(".preview-overlay");
+      const editor = document.getElementById("mainEditor");
+      const mode = getCurrentEditorMode?.() || "document";
+
+      if (!preview || !editor) {
+        console.warn("⚠️ Missing preview or editor reference");
         return;
       }
 
-      const highlightText = (text, keyword) => {
-        if (!keyword) return escapeHTML(text).replace(/\n/g, "<br>");
-        const safe = escapeHTML(text);
-        const regex = new RegExp(`(${keyword})`, "gi");
-        return safe.replace(regex, '<mark class="highlight-glow">$1</mark>').replace(/\n/g, "<br>");
-      };
+      const isVisible = preview.classList.toggle("preview-visible");
+      
+      if (isVisible) {
+        try {
+          if (mode === "notepad") {
+            updateGrouping(preview);
+          } else if (mode === "document") {
+            updateDocumentPreview?.();
+          }
+        } catch (err) {
+          console.error("❌ Failed to update preview:", err);
+          forceEditorRecovery?.(); // optional fallback
+        }
+      } else {
+        // 💡 Apply recovery logic after preview closes
+        requestAnimationFrame(() => {
+          editor.classList.remove("hidden-editor");
+          editor.style.display = "block";
+          editor.style.opacity = "1";
+          editor.style.pointerEvents = "auto";
+          editor.scrollTop = 0;
+          editor.offsetHeight; // force reflow
+        });
+      }
 
-      const renderNoteItem = (note) => `
-        <li style="margin-bottom:1rem; display: flex; align-items: start;">
-          <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-          <div class="note-preview" onclick='loadNoteIntoEditor(decodeURIComponent("${encodeURIComponent(note.text)}"))'>
-            ${highlightText(note.text, keyword)}
-          </div>
-        </li>
-      `;
+      console.log('Preview is now', isVisible ? 'visible' : 'hidden');
+    }
 
-      const renderGroupedSection = (titleIcon, label, notes) => {
-        let section = `<h4>${titleIcon} ${escapeHTML(label)}</h4><ul>`;
-        section += notes.map(renderNoteItem).join("");
-        section += "</ul>";
-        return section;
-      };
+    async function renderPreview({
+      mode = "notepad",
+      containerId = "#groupedNotes",
+      keywordInputId = "searchInput",
+      scopeInputId = "searchScope",
+      groupSelectorId = "groupSelector"
+    } = {}) {
+      const container = document.querySelector(containerId);
+      if (!container) {
+        console.warn(`❌ Missing preview container: ${containerId}`);
+        return;
+      }
+ 
+      const keyword = document.getElementById(keywordInputId)?.value?.toLowerCase().trim() || "";
+      const scope = document.getElementById(scopeInputId)?.value || "group";
+      const groupBy = document.getElementById(groupSelectorId)?.value || "project";
+      const now = Date.now();
 
-      let filteredNotes = scope === "all"
-        ? keyword
-          ? notes.filter(({ text = "", title = "", project = "" }) =>
-              `${text} ${title} ${project}`.toLowerCase().includes(keyword))
-          : notes
-        : keyword
-          ? notes.filter(n =>
-              n.text?.toLowerCase().includes(keyword) ||
-              n.project?.toLowerCase().includes(keyword))
-          : notes;
+      let notes = [];
 
-      let html = "";
+      // 🔌 Step 1: Get notes from Firebase or fallback to localStorage
+      try {
+        const user = firebase.auth().currentUser;
+        if (!user) throw new Error("No Firebase user");
 
-      if (scope === "all") {
-        if (filteredNotes.length === 0) {
-          html = `<p>😶 No results found for '${escapeHTML(keyword)}'</p>`;
-          groupedNotes.innerHTML = html;
+        const snapshot = await db
+          .collection("users")
+          .doc(user.uid)
+          .collection("notes")
+          .where("mode", "==", mode)
+          .orderBy("timestamp", "desc")
+          .get();
+
+        notes = snapshot.docs.map(doc => doc.data());
+        console.log(`✅ Pulled ${notes.length} "${mode}" notes from Firebase`);
+      } catch (err) {
+        console.warn("⚠️ Firebase failed — using localStorage:", err);
+        const fallbackNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+        notes = fallbackNotes.filter(note => (note.mode || mode) === mode);
+      }
+
+      // 🔍 Step 2: Apply keyword + scope filtering
+      if (keyword) {
+        notes = notes.filter(note => {
+          const inTitle = note.title?.toLowerCase().includes(keyword);
+          const inProject = note.project?.toLowerCase().includes(keyword);
+          const inText = note.text?.toLowerCase().includes(keyword);
+
+          switch (scope) {
+            case "title": return inTitle;
+            case "project": return inProject;
+            case "content": return inText;
+            default: return inTitle || inProject || inText;
+          }
+        });
+      }
+
+      // 🫥 Step 3: Empty state
+      if (notes.length === 0) {
+        container.innerHTML = `<p>📭 No notes found for <strong>${mode}</strong>.</p>`;
+        return;
+      }
+
+      // 🧠 Step 4: Grouping logic
+      const groups = {};
+
+      if (groupBy === "unresolved") {
+        const unresolved = notes.filter(n => n.resolved === false);
+        if (!unresolved.length) {
+          container.innerHTML = "<p>✅ No unresolved notes!</p>";
           return;
         }
-
-        html += renderGroupedSection("🌐", "Search Results (All Notes)", filteredNotes);
-      } else {
-        const grouped = {};
-
-        switch (groupBy) {
-          case "date":
-            filteredNotes.forEach(note => {
-              const date = new Date(note.timestamp || note.time).toLocaleDateString();
-              grouped[date] = grouped[date] || [];
-              grouped[date].push(note);
-            });
-            for (const date in grouped) {
-              html += renderGroupedSection("🗓️", date, grouped[date]);
-            }
-            break;
-
-          case "title":
-            filteredNotes.forEach(note => {
-              const title = (note.title || "Untitled").trim();
-              grouped[title] = grouped[title] || [];
-              grouped[title].push(note);
-            });
-            Object.keys(grouped).sort().forEach(title => {
-              html += renderGroupedSection("📘", title, grouped[title]);
-            });
-            break;
-
-          case "project":
-            filteredNotes.forEach(note => {
-              const project = note.project || "📂 Unlabeled";
-              grouped[project] = grouped[project] || [];
-              grouped[project].push(note);
-            });
-            for (const project in grouped) {
-              html += renderGroupedSection("📁", project, grouped[project]);
-            }
-            break;
-
-          case "unresolved":
-            const unresolved = filteredNotes.filter(note => note.resolved === false);
-            if (unresolved.length === 0) {
-              groupedNotes.innerHTML = "<p>✅ No unresolved notes!</p>";
-              return;
-            }
-            html += renderGroupedSection("🧩", "Unresolved Ideas", unresolved);
-            break;
-
-          case "forgotten":
-            const forgotten = filteredNotes.filter(note => {
-              const age = now - new Date(note.timestamp || note.time).getTime();
-              return age > 3 * 24 * 60 * 60 * 1000;
-            });
-            if (forgotten.length === 0) {
-              groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
-              return;
-            }
-            html += renderGroupedSection("🧠", "Forgotten Ideas", forgotten);
-            break;
+        groups["🧩 Unresolved Ideas"] = unresolved;
+      } else if (groupBy === "forgotten") {
+        const forgotten = notes.filter(n => {
+          const age = now - new Date(n.timestamp).getTime();
+          return age > 3 * 24 * 60 * 60 * 1000;
+        });
+        if (!forgotten.length) {
+          container.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
+          return;
         }
+        groups["🧠 Forgotten Ideas"] = forgotten;
+      } else {
+        // 🧱 Standard groups by date, title, or project
+        for (const note of notes) {
+          let key;
+          if (groupBy === "title") {
+            const hasTitle = note.title && note.title.trim().length > 0;
+            key = hasTitle
+              ? note.title.trim()
+              : note.mode === "notepad"
+                ? "🌀 Scribstack"
+                : "📥 Draftbank";
+          }
 
+          else if (groupBy === "project") {
+            const hasProject = note.project && note.project.trim().length > 0;
+            key = hasProject
+              ? note.project.trim()
+              : "🫧 Bebepod";
+          } else {
+            key = new Date(note.timestamp).toLocaleDateString();
+          }
+          if (!groups[key]) groups[key] = [];
+          groups[key].push(note);
+        }
+      }
+
+      // 🎨 Step 5: Render notes
+      let html = "";
+      for (const [label, items] of Object.entries(groups)) {
+        html += `<h3 class="group-heading">📁 ${escapeHTML(label)}</h3>`;
+        html += renderNotes(items, mode);
+      }
+
+      // ✅ Inject delete button only if there are notes
+      if (Object.keys(groups).length > 0) {
         html += `
           <button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>
         `;
       }
 
-      groupedNotes.innerHTML = html;
+      container.innerHTML = `<div class="grouped-preview-list">${html}</div>`;
+    }
+
+    function renderNotes(notes, mode) {
+
+      return notes.map(note => {
+        const encoded = encodeURIComponent(note.text || "");
+        const isUntitled = !note.title?.trim();
+        const displayTitle = isUntitled ? "Untitled" : note.title;
+        const safeTitle = escapeHTML(displayTitle);
+        const snippet = escapeHTML(note.text || "").slice(0, 200).replace(/\n/g, "<br>");
+
+        return `
+          <div class="grouped-note" data-timestamp="${note.timestamp}">
+            <h4>
+              <label>
+                <input type="checkbox" class="note-delete-checkbox" data-time="${note.id || note.timestamp}" />
+                <span
+                  class="note-title ${isUntitled ? 'untitled-note' : ''}"
+                  data-timestamp="${note.timestamp}"
+                  onclick="enableTitleEdit(this)"
+                >
+                  ${safeTitle}
+                </span>
+              </label>
+            </h4>
+            <div
+              class="note-preview"
+              ondblclick='loadNoteIntoEditor(decodeURIComponent("${encoded}"), "${mode}")'
+            >
+              ${snippet}...
+            </div>
+          </div>`;
+      }).join("");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("groupSelector")?.addEventListener("change", () => {
+        const mode = getCurrentEditorMode?.() || "notepad";
+        if (mode === "document") {
+          updateDocumentPreview();
+        } else {
+          updateGrouping();
+        }
+      });
+    });
+
+    function enableTitleEdit(span) {
+      const timestamp = span.dataset.timestamp;
+      const currentTitle = span.innerText.trim();
+      const input = document.createElement("input");
+      input.type = "text";
+      input.value = currentTitle === "Untitled" ? "" : currentTitle;
+      input.className = "inline-title-editor";
+      input.dataset.timestamp = timestamp;
+
+      input.onblur = saveEditedTitle;
+      input.onkeydown = (e) => {
+        if (e.key === "Enter") input.blur();
+        if (e.key === "Escape") span.innerText = currentTitle; // revert
+      };
+
+      span.replaceWith(input);
+      input.focus();
+    }
+
+    function saveEditedTitle(e) {
+      const input = e.target;
+      const newTitle = input.value.trim();
+      const timestamp = input.dataset.timestamp;
+
+      const savedNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+      const index = savedNotes.findIndex(n => n.timestamp == timestamp);
+      if (index >= 0) {
+        savedNotes[index].title = newTitle;
+        localStorage.setItem("savedNotes", JSON.stringify(savedNotes));
+      }
+
+      // Refresh to reflect changes
+      updatePreviewByMode();
+    }
+
+
+    function getActiveEditorContent() {
+      return editor.innerHTML; // or use .value if you're working in <textarea>
     }
 
     function toggleItalic() {
@@ -2168,38 +2467,73 @@
       const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       const updated = notes.filter(n => n.timestamp !== time);
       localStorage.setItem('savedNotes', JSON.stringify(updated));
-      updateGrouping();
+
+      const mode = getCurrentEditorMode?.() || "notepad";
+      if (mode === "document") {
+        updateDocumentPreview();
+      } else {
+        updateGrouping();
+      }
     }
 
-    window.onload = async function () {
+    document.addEventListener("DOMContentLoaded", async () => {
       await initializeFirebase();
 
-      firebase.auth().onAuthStateChanged(user => {
-        if (!user) {
-          alert("Please sign in first.");
-          window.location.href = "signin.html";
-        } else {
-          console.log("✅ User is signed in:", user.email);
+      requestAnimationFrame(() => {
+        updateGrouping(preview); // ✅ Called right after DOM is painted
+      });
 
-          const editor = document.querySelector('.hidden-editor');
-          if (editor) {
-            editor.style.display = 'block'; // ensure it's in flow, if it might have been none
-            editor.getBoundingClientRect(); // force reflow
+      // Ensure .preview-overlay exists first
+      const checkPreviewExists = setInterval(() => {
+        const preview = document.querySelector(".preview-overlay");
+        if (preview) return;
+
+        clearInterval(checkPreviewExists); // Found it, stop checking
+
+        firebase.auth().onAuthStateChanged(user => {
+          if (user) {
+            console.log("✅ User is signed in:", user.email || user.uid);
+
+            const mode = getCurrentEditorMode?.() || "notepad";
+            if (mode === "document") {
+              updateDocumentPreview();
+              } else {
+              updateGrouping();
+              } // Safe to call
+          } else {
+            firebase.auth().signInAnonymously()
+              .then(() => {
+                console.log("✅ Signed in anonymously");
+                const mode = getCurrentEditorMode?.() || "notepad";
+                  if (mode === "document") {
+                  updateDocumentPreview();
+                } else {
+                  updateGrouping();
+                } // Retry after sign-in
+              })
+              .catch(console.error);
+          }
+
+          const editor = document.getElementById('editor'); // ✅ consistent anchor
+          if (editor && editor.classList.contains('hidden-editor')) {
+            editor.classList.remove('hidden-editor');
+            editor.style.display = 'block';
+            editor.getBoundingClientRect(); // force reflow if needed
             editor.classList.add('visible');
           }
 
           loadSavedText();
 
-          mainEditor.addEventListener("input", () => {
+          editor.addEventListener("input", () => {
             hasUnsavedChanges = true; // ✅ still needed
             
             const currentMode = getCurrentEditorMode();
-            const text = mainEditor.innerText || "";
+            const text = editor.innerText || "";
 
-              if (currentMode === "document") {
-                const newTitle = text.split("\n")[0]?.trim() || "Untitled";
+            if (currentMode === "document") {
+              const newTitle = text.split("\n")[0]?.trim() || "Untitled";
 
-                console.log("📝 Updating tab title (Document):", newTitle);
+              console.log("📝 Updating tab title (Document):", newTitle);
 
               if (tabs[activeTabIndex]) {
                 tabs[activeTabIndex].title = newTitle;
@@ -2210,23 +2544,32 @@
               // Optional: Add a debug log or skip entirely
               console.log("✏️ Skipping title update in Notepad mode");
             }
-          });
 
-          applyMoodTheme();
-          updateGrouping();
-          safeRenderTabs();
+            applyMoodTheme();
+
+            const mode = getCurrentEditorMode?.() || "notepad";
+              if (mode === "document") {
+                updateDocumentPreview();
+              } else {
+                updateGrouping();
+              }
+
+            safeRenderTabs();
+          });  
           setInterval(autoSave, 30000);
-        }
-      });
+        });  
 
-      mainEditor.addEventListener("click", function (e) {
+        // ✅ This was missing: it closes `setInterval` block
+      }, 200); // check every 200ms until preview is found
+
+      editor.addEventListener("click", function (e) {
         const el = e.target.closest("a");
         if (el && el.href) {
           e.preventDefault();
           window.open(el.href, "_blank", "noopener");
         }
       });
-    };
+    });
 
     function deleteSelectedNotes() {
       const checkboxes = document.querySelectorAll('.note-delete-checkbox:checked');
@@ -2239,13 +2582,46 @@
       if (!confirmDelete) return;
 
       let savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-      const timesToDelete = Array.from(checkboxes).map(cb => cb.getAttribute('data-time'));
+      // 👇 And log what you're comparing them to
+      console.log("Saved note timestamps:", savedNotes.map(n => n.timestamp));
 
+      const timesToDelete = Array.from(checkboxes).map(cb => cb.getAttribute('data-time'));
+      // 👇 Insert log here before filtering
+      console.log("Timestamps to delete:", timesToDelete);
+
+      // 🚮 1. Delete from localStorage
       savedNotes = savedNotes.filter(note => !timesToDelete.includes(note.timestamp));
       localStorage.setItem('savedNotes', JSON.stringify(savedNotes));
 
-      updateGrouping();
-      saveStatus.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
+      // ☁️ 2. (Optional) Delete from Firebase
+      const user = firebase.auth().currentUser;
+      if (user) {
+        const notesRef = firebase.firestore()
+          .collection("users")
+          .doc(user.uid)
+          .collection("notes");
+
+        timesToDelete.forEach(id => {
+          notesRef.doc(id).delete().then(() => {
+            console.log(`🗑️ Deleted note with ID: ${id} from Firestore`);
+          }).catch(err => {
+            console.error(`⚠️ Failed to delete note ${id}:`, err);
+          });
+        });
+      }
+      
+      // 🔄 3. Refresh preview
+      const mode = getCurrentEditorMode?.() || "notepad";
+      if (mode === "document") {
+        updateDocumentPreview();
+      } else {
+        updateGrouping();
+      }
+
+      const statusEl = document.getElementById("saveStatus");
+      if (statusEl) {
+        statusEl.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
+      }
     }
 
     function applyFormat(type) {
@@ -2373,7 +2749,7 @@
 
     function printNote() {
       const printWindow = window.open('', '_blank');
-      const noteContent = mainEditor.innerHTML;
+      const noteContent = editor.innerHTML;
 
       const styles = `
         <style>
@@ -2455,7 +2831,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const marginBtn = document.getElementById("marginBtn");
       const marginDropdown = document.getElementById("marginDropdown");
-      const editor = document.getElementById("mainEditor");
+      const editor = document.getElementById("editor");
 
       if (!marginBtn || !marginDropdown || !editor) {
         console.warn("⛔ Missing margin UI elements.");
@@ -2509,18 +2885,15 @@
     });
 
     function applyEditorMode(mode) {
+
+      if (currentEditorMode === mode) return;
+      console.log("🎯 applyEditorMode triggered with", mode);
+      currentEditorMode = mode;
       if (!editor) return;
 
       cacheEditorContent();
       applyEditorStyles(mode);
-
-      // 🧠 SWITCH MODE FIRST so helpers update activeTabIndex correctly
-      setEditorModeAttribute(mode);
-      setActiveTabBar(mode);
-
-      // 🔁 RENDER tab buttons AND assign correct active index per mode
       safeRenderTabs();
-
       restoreEditorContent(mode);
       focusEditorSafely();
     }
@@ -2537,7 +2910,6 @@
     function applyEditorStyles(mode) {
       if (!editor) return;
 
-      const marginBox = document.getElementById("marginBox");
       const paperSize = getSelectedPaperSize?.(); // optional
       const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
 
@@ -2549,8 +2921,6 @@
 
       // 🧠 NOTEPAD MODE
       if (mode === "notepad") {
-        marginBox?.classList.add("hidden");
-        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "none");
 
         // Clear any inline styles related to document layout
@@ -2569,8 +2939,6 @@
 
       // 📄 DOCUMENT MODE
       } else if (mode === "document") {
-        marginBox?.classList.remove("hidden");
-        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "flex");
 
         // 📏 Apply saved margins only
@@ -2607,32 +2975,29 @@
       editor.style.paddingRight = `${right}px`;
     }
 
-    function updateTabTitleByMode(mode) {
+    function updateTabTitleByMode(mode = tabs[activeTabIndex]?.mode || "document") {
+      console.log("🧪 updateTabTitleByMode called with mode:", mode);
       if (!tabs[activeTabIndex]) return;
 
-      if (mode === "notepad") {
-        const now = new Date();
-        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-      } else if (mode === "document") {
-        const text = editor.innerText || "";
-        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
-      }
+      const currentTitle = tabs[activeTabIndex].title?.trim();
+      const shouldOverwrite =
+        !currentTitle ||
+        currentTitle === "Untitled" 
+
+      console.log("🔎 Title before update:", currentTitle, "| shouldOverwrite:", shouldOverwrite);
+
+      if (!shouldOverwrite) return;
+
+      const now = new Date();
+      tabs[activeTabIndex].title =
+        mode === "notepad"
+          ? `🖊️ Scribs ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
+          : `📄 Drafts ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
-    }
+    }  
 
     function restoreEditorContent(mode) {
-      const marginBox = document.getElementById("marginBox");
-
-      if (mode === "notepad") {
-        editor.innerHTML = notepadCache || "";
-      } else if (mode === "document") {
-        editor.innerHTML = documentCache || "";
-        if (marginBox && !editor.contains(marginBox)) {
-          editor.appendChild(marginBox);
-        }
-      }
-
       editor.innerHTML = editor.innerHTML.trim();
     }
 
@@ -2676,6 +3041,8 @@
         .filter(tab => tab.mode === mode);
     }
 
+    let isRenderingTabs = false;
+
     function renderTabsForMode(mode) {
       if (isRenamingTab) {
         console.warn(`⛔ Skipping renderTabsForMode("${mode}"): rename input is still active`);
@@ -2708,6 +3075,12 @@
       });
 
       tabContainer.appendChild(createAddTabButton(mode));
+
+      try {
+      // render logic
+      } finally {
+        isRenderingTabs = false;
+      }
     }
 
     function createTabElement(tab, activeIndexForMode) {
@@ -2717,13 +3090,25 @@
         tabBtn.classList.add("active");
       }
 
-      const tabLabel = document.createElement("span");
-      tabLabel.className = "tab-label";
-      tabLabel.innerText = tab.title;
-      tabLabel.addEventListener("click", () => switchTab(tab.originalIndex));
+      const tabLabel = createTabLabel(tab);
+      const closeBtn = createTabCloseButton(tab);
 
-      tabLabel.addEventListener("dblclick", (e) => {
+      tabBtn.appendChild(tabLabel);
+      tabBtn.appendChild(closeBtn);
+
+      return tabBtn;
+    }
+
+    function createTabLabel(tab) {
+      const label = document.createElement("span");
+      label.className = "tab-label";
+      label.innerText = tab.title;
+
+      label.addEventListener("click", () => switchTab(tab.originalIndex));
+
+      label.addEventListener("dblclick", (e) => {
         e.stopPropagation();
+        if (isRenamingTab) return;
         isRenamingTab = true;
 
         const input = document.createElement("input");
@@ -2731,53 +3116,59 @@
         input.value = tab.title;
 
         if (document.body.classList.contains("dark-theme")) {
-          input.style.background = "#1e1e1e";
-          input.style.color = "#eee";
-          input.style.border = "1px dashed hotpink";
-          input.style.caretColor = "hotpink";
+          input.classList.add("dark-theme-input");
         }
 
-        input.addEventListener("click", e => e.stopPropagation());
+        input.addEventListener("click", (e) => e.stopPropagation());
 
-        input.addEventListener("keydown", e => {
+        input.addEventListener("keydown", (e) => {
           if (e.key === "Enter") input.blur();
-          if (e.key === "Escape") {
-            isRenamingTab = false;
-            renderAllTabs();
-          }
-        });
+            else if (e.key === "Escape") {
+              isRenamingTab = false;
+              renderAllTabs();
+            }
+          });
 
-        input.addEventListener("blur", e => {
+          input.addEventListener("blur", (e) => {
           const newTitle = e.target.value.trim();
-          if (newTitle && newTitle !== tab.title) {
+          const isDuplicate = tabs.some(
+            (t) => t.title === newTitle && t.originalIndex !== tab.originalIndex
+          );
+
+          if (newTitle && newTitle !== tab.title && !isDuplicate) {
             tabs[tab.originalIndex].title = newTitle;
             localStorage.setItem("tabs", JSON.stringify(tabs));
             hasUnsavedChanges = true;
           }
+
           isRenamingTab = false;
           renderAllTabs();
         });
 
-        tabBtn.replaceChild(input, tabLabel);
-        setTimeout(() => {
+        const tabBtn = label.parentElement;
+        tabBtn.replaceChild(input, label);
+
+        requestAnimationFrame(() => {
           input.focus();
           input.select();
-        }, 0);
+        });
       });
 
+      return label;
+    }
+
+    function createTabCloseButton(tab) {
       const closeBtn = document.createElement("button");
       closeBtn.innerText = "⨯";
       closeBtn.className = "tab-close-btn";
       closeBtn.title = "Close Tab";
+
       closeBtn.onclick = (e) => {
         e.stopPropagation();
         closeTab(tab.originalIndex);
       };
 
-      tabBtn.appendChild(tabLabel);
-      tabBtn.appendChild(closeBtn);
-
-      return tabBtn;
+      return closeBtn;
     }
 
     function createAddTabButton(mode) {
@@ -2809,20 +3200,22 @@
 
     function switchEditorMode(newMode) {
       const currentMode = getCurrentEditorMode();
+      console.log("🌀 switchEditorMode called with:", newMode);
       if (newMode === currentMode) return;
 
       applyEditorMode(newMode);
       localStorage.setItem("editorMode", newMode);
       setActiveTabBar(newMode);
       safeRenderTabs(); // or renderAllTabs() if you don't use safeRender
-      loadActiveTabContent();
     }
 
-   function switchTab(originalIndex) {
+    function switchTab(originalIndex) {
       if (typeof tabs[originalIndex] === "undefined") {
         console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
         return;
       }
+
+      console.log("💾 Saving content before switch:", tabs[activeTabIndex].content);
 
       const selectedTab = tabs[originalIndex];
 
@@ -2839,8 +3232,13 @@
         if (!confirmSwitch) return;
       }
 
+      // 💾 Preserve edits from current tab
+      tabs[activeTabIndex].content = editor.innerHTML.trim();
+      console.log("🖊️ editor.innerHTML is now:", editor.innerHTML);
       setActiveTabIndex(selectedTab.mode, originalIndex);
+      console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
       loadActiveTabContent();
+      
       safeRenderTabs();
     }
 
@@ -2908,11 +3306,8 @@
         return; // 💡 Exit here, switchEditorMode will handle loading
       }
 
-      // ✅ If already in correct mode, just load content
-      editor.innerHTML = activeTab.content || "";
-
-      if (mode === "document" && !editor.contains(marginBox)) {
-        editor.appendChild(marginBox);
+      if (mode === currentMode && editor.innerHTML.trim() !== (activeTab.content || "").trim()) {
+        editor.innerHTML = activeTab.content || "";
       }
 
       editor.setAttribute("data-mode", mode);
@@ -2939,8 +3334,8 @@
       // Title logic based on mode
       const title =
         mode === "notepad"
-        ? `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
-        : "📚 EditDocs";
+        ? "🖊️ Scribs"
+        : "📄 Drafts";
 
       const safeMode = mode === "notepad" ? "notepad" : "document"
 
@@ -2961,7 +3356,21 @@
     }
 
     function getCurrentEditorMode() {
-      return editor?.getAttribute("data-mode") || "document";
+      const editor = document.getElementById("editor");
+      const mode = editor?.getAttribute("data-mode");
+      console.log("💡 Saving in mode:", mode);
+      return mode === "notepad" || mode === "document" ? mode : "unknown";
+    }
+
+    function setCurrentEditorMode(mode) {
+      const editor = document.getElementById("mainEditor");
+      if (editor && (mode === "document" || mode === "notepad")) {
+        currentEditorMode = mode;
+        editor.dataset.mode = mode; // update DOM
+        console.log("🔄 Updated mode to:", mode);
+      } else {
+        console.warn("⚠️ Invalid or missing editor/mode");
+      }
     }
 
     function ensureAtLeastOneTab(filteredTabs, mode) {
@@ -2990,31 +3399,56 @@
     };
 
     function updatePaperSize() {
-      if (mainEditor.getAttribute("data-mode") !== "document") return; // 🛑 Don't update in notepad mode
+      if (editor.getAttribute("data-mode") !== "document") return; // 🛑 Don't update in notepad mode
 
       const selectedSize = paperSizeSelect.value;
       switch (selectedSize) {
         case "letter":
-          mainEditor.style.width = "8.5in";
-          mainEditor.style.minHeight = "11in";
+          editor.style.width = "8.5in";
+          editor.style.minHeight = "11in";
           break;
         case "legal":
-          mainEditor.style.width = "8.5in";
-          mainEditor.style.minHeight = "14in";
+          editor.style.width = "8.5in";
+          editor.style.minHeight = "14in";
           break;
         case "a3":
-          mainEditor.style.width = "11.7in";
-          mainEditor.style.minHeight = "16.5in";
+          editor.style.width = "11.7in";
+          editor.style.minHeight = "16.5in";
           break;
         case "a4":
-          mainEditor.style.width = "8.27in";
-          mainEditor.style.minHeight = "11.69in";
+          editor.style.width = "8.27in";
+          editor.style.minHeight = "11.69in";
           break;
         case "a5":
-          mainEditor.style.width = "5.8in";
-          mainEditor.style.minHeight = "8.3in";
+          editor.style.width = "5.8in";
+          editor.style.minHeight = "8.3in";
           break;
       }
+    }
+
+    function migrateNotes(notes) {
+      return notes.map(note => {
+        // Add missing ID from timestamp
+        if (!note.id && note.timestamp) {
+          note.id = note.timestamp;
+        }
+
+        // Ensure mode is set
+        if (!note.mode) {
+          note.mode = "document";
+        }
+
+        // Ensure project exists
+        if (!note.project) {
+          note.project = "📂 Unlabeled";
+        }
+
+        // Ensure resolved & tags exist
+        note.resolved = note.resolved ?? false;
+        note.tags = note.tags ?? [];
+
+        return note;
+      });
     }
 
     document.addEventListener("click", () => {
