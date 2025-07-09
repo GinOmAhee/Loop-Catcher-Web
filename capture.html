@@ -2981,7 +2981,7 @@
       }
     }
 
-    document.addEventListener("click", () => {
+    document.addEventListener("click", (e) => {
       const isClickInsideEditor = e.target.closest("#mainEditor");
       if (!isClickInsideEditor) {
         setTimeout(() => {
