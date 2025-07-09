@@ -2957,23 +2957,33 @@
 
     function applyEditorMode(mode) {
       console.log("🎯 applyEditorMode triggered with", mode);
-      localStorage.setItem("editorMode", mode); // 🔒 Save mode
+      localStorage.setItem("editorMode", mode);
       currentEditorMode = mode;
 
-      cacheEditorContent();
+      // 🔐 Cache editor content before switching
+      if (activeTabIndex !== null) {
+        if (mode === "notepad") {
+          tabs[activeTabIndex].documentContent = documentEditor.innerHTML.trim();
+        } else {
+          tabs[activeTabIndex].notepadContent = notepadEditor.innerHTML.trim();
+        }
+      }
 
       requestAnimationFrame(() => {
         toggleEditorVisibility(mode);
         applyEditorStyles(mode);
 
-        const active = getActiveEditor();
-        active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
-        active.setAttribute("data-mode", mode);
+        // 🔄 Load correct content into editor
+        const editor = getActiveEditor();
+        const tab = tabs[activeTabIndex] || {};
+        editor.innerHTML = (mode === "notepad" ? tab.notepadContent : tab.documentContent) || "";
+        editor.setAttribute("data-mode", mode);
+        setTimeout(() => editor.focus(), 0);
 
-        safeRenderTabs();
-        setTimeout(() => active.focus(), 0);
+        safeRenderTabs(); // 🔁 Refresh tabs after switch
       });
     }
+
 
     function toggleEditorVisibility(targetMode) {
       const notepadEditor = document.getElementById("notepadEditor");
@@ -3090,26 +3100,23 @@
     function safeRenderTabs() {
       ["notepad", "document"].forEach(mode => renderTabsForMode(mode));
 
-      // 🛡️ Lock the tabs not relevant to the current editor mode
-      const allTabLabels = document.querySelectorAll(".tab-label");
+      // 🔒 Disable non-active-mode tabs
+      document.querySelectorAll(".tab-container span").forEach(tab => {
+        const tabMode = tab.closest(".tab-container").classList.contains("notepad-tabs")
+          ? "notepad"
+          : "document";
 
-      allTabLabels.forEach(label => {
-        const tabType = label.getAttribute("data-type");
-
-        if (tabType !== currentEditorMode) {
-          // Lock it
-          label.classList.add("disabled");
-          label.style.pointerEvents = "none";
-          label.style.opacity = "0.5"; // Optional: visually show it's disabled
+        if (tabMode !== currentEditorMode) {
+          tab.classList.add("disabled-tab");
+          tab.setAttribute("title", "Switch to this mode to open this tab");
+          tab.style.pointerEvents = "none";
         } else {
-          // Unlock it
-          label.classList.remove("disabled");
-          label.style.pointerEvents = "auto";
-          label.style.opacity = "1";
+          tab.classList.remove("disabled-tab");
+          tab.removeAttribute("title");
+          tab.style.pointerEvents = "auto";
         }
       });
     }
-
 
     function abortIfRenaming() {
       if (isRenamingTab) {
@@ -3315,6 +3322,7 @@
       const editor = getActiveEditor();
       console.log("💾 Saving content before switch:", editor?.innerHTML);
 
+      // ✅ Save current content
       if (currentEditorMode === "notepad") {
         tabs[activeTabIndex].notepadContent = notepadEditor.innerHTML.trim();
       } else {
@@ -3322,34 +3330,25 @@
       }
 
       const selectedTab = tabs[originalIndex];
-      const selectedMode = selectedTab.mode; // ✅ define this!
+      const selectedMode = selectedTab.mode;
 
       if (selectedMode !== currentEditorMode) {
         switchEditorMode(selectedMode);
       }
-      
-      // If unsaved changes exist in current tab, prompt user (optional enhancement)
-      if (hasUnsavedChanges) {
-        const confirmSwitch = confirm("⚠️ You have unsaved changes. Switch tabs anyway?");
-        if (!confirmSwitch) return;
-      }
 
-      // 🔄 Switch active tab index
-      setActiveTabIndex(selectedMode, originalIndex);
+      activeTabIndex = originalIndex;
 
-      // ✅ Load new content into editor
-      const activeTab = tabs[activeTabIndex];
-      const newContent = selectedMode === "notepad"
-        ? activeTab.notepadContent || ""
-        : activeTab.documentContent || "";
+      // ✅ Load new tab's content
+      notepadEditor.innerHTML = selectedTab.notepadContent || "";
+      documentEditor.innerHTML = selectedTab.documentContent || "";
 
-      editor.innerHTML = newContent;
+      const editor = getActiveEditor();
+      editor.innerHTML = selectedMode === "notepad"
+        ? selectedTab.notepadContent || ""
+        : selectedTab.documentContent || "";
       editor.setAttribute("data-mode", selectedMode);
       setTimeout(() => editor.focus(), 0);
 
-      console.log("📥 Loaded content for new tab:", newContent);
-
-      // ♻️ Refresh tab UI
       safeRenderTabs();
     }
 
