@@ -3089,7 +3089,27 @@
 
     function safeRenderTabs() {
       ["notepad", "document"].forEach(mode => renderTabsForMode(mode));
+
+      // 🛡️ Lock the tabs not relevant to the current editor mode
+      const allTabLabels = document.querySelectorAll(".tab-label");
+
+      allTabLabels.forEach(label => {
+        const tabType = label.getAttribute("data-type");
+
+        if (tabType !== currentEditorMode) {
+          // Lock it
+          label.classList.add("disabled");
+          label.style.pointerEvents = "none";
+          label.style.opacity = "0.5"; // Optional: visually show it's disabled
+        } else {
+          // Unlock it
+          label.classList.remove("disabled");
+          label.style.pointerEvents = "auto";
+          label.style.opacity = "1";
+        }
+      });
     }
+
 
     function abortIfRenaming() {
       if (isRenamingTab) {
@@ -3292,13 +3312,14 @@
     }
 
     function switchTab(originalIndex) {
-      if (typeof tabs[originalIndex] === "undefined") {
-        console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
-        return;
-      }
-
       const editor = getActiveEditor();
       console.log("💾 Saving content before switch:", editor?.innerHTML);
+
+      if (currentEditorMode === "notepad") {
+        tabs[activeTabIndex].notepadContent = notepadEditor.innerHTML.trim();
+      } else {
+        tabs[activeTabIndex].documentContent = documentEditor.innerHTML.trim();
+      }
 
       const selectedTab = tabs[originalIndex];
       const selectedMode = selectedTab.mode; // ✅ define this!
@@ -3313,18 +3334,22 @@
         if (!confirmSwitch) return;
       }
 
-      // 💾 Preserve edits from current tab
-      if (currentEditorMode === "document") {
-        tabs[activeTabIndex].documentContent = editor.innerHTML.trim();
-      } else {
-        tabs[activeTabIndex].notepadContent = editor.innerHTML.trim();
-      }
-      console.log("🖊️ editor.innerHTML is now:", editor.innerHTML);
-      setActiveTabIndex(selectedTab.mode, originalIndex);
-      console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
+      // 🔄 Switch active tab index
+      setActiveTabIndex(selectedMode, originalIndex);
 
-      loadActiveTabContent();
-      
+      // ✅ Load new content into editor
+      const activeTab = tabs[activeTabIndex];
+      const newContent = selectedMode === "notepad"
+        ? activeTab.notepadContent || ""
+        : activeTab.documentContent || "";
+
+      editor.innerHTML = newContent;
+      editor.setAttribute("data-mode", selectedMode);
+      setTimeout(() => editor.focus(), 0);
+
+      console.log("📥 Loaded content for new tab:", newContent);
+
+      // ♻️ Refresh tab UI
       safeRenderTabs();
     }
 
