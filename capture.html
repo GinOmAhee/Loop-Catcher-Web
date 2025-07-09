@@ -349,9 +349,15 @@
     pointer-events: none;
   }
 
+  #editorContent {
+    position: relative;
+    z-index: 5;
+  }
+
   /* Notepad Mode Styles */
-  #mainEditor[data-mode="notepad"] {
+  #editorContent[data-mode="notepad"] {
     font-family: "Courier New", monospace;
+    position: relative;
     font-size: 1rem;
     padding: 0.9rem;
     width: 50%;
@@ -361,9 +367,11 @@
     background-color: #fffdf7;
     height: 300px; /* ← Add your preferred height */
     overflow-y: auto; /* Optional: adds scroll if content overflows */
+    z-index: 5;
   }
 
-  #mainEditor[data-mode="document"] {
+  #editorContent[data-mode="document"] {
+    position: relative;
     width: 8.27in;
     min-height: 11.69in;
     padding: 0;
@@ -374,9 +382,9 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
     box-sizing: border-box;
-    width: 80%;
     min-height: 400px;
     max-height: calc(100vh - 5rem); /* or whatever fits below your tab bar */
+    z-index: 5;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -436,7 +444,7 @@
     right: 0;
     height: 0;
     border-top: 1px dotted #aaa;
-    z-index: 1;
+    z-index: 0;
     pointer-events: none;
   }
 
@@ -445,7 +453,7 @@
     inset: var(--margin-top, 1in) var(--margin-right, 1in) var(--margin-bottom, 1in) var(--margin-left, 1in);
     border: 2px dashed rgba(0, 0, 0, 0.2);
     pointer-events: none;
-    z-index: 1;
+    z-index: 0;
   }
 
   .margin-box::before {
@@ -457,7 +465,7 @@
     left: var(--margin-left, 1in);
     border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
     pointer-events: none;
-    z-index: 2;
+    z-index: 0;
   }
 
   #mainEditor:not(.hidden-editor) {
@@ -1421,21 +1429,16 @@
 
       const mode = localStorage.getItem("editorMode") || "document";
       setActiveTabBar(mode);
-      
-      if (!mainEditor) {
-        console.error("❌ mainEditor not found");
-        return;
-      }
 
       console.log("✅ mainEditor is:", mainEditor);
 
-      mainEditor.addEventListener("input", () => {
-        undoStack.push(mainEditor.innerHTML);
+      editor.addEventListener("input", () => {
+        undoStack.push(editor.innerHTML);
         redoStack = [];
 
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
-          localStorage.setItem("capturedText", mainEditor.innerHTML);
+          localStorage.setItem("capturedText", editor.innerHTML);
           localStorage.setItem("lastSaved", new Date().toISOString());
           updateGrouping();
           saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
@@ -2035,24 +2038,21 @@
 
 
     function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
-      if (!mainEditor || !marginBox) {
+      if (!editor || !mainEditor) {
         console.error("❌ Cannot load note — editor elements missing");
         return;
-       }
+      }
 
         switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
 
-        if (mode === "notepad") {
-          mainEditor.innerHTML = noteHTML; // inject into the full editor shell
-        } else if (mode === "document") {
-          marginBox.innerHTML = noteHTML; // inject only inside marginBox
-        }
+        editor.innerHTML = noteHTML;
 
         setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
-
-        mainEditor.focus();
+        editor.focus();
+        
         saveStatus.innerText = "📝 Loaded note from preview";
         preview.style.display = 'none';
+
         undoStack.push(noteHTML);
         redoStack = [];
 
@@ -2207,6 +2207,7 @@
 
       const preview = document.querySelector(".preview-overlay");
       const mainEditor = document.getElementById("mainEditor");
+      const editor = document.getElementById("editorContent");
       const mode = getCurrentEditorMode?.() || "document";
 
       if (!preview || !mainEditor) {
@@ -2236,6 +2237,11 @@
           mainEditor.style.pointerEvents = "auto";
           mainEditor.scrollTop = 0;
           mainEditor.offsetHeight; // force reflow
+
+          // ✅ Also refocus the inner editor if needed:
+          if (editor) {
+            editor.focus();
+          }  
         });
       }
 
@@ -2248,7 +2254,8 @@
     }
 
     function getActiveEditorContent() {
-      return mainEditor.innerHTML; // or use .value if you're working in <textarea>
+      const contentDiv = document.getElementById("editorContent");
+      return contentDiv?.innerHTML || "";
     }
 
     function toggleItalic() {
@@ -2324,26 +2331,29 @@
         } else {
           console.log("✅ User is signed in:", user.email);
 
-          const editor = document.getElementById('mainEditor'); // ✅ consistent anchor
-          if (editor && editor.classList.contains('hidden-editor')) {
-            editor.classList.remove('hidden-editor');
-            editor.style.display = 'block';
-            editor.getBoundingClientRect(); // force reflow if needed
-            editor.classList.add('visible');
+          const mainEditor = document.getElementById('mainEditor'); // ✅ layout shell
+
+          if (mainEditor && mainEditor.classList.contains('hidden-editor')) {
+            mainEditor.classList.remove('hidden-editor');
+            mainEditor.style.display = 'block';
+            mainEditor.getBoundingClientRect(); // ✅ force reflow
+            mainEditor.classList.add('visible');
           }
 
           loadSavedText();
 
-          mainEditor.addEventListener("input", () => {
+          const editor = document.getElementById("editorContent");
+          
+          editor.addEventListener("input", () => {
             hasUnsavedChanges = true; // ✅ still needed
             
             const currentMode = getCurrentEditorMode();
-            const text = mainEditor.innerText || "";
+            const text = editor.innerText || "";
 
-              if (currentMode === "document") {
-                const newTitle = text.split("\n")[0]?.trim() || "Untitled";
+            if (currentMode === "document") {
+              const newTitle = text.split("\n")[0]?.trim() || "Untitled";
 
-                console.log("📝 Updating tab title (Document):", newTitle);
+              console.log("📝 Updating tab title (Document):", newTitle);
 
               if (tabs[activeTabIndex]) {
                 tabs[activeTabIndex].title = newTitle;
@@ -2356,18 +2366,18 @@
             }
           });
 
+          editor.addEventListener("click", function (e) {
+            const el = e.target.closest("a");
+            if (el && el.href) {
+              e.preventDefault();
+              window.open(el.href, "_blank", "noopener");
+            }
+          });
+
           applyMoodTheme();
           updateGrouping();
           safeRenderTabs();
           setInterval(autoSave, 30000);
-        }
-      });
-
-      mainEditor.addEventListener("click", function (e) {
-        const el = e.target.closest("a");
-        if (el && el.href) {
-          e.preventDefault();
-          window.open(el.href, "_blank", "noopener");
         }
       });
     };
@@ -2517,7 +2527,7 @@
 
     function printNote() {
       const printWindow = window.open('', '_blank');
-      const noteContent = mainEditor.innerHTML;
+      const noteContent = document.getElementById("editorContent").innerHTML;
 
       const styles = `
         <style>
@@ -2670,7 +2680,9 @@
     }
 
     function cacheEditorContent() {
-      const currentMode = editor.getAttribute("data-mode");
+      const currentMode = editor.getAttribute("data-mode"); // editor = #mainEditor
+      const content = document.getElementById("editorContent").innerHTML;
+
       if (currentMode === "notepad") {
         notepadCache = editor.innerHTML;
       } else if (currentMode === "document") {
@@ -2682,6 +2694,7 @@
       if (!editor) return;
 
       const marginBox = document.getElementById("marginBox");
+      const editorContent = document.getElementById("editorContent"); // 👈 actual editable zone
       const paperSize = getSelectedPaperSize?.(); // optional
       const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
 
@@ -2689,22 +2702,24 @@
       editor.setAttribute("contenteditable", "true");
       editor.classList.remove("notepad-mode", "document-mode");
       editor.classList.add(`${mode}-mode`);
-      editor.setAttribute("data-mode", mode);
+
+      editorContent.setAttribute("contenteditable", "true"); // 👈 only inner is editable
+      editorContent.classList.remove("notepad-mode", "document-mode");
+      editorContent.classList.add(`${mode}-mode`);
 
       // 🧠 NOTEPAD MODE
       if (mode === "notepad") {
         marginBox?.classList.add("hidden");
-        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "none");
 
         // Clear any inline styles related to document layout
-        editor.style.margin = "";
-        editor.style.paddingTop = "";
-        editor.style.paddingBottom = "";
-        editor.style.paddingLeft = "";
-        editor.style.paddingRight = "";
-        editor.style.removeProperty("width");
-        editor.style.removeProperty("min-height");
+        editorContent.style.margin = "";
+        editorContent.style.paddingTop = "";
+        editorContent.style.paddingBottom = "";
+        editorContent.style.paddingLeft = "";
+        editorContent.style.paddingRight = "";
+        editorContent.style.removeProperty("width");
+        editorContent.style.removeProperty("min-height");
 
         console.log("🔍 Width after cleanup:", editor.style.width, editor.style.minHeight);
 
@@ -2714,15 +2729,14 @@
       // 📄 DOCUMENT MODE
       } else if (mode === "document") {
         marginBox?.classList.remove("hidden");
-        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "flex");
 
         // 📏 Apply saved margins only
         if (Object.keys(savedMargins).length > 0) {
-          editor.style.paddingTop = `${savedMargins.top}px`;
-          editor.style.paddingBottom = `${savedMargins.bottom}px`;
-          editor.style.paddingLeft = `${savedMargins.left}px`;
-          editor.style.paddingRight = `${savedMargins.right}px`;
+          editorContent.style.paddingTop = `${savedMargins.top}px`;
+          editorContent.style.paddingBottom = `${savedMargins.bottom}px`;
+          editorContent.style.paddingLeft = `${savedMargins.left}px`;
+          editorContent.style.paddingRight = `${savedMargins.right}px`;
         }
 
         modeToggleBtn.innerText = "🧠 Notepad Mode";
@@ -2745,54 +2759,57 @@
       const left = saved.left || 0;
       const right = saved.right || 0;
 
-      editor.style.paddingTop = `${top}px`;
-      editor.style.paddingBottom = `${bottom}px`;
-      editor.style.paddingLeft = `${left}px`;
-      editor.style.paddingRight = `${right}px`;
-    }
+      const editorContent = document.getElementById("editorContent");
 
-    function updateTabTitleByMode(mode) {
-      if (!tabs[activeTabIndex]) return;
-
-      if (mode === "notepad") {
-        const now = new Date();
-        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-      } else if (mode === "document") {
-        const text = editor.innerText || "";
-        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
+      if (editorContent) {
+        editorContent.style.paddingTop = `${top}px`;
+        editorContent.style.paddingBottom = `${bottom}px`;
+        editorContent.style.paddingLeft = `${left}px`;
+        editorContent.style.paddingRight = `${right}px`;
       }
-
-      localStorage.setItem("tabs", JSON.stringify(tabs));
     }
 
     function restoreEditorContent(mode) {
+      const editorContent = document.getElementById("editorContent");
       const marginBox = document.getElementById("marginBox");
 
+      if (!editorContent) return;
+
       if (mode === "notepad") {
-        editor.innerHTML = notepadCache || "";
+        editorContent.innerHTML = notepadCache || "";
       } else if (mode === "document") {
-        editor.innerHTML = documentCache || "";
-        if (marginBox && !editor.contains(marginBox)) {
-          editor.appendChild(marginBox);
+        editorContent.innerHTML = documentCache || "";
+    
+        // Only append marginBox if it somehow got removed from layout shell
+        const mainEditor = document.getElementById("mainEditor");
+        if (marginBox && mainEditor && !mainEditor.contains(marginBox)) {
+          mainEditor.appendChild(marginBox);
         }
       }
 
-      editor.innerHTML = editor.innerHTML.trim();
+      editorContent.innerHTML = editorContent.innerHTML.trim();
     }
 
+
     function setEditorModeAttribute(mode) {
-      editor.setAttribute("data-mode", mode);
+      const editorContent = document.getElementById("editorContent");
+      if (editorContent) {
+        editorContent.setAttribute("data-mode", mode);
+      }
     }
 
     function focusEditorSafely() {
-      setTimeout(() => editor.focus(), 0);
+      const editorContent = document.getElementById("editorContent");
+      if (editorContent) {
+        setTimeout(() => editorContent.focus(), 0);
+      }
     }
 
     function setupModeToggle() {
       modeToggleBtn = document.getElementById("modeToggleBtn");
 
       modeToggleBtn?.addEventListener("click", () => {
-        const currentMode = editor?.getAttribute("data-mode");
+        const currentMode = editorContent?.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
         localStorage.setItem("editorMode", nextMode);
         applyEditorMode(nextMode); // 👈 THIS is what was missing earlier
@@ -3043,7 +3060,7 @@
       }
 
       const mode = activeTab.mode || "document";
-      const currentMode = editor.getAttribute("data-mode");
+      const currentMode = editorContent.getAttribute("data-mode");
 
       // Only switch modes if necessary
       if (mode !== currentMode) {
@@ -3053,18 +3070,15 @@
       }
 
       if (mode === currentMode && editor.innerHTML.trim() !== (activeTab.content || "").trim()) {
-        editor.innerHTML = activeTab.content || "";
+        editorContent.innerHTML = activeTab.content || "";
       }
 
       if (mode === "document" && !editor.contains(marginBox)) {
-        editor.appendChild(marginBox);
+        editorContent.appendChild(marginBox);
       }
 
-      editor.setAttribute("data-mode", mode);
+      editorContent.setAttribute("data-mode", mode);
       focusEditorSafely();
-
-       // 🧠 Safely update title after content + mode have landed
-       updateTabTitleByMode(mode);
     }
 
     function getTabContainer(mode) {
@@ -3106,7 +3120,7 @@
     }
 
     function getCurrentEditorMode() {
-      return editor?.getAttribute("data-mode") || "document";
+      return editorContent?.getAttribute("data-mode") || "document";
     }
 
     function ensureAtLeastOneTab(filteredTabs, mode) {
@@ -3135,29 +3149,29 @@
     };
 
     function updatePaperSize() {
-      if (mainEditor.getAttribute("data-mode") !== "document") return; // 🛑 Don't update in notepad mode
+      if (editorContent.getAttribute("data-mode") !== "document") return; // 🛑 Don't update in notepad mode
 
       const selectedSize = paperSizeSelect.value;
       switch (selectedSize) {
         case "letter":
-          mainEditor.style.width = "8.5in";
-          mainEditor.style.minHeight = "11in";
+          editorContent.style.width = "8.5in";
+          editorContent.style.minHeight = "11in";
           break;
         case "legal":
-          mainEditor.style.width = "8.5in";
-          mainEditor.style.minHeight = "14in";
+          editorContent.style.width = "8.5in";
+          editorContent.style.minHeight = "14in";
           break;
         case "a3":
-          mainEditor.style.width = "11.7in";
-          mainEditor.style.minHeight = "16.5in";
+          editorContent.style.width = "11.7in";
+          editorContent.style.minHeight = "16.5in";
           break;
         case "a4":
-          mainEditor.style.width = "8.27in";
-          mainEditor.style.minHeight = "11.69in";
+          editorContent.style.width = "8.27in";
+          editorContent.style.minHeight = "11.69in";
           break;
         case "a5":
-          mainEditor.style.width = "5.8in";
-          mainEditor.style.minHeight = "8.3in";
+          editorContent.style.width = "5.8in";
+          editorContent.style.minHeight = "8.3in";
           break;
       }
     }
