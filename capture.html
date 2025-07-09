@@ -1698,11 +1698,11 @@
       tabs[activeTabIndex].content = content;
 
       // 🗂️ Cache by mode
-        if (mode === EditorModes.NOTEPAD) {
+        if (mode === "notepad") {
         notepadCache = content;
         localStorage.setItem("notepadContent", content);
         console.log("✍️ Notepad cached:", notepadCache);
-      } else if (mode === EditorModes.DOCUMENT) {
+      } else if (mode === "document") {
         documentCache = content;
         localStorage.setItem("documentContent", content);
         console.log("📄 Document cached:", documentCache);
@@ -2991,10 +2991,10 @@
 
       const content = editor?.innerHTML || "";
 
-      if (mode === EditorModes.NOTEPAD) {
+      if (mode === "notepad") {
         notepadCache = content;
         console.log("✅ Saved Notepad Content:", content);
-      } else if (mode === EditorModes.DOCUMENT) {
+      } else if (mode === "document") {
         documentCache = content;
         console.log("✅ Saved Document Content:", content);
       } else {
@@ -3301,7 +3301,7 @@
       console.log("🔍 Calling applyEditorMode with:", newMode);
 
       const isDocVisible = document.getElementById("documentEditor")?.offsetParent !== null;
-      const currentMode = isDocVisible ? EditorModes.DOCUMENT : EditorModes.NOTEPAD;
+      const currentMode = isDocVisible ? "document" : "notepad";
 
       console.log("🔄 switchEditorMode called. New mode:", newMode);
 
