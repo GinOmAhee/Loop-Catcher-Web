@@ -1465,6 +1465,7 @@
       document.addEventListener("click", (e) => {
         const clickedInsidePreview = preview.contains(e.target);
         const clickedToggle = previewToggle.contains(e.target);
+        const clickedInsideMainEditor = mainEditor.contains(e.target);
         const clickedInsideEditor =
           mainEditor.contains(e.target) || editor?.contains(e.target);
         const isRenaming = e.target.classList.contains("tab-rename-input");
@@ -2674,8 +2675,13 @@
     }
 
     function cacheEditorContent() {
+
+      if (!editor) {
+        console.warn("⚠️ editor not available when caching content.");
+        return;
+      }
+
       const currentMode = editor.getAttribute("data-mode"); // editor = #mainEditor
-      const content = document.getElementById("editorContent").innerHTML;
 
       if (currentMode === "notepad") {
         notepadCache = editor.innerHTML;
