@@ -3314,7 +3314,7 @@
       }
 
       // 💾 Preserve edits from current tab
-      if (currentMode === "document") {
+      if (currentEditorMode === "document") {
         tabs[activeTabIndex].documentContent = editor.innerHTML.trim();
       } else {
         tabs[activeTabIndex].notepadContent = editor.innerHTML.trim();
@@ -3397,7 +3397,7 @@
       const currentMode = editor.getAttribute("data-mode");
       const mode = getVisibleEditorMode(); // 🔁 You only need this once
 
-      const content = visibleMode === "document"
+      const content = currentEditorMode === "document"
         ? activeTab.documentContent || ""
         : activeTab.notepadContent || "";
 
