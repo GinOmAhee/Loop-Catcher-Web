@@ -3419,7 +3419,7 @@
 
     function setActiveTabIndex(index) {
       const mode = localStorage.getItem("editorMode") || "notepad";
-      localStorage.setItem(`activeTabIndex_${currentMode}`, index);
+      localStorage.setItem(`activeTabIndex_${mode}`, index);
     }
 
     const paperSizes = {
