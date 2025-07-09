@@ -345,6 +345,10 @@
   }
 
   #notepadEditor {
+    display: block;
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 1;
     font-family: "Courier New", monospace;
     font-size: 1rem;
     padding: 0.9rem;
@@ -2965,8 +2969,7 @@
       requestAnimationFrame(() => {
         toggleEditorVisibility(mode);
         applyEditorStyles(mode);
-
-        const active = getActiveEditor();
+        
         safeRenderTabs();
         active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
         active.setAttribute("data-mode", mode);
@@ -3434,26 +3437,27 @@
         return;
       }
 
-      const mode = activeTab.mode || "document";
       const editor = getActiveEditor();
       const currentMode = editor.getAttribute("data-mode");
+      const mode = getVisibleEditorMode(); // 🔁 You only need this once
 
-      // Only switch modes if necessary
+      const content = (mode === "document")
+        ? activeTab.documentContent || ""
+        : activeTab.notepadContent || "";
+
+      // If the editor mode doesn't match, switch it and reload
       if (mode !== currentMode) {
         localStorage.setItem("editorMode", mode);
-        switchEditorMode(mode); // safe to call here now
-        return; // 💡 Exit here, switchEditorMode will handle loading
+        switchEditorMode(mode); // Will reload content itself
+        return;
       }
 
-      if (mode === currentMode && editor.innerHTML.trim() !== (activeTab.content || "").trim()) {
-        editor.innerHTML = activeTab.content || "";
-      }
-
+      editor.innerHTML = content;
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
 
-       // 🧠 Safely update title after content + mode have landed
-       updateTabTitleByMode(mode);
+      // Update tab title after editor sync
+      updateTabTitleByMode(mode);
     }
 
     function getTabContainer(mode) {
