@@ -1278,9 +1278,6 @@
     let isRenderingTabs = false;
     let currentEditorMode = getCurrentEditorMode(); // or "notepad" as fallback
 
-   
-    const marginBox = document.getElementById("marginBox"); // 💡 safe reference
-
     async function initializeFirebase() {
       try {
         const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
@@ -1473,6 +1470,30 @@
         const rect = textColorBtn.getBoundingClientRect();
         textColorDropdown.style.left = `${rect.left}px`;
         textColorDropdown.style.top = `${rect.bottom + 5}px`;
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const marginBtn = document.getElementById("marginBtn");
+        const marginDropdown = document.getElementById("marginDropdown");
+
+        if (!marginBtn || !marginDropdown) {
+          console.warn("⛔ Missing margin dropdown elements.");
+          return;
+        }
+
+        marginBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          marginDropdown.classList.toggle("hidden");
+
+          const rect = marginBtn.getBoundingClientRect();
+          marginDropdown.style.top = `${rect.bottom + 5}px`;
+          marginDropdown.style.left = `${rect.left}px`;
+        });
+
+        // Optional: Hide dropdown when clicking outside
+        document.addEventListener("click", () => {
+          marginDropdown.classList.add("hidden");
+        });
       });
 
       document.addEventListener("DOMContentLoaded", () => {
@@ -1676,9 +1697,6 @@
       }
 
       localStorage.removeItem("customMargins");
-
-      editor.style.padding = "0";
-      editor.style.margin = "0";
 
       tabs[activeTabIndex].content = editor?.innerHTML?.trim() || "";
       
@@ -2876,63 +2894,6 @@
      }
     }
 
-    // ✅ Margin Input UI logic
-    document.addEventListener("DOMContentLoaded", () => {
-      const marginBtn = document.getElementById("marginBtn");
-      const marginDropdown = document.getElementById("marginDropdown");
-      const editor = getActiveEditor();
-
-      if (!marginBtn || !marginDropdown || !editor) {
-        console.warn("⛔ Missing margin UI elements.");
-        return;
-      }
-
-      marginBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        marginDropdown.classList.toggle("hidden");
-        const rect = marginBtn.getBoundingClientRect();
-        marginDropdown.style.top = `${rect.bottom + 5}px`;
-        marginDropdown.style.left = `${rect.left}px`;
-
-        const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
-        document.getElementById("marginTop").value = (savedMargins.top || 0) / 96;
-        document.getElementById("marginBottom").value = (savedMargins.bottom || 0) / 96;
-        document.getElementById("marginLeft").value = (savedMargins.left || 0) / 96;
-        document.getElementById("marginRight").value = (savedMargins.right || 0) / 96;
-      });
-
-      function inchesToPixels(inches) {
-        return parseFloat(inches) * 96;
-      }
-
-      document.getElementById("applyMarginBtn").addEventListener("click", () => {
-        const top = inchesToPixels(document.getElementById("marginTop").value || 0);
-        const bottom = inchesToPixels(document.getElementById("marginBottom").value || 0);
-        const left = inchesToPixels(document.getElementById("marginLeft").value || 0);
-        const right = inchesToPixels(document.getElementById("marginRight").value || 0);
-
-        editor.style.paddingTop = `${top}px`;
-        editor.style.paddingBottom = `${bottom}px`;
-        editor.style.paddingLeft = `${left}px`;
-        editor.style.paddingRight = `${right}px`;
-
-        // ✅ Save margins only *after* user applied them
-        localStorage.setItem("customMargins", JSON.stringify({ top, bottom, left, right }));
-
-        marginDropdown.classList.add("hidden");
-
-        // Optional: reapply to make sure margins persist
-        applyCustomMargins();
-      });
-
-      // Close dropdown if clicked outside
-      document.addEventListener("click", (e) => {
-        if (!marginDropdown.contains(e.target) && !marginBtn.contains(e.target)) {
-          marginDropdown.classList.add("hidden");
-        }
-      });
-    });
-
     function getVisibleEditorMode() {
       const notepadVisible = document.getElementById("notepadEditor")?.offsetParent !== null;
       const documentVisible = document.getElementById("documentEditor")?.offsetParent !== null;
@@ -3017,31 +2978,12 @@
       if (mode === "notepad") {
         toolbar && (toolbar.style.display = "none");
 
-        // Clear any inline styles related to document layout
-        editor.style.margin = "";
-        editor.style.paddingTop = "";
-        editor.style.paddingBottom = "";
-        editor.style.paddingLeft = "";
-        editor.style.paddingRight = "";
-        editor.style.removeProperty("width");
-        editor.style.removeProperty("min-height");
-
-        console.log("🔍 Width after cleanup:", editor.style.width, editor.style.minHeight);
-
         modeToggleBtn.innerText = "📄 Document Mode";
         status && (status.innerText = "🧠 Notepad Mode Active");
 
       // 📄 DOCUMENT MODE
       } else if (mode === "document") {
         toolbar && (toolbar.style.display = "flex");
-
-        // 📏 Apply saved margins only
-        if (Object.keys(savedMargins).length > 0) {
-          editor.style.paddingTop = `${savedMargins.top}px`;
-          editor.style.paddingBottom = `${savedMargins.bottom}px`;
-          editor.style.paddingLeft = `${savedMargins.left}px`;
-          editor.style.paddingRight = `${savedMargins.right}px`;
-        }
 
         modeToggleBtn.innerText = "🧠 Notepad Mode";
         status && (status.innerText = "📄 Document Mode Active");
