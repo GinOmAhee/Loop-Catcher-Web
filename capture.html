@@ -2456,6 +2456,15 @@
         console.log("⌨️ Key pressed:", e.key);
       });
 
+      editor.addEventListener("blur", (e) => {
+        e.preventDefault();
+        console.log("⛔ Editor blur blocked (test)");
+        setTimeout(() => {
+          editor.focus();
+          console.log("🛡️ Re-focused editor");
+        }, 10);
+      });
+
       marginBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         marginDropdown.classList.toggle("hidden");
