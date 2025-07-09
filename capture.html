@@ -333,6 +333,7 @@
   }
 
   #mainEditor {
+    position: relative; /* Needed for marginBox to sit inside */
     margin: 0rem auto; /* Add to match document mode */
     overflow-y: auto;
     outline: none;
@@ -442,10 +443,14 @@
   }
 
   .margin-box {
-    position: relative;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    box-sizing: border-box;
+    inset: 0;
+    z-index: 1;
   }
 
   .margin-box::before {
@@ -456,7 +461,6 @@
     bottom: var(--margin-bottom, 1in);
     left: var(--margin-left, 1in);
     border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
-    pointer-events: none;
     z-index: 2;
   }
 
@@ -1102,7 +1106,7 @@
   
   <!-- 📝 Rich Text Editor -->
   <div id="mainEditor" contenteditable="true" data-mode="document">
-    <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
+    <div id="marginBox" class="margin-box" tabindex="-1"></div>
   </div>
 
   <!-- 📝 Main Editor (always visible) -->
