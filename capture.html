@@ -3397,10 +3397,9 @@
       const currentMode = editor.getAttribute("data-mode");
       const mode = getVisibleEditorMode(); // 🔁 You only need this once
 
-      const content =
-        const content = visibleMode === "document"
-          ? activeTab.documentContent || ""
-          : activeTab.notepadContent || "";
+      const content = visibleMode === "document"
+        ? activeTab.documentContent || ""
+        : activeTab.notepadContent || "";
 
       
       if (visibleMode !== currentMode) {
