@@ -1691,11 +1691,14 @@
       const editor = getActiveEditor();
       if (!editor) return;
 
-      const mode = getVisibleEditorMode(); // or use currentEditorMode if accurate
-
-      // 💾 Save editor content into active tab
+      const mode = getVisibleEditorMode();
       const content = editor.innerHTML.trim();
-      tabs[activeTabIndex].content = content;
+
+      if (mode === "document") {
+        tabs[activeTabIndex].documentContent = content;
+      } else if (mode === "notepad") {
+        tabs[activeTabIndex].notepadContent = content;
+      }
 
       // 🗂️ Cache by mode
         if (mode === "notepad") {
@@ -1751,7 +1754,12 @@
 
       } else {
         // ✅ First-time fallback
-        tabs = [{ title: "Note 1", content: "", mode: "document" }];
+        tabs = [{
+          title: "Note 1",
+          notepadContent: "",
+          documentContent: "",
+        }];
+        
         activeTabIndex = 0;
         console.log("🎯 current mode from storage:", localStorage.getItem("editorMode"));
         applyEditorMode?.("document");
@@ -3472,8 +3480,8 @@
 
       const newTab = {
         title,
-        content: "",
-        mode: safeMode
+        notepadContent: mode === "notepad" ? "<br>" : "",
+        documentContent: mode === "document" ? "<br>" : "",
       };
 
       tabs.push(newTab);
