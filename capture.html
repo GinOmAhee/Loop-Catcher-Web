@@ -345,6 +345,8 @@
   }
 
   #notepadEditor {
+    width: 4.27in;
+    min-height: 6in;
     display: block;
     visibility: visible;
     pointer-events: auto;
@@ -354,11 +356,12 @@
     padding: 0.9rem;
     width: 50%;
     margin: 0 auto;
-    border: none;
-    box-shadow: none;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
     background-color: #fffdf7;
-    height: 300px;
-    overflow-y: auto;
+    
+   
   }
 
   #documentEditor {
@@ -3319,9 +3322,6 @@
     }
 
     function switchTab(originalIndex) {
-      const editor = getActiveEditor();
-      console.log("💾 Saving content before switch:", editor?.innerHTML);
-
       // ✅ Save current content
       if (currentEditorMode === "notepad") {
         tabs[activeTabIndex].notepadContent = notepadEditor.innerHTML.trim();
