@@ -499,28 +499,33 @@
   /* === TABS === */
   .tab-bar {
     display: flex;
-    align-items: center;
-    padding: 0 1rem 0 0.5rem;
+    flex-direction: column; /* ⬅️ THIS makes it vertical */
+    align-items: flex-start; /* Optional: align to left */
+    padding: .5rem .5rem 0.2rem 0.2rem;
     margin-bottom: 0.5rem;
     border-bottom: 2px solid #ccc;
     position: sticky;
     top: 0;
-    height: 3rem;
+    min-height: 8rem;
+    height: auto;
     z-index: 10; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
   }
-
   .mode-tab-container {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     flex-wrap: wrap;
-    margin-bottom: 0.5rem
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+    pointer-events: none;
+    user-select: none;
+    transition: opacity 0.2s ease;
   }
 
   .document-tabs {
-    border-bottom: 2px solid #ccc;
+    border-bottom: 2px solid #4169E1;
     padding-bottom: 4px;
     max-width: 75vw; /* ⛳ LIMIT how wide tabs can go */
     scrollbar-width: thin;
@@ -532,7 +537,7 @@
   }
 
   .notepad-tabs {
-    border-bottom: 2px dashed #aaa;
+    border-bottom: 2px dashed #FF69B4;
     padding-bottom: 4px;
     max-width: 75vw; /* ⛳ LIMIT how wide tabs can go */
     scrollbar-width: thin;
@@ -550,7 +555,7 @@
     gap: 3rem; /* ← this creates space between label & close button */
     min-width: 150px;
     max-width: 150px;
-    width: 150px; /* optional for clarity */
+    width: 200px; /* optional for clarity */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -563,13 +568,6 @@
     color: var(--tab-text);
     border: 1px solid var(--tab-border);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-  }
-
-  .mode-tab-container {
-    opacity: 0.5;
-    pointer-events: none;
-    user-select: none;
-    transition: opacity 0.2s ease;
   }
 
   .mode-tab-container.active {
@@ -2492,25 +2490,17 @@
     function applyEditorMode(mode) {
       if (!editor) return;
 
-      // 🧠 Cache previous content before mode switch
       cacheEditorContent();
-
-      // 💅 Apply mode-specific visual + structural updates
       applyEditorStyles(mode);
 
+      // 🧠 SWITCH MODE FIRST so helpers update activeTabIndex correctly
+      setEditorModeAttribute(mode);
       setActiveTabBar(mode);
 
-      // 🧾 Update tab title based on mode
-      updateTabTitleByMode(mode);
-
-      // 💾 Persist title update + re-render correct tab bar
+      // 🔁 RENDER tab buttons AND assign correct active index per mode
       safeRenderTabs();
 
-      // 🧩 Restore content from cache
       restoreEditorContent(mode);
-
-      // 🪄 Final touches
-      setEditorModeAttribute(mode);
       focusEditorSafely();
     }
 
@@ -2588,10 +2578,10 @@
 
       if (mode === "notepad") {
         const now = new Date();
-        tabs[activeTabIndex].title = `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
       } else if (mode === "document") {
         const text = editor.innerText || "";
-        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "Untitled";
+        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
       }
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
@@ -2894,6 +2884,9 @@
 
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
+
+       // 🧠 Safely update title after content + mode have landed
+       updateTabTitleByMode(mode);
     }
 
     function getTabContainer(mode) {
@@ -2916,10 +2909,12 @@
         ? `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
         : "📚 EditDocs";
 
+      const safeMode = mode === "notepad" ? "notepad" : "document"
+
       const newTab = {
         title,
         content: "",
-        mode: mode || "document"
+        mode: safeMode
       };
 
       tabs.push(newTab);
