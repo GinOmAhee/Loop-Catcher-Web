@@ -2513,6 +2513,17 @@
         });
       });
 
+      document.addEventListener("DOMContentLoaded", () => {
+        editor = getSafeElement("editorContent");
+        mainEditor = getSafeElement("mainEditor");
+
+        // now it's safe to use
+        editor.setAttribute("data-mode", "document");  // won't crash
+        editor.addEventListener("input", () => {
+          console.log("✍️ Editor input detected.");
+        });
+      });
+
       applyBtn.addEventListener("click", () => {
         restoreSelection();
 
