@@ -2962,8 +2962,14 @@
         safeRenderTabs();
         active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
         active.setAttribute("data-mode", mode);
+
       });
-       setTimeout(() => active.focus(), 0);
+
+      const active = getActiveEditor();
+      active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
+      active.setAttribute("data-mode", mode);
+
+      setTimeout(() => active.focus(), 0); // ✅ now 'active' is defined
     }
 
     function toggleEditorVisibility(targetMode) {
