@@ -1278,7 +1278,7 @@
     let isRenderingTabs = false;
     let currentEditorMode = getCurrentEditorMode(); // or "notepad" as fallback
 
-
+    const currentMode = editorMode;
     const marginBox = document.getElementById("marginBox"); // 💡 safe reference
 
     async function initializeFirebase() {
@@ -3329,6 +3329,8 @@
       console.log("🖊️ editor.innerHTML is now:", editor.innerHTML);
       setActiveTabIndex(selectedTab.mode, originalIndex);
       console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
+
+      const currentMode = getVisibleEditorMode();
       loadActiveTabContent();
       
       safeRenderTabs();
@@ -3417,9 +3419,6 @@
       editor.innerHTML = content;
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
-
-      // Update tab title after editor sync
-      updateTabTitleByMode(mode);
     }
 
     function getTabContainer(mode) {
