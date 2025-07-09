@@ -3257,9 +3257,8 @@
 
       const selectedTab = tabs[originalIndex];
 
-      const currentMode = getVisibleEditorMode();
       if (selectedMode !== currentMode) {
-        switchEditorMode(selectedMode);
+        switchEditorMode(tab.mode);
       }
       
       // If unsaved changes exist in current tab, prompt user (optional enhancement)
