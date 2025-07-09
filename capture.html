@@ -3281,6 +3281,10 @@
       const notepadContainer = document.getElementById("notepadTabContainer");
       const documentContainer = document.getElementById("documentTabContainer");
 
+      // 💬 Log current class states before mutation
+      console.log("🧠 Before update — Notepad tab classes:", notepadContainer?.classList?.value);
+      console.log("📄 Before update — Document tab classes:", documentContainer?.classList?.value);
+
       if (mode === "document") {
         documentContainer.classList.add("active");
         notepadContainer.classList.remove("active");
@@ -3288,6 +3292,9 @@
         notepadContainer.classList.add("active");
         documentContainer.classList.remove("active");
       }
+      // 💬 Log updated class states after mutation
+      console.log("🧠 After update — Notepad tab classes:", notepadContainer?.classList?.value);
+      console.log("📄 After update — Document tab classes:", documentContainer?.classList?.value);
     }
 
     function switchEditorMode(newMode) {
@@ -3304,11 +3311,11 @@
         applyEditorMode(newMode);
       } else {
         applyEditorMode(newMode);
+        setActiveTabBar(newMode);
       }
 
       // 💾 Update storage and UI regardless
       localStorage.setItem("editorMode", newMode);
-      setActiveTabBar(newMode);
       safeRenderTabs(); // or renderAllTabs(), depending on setup
     }
 
