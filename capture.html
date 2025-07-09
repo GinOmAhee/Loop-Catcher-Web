@@ -2343,28 +2343,6 @@
           loadSavedText();
 
           const editor = document.getElementById("editorContent");
-          
-          editor.addEventListener("input", () => {
-            hasUnsavedChanges = true; // ✅ still needed
-            
-            const currentMode = getCurrentEditorMode();
-            const text = editor.innerText || "";
-
-            if (currentMode === "document") {
-              const newTitle = text.split("\n")[0]?.trim() || "Untitled";
-
-              console.log("📝 Updating tab title (Document):", newTitle);
-
-              if (tabs[activeTabIndex]) {
-                tabs[activeTabIndex].title = newTitle;
-                localStorage.setItem("tabs", JSON.stringify(tabs));
-                safeRenderTabs();
-              }
-            } else {
-              // Optional: Add a debug log or skip entirely
-              console.log("✏️ Skipping title update in Notepad mode");
-            }
-          });
 
           editor.addEventListener("click", function (e) {
             const el = e.target.closest("a");
