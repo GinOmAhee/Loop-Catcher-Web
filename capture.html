@@ -1276,7 +1276,7 @@
     let documentCache = "";
     let hasUnsavedChanges = false;
     let isRenderingTabs = false;
-    let currentEditorMode = getCurrentEditorMode(); // or "notepad" as fallback
+    let currentEditorMode = localStorage.getItem("editorMode") || "document";
 
     async function initializeFirebase() {
       try {
