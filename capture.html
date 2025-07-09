@@ -1690,16 +1690,33 @@
 
       const editor = getActiveEditor();
       if (!editor) return;
-      tabs[activeTabIndex].content = editor.innerHTML.trim();
 
-      // Save full tabs array
-      localStorage.setItem('tabs', JSON.stringify(tabs));
-      localStorage.setItem('activeTabIndex', activeTabIndex);
-      localStorage.setItem('lastSaved', now.toISOString());
+      const mode = getVisibleEditorMode(); // or use currentEditorMode if accurate
+
+      // 💾 Save editor content into active tab
+      const content = editor.innerHTML.trim();
+      tabs[activeTabIndex].content = content;
+
+      // 🗂️ Cache by mode
+        if (mode === EditorModes.NOTEPAD) {
+        notepadCache = content;
+        localStorage.setItem("notepadContent", content);
+        console.log("✍️ Notepad cached:", notepadCache);
+      } else if (mode === EditorModes.DOCUMENT) {
+        documentCache = content;
+        localStorage.setItem("documentContent", content);
+        console.log("📄 Document cached:", documentCache);
+      } else {
+        console.warn("⛔ Unknown mode during autoSave:", mode);
+      }
+
+      // 💼 Save tab data and metadata
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      localStorage.setItem("activeTabIndex", activeTabIndex);
+      localStorage.setItem("lastSaved", now.toISOString());
 
       saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
-
-      hasUnsavedChanges = false; // Reset after save
+      hasUnsavedChanges = false;
     }
 
     window.addEventListener("beforeunload", (e) => {
@@ -2970,11 +2987,18 @@
 
     function cacheEditorContent() {
       const editor = getActiveEditor();
-      const id = editor?.id;
-        if (id === "notepadEditor") {
-          notepadCache = editor.innerHTML;
-        } else if (id === "documentEditor") {
-         documentCache = editor.innerHTML;
+      const mode = getVisibleEditorMode(); // or currentEditorMode if stable
+
+      const content = editor?.innerHTML || "";
+
+      if (mode === EditorModes.NOTEPAD) {
+        notepadCache = content;
+        console.log("✅ Saved Notepad Content:", content);
+      } else if (mode === EditorModes.DOCUMENT) {
+        documentCache = content;
+        console.log("✅ Saved Document Content:", content);
+      } else {
+        console.warn("⛔ Unknown editor mode during caching.");
       }
     }
 
@@ -3274,17 +3298,25 @@
     }
 
     function switchEditorMode(newMode) {
-      console.log("🔍 Calling applyEditorMode with:", newMode); // ← safe here
+      console.log("🔍 Calling applyEditorMode with:", newMode);
+
       const isDocVisible = document.getElementById("documentEditor")?.offsetParent !== null;
-      const currentMode = isDocVisible ? "document" : "notepad";
+      const currentMode = isDocVisible ? EditorModes.DOCUMENT : EditorModes.NOTEPAD;
 
       console.log("🔄 switchEditorMode called. New mode:", newMode);
-      if (newMode === currentMode) return;
 
-      applyEditorMode(newMode);
+      // 🧠 Reapply even if mode matches, in case layout froze or content needs refresh
+      if (newMode === currentMode && newMode === currentEditorMode) {
+        console.log("🧩 Already in requested mode, but reapplying for safety.");
+        applyEditorMode(newMode);
+      } else {
+        applyEditorMode(newMode);
+      }
+
+      // 💾 Update storage and UI regardless
       localStorage.setItem("editorMode", newMode);
       setActiveTabBar(newMode);
-      safeRenderTabs(); // or renderAllTabs() if you're using that
+      safeRenderTabs(); // or renderAllTabs(), depending on setup
     }
 
     function switchTab(originalIndex) {
