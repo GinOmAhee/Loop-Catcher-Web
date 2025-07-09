@@ -333,59 +333,24 @@
   }
 
   #mainEditor {
-    position: relative; /* Needed for marginBox to sit inside */
-    margin: 0rem auto; /* Add to match document mode */
+    position: relative;
     overflow-y: auto;
     outline: none;
-    transition: all 0.2s ease;
-  }
-
-  #mainEditor::before {
-    content: "";
-    position: absolute;
-    top: var(--paddingTop);
-    bottom: var(--paddingBottom);
-    left: var(--paddingLeft);
-    right: var(--paddingRight);
-    border: 1px dashed rgba(0, 0, 0, 0.1);
-    pointer-events: none;
-  }
-
-  /* Notepad Mode Styles */
-  #mainEditor[data-mode="notepad"] {
-    font-family: "Courier New", monospace;
-    font-size: 1rem;
-    padding: 0.9rem;
-    width: 50%;
-    margin: 0 auto;
-    border: none;
-    box-shadow: none;
-    background-color: #fffdf7;
-    height: 300px; /* ← Add your preferred height */
-    overflow-y: auto; /* Optional: adds scroll if content overflows */
   }
 
   #mainEditor[data-mode="document"] {
     width: 8.27in;
     min-height: 11.69in;
-    padding: 0;
-    margin: 0rem auto;
-    font-family: "Arial", sans-serif;
-    font-size: 1rem;
+    padding: 1in;
     border: 1px solid #ccc;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-    box-sizing: border-box;
-    width: 80%;
-    min-height: 400px;
-    max-height: calc(100vh - 5rem); /* or whatever fits below your tab bar */
+    background-color: white;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --btn-bg: #333;
-      --btn-text: #fff;
-    }
+  #mainEditor[data-mode="notepad"] {
+    padding: 1rem;
+    font-family: monospace;
+    height: 300px;
+    background-color: #fffdf7;
   }
 
   /* Generic inheritance-friendly rules */
@@ -432,16 +397,6 @@
     border: 1px solid currentColor;
   }
 
-  .page-break-line {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 0;
-    border-top: 1px dotted #aaa;
-    z-index: 1;
-    pointer-events: none;
-  }
-
   .margin-box {
     pointer-events: none;
     position: absolute;
@@ -450,8 +405,7 @@
     width: 100%;
     height: 100%;
     inset: 0;
-    z-index: 1;
-  }
+    z-index: 
 
   .margin-box::before {
     content: "";
@@ -460,7 +414,7 @@
     right: var(--margin-right, 1in);
     bottom: var(--margin-bottom, 1in);
     left: var(--margin-left, 1in);
-    border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
+    border: 2px dashed rgba(0, 0, 0, 0.2);
     z-index: 2;
   }
 
@@ -1106,7 +1060,8 @@
   
   <!-- 📝 Rich Text Editor -->
   <div id="mainEditor" contenteditable="true" data-mode="document">
-    <div id="marginBox" class="margin-box" tabindex="-1"></div>
+    <div class="margin-box" id="marginBox" tabindex="-1"></div>
+    <p>Start typing here...</p>
   </div>
 
   <!-- 📝 Main Editor (always visible) -->
