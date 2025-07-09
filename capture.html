@@ -2545,75 +2545,79 @@
         updateGrouping(preview); // ✅ Called right after DOM is painted
       });
 
-    // Ensure .preview-overlay exists first
-    const checkPreviewExists = setInterval(() => {
-      const preview = document.querySelector(".preview-overlay");
-      if (preview) return;
+      const checkPreviewExists = setInterval(() => {
+        const preview = document.querySelector(".preview-overlay");
+        if (preview) return;
+          clearInterval(checkPreviewExists); // Found it, stop checking
 
-      clearInterval(checkPreviewExists); // Found it, stop checking
+          firebase.auth().onAuthStateChanged(user => {
+            const documentEditor = document.getElementById("documentEditor");
+            const isDocumentVisible = !documentEditor?.classList.contains("hidden-editor");
+            const mode = isDocumentVisible ? "document" : "notepad";
 
-      firebase.auth().onAuthStateChanged(user => {
-        const documentEditor = document.getElementById("documentEditor");
-        const isDocumentVisible = !documentEditor?.classList.contains("hidden-editor");
-        const mode = isDocumentVisible ? "document" : "notepad";
-
-        if (user) {
-          console.log("✅ User is signed in:", user.email || user.uid);
-
-          if (mode === "document") {
-            updateDocumentPreview();
-          } else {
-            updateGrouping();
-          }
-        } else {
-          firebase.auth().signInAnonymously()
-            .then(() => {
-              console.log("✅ Signed in anonymously");
-
+            const runPreviewLogic = () => {
               if (mode === "document") {
                 updateDocumentPreview();
               } else {
                 updateGrouping();
               }
-            })
-            .catch(console.error);
-          }
-        });
-      }, 250);
+            };
 
-          const editor = getActiveEditor(); // ✅ consistent anchor
-          if (editor && editor.classList.contains('hidden-editor')) {
-            editor.classList.remove('hidden-editor');
-            editor.style.display = 'block';
-            editor.getBoundingClientRect(); // force reflow if needed
-            editor.classList.add('visible');
-          }
-
-            loadSavedText();
-
-            applyMoodTheme();
-
-            if (isDocMode) {
-              updateDocumentPreview();
+            if (user) {
+              console.log("✅ User is signed in:", user.email || user.uid);
+              runPreviewLogic();
             } else {
-              updateGrouping();
-            }
-
-            safeRenderTabs();
-          });
-
-          setInterval(autoSave, 30000);
-
-    // ✅ This was missing: it closes `setInterval` block
-    }, 200); // check every 200ms until preview is found
-
-          getActiveEditor().addEventListener("click", function (e) {
-            const el = e.target.closest("a");
-            if (el && el.href) {
-              e.preventDefault();
-              window.open(el.href, "_blank", "noopener");
+              firebase.auth().signInAnonymously()
+                .then(() => {
+                  console.log("✅ Signed in anonymously");
+                  runPreviewLogic();
+                })
+                .catch(console.error);
             }
           });
+        }, 200); // Check every 200ms
+
+      // Reveal editor if hidden
+      const editor = getActiveEditor();
+      if (editor && editor.classList.contains("hidden-editor")) {
+        editor.classList.remove("hidden-editor");
+        editor.style.display = "block";
+        editor.getBoundingClientRect(); // Trigger reflow
+        editor.classList.add("visible");
+      }
+
+      loadSavedText();
+      applyMoodTheme();
+
+      const isDocMode = document.getElementById("documentEditor")?.offsetParent !== null;
+      if (isDocMode) {
+        updateDocumentPreview();
+      } else {
+        updateGrouping();
+      }
+
+      safeRenderTabs();
+
+      // Activate link-click behavior inside editor
+      getActiveEditor().addEventListener("click", function (e) {
+        const el = e.target.closest("a");
+        if (el && el.href) {
+          e.preventDefault();
+          window.open(el.href, "_blank", "noopener");
+        }
+      });
+    });
+
+    // 🔄 Auto-save every 30 seconds
+    setInterval(autoSave, 30000);
+
+    getActiveEditor().addEventListener("click", function (e) {
+      const el = e.target.closest("a");
+      if (el && el.href) {
+        e.preventDefault();
+        window.open(el.href, "_blank", "noopener");
+      }
+    });
 
     function deleteSelectedNotes() {
       const checkboxes = document.querySelectorAll('.note-delete-checkbox:checked');
