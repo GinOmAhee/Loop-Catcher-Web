@@ -2173,15 +2173,23 @@
 
           mainEditor.addEventListener("input", () => {
             hasUnsavedChanges = true; // ✅ still needed
-
+            
+            const currentMode = getCurrentEditorMode();
             const text = mainEditor.innerText || "";
-            const newTitle = text.split("\n")[0]?.trim() || "Untitled";
 
-            console.log("Updating tab title to:", newTitle);
-            if (tabs[activeTabIndex]) {
-              tabs[activeTabIndex].title = newTitle;
-              localStorage.setItem("tabs", JSON.stringify(tabs));
-              safeRenderTabs();
+              if (currentMode === "document") {
+                const newTitle = text.split("\n")[0]?.trim() || "Untitled";
+
+                console.log("📝 Updating tab title (Document):", newTitle);
+
+              if (tabs[activeTabIndex]) {
+                tabs[activeTabIndex].title = newTitle;
+                localStorage.setItem("tabs", JSON.stringify(tabs));
+                safeRenderTabs();
+              }
+            } else {
+              // Optional: Add a debug log or skip entirely
+              console.log("✏️ Skipping title update in Notepad mode");
             }
           });
 
@@ -2490,6 +2498,8 @@
       // 💅 Apply mode-specific visual + structural updates
       applyEditorStyles(mode);
 
+      setActiveTabBar(mode);
+
       // 🧾 Update tab title based on mode
       updateTabTitleByMode(mode);
 
@@ -2616,8 +2626,8 @@
       modeToggleBtn?.addEventListener("click", () => {
         const currentMode = editor?.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
-        console.log("🌀 Toggling mode from", currentMode, "to", nextMode);
-        applyEditorMode(nextMode);
+        localStorage.setItem("editorMode", nextMode);
+        applyEditorMode(nextMode); // 👈 THIS is what was missing earlier
       });
 
       const savedMode = localStorage.getItem("editorMode") || "document";
@@ -2625,10 +2635,8 @@
     }
 
     function safeRenderTabs() {
-      if (abortIfRenaming()) return;
-
-      renderDocumentTabs();
-      renderNotepadTabs();
+      const mode = getCurrentEditorMode();
+      renderTabsForMode(mode);
     }
 
     function abortIfRenaming() {
@@ -2639,72 +2647,52 @@
       return false;
     }
 
-    function renderDocumentTabs() {
-      if (isRenamingTab) {
-        console.warn("⛔ Skipping renderDocumentTabs(): rename input is still active");
-        return;
-      }
-
-      const tabContainer = document.getElementById("documentTabContainer");
-      if (!tabContainer) return;
-
-      tabContainer.innerHTML = "";
-
-      const filteredTabs = tabs
-        .map((tab, i) => ({ ...tab, originalIndex: i }))
-        .filter(tab => tab.mode === "document");
-
-      if (ensureAtLeastOneTab(filteredTabs, "document")) return;
-
-      const savedIndex = getActiveTabIndex("notepad");
-      const isValidIndex = filteredTabs.some(tab => tab.originalIndex === savedIndex);
-      if (!isValidIndex && filteredTabs.length > 0) {
-        setActiveTabIndex("notepad", filteredTabs[0].originalIndex);
-
-        filteredTabs.forEach(tab => {
-          const tabBtn = createTabElement(tab);
-          tabContainer.appendChild(tabBtn);
-        });
-      }
-
-      tabContainer.appendChild(createAddTabButton("document"));
+    function getTabsByMode(mode) {
+      return tabs
+        .map((tab, index) => ({ ...tab, originalIndex: index }))
+        .filter(tab => tab.mode === mode);
     }
 
-    function renderNotepadTabs() {
+    function renderTabsForMode(mode) {
       if (isRenamingTab) {
-        console.warn("⛔ Skipping renderNotepadTabs(): rename input is still active");
+        console.warn(`⛔ Skipping renderTabsForMode("${mode}"): rename input is still active`);
         return;
       }
 
-      const tabContainer = document.getElementById("notepadTabContainer");
+      const containerId = mode === "notepad" ? "notepadTabContainer" : "documentTabContainer";
+      const tabContainer = document.getElementById(containerId);
       if (!tabContainer) return;
 
       tabContainer.innerHTML = "";
 
       const filteredTabs = tabs
         .map((tab, i) => ({ ...tab, originalIndex: i }))
-        .filter(tab => tab.mode === "notepad");
+        .filter(tab => tab.mode === mode);
 
-      if (ensureAtLeastOneTab(filteredTabs, "notepad")) return;
+      if (ensureAtLeastOneTab(filteredTabs, mode)) return;
 
-      const savedIndex = getActiveTabIndex("notepad");
+      const savedIndex = getActiveTabIndex(mode);
       const isValidIndex = filteredTabs.some(tab => tab.originalIndex === savedIndex);
       if (!isValidIndex && filteredTabs.length > 0) {
-        setActiveTabIndex("notepad", filteredTabs[0].originalIndex);
+        setActiveTabIndex(mode, filteredTabs[0].originalIndex);
       }
+
+      const activeIndexForMode = getActiveTabIndex(mode);
 
       filteredTabs.forEach(tab => {
         const tabBtn = createTabElement(tab);
         tabContainer.appendChild(tabBtn);
       });
 
-      tabContainer.appendChild(createAddTabButton("document"));
+      tabContainer.appendChild(createAddTabButton(mode));
     }
 
-    function createTabElement(tab) {
+    function createTabElement(tab, activeIndexForMode) {
       const tabBtn = document.createElement("div");
       tabBtn.className = "tab";
-      if (tab.originalIndex === activeTabIndex) tabBtn.classList.add("active");
+      if (tab.originalIndex === activeIndexForMode) {
+        tabBtn.classList.add("active");
+      }
 
       const tabLabel = document.createElement("span");
       tabLabel.className = "tab-label";
@@ -2778,20 +2766,21 @@
     }
 
     function renderAllTabs() {
-      renderDocumentTabs();
-      renderNotepadTabs();
+      renderTabsForMode("document");
+      renderTabsForMode("notepad");
     }
 
     function setActiveTabBar(mode) {
-      document.getElementById("documentTabContainer").classList.toggle("active", mode === "document");
-      document.getElementById("notepadTabContainer").classList.toggle("active", mode === "notepad");
+      console.log("🎯 applyEditorMode triggered with", mode);
+      const notepadContainer = document.getElementById("notepadTabContainer");
+      const documentContainer = document.getElementById("documentTabContainer");
 
       if (mode === "document") {
-        documentTabContainer.classList.add("active");
-        notepadTabContainer.classList.remove("active");
+        documentContainer.classList.add("active");
+        notepadContainer.classList.remove("active");
       } else {
-        notepadTabContainer.classList.add("active");
-        documentTabContainer.classList.remove("active");
+        notepadContainer.classList.add("active");
+        documentContainer.classList.remove("active");
       }
     }
 
@@ -2806,7 +2795,7 @@
       loadActiveTabContent();
     }
 
-    function switchTab(originalIndex) {
+   function switchTab(originalIndex) {
       if (typeof tabs[originalIndex] === "undefined") {
         console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
         return;
@@ -2827,9 +2816,7 @@
         if (!confirmSwitch) return;
       }
 
-      const mode = tabs[originalIndex]?.mode || "document";
-
-      setActiveTabIndex(tab.mode, originalIndex);
+      setActiveTabIndex(selectedTab.mode, originalIndex);
       loadActiveTabContent();
       safeRenderTabs();
     }
@@ -2869,16 +2856,13 @@
 
       // 🧠 Save new active tab index for this mode
       setActiveTabIndex(currentMode, remainingTabs[0].originalIndex);
+      activeTabIndex = remainingTabs[0].originalIndex;
 
       // 💾 Save tabs
       localStorage.setItem("tabs", JSON.stringify(tabs));
 
       // 🔁 Re-render tab bar
-      if (currentMode === "notepad") {
-        renderNotepadTabs();
-      } else {
-        renderDocumentTabs();
-      }
+      safeRenderTabs();
 
       // 📥 Load selected tab content
       loadActiveTabContent();
@@ -2929,8 +2913,8 @@
       // Title logic based on mode
       const title =
         mode === "notepad"
-        ? `🧠 ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
-        : "Untitled";
+        ? `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
+        : "📚 EditDocs";
 
       const newTab = {
         title,
@@ -2939,11 +2923,13 @@
       };
 
       tabs.push(newTab);
-      setActiveTabIndex(mode, tabs.length - 1);
+      const newIndex = tabs.length - 1;
+      setActiveTabIndex(mode, newIndex);
+      activeTabIndex = newIndex;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
       safeRenderTabs(); // 💡 Ensures rename-safe refresh
-      loadSavedText(); // ✅ Load blank or default content
+      loadActiveTabContent(); // ✅ Load blank or default content
     }
 
     function getCurrentEditorMode() {
