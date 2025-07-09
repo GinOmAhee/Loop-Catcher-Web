@@ -2189,29 +2189,6 @@
           }
 
           loadSavedText();
-
-          mainEditor.addEventListener("input", () => {
-            hasUnsavedChanges = true; // ✅ still needed
-            
-            const currentMode = getCurrentEditorMode();
-            const text = mainEditor.innerText || "";
-
-              if (currentMode === "document") {
-                const newTitle = text.split("\n")[0]?.trim() || "Untitled";
-
-                console.log("📝 Updating tab title (Document):", newTitle);
-
-              if (tabs[activeTabIndex]) {
-                tabs[activeTabIndex].title = newTitle;
-                localStorage.setItem("tabs", JSON.stringify(tabs));
-                safeRenderTabs();
-              }
-            } else {
-              // Optional: Add a debug log or skip entirely
-              console.log("✏️ Skipping title update in Notepad mode");
-            }
-          });
-
           applyMoodTheme();
           updateGrouping();
           safeRenderTabs();
@@ -2607,20 +2584,6 @@
       editor.style.paddingRight = `${right}px`;
     }
 
-    function updateTabTitleByMode(mode) {
-      if (!tabs[activeTabIndex]) return;
-
-      if (mode === "notepad") {
-        const now = new Date();
-        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-      } else if (mode === "document") {
-        const text = editor.innerText || "";
-        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
-      }
-
-      localStorage.setItem("tabs", JSON.stringify(tabs));
-    }
-
     function restoreEditorContent(mode) {
       const marginBox = document.getElementById("marginBox");
 
@@ -2917,9 +2880,6 @@
 
       editor.setAttribute("data-mode", mode);
       focusEditorSafely();
-
-       // 🧠 Safely update title after content + mode have landed
-       updateTabTitleByMode(mode);
     }
 
     function getTabContainer(mode) {
