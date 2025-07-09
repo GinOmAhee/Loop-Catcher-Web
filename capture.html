@@ -2348,9 +2348,14 @@
         dropdownSelect.selectedIndex = 0; // reset dropdown
       });
 
-      // Hide dropdown when clicking outside
       document.addEventListener("click", (e) => {
-        if (!fontSizeDropdown.contains(e.target) && !fontSizeBtn.contains(e.target)) {
+        const isClickInsideEditor = e.target.closest("#mainEditor");
+
+        if (
+          !fontSizeDropdown.contains(e.target) &&
+          !fontSizeBtn.contains(e.target) &&
+          !isClickInsideEditor
+        ) {
           fontSizeDropdown.classList.add("hidden");
         }
       });
@@ -2446,25 +2451,6 @@
         return;
       }
 
-      editor.addEventListener("focus", () => {
-        console.log("✅ Editor focused");
-      });
-      editor.addEventListener("blur", () => {
-        console.log("❌ Editor blurred");
-      });
-      editor.addEventListener("keydown", (e) => {
-        console.log("⌨️ Key pressed:", e.key);
-      });
-
-      editor.addEventListener("blur", (e) => {
-        e.preventDefault();
-        console.log("⛔ Editor blur blocked (test)");
-        setTimeout(() => {
-          editor.focus();
-          console.log("🛡️ Re-focused editor");
-        }, 10);
-      });
-
       marginBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         marginDropdown.classList.toggle("hidden");
@@ -2503,9 +2489,14 @@
         applyCustomMargins();
       });
 
-      // Close dropdown if clicked outside
       document.addEventListener("click", (e) => {
-        if (!marginDropdown.contains(e.target) && !marginBtn.contains(e.target)) {
+        const isClickInsideEditor = e.target.closest("#mainEditor");
+
+        if (
+          !marginDropdown.contains(e.target) &&
+          !marginBtn.contains(e.target) &&
+          !isClickInsideEditor
+        ) {
           marginDropdown.classList.add("hidden");
         }
       });
@@ -2991,12 +2982,15 @@
     }
 
     document.addEventListener("click", () => {
-      setTimeout(() => {
-        fontDropdown?.classList.add("hidden");
-        sizeDropdown?.classList.add("hidden");
-        textColorDropdown?.classList.add("hidden");
-        highlightDropdown?.classList.add("hidden");
-      }, 100); // this gives time for clicks inside dropdowns to register
+      const isClickInsideEditor = e.target.closest("#mainEditor");
+      if (!isClickInsideEditor) {
+        setTimeout(() => {
+          fontDropdown?.classList.add("hidden");
+          sizeDropdown?.classList.add("hidden");
+          textColorDropdown?.classList.add("hidden");
+          highlightDropdown?.classList.add("hidden");
+        }, 100); // this gives time for clicks inside dropdowns to register
+      }  
     });
 
   </script>
