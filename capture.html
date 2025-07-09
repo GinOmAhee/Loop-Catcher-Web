@@ -1099,6 +1099,12 @@
          </label>
        </div>
 
+  
+  <!-- 📝 Rich Text Editor -->
+  <div id="mainEditor" contenteditable="true" data-mode="document">
+    <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
+  </div>
+
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
      <div class="editor-area">
@@ -1207,10 +1213,6 @@
         </div>
       </div>
 
-        <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" contenteditable="true" data-mode="document">
-          <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
-        </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
