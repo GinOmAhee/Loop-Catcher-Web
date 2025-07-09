@@ -3257,7 +3257,7 @@
 
       const selectedTab = tabs[originalIndex];
 
-      const nextMode = currentMode === "notepad" ? "document" : "notepad";
+      const currentMode = getVisibleEditorMode();
       if (selectedMode !== currentMode) {
         switchEditorMode(selectedMode);
       }
@@ -3420,7 +3420,7 @@
 
     function setActiveTabIndex(index) {
       const mode = localStorage.getItem("editorMode") || "notepad";
-      localStorage.setItem(`activeTabIndex_${mode}`, index);
+      localStorage.setItem(`activeTabIndex_${currentMode}`, index);
     }
 
     const paperSizes = {
