@@ -2483,7 +2483,13 @@
 
 
     function getActiveEditorContent() {
-      return getActiveEditor().innerHTML; // or use .value if you're working in <textarea>
+      const editor = getActiveEditor();
+      if (editor) {
+        return editor.innerHTML.trim();
+      } else {
+        console.warn("⛔ Editor not found.");
+        return "";
+      }
     }
 
     function toggleItalic() {
@@ -2909,6 +2915,7 @@
 
     function applyEditorMode(mode) {
       console.log("🎯 applyEditorMode triggered with", mode);
+      localStorage.setItem("editorMode", mode); // 🔒 Save mode
       currentEditorMode = mode;
 
       cacheEditorContent();
@@ -2916,18 +2923,14 @@
       requestAnimationFrame(() => {
         toggleEditorVisibility(mode);
         applyEditorStyles(mode);
-        
-        safeRenderTabs();
+
+        const active = getActiveEditor();
         active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
         active.setAttribute("data-mode", mode);
 
+        safeRenderTabs();
+        setTimeout(() => active.focus(), 0);
       });
-
-      const active = getActiveEditor();
-      active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
-      active.setAttribute("data-mode", mode);
-
-      setTimeout(() => active.focus(), 0); // ✅ now 'active' is defined
     }
 
     function toggleEditorVisibility(targetMode) {
@@ -3089,9 +3092,9 @@
       const activeIndexForMode = getActiveTabIndex(mode);
 
       filteredTabs.forEach(tab => {
-        const tabBtn = createTabElement(tab);
+        const tabBtn = createTabElement(tab, activeIndexForMode); // <== ADD second arg!
         tabContainer.appendChild(tabBtn);
-      });
+      })
 
       tabContainer.appendChild(createAddTabButton(mode));
 
@@ -3268,7 +3271,11 @@
       }
 
       // 💾 Preserve edits from current tab
-      tabs[activeTabIndex].content = editor.innerHTML.trim();
+      if (currentMode === "document") {
+        tabs[activeTabIndex].documentContent = editor.innerHTML.trim();
+      } else {
+        tabs[activeTabIndex].notepadContent = editor.innerHTML.trim();
+      }
       console.log("🖊️ editor.innerHTML is now:", editor.innerHTML);
       setActiveTabIndex(selectedTab.mode, originalIndex);
       console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
@@ -3347,9 +3354,10 @@
       const currentMode = editor.getAttribute("data-mode");
       const mode = getVisibleEditorMode(); // 🔁 You only need this once
 
-      const content = (mode === "document")
-        ? activeTab.documentContent || ""
-        : activeTab.notepadContent || "";
+      const content =
+        mode === "document"
+          ? activeTab.documentContent ?? "<br>"
+          : activeTab.notepadContent ?? "<br>";
 
       // If the editor mode doesn't match, switch it and reload
       if (mode !== currentMode) {
@@ -3375,20 +3383,15 @@
     }
 
     function addNewTab(mode) {
-      const now = new Date();
-
-      // Title logic based on mode
-      const title =
-        mode === "notepad"
-        ? "🖊️ Scribs"
-        : "📄 Drafts";
-
-      const safeMode = mode === "notepad" ? "notepad" : "document"
-
+      const title = mode === "notepad" ? "🖊️ Scribs" : "📄 Drafts";
       const newTab = {
         title,
+        mode,
         notepadContent: mode === "notepad" ? "<br>" : "",
         documentContent: mode === "document" ? "<br>" : "",
+        tags: [],
+        resolved: false,
+        project: "📂 Unlabeled"
       };
 
       tabs.push(newTab);
@@ -3397,8 +3400,8 @@
       activeTabIndex = newIndex;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
-      safeRenderTabs(); // 💡 Ensures rename-safe refresh
-      loadActiveTabContent(); // ✅ Load blank or default content
+      safeRenderTabs();
+      loadActiveTabContent();
     }
 
     function ensureAtLeastOneTab(filteredTabs, mode) {
