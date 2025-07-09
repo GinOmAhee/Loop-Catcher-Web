@@ -3274,7 +3274,6 @@
       setActiveTabIndex(selectedTab.mode, originalIndex);
       console.log("📥 Loaded content for new tab:", tabs[activeTabIndex].content);
 
-      const currentMode = getVisibleEditorMode();
       loadActiveTabContent();
       
       safeRenderTabs();
