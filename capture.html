@@ -1278,7 +1278,7 @@
     let isRenderingTabs = false;
     let currentEditorMode = getCurrentEditorMode(); // or "notepad" as fallback
 
-    const currentMode = editorMode;
+   
     const marginBox = document.getElementById("marginBox"); // 💡 safe reference
 
     async function initializeFirebase() {
@@ -1388,7 +1388,7 @@
 
       const editor = getActiveEditor(); // ✅ use the helper safely
 
-      const defaultMode = localStorage.getItem("editorMode") || "notepad";
+      const defaultMode = localStorage.getItem("mode") || "notepad";
       toggleEditorVisibility(defaultMode); // 👈 shows correct editor on page load
 
       if (!editor) {
@@ -1399,10 +1399,10 @@
       console.log("✅ editor is:", editor);
 
       // ⬇️ NOW safe to call logic that depends on those elements
-      const savedMode = localStorage.getItem("editorMode") || "document";
+      const savedMode = localStorage.getItem("mode") || "document";
       switchEditorMode(savedMode);
 
-      const mode = localStorage.getItem("editorMode") || "document";
+      const mode = localStorage.getItem("mode") || "document";
       setActiveTabBar(mode);
 
       console.log("✅ editor is:", editor);
@@ -1752,7 +1752,7 @@
         );
         editorEl.innerHTML = content;
 
-        console.log("🎯 current mode from storage:", localStorage.getItem("editorMode"));
+        console.log("🎯 current mode from storage:", localStorage.getItem("mode"));
         applyEditorMode?.(mode); // ✅ restore mode (sets class + data-mode)
         safeRenderTabs();
 
@@ -1765,7 +1765,7 @@
         }];
         
         activeTabIndex = 0;
-        console.log("🎯 current mode from storage:", localStorage.getItem("editorMode"));
+        console.log("🎯 current mode from storage:", localStorage.getItem("mode"));
         applyEditorMode?.("document");
         safeRenderTabs();
       }
@@ -3298,7 +3298,7 @@
       }
 
       // 💾 Update storage and UI regardless
-      localStorage.setItem("editorMode", newMode);
+      localStorage.setItem("mode", newMode);
       safeRenderTabs(); // or renderAllTabs(), depending on setup
     }
 
@@ -3348,7 +3348,7 @@
     }
 
     function closeTab(index) {
-      const currentMode = localStorage.getItem("editorMode") || "document";
+      const currentMode = localStorage.getItem("mode") || "document";
       const tabBeingClosed = tabs[index];
 
       // 🚫 Prevent tab close during rename
@@ -3411,7 +3411,7 @@
 
       // If the editor mode doesn't match, switch it and reload
       if (mode !== currentMode) {
-        localStorage.setItem("editorMode", mode);
+        localStorage.setItem("document", mode);
         switchEditorMode(mode); // Will reload content itself
         return;
       }
