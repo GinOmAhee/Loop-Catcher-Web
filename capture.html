@@ -1441,7 +1441,11 @@
     });
 
     function maybeClosePreview(e) {
-      if (e.target.classList.contains("tab-rename-input")) return;
+      if (
+        e.target.classList.contains("tab-rename-input") ||
+        e.target.closest("#mainEditor")
+      ) return;
+
       if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
         preview.style.display = 'none';
       }
