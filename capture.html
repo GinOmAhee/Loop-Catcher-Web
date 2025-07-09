@@ -1247,8 +1247,12 @@
       </div>
 
         <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" contenteditable="true" data-mode="document">
-          <div class="margin-box" id="marginBox" contenteditable="true" tabindex="-1"></div>
+        <!-- Outer shell (layout only) -->
+        <div id="mainEditor" contenteditable="false">
+          <!-- Actual typing zone -->
+          <div id="editorContent" contenteditable="true"></div>
+          <!-- Margin visuals only -->
+          <div id="marginBox" class="margin-box" tabindex="-1"></div>
         </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
@@ -1268,13 +1272,17 @@
   <script>
     let isRenamingTab = false;
 
+    const contentZone = document.getElementById("editorContent");
+    contentZone.focus();
+
     let db = null;
 
     let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
 
     let toggleBtn;
     let saveStatus;
-    let editor, maineditor
+    let editor; 
+    let maineditor;
     let attachedFilesList;
     let groupedNotes;
     let fontBtn;
@@ -1384,8 +1392,8 @@
 
     window.addEventListener("DOMContentLoaded", () => {
 
-      editor = document.getElementById("mainEditor");      // your interactive zone
-      mainEditor = editor; // layout shell
+      editor = document.getElementById("editorContent");   // interactive typing zone
+      mainEditor = document.getElementById("mainEditor");  // layout shell
       toggleBtn = document.getElementById('previewToggle');
       saveStatus = document.getElementById('saveStatus');
       attachedFilesList = document.getElementById('attachedFilesList');
