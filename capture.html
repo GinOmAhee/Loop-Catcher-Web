@@ -2455,14 +2455,56 @@
       input.className = "inline-title-editor";
       input.dataset.timestamp = timestamp;
 
-      input.onblur = saveEditedTitle;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") input.blur();
-        if (e.key === "Escape") span.innerText = currentTitle; // revert
-      };
+      let originalTitle = currentTitle;
 
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") input.blur();
+          else if (e.key === "Escape") {
+            isRenamingTab = false;
+            renderAllTabs();
+          }
+        });
+
+        input.addEventListener("blur", (e) => {
+          const newTitle = e.target.value.trim();
+
+          if (newTitle === "") {
+            span.innerText = originalTitle;
+            return;
+          }
+
+          const isDuplicate = tabs.some(
+            (t) => t.title === newTitle && t.timestamp !== timestamp
+          );
+
+          if (isDuplicate) {
+            alert("⚠️ A tab with this title already exists.");
+            renderAllTabs(); // reset to avoid collision
+            return;
+          }
+
+          const tab = tabs.find((t) => t.timestamp === timestamp);
+          if (tab) {
+            tab.title = newTitle;
+            saveTabsToStorage(); // or Firebase if you're syncing
+          }
+
+          isRenamingTab = false;
+          renderAllTabs(); // update UI
+        });
+
+        // Prevent blur when clicking font dropdown (only if it shares DOM space)
+        fontSizeDropdown.addEventListener("mousedown", (e) => {
+        const tag = e.target.tagName;
+        if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
+          e.preventDefault();
+        }
+      });
+
+      // Swap span for input
       span.replaceWith(input);
       input.focus();
+      isRenamingTab = true;
     }
 
     function saveEditedTitle(e) {
