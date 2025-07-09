@@ -1290,7 +1290,31 @@
 
     let toggleBtn;
     let saveStatus;
-    let editor; 
+    
+
+    let editor = document.getElementById("editorContent");
+
+    if (!editor) {
+      console.warn("⚠️ editorContent not found. Creating a dummy fallback to prevent errors.");
+      editor = {
+        getAttribute: () => "document",
+        setAttribute: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        focus: () => {},
+        contains: () => false,
+        innerHTML: "",
+        classList: {
+          add: () => {},
+          remove: () => {},
+          contains: () => false,
+        },
+        style: {},
+        scrollTop: 0,
+        appendChild: () => {},
+      };
+    }
+
     let maineditor;
     let attachedFilesList;
     let groupedNotes;
