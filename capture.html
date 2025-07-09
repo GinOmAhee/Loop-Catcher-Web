@@ -2189,6 +2189,7 @@
           }
 
           loadSavedText();
+
           applyMoodTheme();
           updateGrouping();
           safeRenderTabs();
@@ -2625,14 +2626,6 @@
       ["notepad", "document"].forEach(mode => renderTabsForMode(mode));
     }
 
-    function abortIfRenaming() {
-      if (isRenamingTab) {
-        console.warn("⛔ Aborting: rename input is still active");
-        return true;
-      }
-      return false;
-    }
-
     function getTabsByMode(mode) {
       return tabs
         .map((tab, index) => ({ ...tab, originalIndex: index }))
@@ -2640,11 +2633,6 @@
     }
 
     function renderTabsForMode(mode) {
-      if (isRenamingTab) {
-        console.warn(`⛔ Skipping renderTabsForMode("${mode}"): rename input is still active`);
-        return;
-      }
-
       const containerId = mode === "notepad" ? "notepadTabContainer" : "documentTabContainer";
       const tabContainer = document.getElementById(containerId);
       if (!tabContainer) return;
