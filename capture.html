@@ -3356,14 +3356,14 @@
       const mode = getVisibleEditorMode(); // 🔁 You only need this once
 
       const content =
-        mode === "document"
-          ? activeTab.documentContent ?? "<br>"
-          : activeTab.notepadContent ?? "<br>";
+        const content = visibleMode === "document"
+          ? activeTab.documentContent || ""
+          : activeTab.notepadContent || "";
 
-      // If the editor mode doesn't match, switch it and reload
-      if (mode !== currentMode) {
-        localStorage.setItem("data-mode", mode);
-        switchEditorMode(mode); // Will reload content itself
+      
+      if (visibleMode !== currentMode) {
+        localStorage.setItem("data-mode", visibleMode);
+        switchEditorMode(visibleMode); // Will reload content itself
         return;
       }
 
