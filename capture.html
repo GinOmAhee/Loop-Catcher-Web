@@ -1465,7 +1465,8 @@
       document.addEventListener("click", (e) => {
         const clickedInsidePreview = preview.contains(e.target);
         const clickedToggle = previewToggle.contains(e.target);
-        const clickedInsideEditor = mainEditor.contains(e.target);
+        const clickedInsideEditor =
+          mainEditor.contains(e.target) || editor?.contains(e.target);
         const isRenaming = e.target.classList.contains("tab-rename-input");
 
         console.log("Preview auto-close triggered.");
@@ -1473,19 +1474,22 @@
         console.log("Clicked inside editor:", clickedInsideEditor);
         console.log("Editor was hidden:", mainEditor.classList.contains("hidden-editor"));
 
-        if (
-          preview.classList.contains("preview-visible") &&
-          !clickedInsidePreview &&
-          !clickedToggle &&
-          !clickedInsideEditor &&
-          !isRenaming
-        ) {
-         preview.classList.remove("preview-visible");
-         if (mainEditor.classList.contains("hidden-editor")) {
-           mainEditor.classList.remove("hidden-editor");
-         }
-        }
-      });
+        setTimeout(() => {
+
+          if (
+            preview.classList.contains("preview-visible") &&
+            !clickedInsidePreview &&
+            !clickedToggle &&
+            !clickedInsideEditor &&
+            !isRenaming
+          ) {
+            preview.classList.remove("preview-visible");
+            if (mainEditor.classList.contains("hidden-editor")) {
+              mainEditor.classList.remove("hidden-editor");
+            }
+          }
+        }, 50);
+      })
 
       fontBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -2799,7 +2803,8 @@
       modeToggleBtn = document.getElementById("modeToggleBtn");
 
       modeToggleBtn?.addEventListener("click", () => {
-        const currentMode = editorContent?.getAttribute("data-mode");
+        const editor = document.getElementById("editorContent");
+        const currentMode = editor?.getAttribute("data-mode") || "document";
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
         localStorage.setItem("editorMode", nextMode);
         applyEditorMode(nextMode); // 👈 THIS is what was missing earlier
