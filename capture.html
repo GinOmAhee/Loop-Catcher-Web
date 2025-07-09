@@ -2947,26 +2947,19 @@
       }
 
     function applyEditorMode(mode) {
-      if (currentEditorMode === mode) {
-        console.log("🧩 Already in requested mode, skipping apply.");
-        return;
-      }
+       console.log("🎯 applyEditorMode triggered with", mode);
+       currentEditorMode = mode;
 
-      console.log("🎯 applyEditorMode triggered with", mode);
-      currentEditorMode = mode;
+       cacheEditorContent();
+       toggleEditorVisibility(mode);
+       applyEditorStyles(mode);
 
-      cacheEditorContent();                    // Save current editor text
-      toggleEditorVisibility(mode);           // Show/hide correct editor
-      applyEditorStyles(mode);                // 👈 INSERT HERE ✅ update layout styles
+       const active = getActiveEditor();
+       safeRenderTabs();
+       active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
+       active.setAttribute("data-mode", mode);
 
-      const active = getActiveEditor();
-      console.log("👀 New active editor is:", active?.id);
-
-      safeRenderTabs();                       // Re-render UI tabs if needed
-      active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
-      active.setAttribute("data-mode", mode);
-
-      setTimeout(() => active.focus(), 0);    // Smooth refocus
+       setTimeout(() => active.focus(), 0);
     }
 
     function toggleEditorVisibility(targetMode) {
