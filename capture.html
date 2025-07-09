@@ -351,6 +351,7 @@
 
   #editorContent {
     position: relative;
+    background: white;
     z-index: 5;
   }
 
@@ -1432,18 +1433,29 @@
 
       console.log("✅ mainEditor is:", mainEditor);
 
-      editor.addEventListener("input", () => {
-        undoStack.push(editor.innerHTML);
-        redoStack = [];
+      if (editor) {
+        editor.addEventListener("click", function (e) {
+          const el = e.target.closest("a");
+          if (el && el.href) {
+            e.preventDefault();
+            window.open(el.href, "_blank", "noopener");
+          }
+        });
+      } else {
+        console.warn("⚠️ editor not found — skipping link click listener");
+      }
+        editor.addEventListener("input", () => {
+          undoStack.push(editor.innerHTML);
+          redoStack = [];
 
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          localStorage.setItem("capturedText", editor.innerHTML);
-          localStorage.setItem("lastSaved", new Date().toISOString());
-          updateGrouping();
-          saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
-        }, 1000);
-      });
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            localStorage.setItem("capturedText", editor.innerHTML);
+            localStorage.setItem("lastSaved", new Date().toISOString());
+            updateGrouping();
+            saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
+          }, 1000);
+        });
     
       previewToggle.addEventListener("click", (e) => {
         e.stopPropagation();
