@@ -3269,7 +3269,6 @@
       }
 
       // 💾 Preserve edits from current tab
-      const editor = getActiveEditor();
       tabs[activeTabIndex].content = editor.innerHTML.trim();
       console.log("🖊️ editor.innerHTML is now:", editor.innerHTML);
       setActiveTabIndex(selectedTab.mode, originalIndex);
