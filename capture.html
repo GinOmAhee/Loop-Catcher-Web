@@ -336,6 +336,7 @@
     position: relative;
     overflow: auto;
     min-height: 100%;
+    background-color: #fffdf7;
   }
 
   #mainEditor::before {
@@ -345,18 +346,18 @@
     bottom: var(--paddingBottom);
     left: var(--paddingLeft);
     right: var(--paddingRight);
-    border: 1px dashed rgba(0, 0, 0, 0.1);
+    border: 1px dashed rgba(166, 150, 150, 0.1);
     pointer-events: none;
   }
 
-  #editorContent {
+  #editor {
     position: relative;
     background: white;
     z-index: 5;
   }
 
   /* Notepad Mode Styles */
-  #editorContent[data-mode="notepad"] {
+  #editor[data-mode="notepad"] {
     font-family: "Courier New", monospace;
     position: relative;
     font-size: 1rem;
@@ -371,7 +372,7 @@
     z-index: 5;
   }
 
-  #editorContent[data-mode="document"] {
+  #editor[data-mode="document"] {
     position: relative;
     width: 8.27in;
     min-height: 11.69in;
