@@ -3401,8 +3401,8 @@
         ? activeTab.documentContent || ""
         : activeTab.notepadContent || "";
 
-      
-      if (visibleMode !== currentMode) {
+      const visibleMode = localStorage.getItem("editorMode") || "document";
+      if (visibleMode !== currentEditorMode) {
         localStorage.setItem("data-mode", visibleMode);
         switchEditorMode(visibleMode); // Will reload content itself
         return;
