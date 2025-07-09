@@ -1291,12 +1291,15 @@
     let toggleBtn;
     let saveStatus;
     
-
+    let maineditor;
     let editor = document.getElementById("editorContent");
 
-    if (!editor) {
-      console.warn("⚠️ editorContent not found. Creating a dummy fallback to prevent errors.");
-      editor = {
+    function getSafeElement(id) {
+      const el = document.getElementById(id);
+      if (el) return el;
+
+      console.warn(`⚠️ ${id} not found. Returning dummy element.`);
+      return {
         getAttribute: () => "document",
         setAttribute: () => {},
         addEventListener: () => {},
@@ -1315,7 +1318,7 @@
       };
     }
 
-    let maineditor;
+    
     let attachedFilesList;
     let groupedNotes;
     let fontBtn;
@@ -1425,7 +1428,6 @@
 
     window.addEventListener("DOMContentLoaded", () => {
 
-      editor = document.getElementById("editorContent");   // interactive typing zone
       mainEditor = document.getElementById("mainEditor");  // layout shell
       toggleBtn = document.getElementById('previewToggle');
       saveStatus = document.getElementById('saveStatus');
