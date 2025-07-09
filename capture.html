@@ -2589,27 +2589,7 @@
             editor.classList.add('visible');
           }
 
-          loadSavedText();
-
-          editor.addEventListener("input", () => {
-            hasUnsavedChanges = true;
-
-            const isDocMode = document.getElementById("documentEditor")?.offsetParent !== null;
-            const text = editor.innerText || "";
-
-            if (isDocMode) {
-              const newTitle = text.split("\n")[0]?.trim() || "Untitled";
-
-              console.log("📝 Updating tab title (Document):", newTitle);
-
-              if (tabs[activeTabIndex]) {
-                tabs[activeTabIndex].title = newTitle;
-                localStorage.setItem("tabs", JSON.stringify(tabs));
-                safeRenderTabs();
-              }
-            } else {
-              console.log("✏️ Skipping title update in Notepad mode");
-            }  
+            loadSavedText();
 
             applyMoodTheme();
 
@@ -3083,29 +3063,7 @@
       editor.style.paddingBottom = `${bottom}px`;
       editor.style.paddingLeft = `${left}px`;
       editor.style.paddingRight = `${right}px`;
-    }
-
-    function updateTabTitleByMode(mode = tabs[activeTabIndex]?.mode || "document") {
-      console.log("🧪 updateTabTitleByMode called with mode:", mode);
-      if (!tabs[activeTabIndex]) return;
-
-      const currentTitle = tabs[activeTabIndex].title?.trim();
-      const shouldOverwrite =
-        !currentTitle ||
-        currentTitle === "Untitled" 
-
-      console.log("🔎 Title before update:", currentTitle, "| shouldOverwrite:", shouldOverwrite);
-
-      if (!shouldOverwrite) return;
-
-      const now = new Date();
-      tabs[activeTabIndex].title =
-        mode === "notepad"
-          ? `🖊️ Scribs ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
-          : `📄 Drafts ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-
-      localStorage.setItem("tabs", JSON.stringify(tabs));
-    }  
+    } 
 
     function restoreEditorContent(mode) {
       const editor = getActiveEditor();
