@@ -3413,11 +3413,14 @@
     }
 
     function getActiveTabIndex(mode) {
-      return parseInt(localStorage.getItem(`activeTabIndex_${editorMode}`)) || 0;
+      const currentMode = mode || getCurrentEditorMode(); // fallback to stored mode
+      const activeIndex = localStorage.getItem(`activeTabIndex_${currentMode}`);
+      return parseInt(activeIndex, 10) || 0;
     }
 
-    function setActiveTabIndex(mode, index) {
-      localStorage.setItem(`activeTabIndex_${editorMode}`, index);
+    function setActiveTabIndex(index) {
+      const mode = localStorage.getItem("editorMode") || "notepad";
+      localStorage.setItem(`activeTabIndex_${mode}`, index);
     }
 
     const paperSizes = {
