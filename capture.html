@@ -499,53 +499,70 @@
   /* === TABS === */
   .tab-bar {
     display: flex;
-    flex-direction: column; /* ⬅️ THIS makes it vertical */
-    align-items: flex-start; /* Optional: align to left */
-    padding: .5rem .5rem 0.2rem 0.2rem;
+    flex-direction: row; /* ⬅️ CHANGED from column to row */
+    justify-content: space-between;
+    align-items: flex-end; /* Align bottom edge if tab heights vary */
+    padding: 0.5rem 0.5rem 0.2rem 0.2rem;
     margin-bottom: 0.5rem;
     border-bottom: 2px solid #ccc;
     position: sticky;
     top: 0;
-    min-height: 8rem;
+    min-height: 3rem;
     height: auto;
-    z-index: 10; /* Make sure it stays above other elements */
+    z-index: 10;
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
+    gap: 1rem; /* Optional: space between left/right tab zones */
   }
+
+  /* Mode container shared base */
   .mode-tab-container {
+    flex-shrink: 0; /* Prevent shrinking */
     display: flex;
-    gap: 3px;
     flex-wrap: wrap;
-    margin-bottom: 0.5rem;
+    gap: 3px;
+    max-height: 3rem; /* Adjust based on your needs */
+    white-space: nowrap; /* Keep tabs on one line */
+    flex: 1 1 0%;            /* evenly split width */
+    overflow: auto; /* Enable horizontal scrolling */
+    padding-bottom: 4px;
     opacity: 0.5;
     pointer-events: none;
     user-select: none;
     transition: opacity 0.2s ease;
   }
 
-  .document-tabs {
-    border-bottom: 2px solid #4169E1;
-    padding-bottom: 4px;
-    max-width: 75vw; /* ⛳ LIMIT how wide tabs can go */
-    scrollbar-width: thin;
-    scroll-behavior: smooth;
-    scrollbar-color: var(--tab-border) transparent;
-    overflow-x: auto; 
-    overflow-y: hidden;
-    padding-right: 4rem; /* leaves space for theme toggle */
+  .tab-bar {
+    max-height: 3.5rem; /* Adjust based on your needs */
+    display: flex;
   }
 
+  /* Active mode gets interactivity */
+  .mode-tab-container.active {
+    opacity: 1;
+    pointer-events: auto;
+    user-select: auto;
+  }
+
+  /* Notepad tabs (left-aligned) */
   .notepad-tabs {
     border-bottom: 2px dashed #FF69B4;
-    padding-bottom: 4px;
-    max-width: 75vw; /* ⛳ LIMIT how wide tabs can go */
+    justify-content: flex-start;
+    padding-right: 1rem;
+    -width: thin;
+    scroll-behavior: smooth;
+    scrollbar-color: var(--tab-border) transparent;
+  }
+
+  /* Document tabs (right-aligned) */
+  .document-tabs {
+    border-bottom: 2px solid #4169E1;
+    justify-content: flex-end;
+    padding-left: 1rem;
     scrollbar-width: thin;
     scroll-behavior: smooth;
     scrollbar-color: var(--tab-border) transparent;
-    overflow-x: auto; 
-    overflow-y: hidden;
-    padding-right: 4rem; /* leaves space for theme toggle */
   }
 
   .tab {
@@ -568,12 +585,6 @@
     color: var(--tab-text);
     border: 1px solid var(--tab-border);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-  }
-
-  .mode-tab-container.active {
-    opacity: 1;
-    pointer-events: auto;
-    user-select: auto;
   }
 
   .tab.add-tab {
@@ -941,12 +952,15 @@
 
   /* === THEME TOGGLE SWITCH === */
   .theme-toggle {
-    position: absolute;
-    top: 50%;
-    right: 1rem;
-    transform: translateY(-50%);
-    z-index: 10;
+    display: block;
+    position: sticky;
+    align-self: flex-end;
+    margin-left: 1rem;
+    margin-right: .2rem;
+    top: .3rem; /* just below your tab bar */
+    z-index: 9;
   }
+  
   .theme-toggle input {
     display: none;
   }
@@ -1064,14 +1078,6 @@
   <!-- Inside your existing .tab-bar -->
   <div class="tab-bar">
 
-    <!-- Theme toggle stays at top level -->
-    <div class="tab-theme-switch">
-      <label class="theme-toggle">
-        <input type="checkbox" id="themeSwitch" />
-        <span class="slider"></span>
-      </label>
-    </div>
-
     <!-- Document Mode Tabs -->
     <div id="documentTabContainer" class="tab-container mode-tab-container document-tabs">
       <!-- Document mode tabs will go here -->
@@ -1083,9 +1089,17 @@
     </div>
   </div>
 
+       <!-- Theme toggle stays at top level -->
+       <div class="tab-theme-switch">
+         <label class="theme-toggle">
+           <input type="checkbox" id="themeSwitch" />
+           <span class="slider"></span>
+         </label>
+       </div>
+
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
-    <div class="editor-area">
+     <div class="editor-area">
       <button id="previewToggle">☰</button>
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
@@ -2625,8 +2639,7 @@
     }
 
     function safeRenderTabs() {
-      const mode = getCurrentEditorMode();
-      renderTabsForMode(mode);
+      ["notepad", "document"].forEach(mode => renderTabsForMode(mode));
     }
 
     function abortIfRenaming() {
