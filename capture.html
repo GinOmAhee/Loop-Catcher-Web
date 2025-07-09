@@ -2159,11 +2159,17 @@
       console.log('Toggling preview visibility');
 
       const preview = document.querySelector(".preview-overlay");
-      const editor = document.getElementById("mainEditor");
-
+      const notepadEditor = document.getElementById("notepadEditor");
       const documentEditor = document.getElementById("documentEditor");
-      const mode = documentEditor?.style.display !== "none" ? "document" : "notepad";
+      const editor = getActiveEditor();
 
+      let mode = "document"; // fallback
+
+      if (notepadEditor && notepadEditor.offsetParent !== null) {
+         mode = "notepad";
+      } else if (documentEditor && documentEditor.offsetParent !== null) {
+       mode = "document";
+      }
 
       if (!preview || !editor) {
         console.warn("⚠️ Missing preview or editor reference");
