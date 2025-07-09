@@ -2446,6 +2446,16 @@
         return;
       }
 
+      editor.addEventListener("focus", () => {
+        console.log("✅ Editor focused");
+      });
+      editor.addEventListener("blur", () => {
+        console.log("❌ Editor blurred");
+      });
+      editor.addEventListener("keydown", (e) => {
+        console.log("⌨️ Key pressed:", e.key);
+      });
+
       marginBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         marginDropdown.classList.toggle("hidden");
