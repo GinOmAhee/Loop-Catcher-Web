@@ -3259,9 +3259,10 @@
       console.log("💾 Saving content before switch:", editor?.innerHTML);
 
       const selectedTab = tabs[originalIndex];
+      const selectedMode = selectedTab.mode; // ✅ define this!
 
-      if (selectedMode !== currentMode) {
-        switchEditorMode(tab.mode);
+      if (selectedMode !== currentEditorMode) {
+        switchEditorMode(selectedMode);
       }
       
       // If unsaved changes exist in current tab, prompt user (optional enhancement)
