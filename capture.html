@@ -2938,19 +2938,23 @@
     });
 
     function getVisibleEditorMode() {
-      const isNotepadVisible = !document.getElementById("notepadEditor")?.classList.contains("hidden-editor");
-      const isDocumentVisible = !document.getElementById("documentEditor")?.classList.contains("hidden-editor");
+      const notepadVisible = document.getElementById("notepadEditor")?.offsetParent !== null;
+      const documentVisible = document.getElementById("documentEditor")?.offsetParent !== null;
 
-      if (isNotepadVisible) return "notepad";
-      if (isDocumentVisible) return "document";
-        return "document"; // default fallback
-      }
+      if (notepadVisible && !documentVisible) return "notepad";
+      if (documentVisible && !notepadVisible) return "document";
+
+      console.warn("⚠️ Ambiguous visibility state. Assuming 'document'");
+      return "document";
+    }
 
     function applyEditorMode(mode) {
        console.log("🎯 applyEditorMode triggered with", mode);
        currentEditorMode = mode;
 
        cacheEditorContent();
+
+       requestAnimationFrame(() => {
        toggleEditorVisibility(mode);
        applyEditorStyles(mode);
 
