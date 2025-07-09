@@ -2949,20 +2949,20 @@
     }
 
     function applyEditorMode(mode) {
-       console.log("🎯 applyEditorMode triggered with", mode);
-       currentEditorMode = mode;
+      console.log("🎯 applyEditorMode triggered with", mode);
+      currentEditorMode = mode;
 
-       cacheEditorContent();
+      cacheEditorContent();
 
-       requestAnimationFrame(() => {
-       toggleEditorVisibility(mode);
-       applyEditorStyles(mode);
+      requestAnimationFrame(() => {
+        toggleEditorVisibility(mode);
+        applyEditorStyles(mode);
 
-       const active = getActiveEditor();
-       safeRenderTabs();
-       active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
-       active.setAttribute("data-mode", mode);
-
+        const active = getActiveEditor();
+        safeRenderTabs();
+        active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
+        active.setAttribute("data-mode", mode);
+      });
        setTimeout(() => active.focus(), 0);
     }
 
