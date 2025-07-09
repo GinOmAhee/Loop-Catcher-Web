@@ -1728,6 +1728,7 @@
         );
         editorEl.innerHTML = content;
 
+        console.log("🎯 current mode from storage:", localStorage.getItem("editorMode"));
         applyEditorMode?.(mode); // ✅ restore mode (sets class + data-mode)
         safeRenderTabs();
 
@@ -1735,6 +1736,7 @@
         // ✅ First-time fallback
         tabs = [{ title: "Note 1", content: "", mode: "document" }];
         activeTabIndex = 0;
+        console.log("🎯 current mode from storage:", localStorage.getItem("editorMode"));
         applyEditorMode?.("document");
         safeRenderTabs();
       }
@@ -2928,26 +2930,26 @@
       }
 
     function applyEditorMode(mode) {
-      const notepad = document.getElementById("notepadEditor");
-      const documentEd = document.getElementById("documentEditor");
-
-      if (mode === "notepad") {
-        notepad.classList.remove("hidden-editor");
-        notepad.style.display = "block";
-
-        documentEd.classList.add("hidden-editor");
-        documentEd.style.display = "none";
-      } else {
-        documentEd.classList.remove("hidden-editor");
-        documentEd.style.display = "block";
-
-        notepad.classList.add("hidden-editor");
-        notepad.style.display = "none";
+      if (currentEditorMode === mode) {
+        console.log("🧩 Already in requested mode, skipping apply.");
+        return;
       }
 
       console.log("🎯 applyEditorMode triggered with", mode);
-      console.log("📺 notepadEditor display:", notepad.style.display);
-      console.log("📺 documentEditor display:", documentEd.style.display);
+      currentEditorMode = mode;
+
+      cacheEditorContent();                    // Save current editor text
+      toggleEditorVisibility(mode);           // Show/hide correct editor
+      applyEditorStyles(mode);                // 👈 INSERT HERE ✅ update layout styles
+
+      const active = getActiveEditor();
+      console.log("👀 New active editor is:", active?.id);
+
+      safeRenderTabs();                       // Re-render UI tabs if needed
+      active.innerHTML = (mode === "notepad" ? notepadCache : documentCache) || "";
+      active.setAttribute("data-mode", mode);
+
+      setTimeout(() => active.focus(), 0);    // Smooth refocus
     }
 
     function toggleEditorVisibility(targetMode) {
@@ -3087,12 +3089,12 @@
 
       modeToggleBtn?.addEventListener("click", () => {
         console.log("🎯 Toggle button clicked");
-        const currentMode = getVisibleEditorMode(); // ✅ not localStorage
-        const nextMode = currentMode === "notepad" ? "document" : "notepad";
+
+        const currentMode = getVisibleEditorMode(); // ✅ detect current
+        const nextMode = currentMode === "notepad" ? "document" : "notepad"; // ✅ switch target
         console.log("🌀 Requesting mode switch to:", nextMode);
 
-        const savedMode = localStorage.getItem("editorMode") || "document";
-        applyEditorMode(savedMode);
+        switchEditorMode(nextMode); // ✅ use correct target mode
       });
     }
 
