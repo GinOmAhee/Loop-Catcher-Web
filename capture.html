@@ -594,7 +594,7 @@
     pointer-events: auto;
   }
 
-  .preview-visible {
+  .preview-overlay.preview-visible {
     display: flex !important;
   }
 
@@ -2184,8 +2184,9 @@
     function togglePreview() {
       console.log('🌀 Toggling preview visibility');
 
-      const preview = document.querySelector(".preview-overlay");
-      const mode = getCurrentEditorMode?.() || "document";
+      const activeSuite = document.querySelector('.suite.active');
+      const preview = activeSuite?.querySelector('.preview-overlay');
+      const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
       const mainEditor = document.getElementById("mainEditor");
       const marginBox = document.getElementById("marginBox");
 
@@ -2198,9 +2199,8 @@
 
       const toggleBtn = preview?.closest('.suite')?.querySelector('.toggle-preview-btn');
         if (toggleBtn) {
-          toggleBtn.textContent = isVisible ? '✖ Close' : '🗂 View All';
+          toggleBtn.textContent = isVisible ? '✖ Close' : '☰';
         }
-
       if (isVisible) {
         try {
           if (mode === "notepad" || mode === "note") {
