@@ -2029,7 +2029,6 @@
 
       tabs[activeTabIndex].title = titleLine;
       localStorage.setItem("tabs", JSON.stringify(tabs));
-      safeRenderTabs();
       document.title = titleLine;
     }
 
@@ -2380,7 +2379,6 @@
           if (tabs[activeTabIndex]) {
             tabs[activeTabIndex].title = newTitle;
             localStorage.setItem("tabs", JSON.stringify(tabs));
-            safeRenderTabs();
             console.log("📝 Tab title updated:", newTitle);
           }
         } else {
@@ -2390,7 +2388,6 @@
 
       applyMoodTheme();
       updateGrouping();
-      safeRenderTabs();
       setInterval(autoSave, 30000); // Auto-save every 30s
      });
     };
