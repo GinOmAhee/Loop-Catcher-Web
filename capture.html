@@ -898,6 +898,30 @@
     box-shadow: inset 0 -1px 0 hotpink;
   }
 
+  .emoji-mood {
+    display: inline-block;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.emoji-mood:hover {
+  content: "🤔😊";
+  transform: scale(1.2) rotate(3deg);
+}
+
+/* Emoji swap using pseudo-element */
+.emoji-mood::after {
+  content: "🤔😠"; /* default = pouty */
+  display: inline-block;
+  transition: content 0.3s ease;
+}
+
+.emoji-mood:hover::after {
+  content: "🤔😍"; /* smiles when hovered */
+}
+
+
   </style>
 </head>
 <body>
@@ -1145,8 +1169,10 @@
   <div class="save-time" id="saveStatus"></div>
 
   <!-- ===== SIDE NOTES PANEL ===== -->
-  <div id="sideNotesPanel" class="side-notes-panel">
-    <h3>💡 Side Note</h3>
+  <h3 class="side-note-title">
+    <span class="emoji-mood" title="Waiting for your brilliance…">🤔😍</span>
+    Side Thoughts
+  </h3>
     <textarea id="sideNoteInput" placeholder="Type your idea without breaking flow..."></textarea>
     <button onclick="saveSideNote()">Save</button>
     <div id="savedSideNotes"></div>
