@@ -1385,6 +1385,10 @@
       hasUnsavedChanges = true;
     }
 
+    function getCurrentEditorMode() {
+      return localStorage.getItem("editorMode") || "document";
+    }
+
     function getMarginBox() {
       return document.querySelector('#docSuite .margin-box');
     }
