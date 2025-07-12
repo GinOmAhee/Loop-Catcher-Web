@@ -551,25 +551,22 @@
     transition: background 0.3s ease, color 0.3s ease;
   }
 
-  .controls {
+  .controls,
+  .format-toolbar {
     display: flex;
-    gap: 1rem;
-    margin-top: .9rem;
+    gap: 0.5rem;
     align-items: center;
-    padding: 0.5rem
+    justify-content: center; /* ⬅️ center everything horizontally */
+    flex-wrap: wrap; /* ✅ lets buttons wrap on smaller screens */
+    margin-bottom: 1rem;
   }
-  .controls button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+
 
   .save-time {
     margin-top: 1rem;
     font-size: 0.9rem;
     color: #666;
+    align-items: center;
   }
 
   /* === PREVIEW PANEL === */
@@ -2818,7 +2815,7 @@
         switchToDoc.click();
       }
     });
-    
+
   </script>
 
  </body>
