@@ -896,8 +896,8 @@
   
   <!-- ========= MODE SWITCHER UI ========= -->
   <div id="modeSwitcher" class="mode-switcher-bar">
-    <button id="switchToDoc" class="mode-btn active">📄 Document Mode</button>
-    <button id="switchToNote" class="mode-btn">🧠 Note Mode</button>
+    <button id="switchToDoc" class="mode-btn active">📚 EditDoc</button>
+    <button id="switchToNote" class="mode-btn">✏️ Scribble</button>
   </div>
 
   <!-- =========  DOCUMENT SUITE  ========= -->
@@ -1335,7 +1335,7 @@
         document.addEventListener('click', e => {
           if (!preview.contains(e.target) && !toggle.contains(e.target)) {
             preview.classList.remove('active');
-            toggle.textContent = '🗂 View All';
+            toggle.textContent = '☰';
           }
         });
       });
