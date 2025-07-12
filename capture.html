@@ -1074,7 +1074,7 @@
         </div>
 
         <div id="groupedNotes" class="groupedNotes"></div>
-        
+
         <div class="preview-sortbar bottom-searchbar">
           <div class="search-wrapper">
             <input type="text" class="noteSearchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
@@ -1143,6 +1143,15 @@
     let notepadCache = "";
     let documentCache = "";
     let hasUnsavedChanges = false;
+
+    const currentMode = getCurrentEditorMode(); // "document" or "notepad"
+    const groupedNotes = document.getElementById("groupedNotes");
+
+    const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+    const notesForMode = notes.filter(n => (n.mode || "document") === currentMode);
+
+    // Then render notesForMode inside groupedNotes
+
 
     const marginBox = document.getElementById("marginBox"); // 💡 safe reference
     mainEditor = document.getElementById("docEditor");
@@ -1995,6 +2004,21 @@
       localStorage.setItem("tabs", JSON.stringify(tabs));
       safeRenderTabs();
       document.title = titleLine;
+    }
+
+    function switchEditorMode(mode) {
+      const docEditor = document.getElementById("docEditor");
+      const noteEditor = document.getElementById("noteEditor");
+
+      if (mode === "document") {
+        docEditor.style.display = "block";
+        noteEditor.style.display = "none";
+      } else if (mode === "notepad") {
+        docEditor.style.display = "none";
+        noteEditor.style.display = "block";
+      }
+
+      localStorage.setItem("editorMode", mode);
     }
 
     function escapeHTML(text) {
