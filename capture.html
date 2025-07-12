@@ -294,6 +294,14 @@
 
   /* === EDITOR & INPUT === */
 
+  .suite {
+    display: none;
+  }
+
+  .suite.active {
+    display: block;
+  }
+
   #docEditor {
     width: 8.27in;
     min-height: 11.69in;
@@ -2771,6 +2779,47 @@
     });
 
   </script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const docSuite = document.getElementById("docSuite");
+      const noteSuite = document.getElementById("noteSuite");
+      const switchToDoc = document.getElementById("switchToDoc");
+      const switchToNote = document.getElementById("switchToNote");
+
+      // Default state: show docSuite, hide noteSuite
+      docSuite.classList.add("active");
+      noteSuite.classList.remove("active");
+
+      // Click handler for Document Mode
+      switchToDoc.addEventListener("click", () => {
+        docSuite.classList.add("active");
+        noteSuite.classList.remove("active");
+
+        switchToDoc.classList.add("active");
+        switchToNote.classList.remove("active");
+
+        localStorage.setItem("editorMode", "document");
+      });
+
+      // Click handler for Note Mode
+      switchToNote.addEventListener("click", () => {
+        noteSuite.classList.add("active");
+        docSuite.classList.remove("active");
+
+        switchToNote.classList.add("active");
+        switchToDoc.classList.remove("active");
+
+        localStorage.setItem("editorMode", "notepad");
+      });
+
+      // Auto-apply last opened mode
+      const lastMode = localStorage.getItem("editorMode");
+      if (lastMode === "notepad") {
+        switchToNote.click();
+      } else {
+        switchToDoc.click();
+      }
+    });
 
  </body>
 </html>
