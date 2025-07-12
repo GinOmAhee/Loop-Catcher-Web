@@ -241,22 +241,6 @@
     color: #ddd; /* or #f1f1f1 if you want max contrast */
   }
 
-  #modeToggleBtn {
-    background: #f1f1f1;
-    color: #333;
-    border: 1px solid #ccc;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  body.dark-mode #modeToggleBtn {
-    background: #222;
-    color: #eee;
-    border: 1px solid #555;
-  }
-
   /* === THEME CLASSES === */
   .theme-calm {
     --tab-bg: #dceefb;
@@ -313,24 +297,6 @@
   }
 
   /* === EDITOR & INPUT === */
-  #modeToggleBtn {
-    position: fixed;
-    bottom: 1rem;
-    right: 2rem;
-    z-index: 1000;
-    background: #fff;
-    border: 1px solid #ccc;
-    padding: 0.5rem 1rem;
-    border-radius: 30px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  #modeToggleBtn {
-    background: var(--btn-bg, #f0f0f0);
-    color: var(--btn-text, #000);
-  }
 
   #mainEditor {
     position: relative;
@@ -347,36 +313,6 @@
     right: var(--paddingRight);
     border: 1px dashed rgba(0, 0, 0, 0.1);
     pointer-events: none;
-  }
-
-  /* Notepad Mode Styles */
-  #mainEditor[data-mode="notepad"] {
-    font-family: "Courier New", monospace;
-    font-size: 1rem;
-    padding: 0.9rem;
-    width: 50%;
-    margin: 0 auto;
-    border: none;
-    box-shadow: none;
-    background-color: #fffdf7;
-    height: 300px; /* ← Add your preferred height */
-    overflow-y: auto; /* Optional: adds scroll if content overflows */
-  }
-
-  #mainEditor[data-mode="document"] {
-    width: 8.27in;
-    min-height: 11.69in;
-    padding: 0;
-    margin: 0rem auto;
-    font-family: "Arial", sans-serif;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-    box-sizing: border-box;
-    width: 80%;
-    min-height: 400px;
-    max-height: calc(100vh - 5rem); /* or whatever fits below your tab bar */
   }
 
   @media (prefers-color-scheme: dark) {
@@ -504,169 +440,54 @@
     box-sizing: border-box;
   }
 
-  /* === TABS === */
-  .tab-bar {
+  .mode-switcher-bar {
     display: flex;
-    flex-direction: row; /* ⬅️ CHANGED from column to row */
-    justify-content: space-between;
-    align-items: flex-end; /* Align bottom edge if tab heights vary */
-    padding: 0.5rem 0.5rem 0.2rem 0.2rem;
-    margin-bottom: 0.5rem;
-    border-bottom: 2px solid #ccc;
-    position: sticky;
-    top: 0;
-    min-height: 3rem;
-    height: auto;
-    z-index: 10;
-    background-color: var(--tab-bg);
-    border-color: var(--tab-border);
-    transition: background-color 0.3s ease;
-    gap: 1rem; /* Optional: space between left/right tab zones */
-  }
-
-  /* Mode container shared base */
-  .mode-tab-container {
-    flex-shrink: 0; /* Prevent shrinking */
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px;
-    max-height: 3rem; /* Adjust based on your needs */
-    white-space: nowrap; /* Keep tabs on one line */
-    flex: 1 1 0%;            /* evenly split width */
-    overflow: auto; /* Enable horizontal scrolling */
-    padding-bottom: 4px;
-    opacity: 0.5;
-    pointer-events: none;
-    user-select: none;
-    transition: opacity 0.2s ease;
-  }
-
-  .tab-bar {
-    max-height: 3.5rem; /* Adjust based on your needs */
-    display: flex;
-  }
-
-  /* Active mode gets interactivity */
-  .mode-tab-container.active {
-    opacity: 1;
-    pointer-events: auto;
-    user-select: auto;
-  }
-
-  /* Notepad tabs (left-aligned) */
-  .notepad-tabs {
-    border-bottom: 2px dashed #FF69B4;
-    justify-content: flex-start;
-    padding-right: 1rem;
-    -width: thin;
-    scroll-behavior: smooth;
-    scrollbar-color: var(--tab-border) transparent;
-  }
-
-  /* Document tabs (right-aligned) */
-  .document-tabs {
-    border-bottom: 2px solid #4169E1;
-    justify-content: flex-end;
-    padding-left: 1rem;
-    scrollbar-width: thin;
-    scroll-behavior: smooth;
-    scrollbar-color: var(--tab-border) transparent;
-  }
-
-  .tab {
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 3rem; /* ← this creates space between label & close button */
-    min-width: 150px;
-    max-width: 150px;
-    width: 200px; /* optional for clarity */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    padding: 0.3rem 1rem;
-    margin-right: 0px;
-    border-radius: 8px 8px 0 0;
-    font-weight: 500;
-    cursor: pointer;
-    background-color: var(--tab-bg);
-    color: var(--tab-text);
-    border: 1px solid var(--tab-border);
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-  }
-
-  .tab.add-tab {
-    flex-shrink: 0;
-    flex-grow: 0;
-    display: inline-flex;
-    min-width: auto; /* remove that 80px minimum */
-    width: 2.2rem;    /* small square size */
-    padding: 0.4rem;
     justify-content: center;
-    font-size: 1.2rem;
-    font-weight: 600
-    border-radius: 8px 8px 0 0;
+    gap: 1rem;
+    padding: 0.5rem;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .mode-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #e0e0e0;
     cursor: pointer;
-    background-color: var(--tab-bg);
-    color: var(--tab-text);
-    border: 1px solid var(--tab-border);
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-  }
-    
-  .tab.add-tab:hover {
-    background-color: var(--tab-hover);
-    border-color: var(--tab-border);
-  }
-
-  .tab:hover {
-    background-color: var(--tab-hover);
-  }
-
-  .tab.active {
-    background-color: var(--tab-active-bg);
-  }
-
-  body:not(.dark-theme) .tab-rename-input {
-    background: lightgoldenrodyellow;
-    border: 2px dashed red;
-    position: relative;
-    z-index: 9999;
-    display: block;
-  }
-
-  .tab-label {
-    flex-grow: 0 0 auto;
-    display: inline-block;
-    max-width: 145px; /* or whatever size fits your layout */
-    background: var(--tab-bg, #e0e0e0);
     border-radius: 6px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: middle;
-    pointer-events: auto !important;
-    user-select: text !important;
-    cursor: pointer;
-    padding: 0.4rem 0.8rem;
-    
+    font-weight: bold;
   }
 
-  .tab-close-btn {
-    flex-shrink: 0;
-    all: unset;
-    font-size: 0.85rem;
-    margin-left: 6px;
-    padding: 2px 6px;
-    line-height: 1;
-    border-radius: 4px;
-    background: transparent;
-    color: var(--tab-text);
-    cursor: pointer;
-    transition: background 0.2s ease;
+  .mode-btn.active {
+    background-color: #4caf50;
+    color: white;
   }
 
-  .tab button:hover {
-    background: rgba(255, 255, 255, 0.1);
+  .side-notes-panel {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    width: 250px;
+    background: #fff8dc;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+  }
+
+  .side-notes-panel textarea {
+    width: 100%;
+    height: 80px;
+    margin-bottom: 0.5rem;
+  }
+
+  .side-note-entry {
+    background: #fafafa;
+    border-left: 4px solid #ffcc00;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
   }
 
   /* === TOOLBAR & CONTROLS === */
@@ -1065,89 +886,26 @@
   </style>
 </head>
 <body>
-
-  <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
-  <div class="preview-overlay" id="preview">
-    <div class="preview-top">
-      <a href="holdingbay.html">🔄 Holding Bay</a>
-      <a href="actnow.html">🚀 Act Now</a>
-      <a href="buildmomentum.html">🌿 Build Momentum</a>
-      <a href="worthitlater.html">⏳ Worth It Later</a>
-      <a href="parkedpotential.html">📦 Parked Potential</a>
-    </div>
-
-    <div class="preview-middle">
-      <!-- 1. Top: Group selector -->
-      <div class="preview-sortbar">
-        <span title="Group Notes">📂</span>
-        <select id="groupSelector" onchange="updateGrouping()">
-          <option value="date">Date</option>
-          <option value="title">Title</option>
-          <option value="project">Project</option>
-          <option value="unresolved">Unresolved Ideas</option>
-          <option value="forgotten">Forgotten Ideas</option>
-        </select>
-      </div>
-
-      <!-- 2. Scrollable notes area -->
-      <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
-
-      <!-- 3. Bottom: search input anchored in its own bar -->
-      <div class="preview-sortbar bottom-searchbar">
-        <div class="search-wrapper">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="🔍 Search notes..."
-            oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
-          <select id="searchScope" onchange="updateGrouping()" ...>
-            <option value="group">Grouped</option>
-            <option value="all">Search All</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- 4. Very bottom: settings/profile links -->
-      <div class="preview-settings">
-        <a href="settings.html">⚙️ Settings</a>
-        <a href="profile.html">👤 Profile</a>
-      </div>
-
-    </div>
+  
+  <!-- ========= MODE SWITCHER UI ========= -->
+  <div id="modeSwitcher" class="mode-switcher-bar">
+    <button id="switchToDoc" class="mode-btn active">📄 Document Mode</button>
+    <button id="switchToNote" class="mode-btn">🧠 Note Mode</button>
   </div>
 
-  <!-- Inside your existing .tab-bar -->
-  <div class="tab-bar">
-
-    <!-- Document Mode Tabs -->
-    <div id="documentTabContainer" class="tab-container mode-tab-container document-tabs">
-      <!-- Document mode tabs will go here -->
+  <!-- =========  DOCUMENT SUITE  ========= -->
+  <div id="docSuite" class="suite active">
+    <div class="tab-bar">
+      <div id="documentTabContainer" class="tab-container document-tabs"></div>
     </div>
 
-    <!-- Notepad Mode Tabs -->
-    <div id="notepadTabContainer" class="tab-container mode-tab-container notepad-tabs">
-    <!-- Notepad mode tabs will go here -->
+    <div class="controls">
+      <button onclick="saveText()" title="Save">💾</button>
+      <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
+      <button id="printBtn" title="Print Note">🖨️</button>
     </div>
-  </div>
 
-  <!-- Theme toggle stays at top level -->
-  <div class="dark-theme-switch">
-     <label class="theme-toggle">
-       <input type="checkbox" id="themeSwitch" />
-       <span class="slider"></span>
-     </label>
-  </div>
-
-  <!-- 📝 Main Editor (always visible) -->
-  <div class="main-container">
-     <div class="editor-area">
-      <button id="previewToggle">☰</button>
-      <div class="controls">
-       <button onclick="saveText()" title="Save">💾</button>
-       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
-       <button id="printBtn" title="Print Note">🖨️</button>
-      </div>
-      <div id="toolbar">
+    <div id="toolbar">
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
 
@@ -1242,23 +1000,144 @@
           <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
         </div>
 
-          <button onclick="removeFormatting()">🚫</button>
+        <button onclick="removeFormatting()">🚫</button>
         </div>
       </div>
-
-        <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" contenteditable="true" data-mode="document">
-          <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
-        </div>
-
-      <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
 
       <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
 
       <div id="attachedFilesList"></div>
-      <div class="save-time" id="saveStatus"></div>
 
+
+    <div class="main-container">
+      <div class="editor-area">
+        <!-- 🧭 Preview Toggle Button -->
+        <button class="toggle-preview-btn" onclick="togglePreview('doc')">🗂 View All</button>
+
+        <div id="docEditor" class="editor document-mode" contenteditable="true">
+          <div id="marginBox" class="margin-box" contenteditable="false" tabindex="-1"></div>
+        </div>
+      </div>
     </div>
+
+    <!-- 📋 Preview Overlay -->
+    <div id="docPreview" class="preview-overlay">
+      <div class="preview-top">
+        <a href="holdingbay.html">🔄 Holding Bay</a>
+        <a href="actnow.html">🚀 Act Now</a>
+        <a href="buildmomentum.html">🌿 Build Momentum</a>
+        <a href="worthitlater.html">⏳ Worth It Later</a>
+        <a href="parkedpotential.html">📦 Parked Potential</a>
+      </div>
+
+      <div class="preview-middle">
+        <div class="preview-sortbar">
+          <span title="Group Notes">📂</span>
+          <select class="groupSelector" onchange="updateGrouping()">
+            <option value="date">Date</option>
+            <!-- … -->
+          </select>
+        </div>
+
+        <div class="groupedNotes" style="flex-grow:1;overflow-y:auto;"></div>
+
+        <div class="preview-sortbar bottom-searchbar">
+          <div class="search-wrapper">
+            <input type="text" class="searchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
+            <select class="searchScope" onchange="updateGrouping()">
+              <option value="group">Grouped</option>
+              <option value="all">Search All</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="preview-settings">
+          <a href="settings.html">⚙️ Settings</a>
+          <a href="profile.html">👤 Profile</a>
+        </div>
+      </div>
+    </div><!-- /#docPreview -->
+  </div><!-- /#docSuite -->
+
+  <!-- =========  NOTEPAD SUITE  ========= -->
+  <div id="noteSuite" class="suite">
+    <div class="tab-bar">
+      <div id="notepadTabContainer" class="tab-container notepad-tabs"></div>
+    </div>
+
+    <div class="controls">
+      <button onclick="saveText()" title="Save">💾</button>
+      <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
+      <button id="printBtn" title="Print Note">🖨️</button>
+    </div>
+
+    <div class="main-container">
+      <div class="editor-area">
+        <!-- 🧭 Preview Toggle Button -->
+        <button class="toggle-preview-btn" onclick="togglePreview('note')">🗂 View All</button>
+
+        <div id="noteEditor" class="editor notepad-mode" contenteditable="true"></div>
+      </div>
+    </div>
+
+    <!-- 📋 Preview Overlay -->
+    <div id="notePreview" class="preview-overlay">
+      <div class="preview-top">
+        <a href="holdingbay.html">🔄 Holding Bay</a>
+        <a href="actnow.html">🚀 Act Now</a>
+        <a href="buildmomentum.html">🌿 Build Momentum</a>
+        <a href="worthitlater.html">⏳ Worth It Later</a>
+        <a href="parkedpotential.html">📦 Parked Potential</a>
+      </div>
+
+      <div class="preview-middle">
+        <div class="preview-sortbar">
+          <span title="Group Notes">📂</span>
+          <select class="noteGroupSelector" onchange="updateGrouping()">
+            <option value="date">Date</option>
+            <!-- … -->
+          </select>
+        </div>
+
+        <div class="noteGroupedNotes" style="flex-grow:1;overflow-y:auto;"></div>
+
+        <div class="preview-sortbar bottom-searchbar">
+          <div class="search-wrapper">
+            <input type="text" class="noteSearchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
+            <select class="noteSearchScope" onchange="updateGrouping()">
+              <option value="group">Grouped</option>
+              <option value="all">Search All</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="preview-settings">
+          <a href="settings.html">⚙️ Settings</a>
+          <a href="profile.html">👤 Profile</a>
+        </div>
+      </div>
+    </div><!-- /#notePreview -->
+  </div><!-- /#noteSuite -->
+
+  <!-- Theme toggle stays at top level -->
+  <div class="dark-theme-switch">
+     <label class="theme-toggle">
+       <input type="checkbox" id="themeSwitch" />
+       <span class="slider"></span>
+     </label>
+  </div>
+
+  <div class="save-time" id="saveStatus"></div>
+
+  <!-- ===== SIDE NOTES PANEL ===== -->
+  <div id="sideNotesPanel" class="side-notes-panel">
+    <h3>💡 Side Note</h3>
+    <textarea id="sideNoteInput" placeholder="Type your idea without breaking flow..."></textarea>
+    <button onclick="saveSideNote()">Save</button>
+    <div id="savedSideNotes"></div>
+  </div>
+
+  </div>
   </div>
 
   <!-- Your main HTML content above -->
@@ -1514,6 +1393,22 @@
       setupModeToggle();
     });
 
+    document.getElementById("switchToDoc").addEventListener("click", () => {
+      document.getElementById("docSuite").classList.add("active");
+      document.getElementById("noteSuite").classList.remove("active");
+
+      document.getElementById("switchToDoc").classList.add("active");
+      document.getElementById("switchToNote").classList.remove("active");
+    });
+
+    document.getElementById("switchToNote").addEventListener("click", () => {
+      document.getElementById("noteSuite").classList.add("active");
+      document.getElementById("docSuite").classList.remove("active");
+
+      document.getElementById("switchToNote").classList.add("active");
+      document.getElementById("switchToDoc").classList.remove("active");
+    });
+
     function forceEditorRecovery() {
       mainEditor.classList.remove("hidden-editor");
       mainEditor.style.opacity = '1';
@@ -1695,6 +1590,18 @@
         e.returnValue = ""; // Required for most browsers
       }
     });
+
+    function saveSideNote() {
+      const note = document.getElementById("sideNoteInput").value.trim();
+      if (note === "") return;
+
+      const noteDiv = document.createElement("div");
+      noteDiv.className = "side-note-entry";
+      noteDiv.textContent = note;
+
+      document.getElementById("savedSideNotes").appendChild(noteDiv);
+      document.getElementById("sideNoteInput").value = "";
+    }
 
     function loadSavedText() {
       const savedTabs = JSON.parse(localStorage.getItem('tabs') || '[]');
@@ -2644,90 +2551,6 @@
       });
     });
 
-    function applyEditorMode(mode) {
-      if (!editor) return;
-
-      cacheEditorContent();
-      applyEditorStyles(mode);
-
-      // 🧠 SWITCH MODE FIRST so helpers update activeTabIndex correctly
-      setEditorModeAttribute(mode);
-      setActiveTabBar(mode);
-
-      // 🔁 RENDER tab buttons AND assign correct active index per mode
-      safeRenderTabs();
-
-      restoreEditorContent(mode);
-      focusEditorSafely();
-    }
-
-    function cacheEditorContent() {
-      const currentMode = editor.getAttribute("data-mode");
-      if (currentMode === "notepad") {
-        notepadCache = editor.innerHTML;
-      } else if (currentMode === "document") {
-        documentCache = editor.innerHTML;
-      }
-    }
-
-    function applyEditorStyles(mode) {
-      if (!editor) return;
-
-      const marginBox = document.getElementById("marginBox");
-      const paperSize = getSelectedPaperSize?.(); // optional
-      const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
-
-      // 🎨 Shared base reset
-      editor.setAttribute("contenteditable", "true");
-      editor.classList.remove("notepad-mode", "document-mode");
-      editor.classList.add(`${mode}-mode`);
-      editor.setAttribute("data-mode", mode);
-
-      // 🧠 NOTEPAD MODE
-      if (mode === "notepad") {
-        marginBox?.classList.add("hidden");
-        marginBox?.removeAttribute("contenteditable");
-        toolbar && (toolbar.style.display = "none");
-
-        // Clear any inline styles related to document layout
-        editor.style.margin = "";
-        editor.style.paddingTop = "";
-        editor.style.paddingBottom = "";
-        editor.style.paddingLeft = "";
-        editor.style.paddingRight = "";
-        editor.style.removeProperty("width");
-        editor.style.removeProperty("min-height");
-
-        console.log("🔍 Width after cleanup:", editor.style.width, editor.style.minHeight);
-
-        modeToggleBtn.innerText = "📄 Document Mode";
-        status && (status.innerText = "🧠 Notepad Mode Active");
-
-      // 📄 DOCUMENT MODE
-      } else if (mode === "document") {
-        marginBox?.classList.remove("hidden");
-        marginBox?.removeAttribute("contenteditable");
-        toolbar && (toolbar.style.display = "flex");
-
-        // 📏 Apply saved margins only
-        if (Object.keys(savedMargins).length > 0) {
-          editor.style.paddingTop = `${savedMargins.top}px`;
-          editor.style.paddingBottom = `${savedMargins.bottom}px`;
-          editor.style.paddingLeft = `${savedMargins.left}px`;
-          editor.style.paddingRight = `${savedMargins.right}px`;
-        }
-
-        modeToggleBtn.innerText = "🧠 Notepad Mode";
-        status && (status.innerText = "📄 Document Mode Active");
-
-        // Optional: paper size updates
-        paperSizeSelect?.addEventListener("change", updatePaperSize);
-        updatePaperSize?.();
-      }
-
-      // ✏️ Refocus editor (small delay for smoother transitions)
-      setTimeout(() => editor.focus(), 0);
-    }
 
     function applyCustomMargins() {
       const saved = JSON.parse(localStorage.getItem("customMargins") || "{}");
@@ -2741,43 +2564,6 @@
       editor.style.paddingBottom = `${bottom}px`;
       editor.style.paddingLeft = `${left}px`;
       editor.style.paddingRight = `${right}px`;
-    }
-
-    function updateTabTitleByMode(mode) {
-      if (!tabs[activeTabIndex]) return;
-
-      if (mode === "notepad") {
-        const now = new Date();
-        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
-      } else if (mode === "document") {
-        const text = editor.innerText || "";
-        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
-      }
-
-      localStorage.setItem("tabs", JSON.stringify(tabs));
-    }
-
-    function restoreEditorContent(mode) {
-      const marginBox = document.getElementById("marginBox");
-
-      if (mode === "notepad") {
-        editor.innerHTML = notepadCache || "";
-      } else if (mode === "document") {
-        editor.innerHTML = documentCache || "";
-        if (marginBox && !editor.contains(marginBox)) {
-          editor.appendChild(marginBox);
-        }
-      }
-
-      editor.innerHTML = editor.innerHTML.trim();
-    }
-
-    function setEditorModeAttribute(mode) {
-      editor.setAttribute("data-mode", mode);
-    }
-
-    function focusEditorSafely() {
-      setTimeout(() => editor.focus(), 0);
     }
 
     function setupModeToggle() {
@@ -2794,56 +2580,12 @@
       applyEditorMode(savedMode);
     }
 
-    function safeRenderTabs() {
-      ["notepad", "document"].forEach(mode => renderTabsForMode(mode));
-    }
-
     function abortIfRenaming() {
       if (isRenamingTab) {
         console.warn("⛔ Aborting: rename input is still active");
         return true;
       }
       return false;
-    }
-
-    function getTabsByMode(mode) {
-      return tabs
-        .map((tab, index) => ({ ...tab, originalIndex: index }))
-        .filter(tab => tab.mode === mode);
-    }
-
-    function renderTabsForMode(mode) {
-      if (isRenamingTab) {
-        console.warn(`⛔ Skipping renderTabsForMode("${mode}"): rename input is still active`);
-        return;
-      }
-
-      const containerId = mode === "notepad" ? "notepadTabContainer" : "documentTabContainer";
-      const tabContainer = document.getElementById(containerId);
-      if (!tabContainer) return;
-
-      tabContainer.innerHTML = "";
-
-      const filteredTabs = tabs
-        .map((tab, i) => ({ ...tab, originalIndex: i }))
-        .filter(tab => tab.mode === mode);
-
-      if (ensureAtLeastOneTab(filteredTabs, mode)) return;
-
-      const savedIndex = getActiveTabIndex(mode);
-      const isValidIndex = filteredTabs.some(tab => tab.originalIndex === savedIndex);
-      if (!isValidIndex && filteredTabs.length > 0) {
-        setActiveTabIndex(mode, filteredTabs[0].originalIndex);
-      }
-
-      const activeIndexForMode = getActiveTabIndex(mode);
-
-      filteredTabs.forEach(tab => {
-        const tabBtn = createTabElement(tab);
-        tabContainer.appendChild(tabBtn);
-      });
-
-      tabContainer.appendChild(createAddTabButton(mode));
     }
 
     function createTabElement(tab, activeIndexForMode) {
@@ -2924,36 +2666,6 @@
       return addTabBtn;
     }
 
-    function renderAllTabs() {
-      renderTabsForMode("document");
-      renderTabsForMode("notepad");
-    }
-
-    function setActiveTabBar(mode) {
-      console.log("🎯 applyEditorMode triggered with", mode);
-      const notepadContainer = document.getElementById("notepadTabContainer");
-      const documentContainer = document.getElementById("documentTabContainer");
-
-      if (mode === "document") {
-        documentContainer.classList.add("active");
-        notepadContainer.classList.remove("active");
-      } else {
-        notepadContainer.classList.add("active");
-        documentContainer.classList.remove("active");
-      }
-    }
-
-    function switchEditorMode(newMode) {
-      const currentMode = getCurrentEditorMode();
-      if (newMode === currentMode) return;
-
-      applyEditorMode(newMode);
-      localStorage.setItem("editorMode", newMode);
-      setActiveTabBar(newMode);
-      safeRenderTabs(); // or renderAllTabs() if you don't use safeRender
-      loadActiveTabContent();
-    }
-
     function switchTab(originalIndex) {
       if (typeof tabs[originalIndex] === "undefined") {
         console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
@@ -2961,19 +2673,6 @@
       }
 
       const selectedTab = tabs[originalIndex];
-
-      // Prevent switching to a tab in a different mode
-      const currentMode = localStorage.getItem("editorMode") || "document";
-      if (selectedTab.mode !== currentMode) {
-        console.warn(`🚫 Can't switch to a ${selectedTab.mode} tab while in ${currentMode} mode`);
-        return;
-      }
-
-      // If unsaved changes exist in current tab, prompt user (optional enhancement)
-      if (hasUnsavedChanges) {
-        const confirmSwitch = confirm("⚠️ You have unsaved changes. Switch tabs anyway?");
-        if (!confirmSwitch) return;
-      }
 
       setActiveTabIndex(selectedTab.mode, originalIndex);
       loadActiveTabContent();
@@ -2990,9 +2689,6 @@
         return;
       }
 
-      // ⚠️ Ask to confirm unsaved changes
-      const isCurrentTabInView =
-      tabBeingClosed.mode === currentMode && index === activeTabIndex;
 
       if (isCurrentTabInView && hasUnsavedChanges) {
         const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
@@ -3002,10 +2698,6 @@
       // 🗑️ Remove tab
       tabs.splice(index, 1);
 
-      // 🎯 Get remaining tabs for current mode
-      const remainingTabs = tabs
-        .map((tab, i) => ({ ...tab, originalIndex: i }))
-        .filter(tab => tab.mode === currentMode);
 
       if (remainingTabs.length === 0) {
         // 🆕 No tabs left — create one and stop here
@@ -3033,44 +2725,9 @@
         console.warn("⚠️ No active tab to load.");
         return;
       }
-
-      const mode = activeTab.mode || "document";
-      const currentMode = editor.getAttribute("data-mode");
-
-      // Only switch modes if necessary
-      if (mode !== currentMode) {
-        localStorage.setItem("editorMode", mode);
-        switchEditorMode(mode); // safe to call here now
-        return; // 💡 Exit here, switchEditorMode will handle loading
-      }
-
-      if (mode === currentMode && editor.innerHTML.trim() !== (activeTab.content || "").trim()) {
-        editor.innerHTML = activeTab.content || "";
-      }
-
-      if (mode === "document" && !editor.contains(marginBox)) {
-        editor.appendChild(marginBox);
-      }
-
-      editor.setAttribute("data-mode", mode);
-      focusEditorSafely();
-
-       // 🧠 Safely update title after content + mode have landed
-       updateTabTitleByMode(mode);
     }
 
-    function getTabContainer(mode) {
-      if (mode === "notepad") {
-        return document.getElementById("notepadTabContainer");
-      } else if (mode === "document") {
-        return document.getElementById("documentTabContainer");
-      } else {
-        console.warn(`🚫 Unknown mode: ${mode}`);
-        return null;
-      }
-    }
-
-    function addNewTab(mode) {
+    function addNewTab() {
       const now = new Date();
 
       // Title logic based on mode
@@ -3097,19 +2754,6 @@
       loadActiveTabContent(); // ✅ Load blank or default content
     }
 
-    function getCurrentEditorMode() {
-      return editor?.getAttribute("data-mode") || "document";
-    }
-
-    function ensureAtLeastOneTab(filteredTabs, mode) {
-      if (filteredTabs.length === 0) {
-        console.warn(`📭 No tabs left in "${mode}" mode. Creating a new one...`);
-        addNewTab(mode); // 🔁 triggers re-render + content load
-        return true;     // 🧠 Tells caller: "I handled it"
-      }
-      return false;      // All good, tabs exist
-    }
-
     function getActiveTabIndex(mode) {
       return parseInt(localStorage.getItem(`activeTabIndex_${mode}`)) || 0;
     }
@@ -3127,8 +2771,6 @@
     };
 
     function updatePaperSize() {
-      if (mainEditor.getAttribute("data-mode") !== "document") return; // 🛑 Don't update in notepad mode
-
       const selectedSize = paperSizeSelect.value;
       switch (selectedSize) {
         case "letter":
