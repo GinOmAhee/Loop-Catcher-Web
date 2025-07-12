@@ -418,7 +418,6 @@
   }
 
   .margin-box::before {
-    content: "";
     position: absolute;
     top: var(--margin-top, 1in);
     right: var(--margin-right, 1in);
@@ -2063,6 +2062,7 @@
       const now = Date.now();
       const currentMode = localStorage.getItem("editorMode") || "document";
 
+      const groupedNotes = document.querySelector('#groupedNotes');
       if (notes.length === 0) {
         groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
         return;
