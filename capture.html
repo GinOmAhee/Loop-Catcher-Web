@@ -312,6 +312,7 @@
   }
 
   #docEditor {
+    position: relative; 
     width: 8.27in;
     min-height: 11.69in;
     padding: 0;
@@ -409,21 +410,25 @@
     pointer-events: none;
   }
 
+  /* Margin overlay (stays inside #docEditor) */
   .margin-box {
     position: absolute;
-    inset: var(--margin-top, 1in) var(--margin-right, 1in) var(--margin-bottom, 1in) var(--margin-left, 1in);
-    border: 2px dashed rgba(0, 0, 0, 0.2);
+    inset: var(--margin-top, 1in)
+           var(--margin-right, 1in)
+           var(--margin-bottom, 1in)
+           var(--margin-left, 1in);
+    border: 2px dashed rgba(0,0,0,.2);
     pointer-events: none;
     z-index: 1;
   }
 
+  /* optional inside border if you still want a dotted line
+     inside the margin-box itself */
   .margin-box::before {
+    content: "";
     position: absolute;
-    top: var(--margin-top, 1in);
-    right: var(--margin-right, 1in);
-    bottom: var(--margin-bottom, 1in);
-    left: var(--margin-left, 1in);
-    border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
+    inset: 0;                         /* full size of margin‑box */
+    border: 2px dashed rgba(0,0,0,.2);
     pointer-events: none;
     z-index: 2;
   }
