@@ -2644,10 +2644,11 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      const marginBtn = document.getElementById("marginBtn");
-      const marginDropdown = document.getElementById("marginDropdown");
-      const editor = document.getElementById("mainEditor"); // or use getActiveEditor()
-
+      const docSuite = document.getElementById("docSuite");
+      const marginBtn = docSuite?.querySelector("#marginBtn");
+      const marginDropdown = docSuite?.querySelector("#marginDropdown");
+      const editor = docSuite?.querySelector(".editor"); // or specifically #docEditor
+      
       if (!marginBtn || !marginDropdown || !editor) {
         console.warn("⛔ Missing margin UI elements.");
         return;
