@@ -96,7 +96,7 @@
     border: 1px solid #444;
   }
 
-  body.dark-theme .preview-overlay button {
+  body.dark-theme #toggle-preview-btn {
     background-color: #333;
     color: #181A1B;
     border: 1px solid #555;
@@ -367,7 +367,7 @@
   #searchInput,
   #searchInput:focus,
   #modeToggleBtn
-  #previewToggle
+  #toggle-preview-btn
   .preview-bottom {
     background-color: inherit;
     color: inherit;
@@ -727,9 +727,9 @@
     font-size: 0.95rem;
   }
 
-  #previewToggle {
+  #toggle-preview-btn {
     position: sticky;
-    margin: 0 auto 0 1rem; /* pins it to the left */
+    align-items: center;
     top: .5rem; /* just below your tab bar */
     z-index: 9;
     background: var(--editor-bg);
