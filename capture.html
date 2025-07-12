@@ -294,11 +294,30 @@
 
   /* === EDITOR & INPUT === */
 
-  #mainEditor {
-    position: relative;
-    overflow: auto;
-    min-height: 100%;
+  #docEditor {
+    width: 8.27in;
+    min-height: 11.69in;
+    padding: 0;
+    margin: 0rem auto;
+    font-family: "Arial", sans-serif;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    box-sizing: border-box;
   }
+
+  #noteEditor {
+    font-family: "Courier New", monospace;
+    font-size: 1rem;
+    padding: 0.9rem;
+    max-width: 800px;
+    margin: 0 auto;
+    border: none;
+    box-shadow: none;
+    background-color: #fffdf7;
+  }
+
 
   #mainEditor::before {
     content: "";
@@ -1145,7 +1164,6 @@
     let hasUnsavedChanges = false;
 
     const currentMode = getCurrentEditorMode(); // "document" or "notepad"
-    const groupedNotes = document.getElementById("groupedNotes");
 
     const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
     const notesForMode = notes.filter(n => (n.mode || "document") === currentMode);
