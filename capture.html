@@ -33,10 +33,6 @@
   body.dark-theme {
     --editor-bg: #1a1a1a;
     --editor-text: #ffffff;
-    --tab-bg: #121212;
-    --tab-text: #eee;
-    --tab-border: #555;
-    --tab-active-bg: #2d3b44;
     background-color: #000;
     color: #f1f1f1;
   }
@@ -321,7 +317,8 @@
     font-size: 1rem;
     border: 1px solid #ccc;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
+    background-color: var(--editor-bg);
+    color: var(--editor-text);
     box-sizing: border-box;
   }
 
@@ -334,7 +331,8 @@
     margin: 0 auto;
     border: none;
     box-shadow: none;
-    background-color: #fffdf7;
+    background-color: var(--editor-bg);
+    color: var(--editor-text);
   }
 
 
