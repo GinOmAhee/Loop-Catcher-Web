@@ -1332,15 +1332,6 @@
         /* input / autosave */
         editor.addEventListener('input', () => debouncedSave(editor));
 
-        /* preview toggle */
-        toggle?.addEventListener('click', e => {
-          e.stopPropagation();
-          preview.classList.toggle('active');
-          toggle.textContent = preview.classList.contains('active')
-            ? '✖ Close'
-            : '🗂 View All';
-        });
-
         /* click outside to close */
         document.addEventListener('click', e => {
           if (!preview.contains(e.target) && !toggle.contains(e.target)) {
@@ -2204,6 +2195,11 @@
       }
 
       const isVisible = preview.classList.toggle("preview-visible");
+
+      const toggleBtn = preview?.closest('.suite')?.querySelector('.toggle-preview-btn');
+        if (toggleBtn) {
+          toggleBtn.textContent = isVisible ? '✖ Close' : '🗂 View All';
+        }
 
       if (isVisible) {
         try {
