@@ -1013,7 +1013,7 @@
           </select>
         </div>
 
-        <div class="groupedNotes" style="flex-grow:1;overflow-y:auto;"></div>
+        <div id="groupedNotes" class="groupedNotes"></div>
 
         <div class="preview-sortbar bottom-searchbar">
           <div class="search-wrapper">
@@ -1073,8 +1073,8 @@
           </select>
         </div>
 
-        <div class="noteGroupedNotes" style="flex-grow:1;overflow-y:auto;"></div>
-
+        <div id="groupedNotes" class="groupedNotes"></div>
+        
         <div class="preview-sortbar bottom-searchbar">
           <div class="search-wrapper">
             <input type="text" class="noteSearchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
@@ -1244,6 +1244,30 @@
     }
 
     window.addEventListener('DOMContentLoaded', initThemeToggle);
+
+    function handleDropdown(event) {
+      event.stopPropagation();
+
+      // Hide all dropdowns first
+      fontDropdown?.classList.add("hidden");
+      sizeDropdown?.classList.add("hidden");
+      textColorDropdown?.classList.add("hidden");
+      highlightDropdown?.classList.add("hidden");
+
+      const btnId = event.currentTarget.id;
+
+      switch (btnId) {
+        case "fontMenuBtn":
+          fontDropdown?.classList.toggle("hidden");
+          break;
+        case "textColorBtn":
+          textColorDropdown?.classList.toggle("hidden");
+          break;
+        case "highlightBtn":
+          highlightDropdown?.classList.toggle("hidden");
+          break;
+      }
+    }
 
     document.addEventListener("DOMContentLoaded", () => {
       hookSuiteEvents();         // attach listeners to both suites
