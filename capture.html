@@ -1145,13 +1145,17 @@
     let hasUnsavedChanges = false;
 
     const marginBox = document.getElementById("marginBox"); // 💡 safe reference
+    mainEditor = document.getElementById("docEditor");
+
 
     async function initializeFirebase() {
       try {
-        const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+        const res = await fetch(
+          "https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey"
+        );
 
-        // ✅ CORS/network error handling
-        if (!res.ok) throw new Error(`API key fetch failed: ${res.status} ${res.statusText}`);
+        if (!res.ok)
+          throw new Error(`API key fetch failed: ${res.status} ${res.statusText}`);
 
         const { apiKey } = await res.json();
 
@@ -1159,18 +1163,24 @@
           apiKey,
           authDomain: "loop-catcher-firebase.firebaseapp.com",
           projectId: "loop-catcher-firebase",
-          storageBucket: "loop-catcher-firebase.firebasestorage.app"
+          storageBucket: "loop-catcher-firebase.appspot.com" // ✅ fixed
         };
 
-        firebase.initializeApp(firebaseConfig);
+        // ♻️ Only init once (helps during dev hot‑reloads)
+        if (!firebase.apps?.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+
         db = firebase.firestore();
         console.log("✅ Firebase initialized");
       } catch (error) {
         console.error("❌ Failed to initialize Firebase:", error);
-        alert("Firebase failed to initialize. Please check your connection or CORS settings.");
+        alert(
+          "Firebase failed to initialize. Please check your connection or CORS settings."
+        );
       }
     }
-    
+
     const moodThemeMap = {
       "Calm & Clear": "theme-calm",
       "Focused & Strategic": "theme-strategic",
@@ -1235,137 +1245,66 @@
 
     window.addEventListener('DOMContentLoaded', initThemeToggle);
 
-    window.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", () => {
+      hookSuiteEvents();         // attach listeners to both suites
+      initThemeToggle();         // your existing dark‑theme logic
+      initializeFirebase();      // backend just works
 
-      editor = document.getElementById("mainEditor");      // your interactive zone
-      mainEditor = editor; // layout shell
-      toggleBtn = document.getElementById('previewToggle');
-      saveStatus = document.getElementById('saveStatus');
-      attachedFilesList = document.getElementById('attachedFilesList');
-      groupedNotes = document.getElementById('groupedNotes');
-      fontBtn = document.getElementById("fontMenuBtn");
-      fontDropdown = document.getElementById("fontDropdown");
-      fontSizeBtn = document.getElementById("fontSizeBtn");
-      sizeDropdown = document.getElementById("sizeDropdown");
-      textColorBtn = document.getElementById("textColorBtn");
-      textColorDropdown = document.getElementById("textColorDropdown");
-      justifyBtn = document.getElementById("justifyBtn");
-      toolbar = document.getElementById("toolbar");
-      let preview = document.getElementById('preview')
-
-      if (!mainEditor) {
-        console.error("❌ mainEditor not found");
-        return;
-      }
-
-      console.log("✅ mainEditor is:", mainEditor);
-
-      // ⬇️ NOW safe to call logic that depends on those elements
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      switchEditorMode(savedMode); // this might trigger loadActiveTabContent internally
-
-      const mode = localStorage.getItem("editorMode") || "document";
-      setActiveTabBar(mode);
-      
-      if (!mainEditor) {
-        console.error("❌ mainEditor not found");
-        return;
-      }
-
-      console.log("✅ mainEditor is:", mainEditor);
-
-      mainEditor.addEventListener("input", () => {
-        undoStack.push(mainEditor.innerHTML);
-        redoStack = [];
-
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          localStorage.setItem("capturedText", mainEditor.innerHTML);
-          localStorage.setItem("lastSaved", new Date().toISOString());
-          updateGrouping();
-          saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
-        }, 1000);
-      });
-    
-      previewToggle.addEventListener("click", (e) => {
-        e.stopPropagation();
-        togglePreview(); // 🧠 your centralized function
-      });
-
-      document.addEventListener("click", (e) => {
-        const clickedInsidePreview = preview.contains(e.target);
-        const clickedToggle = previewToggle.contains(e.target);
-        const clickedInsideEditor = mainEditor.contains(e.target);
-        const isRenaming = e.target.classList.contains("tab-rename-input");
-
-        console.log("Preview auto-close triggered.");
-        console.log("Clicked inside preview:", clickedInsidePreview);
-        console.log("Clicked inside editor:", clickedInsideEditor);
-        console.log("Editor was hidden:", mainEditor.classList.contains("hidden-editor"));
-
-        if (
-          preview.classList.contains("preview-visible") &&
-          !clickedInsidePreview &&
-          !clickedToggle &&
-          !clickedInsideEditor &&
-          !isRenaming
-        ) {
-         preview.classList.remove("preview-visible");
-         if (mainEditor.classList.contains("hidden-editor")) {
-           mainEditor.classList.remove("hidden-editor");
-         }
-        }
-      });
-
-      fontBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        fontDropdown.classList.toggle("hidden");
-        const rect = fontBtn.getBoundingClientRect();
-        fontDropdown.style.left = `${rect.left}px`;
-        fontDropdown.style.top = `${rect.bottom + 5}px`;
-      });
-
-      fontDropdown.addEventListener("click", (e) => {
-        e.stopPropagation();
-      });
-
-      textColorBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        saveSelection();
-        textColorDropdown.classList.toggle("hidden");
-
-        const rect = textColorBtn.getBoundingClientRect();
-        textColorDropdown.style.left = `${rect.left}px`;
-        textColorDropdown.style.top = `${rect.bottom + 5}px`;
-      });
-
-      document.addEventListener("DOMContentLoaded", () => {
-        const switchEl = document.getElementById("themeSwitch");
-        if (!switchEl) return;
-
-        switchEl.addEventListener("change", () => {
-          const isDark = switchEl.checked;
-          document.body.classList.toggle("dark-mode", isDark);
-          localStorage.setItem("preferredTheme", isDark ? "dark" : "light");
-        });
-      });
-
-      const highlightBtn = document.getElementById("highlightBtn");
-      const highlightDropdown = document.getElementById("highlightDropdown");
-
-      if (highlightBtn) {
-
-        highlightBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          saveSelection();
-          highlightDropdown.classList.toggle("hidden");
-          const rect = highlightBtn.getBoundingClientRect();
-          highlightDropdown.style.left = `${rect.left}px`;
-          highlightDropdown.style.top = `${rect.bottom + 5}px`;
-        });
-      }
-      setupModeToggle();
+      // Auto‑save every 30s
+      setInterval(() => autoSave(getActiveEditor()), 30_000);
     });
+
+    /* ---------------- Suite‑specific listeners --------------- */
+    function hookSuiteEvents() {
+      // 🔁 Register once for BOTH modes
+      ['docSuite', 'noteSuite'].forEach(suiteId => {
+        const suiteEl = document.getElementById(suiteId);
+        const editor  = suiteEl.querySelector('.editor');
+        const preview = suiteEl.querySelector('.preview-overlay');
+        const toggle  = suiteEl.querySelector('.toggle-preview-btn');
+
+        /* input / autosave */
+        editor.addEventListener('input', () => debouncedSave(editor));
+
+        /* preview toggle */
+        toggle?.addEventListener('click', e => {
+          e.stopPropagation();
+          preview.classList.toggle('active');
+          toggle.textContent = preview.classList.contains('active')
+            ? '✖ Close'
+            : '🗂 View All';
+        });
+
+        /* click outside to close */
+        document.addEventListener('click', e => {
+          if (!preview.contains(e.target) && !toggle.contains(e.target)) {
+            preview.classList.remove('active');
+            toggle.textContent = '🗂 View All';
+          }
+        });
+      });
+
+      /* Font / color dropdowns now query the ACTIVE suite */
+    document.querySelectorAll('#fontMenuBtn, #textColorBtn, #highlightBtn')
+      .forEach(btn => btn?.addEventListener('click', handleDropdown));
+    }
+
+    /* ---------------- Helpers --------------- */
+    function getActiveSuite() {
+      return document.querySelector('.suite.active');
+    }
+
+    let debounceTimer;
+    function debouncedSave(editor){
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        localStorage.setItem("capturedText", editor.innerHTML);
+        localStorage.setItem("lastSaved", new Date().toISOString());
+        const saveStatus = document.getElementById('saveStatus');
+        saveStatus && (saveStatus.textContent =
+          `💾 Auto‑saved at ${new Date().toLocaleTimeString()}`);
+      }, 1000);
+    }
 
     document.getElementById("switchToDoc").addEventListener("click", () => {
       document.getElementById("docSuite").classList.add("active");
@@ -1384,10 +1323,11 @@
     });
 
     function forceEditorRecovery() {
-      mainEditor.classList.remove("hidden-editor");
-      mainEditor.style.opacity = '1';
-      mainEditor.style.pointerEvents = 'auto';
-      mainEditor.getBoundingClientRect(); // force repaint
+      const editor = getActiveEditor();
+      editor.classList.remove("hidden-editor");
+      editor.style.opacity = '1';
+      editor.style.pointerEvents = 'auto';
+      editor.getBoundingClientRect(); // force repaint
     }
 
     function markUnsaved() {
@@ -1395,12 +1335,12 @@
     }
 
     function getMarginBox() {
-      return document.getElementById("marginBox");
+      return document.querySelector('#docSuite .margin-box');
     }
 
     function getSelectedPaperSize() {
-      const paperSizeSelector = document.getElementById("paperSizeSelector");
-      return paperSizeSelector ? paperSizeSelector.value : "default-size";
+      const selector = document.querySelector('#docSuite #paperSizeSelector');
+      return selector?.value || "a4"; // ← give a sane default
     }
 
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
@@ -1410,7 +1350,10 @@
     let isRecording = false;
     let debounceTimer;
 
-    let savedSelection = null;
+    let savedSelections = {
+      document: null,
+      note: null
+    };
 
     function saveSelection() {
       const sel = window.getSelection();
@@ -1419,11 +1362,12 @@
       }
     }
 
-    function restoreSelection() {
-      if (savedSelection) {
+    function restoreSelection(mode) {
+      const range = savedSelections[mode];
+      if (range) {
         const sel = window.getSelection();
         sel.removeAllRanges();
-        sel.addRange(savedSelection);
+        sel.addRange(range);
       }
     }
 
@@ -1482,80 +1426,90 @@
       }
     }
 
-   async function saveText() {
-     const now = new Date();
-     const noteText = mainEditor.innerText.trim();
-     const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
-     const noteHTML = mainEditor.innerHTML;
-     if (!noteText) return;
+    async function saveText() {
+      const now = new Date();
 
-     const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      // ⬇️ Determine active suite/editor
+      const isDocMode = document.getElementById("docSuite").classList.contains("active");
+      const editor = isDocMode ? document.getElementById("docEditor") : document.getElementById("noteEditor");
+      const suiteType = isDocMode ? "Document" : "Note";
+      const saveStatus = document.getElementById("saveStatus");
 
-     // ✅ Allow save only if different from last saved note
-     if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
-       saveStatus.innerText = `⚠️ Not saved — no changes detected`;
-       return;
-     }
+      const noteText = editor.innerText.trim();
+      const noteHTML = editor.innerHTML;
 
+      if (!noteText) return;
 
-     let projectName = prompt("📌 Enter project name (optional):");
-     projectName = projectName?.trim() || "📂 Unlabeled";
+      const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
 
-     const newNote = {
-       text: noteHTML,
-       timestamp: now.toISOString(),
-       title: tabs[activeTabIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
-       project: projectName,
-       resolved: false,
-       tags: []
-     };
+      // ✅ Skip if no changes
+      if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
+        if (saveStatus) saveStatus.innerText = `⚠️ Not saved — no changes detected`;
+        return;
+      }
 
-     existingNotes.unshift(newNote);
-     localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
+      let projectName = prompt("📌 Enter project name (optional):");
+      projectName = projectName?.trim() || "📂 Unlabeled";
 
-     try {
-       if (db && firebase.auth().currentUser) {
-         const uid = firebase.auth().currentUser.uid;
-         await db.collection("users").doc(uid).collection("notes").add(newNote);
-         console.log("✅ Note saved to Firestore under user:", uid);
-       } else {
-         console.warn("⚠️ User not logged in or Firebase not ready");
-       }
-     } catch (error) {
-       console.error("❌ Failed to save note to Firestore:", error);
-     }
+      const newNote = {
+        text: noteHTML,
+        timestamp: now.toISOString(),
+        title: `${suiteType} - ${now.toLocaleString()}`,
+        project: projectName,
+        resolved: false,
+        tags: [],
+        type: suiteType.toLowerCase() // Save type for later filtering
+      };
+
+      existingNotes.unshift(newNote);
+      localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
+
+      try {
+        if (db && firebase.auth().currentUser) {
+          const uid = firebase.auth().currentUser.uid;
+          await db.collection("users").doc(uid).collection("notes").add(newNote);
+          console.log(`✅ ${suiteType} saved to Firestore under user:`, uid);
+        } else {
+          console.warn("⚠️ User not logged in or Firebase not ready");
+        }
+      } catch (error) {
+        console.error("❌ Failed to save to Firestore:", error);
+      }
+
+      // Reset layout and content
+      editor.style.padding = "0";
+      editor.style.margin = "0";
+      editor.innerHTML = '';
 
       localStorage.removeItem("customMargins");
 
-      editor.style.padding = "0";
-      editor.style.margin = "0";
+      if (saveStatus) {
+        saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
+      }
 
-      mainEditor.innerHTML = '';
-      tabs[activeTabIndex].content = '';
-      tabs[activeTabIndex].title = 'Untitled';
-      localStorage.setItem('tabs', JSON.stringify(tabs));
-      safeRenderTabs();
-      saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
       updateGrouping();
     }
 
+
     function autoSave() {
-      console.log("✅ autoSave() was called");
       const now = new Date();
 
-      if (!mainEditor) return;
+      const isDocMode = document.getElementById("docSuite").classList.contains("active");
+      const editor = isDocMode ? document.getElementById("docEditor") : document.getElementById("noteEditor");
+      const saveStatus = document.getElementById("saveStatus");
 
-      // Save current content into the active tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      if (!editor) return;
 
-      // Save full tabs array
-      localStorage.setItem('tabs', JSON.stringify(tabs));
-      localStorage.setItem('activeTabIndex', activeTabIndex);
+      const content = editor.innerHTML;
+
+      localStorage.setItem(isDocMode ? 'docDraft' : 'noteDraft', content);
       localStorage.setItem('lastSaved', now.toISOString());
 
-      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+      if (saveStatus) {
+        saveStatus.innerText = `💾 Auto-saved at ${now.toLocaleTimeString()}`;
+      }
 
-      hasUnsavedChanges = false; // Reset after save
+      hasUnsavedChanges = false;
     }
 
     window.addEventListener("beforeunload", (e) => {
@@ -1578,37 +1532,28 @@
     }
 
     function loadSavedText() {
-      const savedTabs = JSON.parse(localStorage.getItem('tabs') || '[]');
-      const savedIndex = parseInt(localStorage.getItem('activeTabIndex')) || 0;
-      const lastSaved = localStorage.getItem('lastSaved');
-      const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
+      const isDocMode = document.getElementById("docSuite").classList.contains("active");
+      const editor = isDocMode ? document.getElementById("docEditor") : document.getElementById("noteEditor");
+      const saveStatus = document.getElementById("saveStatus");
 
-      if (savedTabs.length) {
-        tabs = savedTabs;
-        activeTabIndex = savedIndex;
+      const draftKey = isDocMode ? "docDraft" : "noteDraft";
+      const lastSaved = localStorage.getItem("lastSaved");
+      const attached = JSON.parse(localStorage.getItem("attachedFiles") || "[]");
 
-        const activeTab = tabs[activeTabIndex];
-
-        if (activeTab && typeof activeTab.content === "string") {
-          mainEditor.innerHTML = activeTab.content;
-        } else {
-          console.warn("⚠️ No content found in active tab.");
-          mainEditor.innerHTML = ""; // Optional: fallback message
-        }
-        safeRenderTabs();
-
+      // Load draft content
+      const savedContent = localStorage.getItem(draftKey);
+      if (savedContent) {
+        editor.innerHTML = savedContent;
       } else {
-        // ✅ in case there's nothing saved yet
-        tabs = [{ title: "Note 1", content: "" }];
-        activeTabIndex = 0;
-        safeRenderTabs(); // safely render fresh default
+        editor.innerHTML = ""; // fresh new
       }
 
-      if (lastSaved) {
-        saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+      // Optional save time feedback
+      if (saveStatus && lastSaved) {
+        saveStatus.innerText = `🕓 Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
       }
 
-      updateFileDisplay(attached);
+      updateFileDisplay(attached); // reuse your existing function
     }
 
     function toggleVoiceCapture() {
@@ -1626,7 +1571,14 @@
         return;
       }
 
-      recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+      const isDocMode = document.getElementById("docSuite").classList.contains("active");
+      const editor = isDocMode
+        ? document.getElementById("docEditor")
+        : document.getElementById("noteEditor");
+
+      const status = document.getElementById("saveStatus");
+
+      recognition = new SpeechRecognition();
       recognition.lang = 'en-US';
       recognition.continuous = true;
       recognition.interimResults = false;
@@ -1635,7 +1587,7 @@
       recognition.start();
       isRecording = true;
       document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
-      saveStatus.innerText = "🎙️ Voice capture started...";
+      if (status) status.innerText = "🎙️ Voice capture started...";
 
       recognition.onresult = (event) => {
         let transcript = '';
@@ -1644,13 +1596,13 @@
             let text = event.results[i][0].transcript.trim();
             if (text.toLowerCase().includes("stop")) {
               stopVoiceCapture();
-              saveText();
+              saveText(); // make sure `saveText()` uses correct editor
               return;
             }
             transcript += text + '\n';
           }
         }
-        mainEditor.innerHTML += (mainEditor.innerHTML ? '\n' : '') + transcript.trim();
+        editor.innerHTML += (editor.innerHTML ? '\n' : '') + transcript.trim();
       };
 
       recognition.onerror = (e) => {
@@ -1664,18 +1616,38 @@
         recognition.stop();
         recognition = null;
       }
+
       isRecording = false;
       document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
-      saveText();
-      saveStatus.innerText = "🎤 Voice capture stopped.";
+
+      const isDocMode = document.getElementById("docSuite").classList.contains("active");
+      const status = document.getElementById("saveStatus");
+
+      if (isDocMode) {
+        saveText("document");
+      } else {
+        saveText("note");
+      }
+
+      if (status) status.innerText = "🎤 Voice capture stopped.";
     }
 
     async function handleFileAttachment() {
-      const input = document.getElementById('fileInput');
-      const files = Array.from(input.files);
+      // 🟢 figure out which suite is active
+      const isDocMode = document.getElementById("docSuite").classList.contains("active");
+      const editorType = isDocMode ? "document" : "note";
+
+      // ⬇️ grab the correct input + list inside that suite
+      const suite  = isDocMode ? document.getElementById("docSuite") : document.getElementById("noteSuite");
+      const input  = suite.querySelector('#fileInput');
+      const listEl = suite.querySelector('#attachedFilesList');
+
+      const files  = Array.from(input.files);
+
+      // 🗂 keep a single shared list (or switch to per‑suite list if you prefer)
       const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
 
-      let updated = [...stored];
+      let updated        = [...stored];
       let duplicateCount = 0;
 
       if (!firebase.auth().currentUser || !firebase.storage) {
@@ -1686,55 +1658,86 @@
       const storageRef = firebase.storage().ref();
 
       for (const file of files) {
-        const fileName = file.name;
-
-        // ✅ Check for duplicates by name
+        const fileName   = file.name;
         const isDuplicate = stored.some(f => f.originalName === fileName);
+
         if (isDuplicate) {
           duplicateCount++;
-          continue; // skip to next file
+          continue;
         }
 
-        const uniqueId = crypto?.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        const uniqueId   = crypto?.randomUUID?.() ||
+                           Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
         const storedName = `${fileName}__${uniqueId}`;
-        const fileRef = storageRef.child(`userFiles/${firebase.auth().currentUser.uid}/${storedName}`);
+        const fileRef    = storageRef.child(`userFiles/${firebase.auth().currentUser.uid}/${storedName}`);
 
         try {
           await fileRef.put(file);
           const downloadURL = await fileRef.getDownloadURL();
+
           updated.push({
             originalName: fileName,
-            storedName: storedName,
-            downloadURL: downloadURL
+            storedName,
+            downloadURL,
+            type: editorType   // 📑 tag which suite added it
           });
 
         } catch (err) {
           console.error(`❌ Failed to upload ${fileName}:`, err);
           alert(`❌ Upload failed for ${fileName}`);
         }
-    }
+      }
 
       if (duplicateCount > 0) {
         alert(`⚠️ ${duplicateCount} file(s) already attached and were skipped.`);
       }
 
-      console.log("📎 Final attached files:", updated);
       localStorage.setItem('attachedFiles', JSON.stringify(updated));
-      updateFileDisplay(updated);
-      input.value = ''; // clear input for future uploads
+      updateFileDisplay(updated, listEl);  // ⬅️ pass the suite’s list element
+      input.value = ''; // clear the file input
+    }
+
+    function updateFileDisplay(fileList, listElement) {
+      if (!listElement) return;
+
+      if (fileList.length === 0) {
+        listElement.innerHTML = '';
+        return;
+      }
+
+      listElement.innerHTML = `
+        <strong>📎 Attached Files:</strong>
+        <ul>
+          ${fileList.map(f => `
+            <li class="file-item">
+              <span><a href="${f.downloadURL}" target="_blank">${f.originalName}</a></span>
+              <button onclick="removeFile('${f.storedName}', this)">🗑️</button>
+            </li>
+          `).join('')}
+        </ul>
+      `;
     }
 
     function removeFile(storedName) {
       const files = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
       const updated = files.filter(f => f.storedName !== storedName);
       localStorage.setItem('attachedFiles', JSON.stringify(updated));
-      updateFileDisplay(updated);
+
+      // 🧠 Update correct file list display based on current mode
+      const mode = localStorage.getItem("editorMode") || "document";
+      const fileListElement = mode === "note"
+        ? document.getElementById("noteAttachedFilesList")
+        : document.getElementById("docAttachedFilesList");
+
+      updateFileDisplay(updated, fileListElement);
     }
+
 
     function applyStyle(styleProp, value) {
       const range = getValidSelectionRange();
       if (!range) return;
 
+      const selection = window.getSelection(); // make sure this is locally available
       const selectedText = range.extractContents();
 
       const span = document.createElement("span");
@@ -1742,19 +1745,48 @@
       span.appendChild(selectedText);
       range.insertNode(span);
 
+      // Reselect styled content (optional but nice for UX)
       selection.removeAllRanges();
       const newRange = document.createRange();
       newRange.selectNodeContents(span);
       selection.addRange(newRange);
     }
 
+    function getValidSelectionRange() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return null;
+
+      const range = selection.getRangeAt(0);
+      const editor = getActiveEditor();
+
+      // ✅ Confirm selection is within the active editor
+      if (editor.contains(range.commonAncestorContainer)) {
+        return range;
+      }
+
+      return null;
+    }
+
+    function getActiveEditor() {
+      const mode = localStorage.getItem("editorMode") || "document";
+      return mode === "note"
+        ? document.getElementById("noteEditor")
+        : document.getElementById("docEditor");
+    }
+
     function insertModernLink() {
       const url = prompt("🔗 Enter URL:");
       if (!url) return;
 
-      const range = getValidSelectionRange();
-      if (!range) return;
+      const docEditor = document.getElementById("docEditor");
+      if (!docEditor) return;
 
+      docEditor.focus();
+
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+
+      const range = selection.getRangeAt(0);
       let selectedText = range.toString().trim();
 
       const a = document.createElement("a");
@@ -1781,10 +1813,17 @@
       selection.addRange(newRange);
     }
 
-    function toggleUnorderedList() {
-      const range = getValidSelectionRange();
-      if (!range) return;
 
+    function toggleUnorderedList() {
+      const docEditor = document.getElementById("docEditor");
+      if (!docEditor) return;
+
+      docEditor.focus();
+
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+
+      const range = selection.getRangeAt(0);
       const contents = range.extractContents();
 
       const ul = document.createElement("ul");
@@ -1793,29 +1832,37 @@
       ul.appendChild(li);
 
       range.insertNode(ul);
+
       selection.removeAllRanges();
-      selection.selectAllChildren(li);
+      const newRange = document.createRange();
+      newRange.selectNodeContents(li);
+      selection.addRange(newRange);
     }
 
     let undoStack = [];
     let redoStack = [];
 
     function undo() {
-      if (undoStack.length === 0) return;
-      redoStack.push(mainEditor.innerHTML);
+      const docEditor = document.getElementById("docEditor");
+      if (!docEditor || undoStack.length === 0) return;
+
+      redoStack.push(docEditor.innerHTML);
       const last = undoStack.pop();
-      mainEditor.innerHTML = last || '';
+      docEditor.innerHTML = last || '';
     }
 
     function redo() {
-      if (redoStack.length === 0) return;
-      undoStack.push(mainEditor.innerHTML);
+      const docEditor = document.getElementById("docEditor");
+      if (!docEditor || redoStack.length === 0) return;
+
+      undoStack.push(docEditor.innerHTML);
       const next = redoStack.pop();
-      mainEditor.innerHTML = next || '';
+      docEditor.innerHTML = next || '';
     }
 
     function cleanEditor() {
-      const walker = document.createTreeWalker(mainEditor, NodeFilter.SHOW_ELEMENT, null, false);
+      const docEditor = document.getElementById("docEditor");
+      const walker = document.createTreeWalker(docEditor, NodeFilter.SHOW_ELEMENT, null, false);
       const toRemove = [];
 
       while (walker.nextNode()) {
@@ -1831,10 +1878,14 @@
         parent.removeChild(node);
       });
 
-      saveStatus.innerText = "🧹 Cleaned extra formatting.";
+      const saveStatus = document.getElementById("saveStatus");
+      if (saveStatus) saveStatus.innerText = "🧹 Cleaned extra formatting.";
     }
 
     function alignText(direction) {
+      const docEditor = document.getElementById("docEditor");
+      if (!docEditor || localStorage.getItem("editorMode") !== "document") return;
+
       const range = getValidSelectionRange();
       if (!range) return;
 
@@ -1846,6 +1897,7 @@
       range.insertNode(container);
 
       // Re-select the container so user can keep typing there
+      const selection = window.getSelection();
       selection.removeAllRanges();
       const newRange = document.createRange();
       newRange.selectNodeContents(container);
@@ -1853,13 +1905,16 @@
     }
 
     function toggleStrikeThrough() {
+      const docEditor = document.getElementById("docEditor");
+      if (!docEditor || localStorage.getItem("editorMode") !== "document") return;
+
       const range = getValidSelectionRange();
       if (!range) return;
 
+      const selection = window.getSelection();
       const commonAncestor = range.commonAncestorContainer;
       let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
 
-      // 🔍 Check if already struck through
       const isAlreadyStruck = parentElement.closest('s, strike, del');
       if (isAlreadyStruck) {
         const strikeElement = isAlreadyStruck;
@@ -1870,7 +1925,7 @@
         parent.removeChild(strikeElement);
       } else {
         const contents = range.extractContents();
-        const s = document.createElement('s'); // or 'strike' or 'del'
+        const s = document.createElement('s');
         s.appendChild(contents);
         range.insertNode(s);
 
@@ -1881,65 +1936,42 @@
       }
     }
 
-    function updateFileDisplay(fileList) {
-      if (fileList.length === 0) {
-        attachedFilesList.innerHTML = '';
+    function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
+      const docEditor = document.getElementById("docEditor");
+      const noteEditor = document.getElementById("noteEditor");
+      const marginBox = document.getElementById("marginBox");
+
+      if (!docEditor || !noteEditor || !marginBox) {
+        console.error("❌ Cannot load note — one or more editor elements missing");
         return;
       }
 
-      attachedFilesList.innerHTML = `
-        <strong>📎 Attached Files:</strong>
-        <ul>
-          ${fileList.map(f => `
-            <li class="file-item">
-              <span><a href="${f.downloadURL}" target="_blank">${f.originalName}</a></span>
-              <button onclick="removeFile('${f.storedName}')">🗑️</button>
-            </li>
-         `).join('')}
-       </ul>
-     `;
-    }
+      switchEditorMode(mode); // ✅ Activate correct mode
 
-    function getValidSelectionRange() {
-      const sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return null;
-      return sel.getRangeAt(0);
-    }
+      if (mode === "note") {
+        noteEditor.innerHTML = noteHTML;
+        noteEditor.focus();
+      } else if (mode === "document") {
+        marginBox.innerHTML = noteHTML;
+        docEditor.focus();
+      }
 
+      setTimeout(() => focusEditorSafely(), 0);
+      saveStatus.innerText = "📝 Loaded note from preview";
+      preview.style.display = 'none';
+      undoStack.push(noteHTML);
+      redoStack = [];
 
-    function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
-      if (!mainEditor || !marginBox) {
-        console.error("❌ Cannot load note — editor elements missing");
-        return;
-       }
+      // 💡 Extract first line as title
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = noteHTML;
+      const text = tempDiv.innerText || "";
+      const titleLine = text.split("\n")[0]?.trim() || "Note";
 
-        switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
-
-        if (mode === "notepad") {
-          mainEditor.innerHTML = noteHTML; // inject into the full editor shell
-        } else if (mode === "document") {
-          marginBox.innerHTML = noteHTML; // inject only inside marginBox
-        }
-
-        setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
-
-        mainEditor.focus();
-        saveStatus.innerText = "📝 Loaded note from preview";
-        preview.style.display = 'none';
-        undoStack.push(noteHTML);
-        redoStack = [];
-
-        // 💡 Extract the first line to use as tab title
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = noteHTML;
-        const text = tempDiv.innerText || "";
-        const titleLine = text.split("\n")[0]?.trim() || "Note";
-
-        // ⬇️ INSERT THIS BLOCK HERE
-        tabs[activeTabIndex].title = titleLine;
-        localStorage.setItem("tabs", JSON.stringify(tabs));
-        safeRenderTabs(); // to update UI tab name
-        document.title = titleLine;
+      tabs[activeTabIndex].title = titleLine;
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      safeRenderTabs();
+      document.title = titleLine;
     }
 
     function escapeHTML(text) {
@@ -1950,22 +1982,22 @@
 
     function updateGrouping() {
       const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
-      const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
+      const keyword = document.getElementById("searchInput")?.value?.toLowerCase()?.trim() || "";
       const scope = document.getElementById("searchScope")?.value || "group";
-      const groupBy = document.getElementById("groupSelector").value;
+      const groupBy = document.getElementById("groupSelector")?.value || "project";
       const now = Date.now();
-      const currentMode = getCurrentEditorMode?.() || "document";
+      const currentMode = localStorage.getItem("editorMode") || "document";
 
       if (notes.length === 0) {
         groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
         return;
       }
 
-      // Filter notes by mode
-      let modeFilteredNotes = notes.filter(note => (note.mode || "document") === currentMode);
+      // ✅ Filter notes by editor mode
+      const modeFilteredNotes = notes.filter(note => (note.mode || "document") === currentMode);
 
-      // Further filter by keyword and scope
-      let filteredNotes = scope === "all"
+      // ✅ Further filter by keyword (if any)
+      const filteredNotes = scope === "all"
         ? keyword
           ? modeFilteredNotes.filter(({ text = "", title = "", project = "" }) =>
               `${text} ${title} ${project}`.toLowerCase().includes(keyword))
@@ -1978,10 +2010,10 @@
 
       const highlightText = (text, keyword) => {
         if (!keyword) return escapeHTML(text).replace(/\n/g, "<br>");
-          const safe = escapeHTML(text);
-          const regex = new RegExp(`(${keyword})`, "gi");
-          return safe.replace(regex, '<mark class="highlight-glow">$1</mark>').replace(/\n/g, "<br>");
-        };
+        const safe = escapeHTML(text);
+        const regex = new RegExp(`(${keyword})`, "gi");
+        return safe.replace(regex, '<mark class="highlight-glow">$1</mark>').replace(/\n/g, "<br>");
+      };
 
       const renderNoteItem = (note) => `
         <li style="margin-bottom:1rem; display: flex; align-items: start;">
@@ -2041,7 +2073,7 @@
               grouped[project].push(note);
             });
             for (const project in grouped) {
-               html += renderGroupedSection("📁", project, grouped[project]);
+              html += renderGroupedSection("📁", project, grouped[project]);
             }
             break;
 
@@ -2056,112 +2088,152 @@
 
           case "forgotten":
             const forgotten = filteredNotes.filter(note => {
-            const age = now - new Date(note.timestamp || note.time).getTime();
-            return age > 3 * 24 * 60 * 60 * 1000;
-          });
-          if (forgotten.length === 0) {
-            groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
-            return;
-          }
-          html += renderGroupedSection("🧠", "Forgotten Ideas", forgotten);
-          break;
-        }
+              const age = now - new Date(note.timestamp || note.time).getTime();
+              return age > 3 * 24 * 60 * 60 * 1000;
+            });
+            if (forgotten.length === 0) {
+              groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
+              return;
+            }
+            html += renderGroupedSection("🧠", "Forgotten Ideas", forgotten);
+            break;
+        }   
 
-        html += `
-          <button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>
-        `;
+          html += `<button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>`;
       }
 
       groupedNotes.innerHTML = html;
     }
 
+
     function togglePreview() {
-      console.log('Toggling preview visibility');
+      console.log('🌀 Toggling preview visibility');
 
       const preview = document.querySelector(".preview-overlay");
-      const mainEditor = document.getElementById("mainEditor");
       const mode = getCurrentEditorMode?.() || "document";
+      const mainEditor = document.getElementById("mainEditor");
+      const marginBox = document.getElementById("marginBox");
 
       if (!preview || !mainEditor) {
-        console.warn("⚠️ Missing preview or mainEditor reference");
+        console.warn("⚠️ Missing preview or editor reference");
         return;
       }
 
       const isVisible = preview.classList.toggle("preview-visible");
-      
+
       if (isVisible) {
         try {
-          if (mode === "notepad") {
-            updateGrouping();
+          if (mode === "notepad" || mode === "note") {
+            updateGrouping?.(); // ✅ Pull in the latest notes
           } else if (mode === "document") {
-            updateDocumentPreview?.();
+            updateDocumentPreview?.(); // ✅ Update layout/margins/fonts, etc.
           }
         } catch (err) {
           console.error("❌ Failed to update preview:", err);
-          forceEditorRecovery?.(); // optional fallback
+          forceEditorRecovery?.();
         }
       } else {
-        // 💡 Apply recovery logic after preview closes
         requestAnimationFrame(() => {
+          // ⛑️ Recovery display logic after preview closes
           mainEditor.classList.remove("hidden-editor");
           mainEditor.style.display = "block";
           mainEditor.style.opacity = "1";
           mainEditor.style.pointerEvents = "auto";
-          mainEditor.scrollTop = 0;
+
+          if (marginBox) marginBox.scrollTop = 0;
           mainEditor.offsetHeight; // force reflow
         });
       }
 
-      console.log('Preview is now', isVisible ? 'visible' : 'hidden');
+      console.log('📺 Preview is now', isVisible ? 'visible' : 'hidden');
     }
 
     function updateDocumentPreview() {
-      const html = getActiveEditorContent(); // or your equivalent
-      preview.innerHTML = renderPreviewHTML(html);
+      const preview = document.querySelector(".preview-overlay");
+      const marginBox = document.getElementById("marginBox");
+
+      if (!preview || !marginBox) {
+        console.warn("⚠️ Cannot update preview — missing preview or marginBox");
+        return;
+      }
+
+      const html = marginBox.innerHTML;
+      preview.innerHTML = renderPreviewHTML?.(html) || html;
     }
 
     function getActiveEditorContent() {
-      return mainEditor.innerHTML; // or use .value if you're working in <textarea>
+      const mode = getCurrentEditorMode?.() || "document";
+
+      if (mode === "document") {
+        const marginBox = document.getElementById("marginBox");
+        return marginBox?.innerHTML || "";
+      }
+
+      if (mode === "note") {
+        const noteEditor = document.getElementById("noteEditor");
+        return noteEditor?.innerHTML || "";
+      }
+
+      return ""; // fallback if no known mode
     }
 
     function toggleItalic() {
+      // 🛑  Only run while Document Mode is active
+      if ((localStorage.getItem("editorMode") || "document") !== "document") return;
+
       const range = getValidSelectionRange();
       if (!range) return;
 
+      const selection      = window.getSelection();      // ✅ local, safe
       const commonAncestor = range.commonAncestorContainer;
-      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+      const parentElement  = commonAncestor.nodeType === 3
+        ? commonAncestor.parentElement
+        : commonAncestor;
 
       const isAlreadyItalic = parentElement.closest('i, em');
 
       if (isAlreadyItalic) {
+        /* 🔄  Un‑italic: unwrap <i>/<em> */
         const italicElement = isAlreadyItalic;
         const parent = italicElement.parentNode;
         while (italicElement.firstChild) {
           parent.insertBefore(italicElement.firstChild, italicElement);
         }
         parent.removeChild(italicElement);
+
       } else {
+        /* ✨  Italicize selection */
         const contents = range.extractContents();
-        const i = document.createElement('i');
-        i.appendChild(contents);
-        range.insertNode(i);
+        const iTag = document.createElement('i');
+        iTag.appendChild(contents);
+        range.insertNode(iTag);
+
+        // Reselect styled text
         selection.removeAllRanges();
         const newRange = document.createRange();
-        newRange.selectNodeContents(i);
+        newRange.selectNodeContents(iTag);
         selection.addRange(newRange);
       }
     }
 
     function toggleUnderline() {
+      // 🔒 Only runs in Document mode
+      if ((localStorage.getItem("editorMode") || "document") !== "document") return;
+
       const range = getValidSelectionRange();
       if (!range) return;
 
-      const commonAncestor = range.commonAncestorContainer;
-      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+      const selection = window.getSelection(); // local + safe
 
-      const isAlreadyUnderlined = parentElement.closest('u');
+      const commonAncestor = range.commonAncestorContainer;
+      const parentElement = commonAncestor.nodeType === 3
+        ? commonAncestor.parentElement
+        : commonAncestor;
+
+      const isAlreadyUnderlined = parentElement.closest("u");
 
       if (isAlreadyUnderlined) {
+        // 🧼 Remove underline
         const uElement = isAlreadyUnderlined;
         const parent = uElement.parentNode;
         while (uElement.firstChild) {
@@ -2169,10 +2241,13 @@
         }
         parent.removeChild(uElement);
       } else {
+        // 🖍️ Apply underline
         const contents = range.extractContents();
-        const u = document.createElement('u');
+        const u = document.createElement("u");
         u.appendChild(contents);
         range.insertNode(u);
+
+        // Reselect it
         selection.removeAllRanges();
         const newRange = document.createRange();
         newRange.selectNodeContents(u);
@@ -2181,11 +2256,15 @@
     }
 
     function deleteNoteByTime(time) {
+      const currentMode = getCurrentEditorMode?.() || "document";
       const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
-      const updated = notes.filter(n => n.timestamp !== time);
+
+      const updated = notes.filter(n => !(n.timestamp === time && (n.mode || "document") === currentMode));
+
       localStorage.setItem('savedNotes', JSON.stringify(updated));
       updateGrouping();
     }
+
 
     window.onload = async function () {
       await initializeFirebase();
@@ -2194,56 +2273,60 @@
         if (!user) {
           alert("Please sign in first.");
           window.location.href = "signin.html";
-        } else {
-          console.log("✅ User is signed in:", user.email);
+          return;
+        }
 
-          const editor = document.getElementById('mainEditor'); // ✅ consistent anchor
-          if (editor && editor.classList.contains('hidden-editor')) {
-            editor.classList.remove('hidden-editor');
-            editor.style.display = 'block';
-            editor.getBoundingClientRect(); // force reflow if needed
-            editor.classList.add('visible');
+        console.log("✅ User is signed in:", user.email);
+
+        const editor = document.getElementById('mainEditor');
+        if (editor && editor.classList.contains('hidden-editor')) {
+          editor.classList.remove('hidden-editor');
+          editor.style.display = 'block';
+          editor.getBoundingClientRect(); // force reflow
+          editor.classList.add('visible');
+        }
+
+        loadSavedText(); // Load saved tab content
+
+        mainEditor.addEventListener("input", () => {
+          hasUnsavedChanges = true;
+
+          const currentMode = getCurrentEditorMode();
+          const text = mainEditor.innerText || "";
+
+          if (currentMode === "document") {
+            const newTitle = text.split("\n")[0]?.trim() || "Untitled";
+
+          if (tabs[activeTabIndex]) {
+            tabs[activeTabIndex].title = newTitle;
+            localStorage.setItem("tabs", JSON.stringify(tabs));
+            safeRenderTabs();
+            console.log("📝 Tab title updated:", newTitle);
           }
-
-          loadSavedText();
-
-          mainEditor.addEventListener("input", () => {
-            hasUnsavedChanges = true; // ✅ still needed
-            
-            const currentMode = getCurrentEditorMode();
-            const text = mainEditor.innerText || "";
-
-              if (currentMode === "document") {
-                const newTitle = text.split("\n")[0]?.trim() || "Untitled";
-
-                console.log("📝 Updating tab title (Document):", newTitle);
-
-              if (tabs[activeTabIndex]) {
-                tabs[activeTabIndex].title = newTitle;
-                localStorage.setItem("tabs", JSON.stringify(tabs));
-                safeRenderTabs();
-              }
-            } else {
-              // Optional: Add a debug log or skip entirely
-              console.log("✏️ Skipping title update in Notepad mode");
-            }
-          });
-
-          applyMoodTheme();
-          updateGrouping();
-          safeRenderTabs();
-          setInterval(autoSave, 30000);
+        } else {
+          console.log("🧠 Notepad mode — skipping title auto-update");
         }
       });
 
-      mainEditor.addEventListener("click", function (e) {
-        const el = e.target.closest("a");
-        if (el && el.href) {
-          e.preventDefault();
-          window.open(el.href, "_blank", "noopener");
-        }
-      });
+      applyMoodTheme();
+      updateGrouping();
+      safeRenderTabs();
+      setInterval(autoSave, 30000); // Auto-save every 30s
+     });
     };
+
+
+    mainEditor.addEventListener("click", function (e) {
+      const currentMode = getCurrentEditorMode?.() || "document";
+      if (currentMode !== "document") return;
+
+      const el = e.target.closest("a");
+      if (el && el.href) {
+        e.preventDefault();
+        window.open(el.href, "_blank", "noopener");
+      }
+    });
+
 
     function deleteSelectedNotes() {
       const checkboxes = document.querySelectorAll('.note-delete-checkbox:checked');
@@ -2304,57 +2387,49 @@
         } else {
           plainText += node.innerText || node.textContent || "";
         }
-     });
+      });
 
-     // Replace the selection with plain text
-     range.deleteContents();
-     range.insertNode(document.createTextNode(plainText));
+      // Replace the selection with plain text
+      range.deleteContents();
+      const textNode = document.createTextNode(plainText);
+      range.insertNode(textNode);
 
-     // Reset selection to end of inserted text
-     selection.removeAllRanges();
-     const newRange = document.createRange();
-     newRange.setStartAfter(range.endContainer);
-     selection.addRange(newRange);
+      // 🔄 Reset selection AFTER inserted text
+      selection.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.setStartAfter(textNode);
+      newRange.setEndAfter(textNode);
+      selection.addRange(newRange);
+
+      saveStatus.innerText = "🚫 Formatting removed.";
     }
 
     document.addEventListener("selectionchange", () => {
+      if (getCurrentEditorMode?.() !== "document") return;
       const range = getValidSelectionRange();
       if (!range) return;
-
       savedRange = range.cloneRange();
     });
 
+    document.addEventListener("DOMContentLoaded", () => {
+      const fontSizeBtn = document.getElementById("fontSizeBtn");
       const fontSizeDropdown = document.getElementById("fontSizeDropdownPanel");
       const applyBtn = document.getElementById("applyFontSize");
       const dropdownSelect = document.getElementById("fontSizeSelect");
       const customInput = document.getElementById("customFontSize");
 
-      fontSizeDropdown.addEventListener("mousedown", (e) => {
-        const tag = e.target.tagName;
-        if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
-          e.preventDefault(); // only block blur on non-interactive elements
-        }
-      });
+      if (!fontSizeBtn || !applyBtn || !dropdownSelect || !customInput) return;
 
-      document.addEventListener("DOMContentLoaded", () => {
-        const fontSizeBtn = document.getElementById("fontSizeBtn");
+      fontSizeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        saveSelection();
+        fontSizeDropdown.classList.toggle("hidden");
 
-        if (!fontSizeBtn) {
-          console.warn("⛔ fontSizeBtn not found");
-          return;
-        }
+        const rect = fontSizeBtn.getBoundingClientRect();
+        fontSizeDropdown.style.left = `${rect.left}px`;
+        fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
 
-        fontSizeBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          saveSelection();
-          fontSizeDropdown.classList.toggle("hidden");
-
-          const rect = fontSizeBtn.getBoundingClientRect();
-          fontSizeDropdown.style.left = `${rect.left}px`;
-          fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
-
-          setTimeout(() => customInput.focus(), 0);
-        });
+        setTimeout(() => customInput.focus(), 0);
       });
 
       applyBtn.addEventListener("click", () => {
@@ -2364,7 +2439,7 @@
         const selectedSize = dropdownSelect.value;
         const fontSize = customValue !== "" ? `${customValue}pt` : selectedSize;
 
-        if (!fontSize) return; // Nothing selected or entered
+        if (!fontSize) return;
 
         const range = getValidSelectionRange();
         if (!range) return;
@@ -2378,19 +2453,37 @@
 
         fontSizeDropdown.classList.add("hidden");
         customInput.value = "";
-        dropdownSelect.selectedIndex = 0; // reset dropdown
+        dropdownSelect.selectedIndex = 0;
       });
 
-      // Hide dropdown when clicking outside
+      // Close dropdown if clicking outside
       document.addEventListener("click", (e) => {
         if (!fontSizeDropdown.contains(e.target) && !fontSizeBtn.contains(e.target)) {
           fontSizeDropdown.classList.add("hidden");
         }
       });
 
+      // Prevent blur when interacting inside dropdown
+      fontSizeDropdown.addEventListener("mousedown", (e) => {
+        const tag = e.target.tagName;
+        if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
+          e.preventDefault();
+        }
+      });
+    });
+
+
     function printNote() {
+      const mode = getCurrentEditorMode?.() || "document";
+
+      let noteContent = "";
+      if (mode === "notepad") {
+        noteContent = mainEditor.innerHTML;
+      } else if (mode === "document") {
+        noteContent = marginBox?.innerHTML || mainEditor.innerHTML; // fallback if marginBox missing
+      }
+
       const printWindow = window.open('', '_blank');
-      const noteContent = mainEditor.innerHTML;
 
       const styles = `
         <style>
@@ -2428,7 +2521,6 @@
       printWindow.document.close();
       printWindow.focus();
 
-      // Delay to ensure styles render
       setTimeout(() => {
         printWindow.print();
         printWindow.close();
@@ -2436,49 +2528,55 @@
     }
 
     function toggleBold() {
+      /* 🔒  Guard — run only while the Document suite is active */
+      if ((localStorage.getItem("editorMode") || "document") !== "document") return;
+
       const range = getValidSelectionRange();
       if (!range) return;
 
+      const selection      = window.getSelection();               // local + safe
       const commonAncestor = range.commonAncestorContainer;
-      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+      const parentElement  = commonAncestor.nodeType === 3
+        ? commonAncestor.parentElement
+        : commonAncestor;
 
-      // 🔍 Check if we're already bolded
       const isAlreadyBold = parentElement.closest('b, strong');
 
       if (isAlreadyBold) {
-       // 🧼 Unbold: replace <b>/<strong> with its inner content
-       const boldElement = isAlreadyBold;
-       const parent = boldElement.parentNode;
-       while (boldElement.firstChild) {
-         parent.insertBefore(boldElement.firstChild, boldElement);
-       }
-       parent.removeChild(boldElement);
-     } else {
-       // 💥 Bold: wrap in <b>
-       const contents = range.extractContents();
-       const b = document.createElement('b');
-       b.appendChild(contents);
-       range.insertNode(b);
+        /* 🧼  Remove bold wrapper */
+        const boldElement = isAlreadyBold;
+        const parent = boldElement.parentNode;
+        while (boldElement.firstChild) {
+          parent.insertBefore(boldElement.firstChild, boldElement);
+        }
+        parent.removeChild(boldElement);
 
-       // Reset selection to newly inserted element
-       selection.removeAllRanges();
-       const newRange = document.createRange();
-       newRange.selectNodeContents(b);
-       selection.addRange(newRange);
-     }
+      } else {
+        /* 💥  Apply bold */
+        const contents = range.extractContents();
+        const bTag = document.createElement('b');
+        bTag.appendChild(contents);
+        range.insertNode(bTag);
+
+        // Reselect the new bold text
+        selection.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.selectNodeContents(bTag);
+        selection.addRange(newRange);
+      }
     }
 
-    // ✅ Margin Input UI logic
     document.addEventListener("DOMContentLoaded", () => {
       const marginBtn = document.getElementById("marginBtn");
       const marginDropdown = document.getElementById("marginDropdown");
-      const editor = document.getElementById("mainEditor");
+      const editor = document.getElementById("mainEditor"); // or use getActiveEditor()
 
       if (!marginBtn || !marginDropdown || !editor) {
         console.warn("⛔ Missing margin UI elements.");
         return;
       }
 
+      // 🔽 When margin button is clicked, toggle dropdown and load saved values
       marginBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         marginDropdown.classList.toggle("hidden");
@@ -2493,10 +2591,7 @@
         document.getElementById("marginRight").value = (savedMargins.right || 0) / 96;
       });
 
-      function inchesToPixels(inches) {
-        return parseFloat(inches) * 96;
-      }
-
+      // ✅ Apply margin values when Apply button is clicked
       document.getElementById("applyMarginBtn").addEventListener("click", () => {
         const top = inchesToPixels(document.getElementById("marginTop").value || 0);
         const bottom = inchesToPixels(document.getElementById("marginBottom").value || 0);
@@ -2508,16 +2603,16 @@
         editor.style.paddingLeft = `${left}px`;
         editor.style.paddingRight = `${right}px`;
 
-        // ✅ Save margins only *after* user applied them
+        // ✅ Save margins
         localStorage.setItem("customMargins", JSON.stringify({ top, bottom, left, right }));
 
         marginDropdown.classList.add("hidden");
 
-        // Optional: reapply to make sure margins persist
-        applyCustomMargins();
+        // 💡 Optional: reapply to keep state consistent
+        applyCustomMargins?.();
       });
 
-      // Close dropdown if clicked outside
+      // 👀 Close margin dropdown if user clicks outside
       document.addEventListener("click", (e) => {
         if (!marginDropdown.contains(e.target) && !marginBtn.contains(e.target)) {
           marginDropdown.classList.add("hidden");
@@ -2525,6 +2620,9 @@
       });
     });
 
+    function inchesToPixels(inches) {
+        return parseFloat(inches) * 96;
+    }  
 
     function applyCustomMargins() {
       const saved = JSON.parse(localStorage.getItem("customMargins") || "{}");
@@ -2534,24 +2632,17 @@
       const left = saved.left || 0;
       const right = saved.right || 0;
 
+      const editor = getActiveEditor(); // 🔁 This ensures the right editor is used
+
+      if (!editor) {
+        console.warn("⛔ No active editor found to apply margins");
+        return;
+      }
+
       editor.style.paddingTop = `${top}px`;
       editor.style.paddingBottom = `${bottom}px`;
       editor.style.paddingLeft = `${left}px`;
       editor.style.paddingRight = `${right}px`;
-    }
-
-    function setupModeToggle() {
-      modeToggleBtn = document.getElementById("modeToggleBtn");
-
-      modeToggleBtn?.addEventListener("click", () => {
-        const currentMode = editor?.getAttribute("data-mode");
-        const nextMode = currentMode === "notepad" ? "document" : "notepad";
-        localStorage.setItem("editorMode", nextMode);
-        applyEditorMode(nextMode); // 👈 THIS is what was missing earlier
-      });
-
-      const savedMode = localStorage.getItem("editorMode") || "document";
-      applyEditorMode(savedMode);
     }
 
     function abortIfRenaming() {
@@ -2560,180 +2651,6 @@
         return true;
       }
       return false;
-    }
-
-    function createTabElement(tab, activeIndexForMode) {
-      const tabBtn = document.createElement("div");
-      tabBtn.className = "tab";
-      if (tab.originalIndex === activeIndexForMode) {
-        tabBtn.classList.add("active");
-      }
-
-      const tabLabel = document.createElement("span");
-      tabLabel.className = "tab-label";
-      tabLabel.innerText = tab.title;
-      tabLabel.addEventListener("click", () => switchTab(tab.originalIndex));
-
-      tabLabel.addEventListener("dblclick", (e) => {
-        e.stopPropagation();
-        isRenamingTab = true;
-
-        const input = document.createElement("input");
-        input.className = "tab-rename-input";
-        input.value = tab.title;
-
-        if (document.body.classList.contains("dark-theme")) {
-          input.style.background = "#1e1e1e";
-          input.style.color = "#eee";
-          input.style.border = "1px dashed hotpink";
-          input.style.caretColor = "hotpink";
-        }
-
-        input.addEventListener("click", e => e.stopPropagation());
-
-        input.addEventListener("keydown", e => {
-          if (e.key === "Enter") input.blur();
-          if (e.key === "Escape") {
-            isRenamingTab = false;
-            renderAllTabs();
-          }
-        });
-
-        input.addEventListener("blur", e => {
-          const newTitle = e.target.value.trim();
-          if (newTitle && newTitle !== tab.title) {
-            tabs[tab.originalIndex].title = newTitle;
-            localStorage.setItem("tabs", JSON.stringify(tabs));
-            hasUnsavedChanges = true;
-          }
-          isRenamingTab = false;
-          renderAllTabs();
-        });
-
-        tabBtn.replaceChild(input, tabLabel);
-        setTimeout(() => {
-          input.focus();
-          input.select();
-        }, 0);
-      });
-
-      const closeBtn = document.createElement("button");
-      closeBtn.innerText = "⨯";
-      closeBtn.className = "tab-close-btn";
-      closeBtn.title = "Close Tab";
-      closeBtn.onclick = (e) => {
-        e.stopPropagation();
-        closeTab(tab.originalIndex);
-      };
-
-      tabBtn.appendChild(tabLabel);
-      tabBtn.appendChild(closeBtn);
-
-      return tabBtn;
-    }
-
-    function createAddTabButton(mode) {
-      const addTabBtn = document.createElement("div");
-      addTabBtn.innerText = "+";
-      addTabBtn.className = "tab add-tab";
-      addTabBtn.onclick = () => addNewTab(mode);
-      return addTabBtn;
-    }
-
-    function switchTab(originalIndex) {
-      if (typeof tabs[originalIndex] === "undefined") {
-        console.warn("⚠️ Tried to switch to a tab that doesn’t exist:", originalIndex);
-        return;
-      }
-
-      const selectedTab = tabs[originalIndex];
-
-      setActiveTabIndex(selectedTab.mode, originalIndex);
-      loadActiveTabContent();
-      safeRenderTabs();
-    }
-
-    function closeTab(index) {
-      const currentMode = localStorage.getItem("editorMode") || "document";
-      const tabBeingClosed = tabs[index];
-
-      // 🚫 Prevent tab close during rename
-      if (isRenamingTab) {
-        console.warn("⛔ Cannot close tab while renaming.");
-        return;
-      }
-
-
-      if (isCurrentTabInView && hasUnsavedChanges) {
-        const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
-        if (!confirmClose) return;
-      }
-
-      // 🗑️ Remove tab
-      tabs.splice(index, 1);
-
-
-      if (remainingTabs.length === 0) {
-        // 🆕 No tabs left — create one and stop here
-        addNewTab(currentMode);
-        return;
-      }
-
-      // 🧠 Save new active tab index for this mode
-      setActiveTabIndex(currentMode, remainingTabs[0].originalIndex);
-      activeTabIndex = remainingTabs[0].originalIndex;
-
-      // 💾 Save tabs
-      localStorage.setItem("tabs", JSON.stringify(tabs));
-
-      // 🔁 Re-render tab bar
-      safeRenderTabs();
-
-      // 📥 Load selected tab content
-      loadActiveTabContent();
-    }
-
-    function loadActiveTabContent() {
-      const activeTab = tabs[activeTabIndex];
-      if (!activeTab) {
-        console.warn("⚠️ No active tab to load.");
-        return;
-      }
-    }
-
-    function addNewTab() {
-      const now = new Date();
-
-      // Title logic based on mode
-      const title =
-        mode === "notepad"
-        ? `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`
-        : "📚 EditDocs";
-
-      const safeMode = mode === "notepad" ? "notepad" : "document"
-
-      const newTab = {
-        title,
-        content: "",
-        mode: safeMode
-      };
-
-      tabs.push(newTab);
-      const newIndex = tabs.length - 1;
-      setActiveTabIndex(mode, newIndex);
-      activeTabIndex = newIndex;
-
-      localStorage.setItem("tabs", JSON.stringify(tabs));
-      safeRenderTabs(); // 💡 Ensures rename-safe refresh
-      loadActiveTabContent(); // ✅ Load blank or default content
-    }
-
-    function getActiveTabIndex(mode) {
-      return parseInt(localStorage.getItem(`activeTabIndex_${mode}`)) || 0;
-    }
-
-    function setActiveTabIndex(mode, index) {
-      localStorage.setItem(`activeTabIndex_${mode}`, index);
     }
 
     const paperSizes = {
@@ -2745,7 +2662,12 @@
     };
 
     function updatePaperSize() {
-      const selectedSize = paperSizeSelect.value;
+      const mode = getCurrentEditorMode?.() || "document";
+      if (mode !== "document") return;
+
+      const selectedSize = paperSizeSelect?.value;
+      if (!selectedSize) return;
+
       switch (selectedSize) {
         case "letter":
           mainEditor.style.width = "8.5in";
