@@ -2186,10 +2186,10 @@
       const activeSuite = document.querySelector('.suite.active');
       const preview = activeSuite?.querySelector('.preview-overlay');
       const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
-      const mainEditor = document.getElementById("mainEditor");
+      const editor = activeSuite?.querySelector('.editor');
       const marginBox = document.getElementById("marginBox");
 
-      if (!preview || !mainEditor) {
+      if (!preview || !editor) {
         console.warn("⚠️ Missing preview or editor reference");
         return;
       }
@@ -2214,13 +2214,13 @@
       } else {
         requestAnimationFrame(() => {
           // ⛑️ Recovery display logic after preview closes
-          mainEditor.classList.remove("hidden-editor");
-          mainEditor.style.display = "block";
-          mainEditor.style.opacity = "1";
-          mainEditor.style.pointerEvents = "auto";
+          editor.classList.remove("hidden-editor");
+          editor.style.display = "block";
+          editor.style.opacity = "1";
+          editor.style.pointerEvents = "auto";
 
           if (marginBox) marginBox.scrollTop = 0;
-          mainEditor.offsetHeight; // force reflow
+          editor.offsetHeight; // force reflow
         });
       }
 
