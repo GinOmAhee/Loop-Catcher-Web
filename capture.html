@@ -336,7 +336,6 @@
     position: relative;
     overflow: auto;
     min-height: 100%;
-    background-color: #fffdf7;
   }
 
   #mainEditor::before {
@@ -346,20 +345,13 @@
     bottom: var(--paddingBottom);
     left: var(--paddingLeft);
     right: var(--paddingRight);
-    border: 1px dashed rgba(166, 150, 150, 0.1);
+    border: 1px dashed rgba(0, 0, 0, 0.1);
     pointer-events: none;
   }
 
-  #editor {
-    position: relative;
-    background: white;
-    z-index: 5;
-  }
-
   /* Notepad Mode Styles */
-  #editor[data-mode="notepad"] {
+  #mainEditor[data-mode="notepad"] {
     font-family: "Courier New", monospace;
-    position: relative;
     font-size: 1rem;
     padding: 0.9rem;
     width: 50%;
@@ -369,11 +361,9 @@
     background-color: #fffdf7;
     height: 300px; /* ← Add your preferred height */
     overflow-y: auto; /* Optional: adds scroll if content overflows */
-    z-index: 5;
   }
 
-  #editor[data-mode="document"] {
-    position: relative;
+  #mainEditor[data-mode="document"] {
     width: 8.27in;
     min-height: 11.69in;
     padding: 0;
@@ -384,9 +374,9 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
     box-sizing: border-box;
+    width: 80%;
     min-height: 400px;
     max-height: calc(100vh - 5rem); /* or whatever fits below your tab bar */
-    z-index: 5;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -446,7 +436,7 @@
     right: 0;
     height: 0;
     border-top: 1px dotted #aaa;
-    z-index: 0;
+    z-index: 1;
     pointer-events: none;
   }
 
@@ -455,7 +445,7 @@
     inset: var(--margin-top, 1in) var(--margin-right, 1in) var(--margin-bottom, 1in) var(--margin-left, 1in);
     border: 2px dashed rgba(0, 0, 0, 0.2);
     pointer-events: none;
-    z-index: 0;
+    z-index: 1;
   }
 
   .margin-box::before {
@@ -467,7 +457,7 @@
     left: var(--margin-left, 1in);
     border: 2px dashed rgba(0, 0, 0, 0.2); /* visual margin border */
     pointer-events: none;
-    z-index: 0;
+    z-index: 2;
   }
 
   #mainEditor:not(.hidden-editor) {
@@ -1257,12 +1247,8 @@
       </div>
 
         <!-- 📝 Rich Text Editor -->
-        <!-- Outer shell (layout only) -->
-        <div id="mainEditor" contenteditable="false">
-          <!-- Actual typing zone -->
-          <div id="editorContent" contenteditable="true"></div>
-          <!-- Margin visuals only -->
-          <div id="marginBox" class="margin-box" tabindex="-1"></div>
+        <div id="mainEditor" contenteditable="true" data-mode="document">
+          <div class="margin-box" id="marginBox" contenteditable="false" tabindex="-1"></div>
         </div>
 
       <button id="modeToggleBtn" title="Switch Editor Mode">🧠 Quick Note Mode</button>
@@ -1282,44 +1268,13 @@
   <script>
     let isRenamingTab = false;
 
-    const contentZone = document.getElementById("editorContent");
-    contentZone.focus();
-
     let db = null;
 
     let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
 
     let toggleBtn;
     let saveStatus;
-    
-    let maineditor;
-    let editor = document.getElementById("editorContent");
-
-    function getSafeElement(id) {
-      const el = document.getElementById(id);
-      if (el) return el;
-
-      console.warn(`⚠️ ${id} not found. Returning dummy element.`);
-      return {
-        getAttribute: () => "document",
-        setAttribute: () => {},
-        addEventListener: () => {},
-        removeEventListener: () => {},
-        focus: () => {},
-        contains: () => false,
-        innerHTML: "",
-        classList: {
-          add: () => {},
-          remove: () => {},
-          contains: () => false,
-        },
-        style: {},
-        scrollTop: 0,
-        appendChild: () => {},
-      };
-    }
-
-    
+    let editor, maineditor
     let attachedFilesList;
     let groupedNotes;
     let fontBtn;
@@ -1429,7 +1384,8 @@
 
     window.addEventListener("DOMContentLoaded", () => {
 
-      mainEditor = document.getElementById("mainEditor");  // layout shell
+      editor = document.getElementById("mainEditor");      // your interactive zone
+      mainEditor = editor; // layout shell
       toggleBtn = document.getElementById('previewToggle');
       saveStatus = document.getElementById('saveStatus');
       attachedFilesList = document.getElementById('attachedFilesList');
@@ -1457,32 +1413,26 @@
 
       const mode = localStorage.getItem("editorMode") || "document";
       setActiveTabBar(mode);
+      
+      if (!mainEditor) {
+        console.error("❌ mainEditor not found");
+        return;
+      }
 
       console.log("✅ mainEditor is:", mainEditor);
 
-      if (editor) {
-        editor.addEventListener("click", function (e) {
-          const el = e.target.closest("a");
-          if (el && el.href) {
-            e.preventDefault();
-            window.open(el.href, "_blank", "noopener");
-          }
-        });
-      } else {
-        console.warn("⚠️ editor not found — skipping link click listener");
-      }
-        editor.addEventListener("input", () => {
-          undoStack.push(editor.innerHTML);
-          redoStack = [];
+      mainEditor.addEventListener("input", () => {
+        undoStack.push(mainEditor.innerHTML);
+        redoStack = [];
 
-          clearTimeout(debounceTimer);
-          debounceTimer = setTimeout(() => {
-            localStorage.setItem("capturedText", editor.innerHTML);
-            localStorage.setItem("lastSaved", new Date().toISOString());
-            updateGrouping();
-            saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
-          }, 1000);
-        });
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          localStorage.setItem("capturedText", mainEditor.innerHTML);
+          localStorage.setItem("lastSaved", new Date().toISOString());
+          updateGrouping();
+          saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
+        }, 1000);
+      });
     
       previewToggle.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1492,9 +1442,7 @@
       document.addEventListener("click", (e) => {
         const clickedInsidePreview = preview.contains(e.target);
         const clickedToggle = previewToggle.contains(e.target);
-        const clickedInsideMainEditor = mainEditor.contains(e.target);
-        const clickedInsideEditor =
-          mainEditor.contains(e.target) || editor?.contains(e.target);
+        const clickedInsideEditor = mainEditor.contains(e.target);
         const isRenaming = e.target.classList.contains("tab-rename-input");
 
         console.log("Preview auto-close triggered.");
@@ -1502,22 +1450,19 @@
         console.log("Clicked inside editor:", clickedInsideEditor);
         console.log("Editor was hidden:", mainEditor.classList.contains("hidden-editor"));
 
-        setTimeout(() => {
-
-          if (
-            preview.classList.contains("preview-visible") &&
-            !clickedInsidePreview &&
-            !clickedToggle &&
-            !clickedInsideEditor &&
-            !isRenaming
-          ) {
-            preview.classList.remove("preview-visible");
-            if (mainEditor.classList.contains("hidden-editor")) {
-              mainEditor.classList.remove("hidden-editor");
-            }
-          }
-        }, 50);
-      })
+        if (
+          preview.classList.contains("preview-visible") &&
+          !clickedInsidePreview &&
+          !clickedToggle &&
+          !clickedInsideEditor &&
+          !isRenaming
+        ) {
+         preview.classList.remove("preview-visible");
+         if (mainEditor.classList.contains("hidden-editor")) {
+           mainEditor.classList.remove("hidden-editor");
+         }
+        }
+      });
 
       fontBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -2082,21 +2027,24 @@
 
 
     function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
-      if (!editor || !mainEditor) {
+      if (!mainEditor || !marginBox) {
         console.error("❌ Cannot load note — editor elements missing");
         return;
-      }
+       }
 
         switchEditorMode(mode); // ✅ Ensure the correct mode is active BEFORE loading content
 
-        editor.innerHTML = noteHTML;
+        if (mode === "notepad") {
+          mainEditor.innerHTML = noteHTML; // inject into the full editor shell
+        } else if (mode === "document") {
+          marginBox.innerHTML = noteHTML; // inject only inside marginBox
+        }
 
         setTimeout(() => focusEditorSafely(), 0); // 🧠 Focus cursor nicely
-        editor.focus();
-        
+
+        mainEditor.focus();
         saveStatus.innerText = "📝 Loaded note from preview";
         preview.style.display = 'none';
-
         undoStack.push(noteHTML);
         redoStack = [];
 
@@ -2251,7 +2199,6 @@
 
       const preview = document.querySelector(".preview-overlay");
       const mainEditor = document.getElementById("mainEditor");
-      const editor = document.getElementById("editorContent");
       const mode = getCurrentEditorMode?.() || "document";
 
       if (!preview || !mainEditor) {
@@ -2281,11 +2228,6 @@
           mainEditor.style.pointerEvents = "auto";
           mainEditor.scrollTop = 0;
           mainEditor.offsetHeight; // force reflow
-
-          // ✅ Also refocus the inner editor if needed:
-          if (editor) {
-            editor.focus();
-          }  
         });
       }
 
@@ -2298,8 +2240,7 @@
     }
 
     function getActiveEditorContent() {
-      const contentDiv = document.getElementById("editorContent");
-      return contentDiv?.innerHTML || "";
+      return mainEditor.innerHTML; // or use .value if you're working in <textarea>
     }
 
     function toggleItalic() {
@@ -2375,24 +2316,35 @@
         } else {
           console.log("✅ User is signed in:", user.email);
 
-          const mainEditor = document.getElementById('mainEditor'); // ✅ layout shell
-
-          if (mainEditor && mainEditor.classList.contains('hidden-editor')) {
-            mainEditor.classList.remove('hidden-editor');
-            mainEditor.style.display = 'block';
-            mainEditor.getBoundingClientRect(); // ✅ force reflow
-            mainEditor.classList.add('visible');
+          const editor = document.getElementById('mainEditor'); // ✅ consistent anchor
+          if (editor && editor.classList.contains('hidden-editor')) {
+            editor.classList.remove('hidden-editor');
+            editor.style.display = 'block';
+            editor.getBoundingClientRect(); // force reflow if needed
+            editor.classList.add('visible');
           }
 
           loadSavedText();
 
-          const editor = document.getElementById("editorContent");
+          mainEditor.addEventListener("input", () => {
+            hasUnsavedChanges = true; // ✅ still needed
+            
+            const currentMode = getCurrentEditorMode();
+            const text = mainEditor.innerText || "";
 
-          editor.addEventListener("click", function (e) {
-            const el = e.target.closest("a");
-            if (el && el.href) {
-              e.preventDefault();
-              window.open(el.href, "_blank", "noopener");
+              if (currentMode === "document") {
+                const newTitle = text.split("\n")[0]?.trim() || "Untitled";
+
+                console.log("📝 Updating tab title (Document):", newTitle);
+
+              if (tabs[activeTabIndex]) {
+                tabs[activeTabIndex].title = newTitle;
+                localStorage.setItem("tabs", JSON.stringify(tabs));
+                safeRenderTabs();
+              }
+            } else {
+              // Optional: Add a debug log or skip entirely
+              console.log("✏️ Skipping title update in Notepad mode");
             }
           });
 
@@ -2400,6 +2352,14 @@
           updateGrouping();
           safeRenderTabs();
           setInterval(autoSave, 30000);
+        }
+      });
+
+      mainEditor.addEventListener("click", function (e) {
+        const el = e.target.closest("a");
+        if (el && el.href) {
+          e.preventDefault();
+          window.open(el.href, "_blank", "noopener");
         }
       });
     };
@@ -2516,17 +2476,6 @@
         });
       });
 
-      document.addEventListener("DOMContentLoaded", () => {
-        editor = getSafeElement("editorContent");
-        mainEditor = getSafeElement("mainEditor");
-
-        // now it's safe to use
-        editor.setAttribute("data-mode", "document");  // won't crash
-        editor.addEventListener("input", () => {
-          console.log("✍️ Editor input detected.");
-        });
-      });
-
       applyBtn.addEventListener("click", () => {
         restoreSelection();
 
@@ -2560,7 +2509,7 @@
 
     function printNote() {
       const printWindow = window.open('', '_blank');
-      const noteContent = document.getElementById("editorContent").innerHTML;
+      const noteContent = mainEditor.innerHTML;
 
       const styles = `
         <style>
@@ -2713,14 +2662,7 @@
     }
 
     function cacheEditorContent() {
-
-      if (!editor) {
-        console.warn("⚠️ editor not available when caching content.");
-        return;
-      }
-
-      const currentMode = editor.getAttribute("data-mode"); // editor = #mainEditor
-
+      const currentMode = editor.getAttribute("data-mode");
       if (currentMode === "notepad") {
         notepadCache = editor.innerHTML;
       } else if (currentMode === "document") {
@@ -2732,7 +2674,6 @@
       if (!editor) return;
 
       const marginBox = document.getElementById("marginBox");
-      const editorContent = document.getElementById("editorContent"); // 👈 actual editable zone
       const paperSize = getSelectedPaperSize?.(); // optional
       const savedMargins = JSON.parse(localStorage.getItem("customMargins") || "{}");
 
@@ -2740,24 +2681,22 @@
       editor.setAttribute("contenteditable", "true");
       editor.classList.remove("notepad-mode", "document-mode");
       editor.classList.add(`${mode}-mode`);
-
-      editorContent.setAttribute("contenteditable", "true"); // 👈 only inner is editable
-      editorContent.classList.remove("notepad-mode", "document-mode");
-      editorContent.classList.add(`${mode}-mode`);
+      editor.setAttribute("data-mode", mode);
 
       // 🧠 NOTEPAD MODE
       if (mode === "notepad") {
         marginBox?.classList.add("hidden");
+        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "none");
 
         // Clear any inline styles related to document layout
-        editorContent.style.margin = "";
-        editorContent.style.paddingTop = "";
-        editorContent.style.paddingBottom = "";
-        editorContent.style.paddingLeft = "";
-        editorContent.style.paddingRight = "";
-        editorContent.style.removeProperty("width");
-        editorContent.style.removeProperty("min-height");
+        editor.style.margin = "";
+        editor.style.paddingTop = "";
+        editor.style.paddingBottom = "";
+        editor.style.paddingLeft = "";
+        editor.style.paddingRight = "";
+        editor.style.removeProperty("width");
+        editor.style.removeProperty("min-height");
 
         console.log("🔍 Width after cleanup:", editor.style.width, editor.style.minHeight);
 
@@ -2767,14 +2706,15 @@
       // 📄 DOCUMENT MODE
       } else if (mode === "document") {
         marginBox?.classList.remove("hidden");
+        marginBox?.removeAttribute("contenteditable");
         toolbar && (toolbar.style.display = "flex");
 
         // 📏 Apply saved margins only
         if (Object.keys(savedMargins).length > 0) {
-          editorContent.style.paddingTop = `${savedMargins.top}px`;
-          editorContent.style.paddingBottom = `${savedMargins.bottom}px`;
-          editorContent.style.paddingLeft = `${savedMargins.left}px`;
-          editorContent.style.paddingRight = `${savedMargins.right}px`;
+          editor.style.paddingTop = `${savedMargins.top}px`;
+          editor.style.paddingBottom = `${savedMargins.bottom}px`;
+          editor.style.paddingLeft = `${savedMargins.left}px`;
+          editor.style.paddingRight = `${savedMargins.right}px`;
         }
 
         modeToggleBtn.innerText = "🧠 Notepad Mode";
@@ -2797,58 +2737,54 @@
       const left = saved.left || 0;
       const right = saved.right || 0;
 
-      const editorContent = document.getElementById("editorContent");
+      editor.style.paddingTop = `${top}px`;
+      editor.style.paddingBottom = `${bottom}px`;
+      editor.style.paddingLeft = `${left}px`;
+      editor.style.paddingRight = `${right}px`;
+    }
 
-      if (editorContent) {
-        editorContent.style.paddingTop = `${top}px`;
-        editorContent.style.paddingBottom = `${bottom}px`;
-        editorContent.style.paddingLeft = `${left}px`;
-        editorContent.style.paddingRight = `${right}px`;
+    function updateTabTitleByMode(mode) {
+      if (!tabs[activeTabIndex]) return;
+
+      if (mode === "notepad") {
+        const now = new Date();
+        tabs[activeTabIndex].title = `✏️ Scribbles ${now.toLocaleDateString()} @ ${now.toLocaleTimeString()}`;
+      } else if (mode === "document") {
+        const text = editor.innerText || "";
+        tabs[activeTabIndex].title = text.split("\n")[0]?.trim() || "📚 EditDocs";
       }
+
+      localStorage.setItem("tabs", JSON.stringify(tabs));
     }
 
     function restoreEditorContent(mode) {
-      const editorContent = document.getElementById("editorContent");
       const marginBox = document.getElementById("marginBox");
 
-      if (!editorContent) return;
-
       if (mode === "notepad") {
-        editorContent.innerHTML = notepadCache || "";
+        editor.innerHTML = notepadCache || "";
       } else if (mode === "document") {
-        editorContent.innerHTML = documentCache || "";
-    
-        // Only append marginBox if it somehow got removed from layout shell
-        const mainEditor = document.getElementById("mainEditor");
-        if (marginBox && mainEditor && !mainEditor.contains(marginBox)) {
-          mainEditor.appendChild(marginBox);
+        editor.innerHTML = documentCache || "";
+        if (marginBox && !editor.contains(marginBox)) {
+          editor.appendChild(marginBox);
         }
       }
 
-      editorContent.innerHTML = editorContent.innerHTML.trim();
+      editor.innerHTML = editor.innerHTML.trim();
     }
 
-
     function setEditorModeAttribute(mode) {
-      const editorContent = document.getElementById("editorContent");
-      if (editorContent) {
-        editorContent.setAttribute("data-mode", mode);
-      }
+      editor.setAttribute("data-mode", mode);
     }
 
     function focusEditorSafely() {
-      const editorContent = document.getElementById("editorContent");
-      if (editorContent) {
-        setTimeout(() => editorContent.focus(), 0);
-      }
+      setTimeout(() => editor.focus(), 0);
     }
 
     function setupModeToggle() {
       modeToggleBtn = document.getElementById("modeToggleBtn");
 
       modeToggleBtn?.addEventListener("click", () => {
-        const editor = document.getElementById("editorContent");
-        const currentMode = editor?.getAttribute("data-mode") || "document";
+        const currentMode = editor?.getAttribute("data-mode");
         const nextMode = currentMode === "notepad" ? "document" : "notepad";
         localStorage.setItem("editorMode", nextMode);
         applyEditorMode(nextMode); // 👈 THIS is what was missing earlier
@@ -3099,7 +3035,7 @@
       }
 
       const mode = activeTab.mode || "document";
-      const currentMode = editorContent.getAttribute("data-mode");
+      const currentMode = editor.getAttribute("data-mode");
 
       // Only switch modes if necessary
       if (mode !== currentMode) {
@@ -3109,15 +3045,18 @@
       }
 
       if (mode === currentMode && editor.innerHTML.trim() !== (activeTab.content || "").trim()) {
-        editorContent.innerHTML = activeTab.content || "";
+        editor.innerHTML = activeTab.content || "";
       }
 
       if (mode === "document" && !editor.contains(marginBox)) {
-        editorContent.appendChild(marginBox);
+        editor.appendChild(marginBox);
       }
 
-      editorContent.setAttribute("data-mode", mode);
+      editor.setAttribute("data-mode", mode);
       focusEditorSafely();
+
+       // 🧠 Safely update title after content + mode have landed
+       updateTabTitleByMode(mode);
     }
 
     function getTabContainer(mode) {
@@ -3159,7 +3098,7 @@
     }
 
     function getCurrentEditorMode() {
-      return editorContent?.getAttribute("data-mode") || "document";
+      return editor?.getAttribute("data-mode") || "document";
     }
 
     function ensureAtLeastOneTab(filteredTabs, mode) {
@@ -3188,29 +3127,29 @@
     };
 
     function updatePaperSize() {
-      if (editorContent.getAttribute("data-mode") !== "document") return; // 🛑 Don't update in notepad mode
+      if (mainEditor.getAttribute("data-mode") !== "document") return; // 🛑 Don't update in notepad mode
 
       const selectedSize = paperSizeSelect.value;
       switch (selectedSize) {
         case "letter":
-          editorContent.style.width = "8.5in";
-          editorContent.style.minHeight = "11in";
+          mainEditor.style.width = "8.5in";
+          mainEditor.style.minHeight = "11in";
           break;
         case "legal":
-          editorContent.style.width = "8.5in";
-          editorContent.style.minHeight = "14in";
+          mainEditor.style.width = "8.5in";
+          mainEditor.style.minHeight = "14in";
           break;
         case "a3":
-          editorContent.style.width = "11.7in";
-          editorContent.style.minHeight = "16.5in";
+          mainEditor.style.width = "11.7in";
+          mainEditor.style.minHeight = "16.5in";
           break;
         case "a4":
-          editorContent.style.width = "8.27in";
-          editorContent.style.minHeight = "11.69in";
+          mainEditor.style.width = "8.27in";
+          mainEditor.style.minHeight = "11.69in";
           break;
         case "a5":
-          editorContent.style.width = "5.8in";
-          editorContent.style.minHeight = "8.3in";
+          mainEditor.style.width = "5.8in";
+          mainEditor.style.minHeight = "8.3in";
           break;
       }
     }
