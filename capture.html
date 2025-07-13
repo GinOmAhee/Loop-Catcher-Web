@@ -978,7 +978,7 @@
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
 
-        <label for="paperSizeSelect">📄 Paper Size:</label>
+        <label for="paperSizeSelect">📄</label>
         <select id="paperSizeSelect">
           <option value="letter">Letter (8.5in × 11in)</option>
           <option value="legal">Legal (8.5in × 14in)</option>
@@ -1417,6 +1417,11 @@
 
       // Auto‑save every 30s
       setInterval(() => autoSave(getActiveEditor()), 30_000);
+
+      // ✅ Auto-close paper size dropdown after selection
+      document.querySelector('#paperSizeSelect')
+        ?.addEventListener('change', e => e.target.blur());
+     
     });
 
     /* ---------------- Suite‑specific listeners --------------- */
