@@ -368,7 +368,6 @@
   #searchInput:focus,
   #modeToggleBtn
   #toggle-preview-btn
-  .side-notes-panel,
   .mode-btn.active,
   .preview-bottom {
   
@@ -502,36 +501,64 @@
     color: white;
   }
 
-  .side-notes-panel {
+  #sideThoughtsBadge {
     position: fixed;
-    right: 1rem;
-    bottom: 1rem;
-    width: 250px;
-    background: var(--side-note-bg, #fff8dc); /* ✨ light default */
-    border: 1px solid var(--side-note-border, #ccc);
+    bottom: 2rem;
+    right: 2rem;
+    background-color: #fff5cc;
+    color: #333;
+    border-radius: 50px;
+    padding: 0.7rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    z-index: 9999;
+  }
+
+  #sideThoughtsBadge:hover .emoji {
+    content: "🤔";
+  }
+  #sideThoughtsBadge:hover .emoji::before {
+    content: "🥰";
+  }
+
+  #thoughtPopup {
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.2);
     padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    z-index: 1000;
-    color: var(--side-note-text, #222);
+    width: 250px;
+    z-index: 9999;
   }
-
-  .side-notes-panel textarea {
-    width: 90%;
+  #thoughtPopup.hidden {
+    display: none;
+  }
+  #thoughtPopup textarea {
+    width: 100%;
     height: 80px;
-    margin-bottom: 0.5rem;
-    background: var(--side-note-textarea-bg, #fff);
-    color: var(--side-note-textarea-text, #000);
-    border: 1px solid var(--side-note-border, #ccc);
-  }
-
-  .side-note-entry {
-    background: var(--side-note-entry-bg, #fafafa);
-    border-left: 4px solid var(--side-note-entry-highlight, #ffcc00);
+    border: 1px solid #ccc;
+    border-radius: 6px;
     padding: 0.5rem;
-    margin-top: 0.5rem;
+    resize: none;
     font-size: 0.9rem;
-    color: var(--side-note-text, #222);
+  }
+  #thoughtPopup button {
+    margin-top: 0.5rem;
+    width: 100%;
+    background: #ffd966;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
   }
 
   /* === TOOLBAR & CONTROLS === */
@@ -1162,15 +1189,16 @@
 
   <div class="save-time" id="saveStatus"></div>
 
-  <!-- ===== SIDE NOTES PANEL ===== -->
-  <div id="sideNotesPanel" class="side-notes-panel">
-    <h3>💡 Side Thoughts</h3>
-    <textarea id="sideNoteInput" placeholder="Type your idea without breaking flow..."></textarea>
-    <button onclick="saveSideNote()">Save</button>
-    <div id="savedSideNotes"></div>
   </div>
 
+  <!-- 🌈 Side Thought Badge & Popup -->
+  <div id="sideThoughtsBadge">
+    <span class="emoji">🧐</span> Side Thoughts
   </div>
+
+  <div id="thoughtPopup" class="hidden">
+    <textarea placeholder="Jot your thought..."></textarea>
+    <button onclick="saveSideThought()">💾 Save</button>
   </div>
 
   <!-- Your main HTML content above -->
@@ -2940,6 +2968,27 @@
         switchToDoc.click();
       }
     });
+
+    document.getElementById("sideThoughtsBadge").addEventListener("click", () => {
+      const popup = document.getElementById("thoughtPopup");
+      popup.classList.toggle("hidden");
+    });
+
+    function saveSideThought() {
+      const textarea = document.querySelector("#thoughtPopup textarea");
+      const thought = textarea.value.trim();
+      if (!thought) return;
+
+      const savedThoughts = JSON.parse(localStorage.getItem("sideThoughts") || "[]");
+      savedThoughts.push({
+        text: thought,
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem("sideThoughts", JSON.stringify(savedThoughts));
+
+      textarea.value = "";
+      alert("🧠 Thought saved!");
+    }
 
   </script>
 
