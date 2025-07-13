@@ -2414,21 +2414,17 @@
     }
 
     function updateDocumentPreview() {
-      const activeSuite = document.querySelector(".suite.active");
-      if (!activeSuite || activeSuite.id !== "docSuite") return; // only for docs
-
-      const preview    = activeSuite.querySelector(".preview-overlay");
-      const docEditor  = document.getElementById("docEditor");
-      const marginBox  = docEditor?.querySelector("#marginBox");
+      const preview   = document.getElementById("docPreview");
+      const docEditor = document.getElementById("docEditor");
+      const marginBox = docEditor?.querySelector("#marginBox");
 
       if (!preview || !marginBox) {
-        console.warn("⚠️ Cannot update preview — missing preview or marginBox");
+        console.warn("⚠️ Cannot update preview — missing preview or marginBox");
         return;
       }
 
-      // whatever HTML you want in the overlay
-      const pageHtml = marginBox.innerHTML;
-      preview.innerHTML = renderPreviewHTML?.(pageHtml) || pageHtml;
+      const html = marginBox.innerHTML;
+      preview.innerHTML = renderPreviewHTML?.(html) || html;
     }
 
     function getActiveEditorContent() {
