@@ -2610,60 +2610,24 @@
     });
 
 
-    function printNote() {
-      const mode = getCurrentEditorMode?.() || "document";
+    function printEditor() {
+      const isNoteMode = document.getElementById('noteSuite').classList.contains('active');
+      const content = isNoteMode
+            ? document.getElementById('noteEditor').innerHTML
+            : document.getElementById('docEditor').innerHTML;
 
-      let noteContent = "";
-      if (mode === "notepad") {
-        const noteEditor = document.getElementById("noteEditor");
-        noteContent = noteEditor?.innerHTML || "";
-      } else if (mode === "document") {
-        const docEditor = document.getElementById("docEditor");
-        noteContent = docEditor?.innerHTML || "";
-      }
-
-      const printWindow = window.open('', '_blank');
-
-      const styles = `
-        <style>
-          body {
-            font-family: 'Arial', sans-serif;
-            padding: 1in;
-            font-size: 12pt;
-            color: #000;
-          }
-          ul, ol {
-            margin-left: 1.5em;
-          }
-          h1, h2, h3, h4, h5 {
-            margin: 1rem 0 0.5rem;
-          }
-          a {
-            color: #007bff;
-            text-decoration: underline;
-          }
-        </style>
-      `;
-
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Print Note</title>
-            ${styles}
-          </head>
-          <body>
-            ${noteContent}
-          </body>
-        </html>
-      `);
-
-      printWindow.document.close();
-      printWindow.focus();
-
-      setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-      }, 300);
+      const win = window.open('', '_blank');
+      win.document.write(`
+        <html><head><title>Print</title>
+          <style>
+            body{font-family:Arial,sans-serif;padding:1in;font-size:12pt;color:#000;}
+            ul,ol{margin-left:1.5em;}  h1,h2,h3,h4,h5{margin:1rem 0 .5rem;}
+            a{color:#007bff;text-decoration:underline;}
+          </style>
+        </head><body>${content}</body></html>`);
+      win.document.close();
+      win.focus();
+      setTimeout(()=>{ win.print(); win.close(); }, 300);
     }
 
     function toggleBold() {
