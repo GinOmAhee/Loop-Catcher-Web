@@ -1730,7 +1730,7 @@
         let transcript = '';
         for (let i = e.resultIndex; i < e.results.length; ++i) {
           if (e.results[i].isFinal) {
-            let command = e.results[i][0].transcript.trim().toLowerCase();
+            let command = text.trim().toLowerCase().replace(/[^\w\s]/gi, ""); // removes punctuation
             console.log('🧠 Command Heard:', command);
 
             // 🧠 Handle special voice commands
