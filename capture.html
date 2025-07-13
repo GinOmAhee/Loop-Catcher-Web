@@ -20,8 +20,6 @@
     --editor-bg: #ffffff;
     --editor-text: #222;
     --preview-text-color: #333;
-    --btn-bg: #f0f0f0;
-    --btn-text: #000;
     --badge-bg: #fff5cc;
     --badge-text: #333;
     --popup-bg: #fff;
@@ -58,6 +56,18 @@
   }
 
   /* === DARK MODE ADJUSTMENTS === */
+
+  body.dark-theme textarea {
+    background: #222;
+    color: #eee;
+    border-color: #444;
+  }
+
+  body.dark-theme #thoughtPopup button {
+    background: #333;
+    color: #eee;
+  }
+
   body.dark-theme button {
     background: #1e1e1e;
     color: #f1f1f1;
@@ -796,7 +806,7 @@
     position: sticky;
     align-self: flex-end;
     margin-right: 1rem;
-    margin-left: .3rem
+    margin-left: .3rem;
     top: 5rem; /* just below your tab bar */
     z-index: 9;
   }
@@ -805,7 +815,7 @@
     position: fixed;
     top: 5rem;
     right: 1rem;
-    left: .3rem
+    left: .3rem;
     z-index: 1000;
   }
 
