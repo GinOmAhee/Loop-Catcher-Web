@@ -2295,8 +2295,11 @@
       console.log('🌀 Toggling preview visibility');
 
       const activeSuite = document.querySelector('.suite.active');
+      console.log("🧠 Detected mode:", mode);
+
       const preview = activeSuite?.querySelector('.preview-overlay');
-      const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
+      const isNoteMode = activeSuite?.id === "noteSuite";
+      const mode = isNoteMode ? "notepad" : "document";
       const editor = activeSuite?.querySelector('.editor');
       const marginBox = document.getElementById("marginBox");
 
