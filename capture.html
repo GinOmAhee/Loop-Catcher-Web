@@ -259,7 +259,7 @@
     --tab-active-bg: #b2f5ea;
     --tab-border: #81e6d9;
     --editor-bg: #f1f0ed;
-    --editor-text: #2E2E2E
+    --editor-text: #2E2E2E;
     background-color: #d7d7da;
     color: #2e2e32;
   }
@@ -299,6 +299,10 @@
 
   .suite {
     display: none;
+  }
+
+  .suite { 
+    display:block !important; 
   }
 
   .suite.active {
@@ -378,8 +382,8 @@
   .preview-sortbar.bottom-searchbar,
   #searchInput,
   #searchInput:focus,
-  #modeToggleBtn
-  #toggle-preview-btn
+  #modeToggleBtn,
+  #toggle-preview-btn,
   .mode-btn.active,
   .preview-bottom {
   
@@ -918,6 +922,11 @@
     box-shadow: inset 0 -1px 0 hotpink;
   }
 
+  #noteEditor {
+    background-color: #fefefe !important;
+    color: #222 !important;
+  }
+
   </style>
 </head>
 <body>
@@ -1171,8 +1180,6 @@
 
   <div class="save-time" id="saveStatus"></div>
 
-  </div>
-
   <!-- 🧠 The Side Thoughts Badge -->
   <div id="sideThoughtsBadge">
     <span class="emoji"></span>
@@ -1190,11 +1197,13 @@
 </body>
 
   <script>
+    window.addEventListener('error', e => console.error('💥 JS error:', e.message));
     let isRenamingTab = false;
 
     let db = null;
 
     let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
+    let highlightDropdown = document.getElementById("highlightDropdown");
 
     let toggleBtn;
     let saveStatus;
@@ -1202,11 +1211,13 @@
     let attachedFilesList;
     let groupedNotes;
     let fontBtn;
-    let fontDropdown;
+    let fontDropdown       = document.getElementById('fontDropdown');
+    let textColorDropdown  = document.getElementById('textColorDropdown');
+    let highlightDropdown  = document.getElementById('highlightDropdown'); // 👈 NEW
     let fontSizeBtn;
     let sizeDropdown;
     let textColorBtn;
-    let textColorDropdown;
+  
     let justifyBtn;
     let toolbar;
     let status;
@@ -1280,9 +1291,7 @@
     }
 
     function initThemeToggle() {
-      const switchEl
-      
-      = document.getElementById('themeSwitch');
+      const switchEl = document.getElementById('themeSwitch');
       if (!switchEl) return;
 
       const savedTheme = localStorage.getItem('theme');
@@ -1321,30 +1330,6 @@
     }
 
     window.addEventListener('DOMContentLoaded', initThemeToggle);
-
-    function handleDropdown(event) {
-      event.stopPropagation();
-
-      // Hide all dropdowns first
-      fontDropdown?.classList.add("hidden");
-      sizeDropdown?.classList.add("hidden");
-      textColorDropdown?.classList.add("hidden");
-      highlightDropdown?.classList.add("hidden");
-
-      const btnId = event.currentTarget.id;
-
-      switch (btnId) {
-        case "fontMenuBtn":
-          fontDropdown?.classList.toggle("hidden");
-          break;
-        case "textColorBtn":
-          textColorDropdown?.classList.toggle("hidden");
-          break;
-        case "highlightBtn":
-          highlightDropdown?.classList.toggle("hidden");
-          break;
-      }
-    }
 
     document.addEventListener("DOMContentLoaded", () => {
       hookSuiteEvents();         // attach listeners to both suites
@@ -1410,7 +1395,7 @@
       });
 
       /* Font / color dropdowns now query the ACTIVE suite */
-      document.querySelectorAll('#fontMenuBtn, #textColorBtn, #highlightBtn')
+      document.querySelectorAll('#fontMenuBtn, #textColorBtn, #highlightBtn', '#paperSizeSelectBtn')
         .forEach(btn => btn?.addEventListener('click', handleDropdown));
     }
 
@@ -1513,7 +1498,7 @@
 
     /* Attach the handler once after DOM is ready */
     document.addEventListener('DOMContentLoaded', () => {
-      ['#fontMenuBtn', '#textColorBtn', '#highlightBtn'].forEach(sel => {
+      ['#fontMenuBtn', '#textColorBtn', '#highlightBtn', '#paperSizeSelectBtn'].forEach(sel => {
         document.querySelectorAll(sel).forEach(btn => {
           btn.addEventListener('click', handleDropdown);
         });
@@ -1537,7 +1522,8 @@
     function saveSelection() {
       const sel = window.getSelection();
       if (sel && sel.rangeCount > 0) {
-        savedSelection = sel.getRangeAt(0).cloneRange();
+        const mode = localStorage.getItem("editorMode") || "document";
+        savedSelections[mode] = sel.getRangeAt(0).cloneRange();   // 👈 FIX
       }
     }
 
@@ -1584,38 +1570,24 @@
     function setHighlightColor(color) {
       mainEditor.focus();
       restoreSelection();
+
       const range = getValidSelectionRange();
       if (!range) return;
 
       const selectedText = range.extractContents();
-      
       const mark = document.createElement("mark");
-      requestAnimationFrame(() => {
-        mark.classList.add("highlight-glow");
-      });
-
+      mark.classList.add("highlight-glow");
       mark.appendChild(selectedText);
       range.insertNode(mark);
 
+      const sel = window.getSelection();           // 👈 FIX
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
-      selection.removeAllRanges();
-      selection.addRange(newRange);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
 
-      // Hide dropdown (if exists)
-      const highlightDropdown = document.getElementById("highlightDropdown");
       highlightDropdown?.classList.add("hidden");
-
-      // Update status
-      const saveStatus = document.getElementById("saveStatus");
-      if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
-
-      // Optional fallback
-      try {
-        document.execCommand("hiliteColor", false, color);
-      } catch (e) {
-        console.warn("execCommand fallback failed", e);
-      }
+      saveStatus.textContent = `🖍️ Highlighted in ${color}`;
     }
 
     async function saveText() {
@@ -2157,6 +2129,8 @@
     function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
       const docEditor = document.getElementById("docEditor");
       const noteEditor = document.getElementById("noteEditor");
+      const preview     = document.querySelector('.suite.active .preview-overlay');
+      const saveStatus  = document.getElementById('saveStatus');
 
       if (!docEditor || !noteEditor) {
         console.error("❌ Cannot load note — one or more editor elements missing");
@@ -2544,7 +2518,8 @@
 
       const confirmDelete = confirm(`Are you sure you want to delete ${checkboxes.length} selected note(s)?`);
       if (!confirmDelete) return;
-
+      
+      
       let savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       const timesToDelete = Array.from(checkboxes).map(cb => cb.getAttribute('data-time'));
 
@@ -2552,6 +2527,7 @@
       localStorage.setItem('savedNotes', JSON.stringify(savedNotes));
 
       updateGrouping();
+      const saveStatus = document.getElementById('saveStatus');
       saveStatus.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
     }
 
@@ -2573,11 +2549,12 @@
       const el = document.createElement(tagName);
       el.appendChild(selectedText);
       range.insertNode(el);
-
-      selection.removeAllRanges();
+      
+      const sel = window.getSelection();
+      sel.removeAllRanges();
       const newRange = document.createRange();
       newRange.selectNodeContents(el);
-      selection.addRange(newRange);
+      sel.addRange(newRange);
     }
 
     function removeFormatting() {
@@ -2602,14 +2579,17 @@
       range.insertNode(textNode);
 
       // 🔄 Reset selection AFTER inserted text
-      selection.removeAllRanges();
+      const sel = window.getSelection();
+      sel.removeAllRanges();
       const newRange = document.createRange();
       newRange.setStartAfter(textNode);
       newRange.setEndAfter(textNode);
-      selection.addRange(newRange);
+      sel.addRange(newRange);
 
       saveStatus.innerText = "🚫 Formatting removed.";
     }
+
+    let savedRange = null;
 
     document.addEventListener("selectionchange", () => {
       if (getCurrentEditorMode?.() !== "document") return;
