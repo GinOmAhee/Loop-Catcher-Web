@@ -1295,8 +1295,12 @@
       const noteDraft = localStorage.getItem("noteDraft");
 
       if (docEditor && docDraft) {
-        // ✅ Just inject the saved content — no marginBox involved
+        console.log("🧠 Draft before cleanup:", docDraft);
+        // Clean the draft
+        docDraft = docDraft.replace(/<div[^>]*id=["']?marginBox["']?[^>]*>[\s\S]*?<\/div>/gi, '');
+        console.log("🧼 Draft after cleanup:", docDraft);
         docEditor.innerHTML = docDraft;
+        
       }
 
       if (noteEditor && noteDraft) {
