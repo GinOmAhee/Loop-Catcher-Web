@@ -2372,7 +2372,7 @@
       const preview = activeSuite?.querySelector('.preview-overlay');
       const isNoteMode = activeSuite?.id === "noteSuite";
       const mode = isNoteMode ? "notepad" : "document";
-      const editor = activeSuite?.qzuerySelector('.editor');
+      const editor = activeSuite?.querySelector('.editor');
       const marginBox = editor?.querySelector("#marginBox"); // ⬅️ scoped properly
       
       console.log("🧠 Detected mode:", mode);
