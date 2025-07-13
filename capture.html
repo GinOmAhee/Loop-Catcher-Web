@@ -2391,7 +2391,7 @@
           if (mode === "notepad" || mode === "note") {
             updateGrouping?.(); // ✅ Pull in the latest notes
           } else if (mode === "document") {
-            updateDocumentPreview?.(); // ✅ Update layout/margins/fonts, etc.
+            setTimeout(updateDocumentPreview, 50); // 👈 Inserted here
           }
         } catch (err) {
           console.error("❌ Failed to update preview:", err);
