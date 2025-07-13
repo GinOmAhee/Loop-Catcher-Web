@@ -1677,14 +1677,13 @@
       const suiteType = isDocMode ? "Document" : "Note";
 
       const clone = editor.cloneNode(true);
-      const margin = clone.querySelector("#marginBox");
-      if (margin) margin.remove(); // ✂️ remove layout junk before saving
+      const marginClone = clone.querySelector('#marginBox');
+      if (marginClone) marginClone.remove(); // ✅ only remove inside the clone
 
-      const noteHTML = clone.innerHTML.replace(/&nbsp;/g, " "); // 👈 clean only your text content
+      const noteHTML = clone.innerHTML.replace(/&nbsp;/g, " ");
       const saveStatus = document.getElementById("saveStatus");
 
       const noteText = editor.innerText.trim();
-
       if (!noteText) return;
 
       const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
@@ -1708,8 +1707,8 @@
         project: projectName,
         resolved: false,
         tags: [],
-        type: suiteType.toLowerCase(), // Save type for later filtering
-        mode  // ✅ add this line to tag the mode
+        type: suiteType.toLowerCase(),
+        mode // ✅ store whether it's notepad or document
       };
 
       existingNotes.unshift(newNote);
@@ -1740,7 +1739,6 @@
 
       updateGrouping();
     }
-
 
     function autoSave() {
       const now = new Date();
@@ -2391,9 +2389,11 @@
           if (mode === "notepad" || mode === "note") {
             updateGrouping?.(); // ✅ Pull in the latest notes
           } else if (mode === "document") {
-            setTimeout(() => {
-              updateDocumentPreview();  // 🧠 give it time to render
-            }, 50);
+              setTimeout(() => updateDocumentPreview(), 50);
+              setTimeout(() => {
+                ensureMarginBox();          // <-- makes sure it exists
+                updateDocumentPreview();
+              }, 50);
           }
         } catch (err) {
           console.error("❌ Failed to update preview:", err);
@@ -2419,6 +2419,7 @@
       // grab the *specific* elements used by the doc suite
       const preview   = document.getElementById("docPreview");   // <div id="docPreview" …>
       const marginBox = document.getElementById("marginBox");    // inside #docEditor
+      const marginBox = ensureMarginBox();   // guarantees it
 
       if (!preview || !marginBox) {
         console.warn("⚠️ Cannot update preview — missing #docPreview or #marginBox");
@@ -2974,6 +2975,25 @@
 
       document.getElementById("sideThoughtTextarea").value = "";
       alert("🧠 Thought saved!");
+    }
+
+   
+    /* 🔧 Call this anytime before you need the margin box */
+    function ensureMarginBox () {
+      const docEditor = document.getElementById('docEditor');
+      if (!docEditor) return null;
+
+      let box = docEditor.querySelector('#marginBox');
+      if (!box) {
+        box = document.createElement('div');
+        box.id = 'marginBox';
+        box.className = 'margin-box';
+        box.contentEditable = 'false';
+        box.tabIndex = -1;
+        docEditor.appendChild(box);
+        console.log('✨ Re‑injected #marginBox');
+      }
+      return box;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
