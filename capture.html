@@ -1440,22 +1440,20 @@
         editor.addEventListener('input', () => debouncedSave(editor));
 
         /* click outside to close */
-        document.addEventListener("click", (e) => {
+        document.addEventListener("click", e => {
           const activeSuite = document.querySelector(".suite.active");
-          const preview = activeSuite?.querySelector(".preview-overlay");
-          const toggleBtn = activeSuite?.querySelector(".toggle-preview-btn");
+          if (!activeSuite) return;
 
-          // Only proceed if preview is visible
-          if (!preview?.classList.contains("preview-visible")) return;
+          const preview   = activeSuite.querySelector(".preview-overlay");
+          const toggleBtn = activeSuite.querySelector(".toggle-preview-btn");
 
-          // If click is outside both preview and toggle, close it
           if (
-            preview && toggleBtn &&
+            preview?.classList.contains("preview-visible") &&
             !preview.contains(e.target) &&
             !toggleBtn.contains(e.target)
           ) {
             preview.classList.remove("preview-visible");
-            toggleBtn.textContent = "☰";
+            toggleBtn.textContent = "☰";         // reset icon
             console.log("🔒 Closed preview by clicking outside");
           }
         });
@@ -2417,16 +2415,20 @@
 
     function updateDocumentPreview() {
       const activeSuite = document.querySelector(".suite.active");
-      const preview = document.querySelector(".preview-overlay");
-      const marginBox = document.getElementById("marginBox");
+      if (!activeSuite || activeSuite.id !== "docSuite") return; // only for docs
+
+      const preview    = activeSuite.querySelector(".preview-overlay");
+      const docEditor  = document.getElementById("docEditor");
+      const marginBox  = docEditor?.querySelector("#marginBox");
 
       if (!preview || !marginBox) {
-        console.warn("⚠️ Cannot update preview — missing preview or marginBox");
+        console.warn("⚠️ Cannot update preview — missing preview or marginBox");
         return;
       }
 
-      const html = marginBox.innerHTML;
-      preview.innerHTML = renderPreviewHTML?.(html) || html;
+      // whatever HTML you want in the overlay
+      const pageHtml = marginBox.innerHTML;
+      preview.innerHTML = renderPreviewHTML?.(pageHtml) || pageHtml;
     }
 
     function getActiveEditorContent() {
