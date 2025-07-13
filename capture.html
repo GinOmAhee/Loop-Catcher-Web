@@ -1349,8 +1349,20 @@
       const noteDraft = localStorage.getItem("noteDraft");
 
       if (docEditor && docDraft) {
-        docEditor.innerHTML = docDraft.replace(/&nbsp;/g, " ");
-        console.log("📄 Recovered and cleaned doc draft");
+        // Remove existing margin box to prevent duplication
+        const oldMargin = docEditor.querySelector("#marginBox");
+        if (oldMargin) oldMargin.remove();
+
+        // Inject saved content
+        docEditor.innerHTML = docDraft;
+
+        // Re-attach clean margin box
+        const newMargin = document.createElement("div");
+        newMargin.id = "marginBox";
+        newMargin.className = "margin-box";
+        newMargin.contentEditable = "false";
+        newMargin.tabIndex = -1;
+        docEditor.appendChild(newMargin);
       }
 
       if (noteEditor && noteDraft) {
@@ -1598,10 +1610,15 @@
       const isDocMode = document.getElementById("docSuite").classList.contains("active");
       const editor = isDocMode ? document.getElementById("docEditor") : document.getElementById("noteEditor");
       const suiteType = isDocMode ? "Document" : "Note";
+
+      const clone = editor.cloneNode(true);
+      const margin = clone.querySelector("#marginBox");
+      if (margin) margin.remove(); // ✂️ remove layout junk before saving
+
+      const noteHTML = clone.innerHTML.replace(/&nbsp;/g, " "); // 👈 clean only your text content
       const saveStatus = document.getElementById("saveStatus");
 
       const noteText = editor.innerText.trim();
-      const noteHTML = editor.innerHTML;
 
       if (!noteText) return;
 
