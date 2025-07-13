@@ -2371,7 +2371,7 @@
       const isNoteMode = activeSuite?.id === "noteSuite";
       const mode = isNoteMode ? "notepad" : "document";
       const editor = activeSuite?.querySelector('.editor');
-      const marginBox = document.getElementById("marginBox");
+      const marginBox = activeSuite?.querySelector('#marginBox');
 
       console.log("🧠 Detected mode:", mode);
 
