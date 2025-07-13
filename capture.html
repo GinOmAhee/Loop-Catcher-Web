@@ -326,14 +326,18 @@
   }
 
   #noteEditor {
-    flex: 1;
-    min-height: 300px;
-    background: #fffde7; /* soft yellow */
-    padding: 1rem;
-    border: 1px solid #ddd;
-    box-sizing: border-box;
-    width: 100%;
-    outline: 2px dashed red;
+    border: 1px solid #ccc;
+    position: relative; 
+    font-family: "Courier New", monospace;
+    font-size: 1rem;
+    padding: 0.9rem;
+    width: 4.14in;
+    height: 5.38in;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--editor-bg);
+    color: var(--editor-text);
   }
 
   @media (prefers-color-scheme: dark) {
@@ -400,31 +404,29 @@
   }
 
   /* === LAYOUT === */
- /* Parent container holds everything below the mode switcher */
   .main-container {
     display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0; /* important for flex children to scroll properly */
-    height: calc(100vh - 3rem); /* adjust based on height of switch bar */
-    overflow: hidden;
+    height: 100vh;
   }
-
-  /* Editor wrapper */
   .editor-area {
     display: flex;
     flex-direction: column;
     flex: 1;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2rem;
     overflow-y: auto;
-    padding: 1rem;
     box-sizing: border-box;
   }
 
   .mode-switcher-bar {
-    position: sticky; /* or fixed if you want it to always stay visible */
-    top: 0;
-    z-index: 10;
-    background: white; /* make sure it doesn’t go transparent */
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    background-color: var(--switcher-bg);
+    border-bottom: 1px solid #ddd; /* optional: override this too if needed */
   }
 
   .mode-btn {
