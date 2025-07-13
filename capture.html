@@ -2368,15 +2368,17 @@
 
       const activeSuite = document.querySelector('.suite.active');
       console.log("🧩 Active suite innerHTML:", activeSuite?.innerHTML); // ⬅️ Drop it here
+
       const preview = activeSuite?.querySelector('.preview-overlay');
       const isNoteMode = activeSuite?.id === "noteSuite";
       const mode = isNoteMode ? "notepad" : "document";
       const editor = activeSuite?.querySelector('.editor');
+      const marginBox = editor?.querySelector("#marginBox"); // ⬅️ scoped properly
       
       console.log("🧠 Detected mode:", mode);
 
-      if (!preview || !editor) {
-        console.warn("⚠️ Missing preview or editor reference");
+      if (!preview || !editor || (mode === "document" && !marginBox)) {
+        console.warn("⚠️ Missing required element(s) for preview");
         return;
       }
 
@@ -2392,7 +2394,6 @@
             updateGrouping?.(); // ✅ Pull in the latest notes
           } else if (mode === "document") {
             setTimeout(() => {
-              const marginBox = activeSuite?.querySelector("#marginBox");
               if (!marginBox) {
                 console.warn("⚠️ Cannot update preview — missing marginBox (delayed)");
                 return;
