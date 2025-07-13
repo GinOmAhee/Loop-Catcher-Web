@@ -22,13 +22,12 @@
     --preview-text-color: #333;
     --btn-bg: #f0f0f0;
     --btn-text: #000;
-    --side-note-bg: #fff8dc;
-    --side-note-border: #ccc;
-    --side-note-text: #222;
-    --side-note-textarea-bg: #fff;
-    --side-note-textarea-text: #000;
-    --side-note-entry-bg: #fafafa;
-    --side-note-entry-highlight: #ffcc00;
+    --badge-bg: #fff5cc;
+    --badge-text: #333;
+    --popup-bg: #fff;
+    --popup-button-bg: #ffd966;
+    --popup-border: #ccc;
+    --popup-text-color: #000;
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px;
     color: #333;
@@ -40,13 +39,12 @@
   body.dark-theme {
     --editor-bg: #1a1a1a;
     --editor-text: #ffffff;
-    --side-note-bg: #1e1e1e;
-    --side-note-border: #444;
-    --side-note-text: #eee;
-    --side-note-textarea-bg: #2a2a2a;
-    --side-note-textarea-text: #eee;
-    --side-note-entry-bg: #2c2c2c;
-    --side-note-entry-highlight: #ffaa00;
+    --badge-bg: #333;
+    --badge-text: #fff7d1;
+    --popup-bg: #444;
+    --popup-button-bg: #ffce5c;
+    --popup-border: #777;
+    --popup-text-color: #fff;
     background-color: #000;
     color: #f1f1f1;
   }
@@ -502,11 +500,11 @@
   }
 
   #sideThoughtsBadge {
+    background-color: var(--badge-bg);
+    color: var(--badge-text);
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    background-color: #fff5cc;
-    color: #333;
     border-radius: 50px;
     padding: 0.7rem 1.2rem;
     font-size: 0.95rem;
@@ -528,12 +526,13 @@
   }
 
   #thoughtPopup {
+    background: var(--popup-bg);
+    border: 1px solid var(--popup-border);
+    color: var(--popup-text-color);
     position: fixed;
     bottom: 6rem;
     right: 2rem;
-    background: #fff;
     border-radius: 12px;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.2);
     padding: 1rem;
     width: 250px;
     z-index: 9999;
@@ -542,9 +541,11 @@
     display: none;
   }
   #thoughtPopup textarea {
-    width: 100%;
+    background: var(--popup-bg);
+    color: var(--popup-text-color);
+    border: 1px solid var(--popup-border);
+    width: 85%;
     height: 80px;
-    border: 1px solid #ccc;
     border-radius: 6px;
     padding: 0.5rem;
     resize: none;
@@ -553,7 +554,7 @@
   #thoughtPopup button {
     margin-top: 0.5rem;
     width: 100%;
-    background: #ffd966;
+    background: var(--popup-button-bg);
     border: none;
     border-radius: 6px;
     padding: 0.5rem;
@@ -2919,6 +2920,39 @@
       }
     }
 
+    document.addEventListener("DOMContentLoaded", () => {
+      if (document.body.classList.contains("dark-mode")) {
+        // badge will auto-style via CSS var
+      }
+
+      // Optional: change emoji or behavior based on mode
+      const activeSuite = document.querySelector('.suite.active');
+      const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
+
+      console.log("🧠 SideThoughts now tracking mode:", mode);
+    });
+
+    function saveSideThought() {
+      const activeSuite = document.querySelector('.suite.active');
+      const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
+      const text = document.getElementById("sideThoughtTextarea").value.trim();
+
+      if (!text) return;
+
+      const existing = JSON.parse(localStorage.getItem("sideThoughts") || "[]");
+
+      existing.unshift({
+        text,
+        mode,
+        timestamp: new Date().toISOString(),
+      });
+
+      localStorage.setItem("sideThoughts", JSON.stringify(existing));
+
+      document.getElementById("sideThoughtTextarea").value = "";
+      alert("🧠 Thought saved!");
+    }
+
     document.addEventListener("click", () => {
       setTimeout(() => {
         fontDropdown?.classList.add("hidden");
@@ -2968,27 +3002,6 @@
         switchToDoc.click();
       }
     });
-
-    document.getElementById("sideThoughtsBadge").addEventListener("click", () => {
-      const popup = document.getElementById("thoughtPopup");
-      popup.classList.toggle("hidden");
-    });
-
-    function saveSideThought() {
-      const textarea = document.querySelector("#thoughtPopup textarea");
-      const thought = textarea.value.trim();
-      if (!thought) return;
-
-      const savedThoughts = JSON.parse(localStorage.getItem("sideThoughts") || "[]");
-      savedThoughts.push({
-        text: thought,
-        timestamp: new Date().toISOString()
-      });
-      localStorage.setItem("sideThoughts", JSON.stringify(savedThoughts));
-
-      textarea.value = "";
-      alert("🧠 Thought saved!");
-    }
 
   </script>
 
