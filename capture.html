@@ -518,11 +518,14 @@
     z-index: 9999;
   }
 
-  #sideThoughtsBadge:hover .emoji {
-    content: "🤔";
+  #sideThoughtsBadge .emoji::before {
+    content: "🤔"; /* default emoji */
+    display: inline-block;
+    transition: all 0.3s ease;
   }
+
   #sideThoughtsBadge:hover .emoji::before {
-    content: "🥰";
+    content: "🥰"; /* emoji on hover */
   }
 
   #thoughtPopup {
