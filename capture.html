@@ -2372,14 +2372,12 @@
       const preview = activeSuite?.querySelector('.preview-overlay');
       const isNoteMode = activeSuite?.id === "noteSuite";
       const mode = isNoteMode ? "notepad" : "document";
-      const editor = activeSuite?.querySelector('.editor');
+      const editor = activeSuite?.qzuerySelector('.editor');
       const marginBox = editor?.querySelector("#marginBox"); // ⬅️ scoped properly
       
       console.log("🧠 Detected mode:", mode);
 
       if (!preview || !editor || (mode === "document" && !marginBox)) {
-        console.warn("⚠️ Missing required element(s) for preview");
-        return;
       }
 
       const isVisible = preview.classList.toggle("preview-visible");
@@ -2394,12 +2392,8 @@
             updateGrouping?.(); // ✅ Pull in the latest notes
           } else if (mode === "document") {
             setTimeout(() => {
-              if (!marginBox) {
-                console.warn("⚠️ Cannot update preview — missing marginBox (delayed)");
-                return;
-              }
-              updateDocumentPreview();
-            }, 50); // Or tweak delay as needed
+              updateDocumentPreview();  // 🧠 give it time to render
+            }, 50);
           }
         } catch (err) {
           console.error("❌ Failed to update preview:", err);
