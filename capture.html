@@ -1341,6 +1341,23 @@
       initThemeToggle();         // your existing dark‑theme logic
       initializeFirebase();      // backend just works
 
+      // 🔁 Recover unsaved drafts on load
+      const docEditor = document.getElementById("docEditor");
+      const noteEditor = document.getElementById("noteEditor");
+
+      const docDraft = localStorage.getItem("docDraft");
+      const noteDraft = localStorage.getItem("noteDraft");
+
+      if (docEditor && docDraft) {
+        docEditor.innerHTML = docDraft;
+        console.log("📄 Recovered unsaved doc draft");
+      }
+
+      if (noteEditor && noteDraft) {
+        noteEditor.innerHTML = noteDraft;
+        console.log("📝 Recovered unsaved note draft");
+      }
+
       // Auto‑save every 30s
       setInterval(() => autoSave(getActiveEditor()), 30_000);
     });
