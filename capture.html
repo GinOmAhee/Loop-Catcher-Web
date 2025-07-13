@@ -2416,12 +2416,9 @@
 
     function updateDocumentPreview() {
       const docEditor = document.getElementById("docEditor");
-      const preview = document.getElementById("docPreview");
+      const previewDocBody = document.getElementById("previewDocBody");
 
-      if (!docEditor || !preview) {
-        console.warn("⚠️ Cannot update preview — missing #docEditor or #docPreview");
-        return;
-      }
+      if (!docEditor || !previewDocBody) return;
 
       // clone editor and strip marginBox (if it exists)
       const clone = docEditor.cloneNode(true);
@@ -2429,7 +2426,7 @@
       if (marginBox) marginBox.remove();  // ✅ remove visual-only elements
 
       // now drop cleaned content into preview
-      preview.innerHTML = clone.innerHTML;
+      previewDocBody.innerHTML = clone.innerHTML;
     }
 
     function getActiveEditorContent() {
