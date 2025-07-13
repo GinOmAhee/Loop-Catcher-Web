@@ -1717,23 +1717,30 @@
       if (!SR) return alert("Voice capture not supported");
 
       const activeSuite = document.querySelector('.suite.active');
-      const editor = activeSuite.querySelector('.editor');
-      const btn = activeSuite.querySelector('.voice-btn');
+      const editor = activeSuite?.querySelector('.editor');
+      const btn = activeSuite?.querySelector('.voice-btn');
       const status = document.getElementById('saveStatus');
+
+      if (!editor) {
+        console.warn("🛑 Editor not found in active suite.");
+        return;
+      }
 
       recognition = new SR();
       recognition.lang = 'en-US';
       recognition.continuous = true;
       recognition.interimResults = false;
 
-      recognition.onresult = e => {
+      recognition.onresult = (event) => {
         let transcript = '';
-        for (let i = e.resultIndex; i < e.results.length; ++i) {
-          if (e.results[i].isFinal) {
-            let command = text.trim().toLowerCase().replace(/[^\w\s]/gi, ""); // removes punctuation
-            console.log('🧠 Command Heard:', command);
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            let text = event.results[i][0].transcript.trim();
+            let command = text.toLowerCase().replace(/[^\w\s]/gi, ""); // normalize
 
-            // 🧠 Handle special voice commands
+            console.log("🧠 Command Heard:", command);
+
+            // 🔊 Voice Commands
             if (command === "stop") {
               speakOutLoud("Stopping now.");
               stopVoiceCapture();
@@ -1752,24 +1759,22 @@
               return;
             }
 
-            // ✍️ Otherwise, treat it as normal text
-            transcript += command + ' ';
+            transcript += text + '\n';
           }
         }
 
-        if (transcript.trim()) {
-          editor.innerHTML += (editor.innerHTML ? '<br>' : '') + transcript.trim();
-        }
+        // Append final transcript
+        editor.innerHTML += (editor.innerHTML ? '\n' : '') + transcript.trim();
       };
 
-      recognition.onerror = e => {
+      recognition.onerror = (e) => {
         console.error("Speech error:", e.error);
         stopVoiceCapture();
       };
 
       recognition.start();
       isRecording = true;
-      btn.textContent = "🛑 Stop Voice";
+      if (btn) btn.textContent = "🛑 Stop Voice";
       if (status) status.textContent = "🎙️ Listening...";
     }
 
