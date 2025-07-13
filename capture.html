@@ -978,8 +978,8 @@
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
 
-        <label for="paperSizeSelect">📄 Paper Size:</label>
-        <select id="paperSizeSelect">
+        <label for="paperSizeSelect">📄</label>
+        <div id="paperSizeDropdown" class="dropdown hidden">
           <option value="letter">Letter (8.5in × 11in)</option>
           <option value="legal">Legal (8.5in × 14in)</option>
           <option value="a3">A3 (11.7in × 16.5in)</option>
@@ -1513,7 +1513,8 @@
       const idMap = {
         fontMenuBtn:     '#fontDropdown',
         textColorBtn:    '#textColorDropdown',
-        highlightBtn:    '#highlightDropdown'
+        highlightBtn:    '#highlightDropdown',
+        paperSizeBtn:     '#paperSizeDropdown'
       };
 
       // Which dropdown do we need?
