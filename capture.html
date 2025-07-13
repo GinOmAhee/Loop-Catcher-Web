@@ -2413,18 +2413,21 @@
       console.log('📺 Preview is now', isVisible ? 'visible' : 'hidden');
     }
 
-    function updateDocumentPreview() {
-      const preview   = document.getElementById("docPreview");
-      const docEditor = document.getElementById("docEditor");
-      const marginBox = docEditor?.querySelector("#marginBox");
+    function updateDocumentPreview () {
+      // grab the *specific* elements used by the doc suite
+      const preview   = document.getElementById("docPreview");   // <div id="docPreview" …>
+      const marginBox = document.getElementById("marginBox");    // inside #docEditor
 
       if (!preview || !marginBox) {
-        console.warn("⚠️ Cannot update preview — missing preview or marginBox");
+        console.warn("⚠️ Cannot update preview — missing #docPreview or #marginBox");
         return;
       }
 
+      // pull just the user’s content (everything INSIDE the margin box)
       const html = marginBox.innerHTML;
-      preview.innerHTML = renderPreviewHTML?.(html) || html;
+
+      // drop it straight into the overlay (or run a formatter if you have one)
+      preview.innerHTML = /* renderPreviewHTML ? */ html;
     }
 
     function getActiveEditorContent() {
