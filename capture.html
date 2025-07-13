@@ -71,20 +71,6 @@
   body.dark-theme p {
     color: #bbb;
   }
-  body.dark-theme #mainEditor {
-    background: #222 
-    color: #ddd 
-    caret-color: #eee 
-  }
-
-  body.dark-theme .tab {
-    background-color: transparent;
-    color: #ccc;
-  }
-
-  body.dark-theme .tab.active {
-    box-shadow: inset 0 -2px 0 hotpink;
-  }
 
 
   body.dark-theme .preview-overlay {
@@ -330,22 +316,18 @@
   }
 
   #noteEditor {
+    border: 1px solid #ccc;
+    position: relative; 
     font-family: "Courier New", monospace;
     font-size: 1rem;
     padding: 0.9rem;
     width: 4.14in;
     height: 5.38in;
     margin: 0 auto;
-    border: none;
-    box-shadow: none;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: var(--editor-bg);
     color: var(--editor-text);
-  }
-
-  body.dark-theme #noteEditor {
-    background: #222 
-    color: #ddd 
-    caret-color: #eee 
   }
 
   @media (prefers-color-scheme: dark) {
@@ -399,16 +381,6 @@
   #searchInput,
   .preview-sortbar select {
     border: 1px solid currentColor;
-  }
-
-  .page-break-line {
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 0;
-    border-top: 1px dotted #aaa;
-    z-index: 1;
-    pointer-events: none;
   }
 
   textarea {
@@ -793,15 +765,6 @@
     padding: 0 2px;
     border-radius: 3px;
     animation: shimmerPulse 1.4s ease-in-out infinite alternate;
-  }
-
-  @keyframes shimmerPulse {
-    0% {
-      background-position: 0% center;
-    }
-    100% {
-      background-position: 100% center;
-    }
   }
 
   /* === DROPDOWN MENU === */
