@@ -1192,14 +1192,16 @@
 
   </div>
 
-  <!-- 🌈 Side Thought Badge & Popup -->
+  <!-- 🧠 The Side Thoughts Badge -->
   <div id="sideThoughtsBadge">
-    <span class="emoji">🧐</span> Side Thoughts
+    <span class="emoji"></span>
+    Side Thoughts
   </div>
 
+  <!-- 💬 The Thought Popup -->
   <div id="thoughtPopup" class="hidden">
-    <textarea placeholder="Jot your thought..."></textarea>
-    <button onclick="saveSideThought()">💾 Save</button>
+    <textarea id="sideThoughtTextarea" placeholder="Drop your thought here..."></textarea>
+    <button onclick="saveSideThought()">Save Thought</button>
   </div>
 
   <!-- Your main HTML content above -->
@@ -1398,6 +1400,26 @@
         noteEditor.innerHTML = noteDraft.replace(/&nbsp;/g, " ");
         console.log("📝 Recovered and cleaned note draft");
       }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // Track mode for styling/context
+        if (document.body.classList.contains("dark-mode")) {
+          // badge styles itself
+        }
+
+        const activeSuite = document.querySelector('.suite.active');
+        const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
+        console.log("🧠 SideThoughts now tracking mode:", mode);
+
+        // 👇 Hook up the badge click to toggle the popup
+        const badge = document.getElementById("sideThoughtsBadge");
+        const popup = document.getElementById("thoughtPopup");
+        if (badge && popup) {
+          badge.addEventListener("click", () => {
+            popup.classList.toggle("hidden");
+          });
+        }
+      });
 
       // Auto‑save every 30s
       setInterval(() => autoSave(getActiveEditor()), 30_000);
@@ -2919,18 +2941,6 @@
           break;
       }
     }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      if (document.body.classList.contains("dark-mode")) {
-        // badge will auto-style via CSS var
-      }
-
-      // Optional: change emoji or behavior based on mode
-      const activeSuite = document.querySelector('.suite.active');
-      const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
-
-      console.log("🧠 SideThoughts now tracking mode:", mode);
-    });
 
     function saveSideThought() {
       const activeSuite = document.querySelector('.suite.active');
