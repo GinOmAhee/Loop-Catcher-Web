@@ -1389,10 +1389,6 @@
       return localStorage.getItem("editorMode") || "document";
     }
 
-    function getMarginBox() {
-      return document.querySelector('#docSuite .margin-box');
-    }
-
     function getSelectedPaperSize() {
       const selector = document.querySelector('#docSuite #paperSizeSelector');
       return selector?.value || "a4"; // ← give a sane default
