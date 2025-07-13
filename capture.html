@@ -28,6 +28,10 @@
     --popup-button-bg: #ffd966;
     --popup-border: #ccc;
     --popup-text-color: #000;
+    --switcher-bg: #f7f7f7;
+    --btn-bg: #e0e0e0;
+    --btn-text: #333;
+    --btn-active-bg: #4caf50;
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px;
     color: #333;
@@ -45,6 +49,10 @@
     --popup-button-bg: #ffce5c;
     --popup-border: #777;
     --popup-text-color: #fff;
+    --switcher-bg: #1f1f1f;
+    --btn-bg: #333;
+    --btn-text: #ddd;
+    --btn-active-bg: #81c784;
     background-color: #000;
     color: #f1f1f1;
   }
@@ -481,21 +489,22 @@
     justify-content: center;
     gap: 1rem;
     padding: 0.5rem;
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #ddd;
+    background-color: var(--switcher-bg);
+    border-bottom: 1px solid #ddd; /* optional: override this too if needed */
   }
 
   .mode-btn {
     padding: 0.5rem 1rem;
     border: none;
-    background-color: #e0e0e0;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
     cursor: pointer;
     border-radius: 6px;
     font-weight: bold;
   }
 
   .mode-btn.active {
-    background-color: #4caf50;
+    background-color: var(--btn-active-bg);
     color: white;
   }
 
