@@ -2418,7 +2418,6 @@
     function updateDocumentPreview () {
       // grab the *specific* elements used by the doc suite
       const preview   = document.getElementById("docPreview");   // <div id="docPreview" …>
-      const marginBox = document.getElementById("marginBox");    // inside #docEditor
       const marginBox = ensureMarginBox();   // guarantees it
 
       if (!preview || !marginBox) {
