@@ -928,7 +928,7 @@
 
     <div class="controls">
       <button onclick="saveText()" title="Save">💾</button>
-      <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
+      <button id="voiceBtnDoc"   class="voice-btn" title="Start Voice">🎤</button>
       <button id="printBtn" title="Print Note">🖨️</button>
     </div>
 
@@ -1094,7 +1094,7 @@
 
     <div class="controls">
       <button onclick="saveText()" title="Save">💾</button>
-      <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
+      <button id="voiceBtnNote"  class="voice-btn" title="Start Voice">🎤</button>
       <button id="printBtn" title="Print Note">🖨️</button>
     </div>
 
@@ -1479,9 +1479,6 @@
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
     const newThemeClass = moodThemeMap[vibe] || "theme-calm"; // Define it first
 
-    let recognition;
-    let isRecording = false;
-
     let savedSelections = {
       document: null,
       note: null
@@ -1701,81 +1698,68 @@
       updateFileDisplay(attached); // reuse your existing function
     }
 
+    let recognition = null;   // global instance
+    let isRecording = false;  // state flag
+
     function toggleVoiceCapture() {
-      if (isRecording) {
-        stopVoiceCapture();
-      } else {
-        startVoiceCapture();
-      }
+      isRecording ? stopVoiceCapture() : startVoiceCapture();
     }
 
     function startVoiceCapture() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert('🎙️ Voice capture is not supported in this browser. Try using Chrome.');
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        alert('🎙  Voice capture not supported in this browser.');
         return;
       }
 
-      const isDocMode = document.getElementById("docSuite").classList.contains("active");
-      const editor = isDocMode
-        ? document.getElementById("docEditor")
-        : document.getElementById("noteEditor");
+      /* Which suite is active? */
+      const activeSuite = document.querySelector('.suite.active');
+      const editor = activeSuite.querySelector('.editor');
+      const btn    = activeSuite.querySelector('.voice-btn');
+      const status = document.getElementById('saveStatus');
 
-      const status = document.getElementById("saveStatus");
-
-      recognition = new SpeechRecognition();
+      recognition = new SR();
       recognition.lang = 'en-US';
       recognition.continuous = true;
-      recognition.interimResults = false;
 
-      console.log("🎤 SpeechRecognition is starting...");
-      recognition.start();
-      isRecording = true;
-      document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
-      if (status) status.innerText = "🎙️ Voice capture started...";
-
-      recognition.onresult = (event) => {
+      recognition.onresult = e => {
         let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            let text = event.results[i][0].transcript.trim();
-            if (text.toLowerCase().includes("stop")) {
-              stopVoiceCapture();
-              saveText(); // make sure `saveText()` uses correct editor
-              return;
-            }
-            transcript += text + '\n';
-          }
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) transcript += e.results[i][0].transcript + '\n';
         }
-        editor.innerHTML += (editor.innerHTML ? '\n' : '') + transcript.trim();
+        /* append to whichever editor is active */
+        editor.innerHTML += (editor.innerHTML ? '<br>' : '') + transcript.trim();
       };
 
-      recognition.onerror = (e) => {
-        console.error("Speech recognition error:", e.error);
+      recognition.onerror = err => {
+        console.error('Speech error:', err.error);
         stopVoiceCapture();
       };
+
+      recognition.start();
+      isRecording = true;
+      btn.textContent = '🛑 Stop Voice';
+      status.textContent = '🎙 Listening…';
     }
 
     function stopVoiceCapture() {
-      if (recognition) {
-        recognition.stop();
-        recognition = null;
-      }
-
+      if (recognition) recognition.stop();
       isRecording = false;
-      document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
 
-      const isDocMode = document.getElementById("docSuite").classList.contains("active");
-      const status = document.getElementById("saveStatus");
+      /* update whichever button is inside the active suite */
+      const activeBtn = document.querySelector('.suite.active .voice-btn');
+      if (activeBtn) activeBtn.textContent = '🎤';
 
-      if (isDocMode) {
-        saveText("document");
-      } else {
-        saveText("note");
-      }
-
-      if (status) status.innerText = "🎤 Voice capture stopped.";
+      const status = document.getElementById('saveStatus');
+      status.textContent = '🎙 Voice capture stopped.';
     }
+
+    /* attach once after DOM ready */
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.voice-btn').forEach(btn => {
+        btn.addEventListener('click', toggleVoiceCapture);
+      });
+    });
 
     async function handleFileAttachment() {
       // 🟢 figure out which suite is active
