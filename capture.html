@@ -2391,6 +2391,11 @@
           if (mode === "notepad" || mode === "note") {
             updateGrouping?.(); // ✅ Pull in the latest notes
           } else if (mode === "document") {
+            const marginBox = document.getElementById("marginBox");
+            if (!marginBox) {
+              console.warn("⚠️ Cannot update preview — missing marginBox");
+              return;
+            }
             setTimeout(updateDocumentPreview, 50); // 👈 Inserted here
           }
         } catch (err) {
