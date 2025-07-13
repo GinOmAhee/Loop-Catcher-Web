@@ -2165,131 +2165,100 @@
     }
 
     function updateGrouping() {
-      const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
-      const keyword = document.getElementById("searchInput")?.value?.toLowerCase()?.trim() || "";
-      const scope = document.getElementById("searchScope")?.value || "group";
-      const groupBy = document.getElementById("groupSelector")?.value || "project";
-      const now = Date.now();
-      const currentMode = localStorage.getItem("editorMode") || "document";
+      /* 1️⃣  Figure out where we are */
+      const activeSuite   = document.querySelector('.suite.active');     // docSuite or noteSuite
+      const preview       = activeSuite?.querySelector('.preview-overlay');
+      if (!preview) return console.warn("⚠️ No preview overlay found");
 
-      const groupedNotes = document.querySelector('#groupedNotes');
-      if (notes.length === 0) {
+      /* 2️⃣  Query *inside* that overlay only */
+      const groupedNotes  = preview.querySelector('.groupedNotes');
+      const keywordInput  = preview.querySelector('.searchInput');
+      const scopeSelect   = preview.querySelector('.searchScope');
+      const groupSelect   = preview.querySelector('.groupSelector');
+
+      /* 3️⃣  Collect user filters */
+      const keyword = keywordInput?.value.toLowerCase().trim() || "";
+      const scope   = scopeSelect?.value   || "group";
+      const groupBy = groupSelect?.value   || "project";
+      const now     = Date.now();
+      const mode    = activeSuite.id === "noteSuite" ? "notepad" : "document";
+
+      /* 4️⃣  Pull saved notes */
+      const allNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      if (!groupedNotes) return;
+      if (allNotes.length === 0) {
         groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
         return;
       }
 
-      // ✅ Filter notes by editor mode
-      const modeFilteredNotes = notes.filter(note => (note.mode || "document") === currentMode);
+      /* 5️⃣  Filter by mode */
+      const modeNotes = allNotes.filter(n => (n.mode || "document") === mode);
 
-      // ✅ Further filter by keyword (if any)
-      const filteredNotes = scope === "all"
-        ? keyword
-          ? modeFilteredNotes.filter(({ text = "", title = "", project = "" }) =>
-              `${text} ${title} ${project}`.toLowerCase().includes(keyword))
-          : modeFilteredNotes
-        : keyword
-          ? modeFilteredNotes.filter(n =>
-              n.text?.toLowerCase().includes(keyword) ||
-              n.project?.toLowerCase().includes(keyword))
-          : modeFilteredNotes;
+      /* 6️⃣  Filter by keyword + scope */
+      const kw = keyword;
+      const passesKW = n =>
+        (`${n.text} ${n.title} ${n.project}`.toLowerCase().includes(kw));
+      const filtered =
+        scope === "all"
+          ? (kw ? modeNotes.filter(passesKW) : modeNotes)
+          : (kw ? modeNotes.filter(passesKW) : modeNotes);
 
-      const highlightText = (text, keyword) => {
-        if (!keyword) return escapeHTML(text).replace(/\n/g, "<br>");
-        const safe = escapeHTML(text);
-        const regex = new RegExp(`(${keyword})`, "gi");
-        return safe.replace(regex, '<mark class="highlight-glow">$1</mark>').replace(/\n/g, "<br>");
-      };
+      /* 7️⃣  Helper renderers */
+      const escape = str => str.replace(/[&<>"']/g, m =>
+        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      const highlight = (txt) =>
+        kw ? escape(txt).replace(new RegExp(`(${kw})`, 'gi'),
+          '<mark class="highlight-glow">$1</mark>') : escape(txt);
 
-      const renderNoteItem = (note) => `
-        <li style="margin-bottom:1rem; display: flex; align-items: start;">
-          <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
-          <div class="note-preview" onclick='loadNoteIntoEditor(decodeURIComponent("${encodeURIComponent(note.text)}"), "${note.mode || 'document'}")'>
-            ${highlightText(note.text, keyword)}
+      const renderLi = note => `
+        <li style="margin:0.5rem 0;display:flex;">
+          <input type="checkbox" class="note-delete-checkbox"
+                 data-time="${note.timestamp}" style="margin-right:8px">
+          <div class="note-preview"
+               onclick='loadNoteIntoEditor(\`${note.text.replace(/`/g,"\\`")}\`,
+                                            "${note.mode||"document"}")'>
+            ${highlight(note.text)}
           </div>
-        </li>
-      `;
+        </li>`;
 
-      const renderGroupedSection = (titleIcon, label, notes) => {
-        let section = `<h4>${titleIcon} ${escapeHTML(label)}</h4><ul>`;
-        section += notes.map(renderNoteItem).join("");
-        section += "</ul>";
-        return section;
-      };
+      const renderSection = (icon,label,arr) =>
+        `<h4>${icon} ${escape(label)}</h4><ul>${arr.map(renderLi).join("")}</ul>`;
 
+      /* 8️⃣  Group + build HTML */
       let html = "";
-
       if (scope === "all") {
-        if (filteredNotes.length === 0) {
-          groupedNotes.innerHTML = `<p>😶 No results found for '${escapeHTML(keyword)}'</p>`;
-          return;
-        }
-
-        html += renderGroupedSection("🌐", "Search Results (All Notes)", filteredNotes);
+        html = filtered.length
+          ? renderSection("🌐","Search Results",filtered)
+          : `<p>😶 No results found for “${escape(kw)}”</p>`;
       } else {
-        const grouped = {};
-
-        switch (groupBy) {
-          case "date":
-            filteredNotes.forEach(note => {
-              const date = new Date(note.timestamp || note.time).toLocaleDateString();
-              grouped[date] = grouped[date] || [];
-              grouped[date].push(note);
-            });
-            for (const date in grouped) {
-              html += renderGroupedSection("🗓️", date, grouped[date]);
-            }
-            break;
-
-          case "title":
-            filteredNotes.forEach(note => {
-              const title = (note.title || "Untitled").trim();
-              grouped[title] = grouped[title] || [];
-              grouped[title].push(note);
-            });
-            Object.keys(grouped).sort().forEach(title => {
-              html += renderGroupedSection("📘", title, grouped[title]);
-            });
-            break;
-
-          case "project":
-            filteredNotes.forEach(note => {
-              const project = note.project || "📂 Unlabeled";
-              grouped[project] = grouped[project] || [];
-              grouped[project].push(note);
-            });
-            for (const project in grouped) {
-              html += renderGroupedSection("📁", project, grouped[project]);
-            }
-            break;
-
-          case "unresolved":
-            const unresolved = filteredNotes.filter(note => note.resolved === false);
-            if (unresolved.length === 0) {
-              groupedNotes.innerHTML = "<p>✅ No unresolved notes!</p>";
-              return;
-            }
-            html += renderGroupedSection("🧩", "Unresolved Ideas", unresolved);
-            break;
-
-          case "forgotten":
-            const forgotten = filteredNotes.filter(note => {
-              const age = now - new Date(note.timestamp || note.time).getTime();
-              return age > 3 * 24 * 60 * 60 * 1000;
-            });
-            if (forgotten.length === 0) {
-              groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
-              return;
-            }
-            html += renderGroupedSection("🧠", "Forgotten Ideas", forgotten);
-            break;
-        }   
-
-          html += `<button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>`;
+        const groupObj = {};
+        filtered.forEach(n=>{
+          const key =
+            groupBy==="date"      ? new Date(n.timestamp).toLocaleDateString() :
+            groupBy==="title"     ? (n.title||"Untitled").trim()               :
+            groupBy==="project"   ? (n.project||"📂 Unlabeled")                :
+            groupBy==="unresolved"? "Unresolved"                               :
+            groupBy==="forgotten" ? "Forgotten"                                : "Other";
+          (groupObj[key]=groupObj[key]||[]).push(n);
+        });
+        for (const [label,arr] of Object.entries(groupObj)) {
+          const icon =
+            groupBy==="date"      ? "🗓️":
+            groupBy==="title"     ? "📘":
+            groupBy==="project"   ? "📁":
+            label==="Unresolved"  ? "🧩":
+            label==="Forgotten"   ? "🧠":"📄";
+          html += renderSection(icon,label,arr);
+        }
       }
 
-      groupedNotes.innerHTML = html;
-    }
+       /* 9️⃣  Delete‑selected button */
+       html += `<button class="delete-notes-btn"
+                        onclick="deleteSelectedNotes()">🗑️</button>`;
 
+       /* 🔟  Inject */
+       groupedNotes.innerHTML = html;
+    }
 
     function togglePreview() {
       console.log('🌀 Toggling preview visibility');
