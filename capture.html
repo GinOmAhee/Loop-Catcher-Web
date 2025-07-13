@@ -1440,17 +1440,30 @@
         editor.addEventListener('input', () => debouncedSave(editor));
 
         /* click outside to close */
-        document.addEventListener('click', e => {
-          if (!preview.contains(e.target) && !toggle.contains(e.target)) {
-            preview.classList.remove('active');
-            toggle.textContent = '☰';
+        document.addEventListener("click", (e) => {
+          const activeSuite = document.querySelector(".suite.active");
+          const preview = activeSuite?.querySelector(".preview-overlay");
+          const toggleBtn = activeSuite?.querySelector(".toggle-preview-btn");
+
+          // Only proceed if preview is visible
+          if (!preview?.classList.contains("preview-visible")) return;
+
+          // If click is outside both preview and toggle, close it
+          if (
+            preview && toggleBtn &&
+            !preview.contains(e.target) &&
+            !toggleBtn.contains(e.target)
+          ) {
+            preview.classList.remove("preview-visible");
+            toggleBtn.textContent = "☰";
+            console.log("🔒 Closed preview by clicking outside");
           }
         });
       });
 
       /* Font / color dropdowns now query the ACTIVE suite */
-    document.querySelectorAll('#fontMenuBtn, #textColorBtn, #highlightBtn')
-      .forEach(btn => btn?.addEventListener('click', handleDropdown));
+      document.querySelectorAll('#fontMenuBtn, #textColorBtn, #highlightBtn')
+        .forEach(btn => btn?.addEventListener('click', handleDropdown));
     }
 
     /* ---------------- Helpers --------------- */
