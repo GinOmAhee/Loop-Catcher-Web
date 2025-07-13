@@ -1103,7 +1103,7 @@
       </div>
 
       <div class="preview-middle">
-        <div class="preview-sortbar">
+        <div id="previewDocBody"></div>
           <span title="Group Notes">📂</span>
           <select class="groupSelector" onchange="updateGrouping()">
             <option value="date">Date</option>
@@ -1676,14 +1676,15 @@
       const editor = isDocMode ? document.getElementById("docEditor") : document.getElementById("noteEditor");
       const suiteType = isDocMode ? "Document" : "Note";
 
+      // ✅ Clone the editor and strip visual-only stuff (like marginBox)
       const clone = editor.cloneNode(true);
       const marginClone = clone.querySelector('#marginBox');
-      if (marginClone) marginClone.remove(); // ✅ only remove inside the clone
+      if (marginClone) marginClone.remove();
 
       const noteHTML = clone.innerHTML.replace(/&nbsp;/g, " ");
+      const noteText = editor.innerText.trim();
       const saveStatus = document.getElementById("saveStatus");
 
-      const noteText = editor.innerText.trim();
       if (!noteText) return;
 
       const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
@@ -1708,7 +1709,7 @@
         resolved: false,
         tags: [],
         type: suiteType.toLowerCase(),
-        mode // ✅ store whether it's notepad or document
+        mode
       };
 
       existingNotes.unshift(newNote);
@@ -1726,18 +1727,17 @@
         console.error("❌ Failed to save to Firestore:", error);
       }
 
-      // Reset layout and content
+      // Clean up editor after save
       editor.style.padding = "0";
       editor.style.margin = "0";
       editor.innerHTML = '';
-
       localStorage.removeItem("customMargins");
 
       if (saveStatus) {
         saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
       }
 
-      updateGrouping();
+      updateGrouping(); // ✅ Refresh preview UI
     }
 
     function autoSave() {
@@ -2365,7 +2365,6 @@
       console.log('🌀 Toggling preview visibility');
 
       const activeSuite = document.querySelector('.suite.active');
-      console.log("🧩 Active suite innerHTML:", activeSuite?.innerHTML); // ⬅️ Drop it here
 
       const preview = activeSuite?.querySelector('.preview-overlay');
       const isNoteMode = activeSuite?.id === "noteSuite";
@@ -2415,21 +2414,22 @@
       console.log('📺 Preview is now', isVisible ? 'visible' : 'hidden');
     }
 
-    function updateDocumentPreview () {
-      // grab the *specific* elements used by the doc suite
-      const preview   = document.getElementById("docPreview");   // <div id="docPreview" …>
-      const marginBox = ensureMarginBox();   // guarantees it
+    function updateDocumentPreview() {
+      const docEditor = document.getElementById("docEditor");
+      const preview = document.getElementById("docPreview");
 
-      if (!preview || !marginBox) {
-        console.warn("⚠️ Cannot update preview — missing #docPreview or #marginBox");
+      if (!docEditor || !preview) {
+        console.warn("⚠️ Cannot update preview — missing #docEditor or #docPreview");
         return;
       }
 
-      // pull just the user’s content (everything INSIDE the margin box)
-      const html = marginBox.innerHTML;
+      // clone editor and strip marginBox (if it exists)
+      const clone = docEditor.cloneNode(true);
+      const marginBox = clone.querySelector("#marginBox");
+      if (marginBox) marginBox.remove();  // ✅ remove visual-only elements
 
-      // drop it straight into the overlay (or run a formatter if you have one)
-      preview.innerHTML = /* renderPreviewHTML ? */ html;
+      // now drop cleaned content into preview
+      preview.innerHTML = clone.innerHTML;
     }
 
     function getActiveEditorContent() {
