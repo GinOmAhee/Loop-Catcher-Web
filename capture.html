@@ -1078,7 +1078,7 @@
       </div>
 
       <div class="preview-middle">
-        <div id="previewDocBody"></div>
+        <div class="preview-sortbar">
           <span title="Group Notes">📂</span>
           <select class="groupSelector" onchange="updateGrouping()">
             <option value="date">Date</option>
@@ -2369,16 +2369,16 @@
     }
 
     function updateDocumentPreview() {
+      const preview = document.getElementById("docPreview");
       const docEditor = document.getElementById("docEditor");
-      const previewDocBody = document.getElementById("previewDocBody");
 
-      if (!docEditor || !previewDocBody) {
-        console.warn("⚠️ Cannot update preview — missing preview container or editor");
+      if (!preview || !docEditor) {
+        console.warn("⚠️ Cannot update preview — missing preview or editor");
         return;
       }
 
       const html = docEditor.innerHTML;
-      previewDocBody.innerHTML = renderPreviewHTML?.(html) || html;
+      preview.innerHTML = renderPreviewHTML?.(html) || html;
     }
 
     function getActiveEditorContent() {
