@@ -1698,60 +1698,90 @@
       updateFileDisplay(attached); // reuse your existing function
     }
 
-    let recognition = null;   // global instance
-    let isRecording = false;  // state flag
+    let recognition = null;
+    let isRecording = false;
+    const synth = window.speechSynthesis;
 
     function toggleVoiceCapture() {
       isRecording ? stopVoiceCapture() : startVoiceCapture();
     }
 
+    function speakOutLoud(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 1;
+      synth.speak(utter);
+    }
+
     function startVoiceCapture() {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) {
-        alert('🎙  Voice capture not supported in this browser.');
-        return;
-      }
+      if (!SR) return alert("Voice capture not supported");
 
-      /* Which suite is active? */
       const activeSuite = document.querySelector('.suite.active');
       const editor = activeSuite.querySelector('.editor');
-      const btn    = activeSuite.querySelector('.voice-btn');
+      const btn = activeSuite.querySelector('.voice-btn');
       const status = document.getElementById('saveStatus');
 
       recognition = new SR();
       recognition.lang = 'en-US';
       recognition.continuous = true;
+      recognition.interimResults = false;
 
       recognition.onresult = e => {
         let transcript = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          if (e.results[i].isFinal) transcript += e.results[i][0].transcript + '\n';
+        for (let i = e.resultIndex; i < e.results.length; ++i) {
+          if (e.results[i].isFinal) {
+            let command = e.results[i][0].transcript.trim().toLowerCase();
+            console.log('🧠 Command Heard:', command);
+
+            // 🧠 Handle special voice commands
+            if (command === "stop") {
+              speakOutLoud("Stopping now.");
+              stopVoiceCapture();
+              return;
+            }
+
+            if (command === "new paragraph") {
+              editor.innerHTML += "<br><br>";
+              speakOutLoud("Starting a new paragraph.");
+              return;
+            }
+
+            if (command === "bold") {
+              document.execCommand("bold");
+              speakOutLoud("Bold enabled.");
+              return;
+            }
+
+            // ✍️ Otherwise, treat it as normal text
+            transcript += command + ' ';
+          }
         }
-        /* append to whichever editor is active */
-        editor.innerHTML += (editor.innerHTML ? '<br>' : '') + transcript.trim();
+
+        if (transcript.trim()) {
+          editor.innerHTML += (editor.innerHTML ? '<br>' : '') + transcript.trim();
+        }
       };
 
-      recognition.onerror = err => {
-        console.error('Speech error:', err.error);
+      recognition.onerror = e => {
+        console.error("Speech error:", e.error);
         stopVoiceCapture();
       };
 
       recognition.start();
       isRecording = true;
-      btn.textContent = '🛑 Stop Voice';
-      status.textContent = '🎙 Listening…';
+      btn.textContent = "🛑 Stop Voice";
+      if (status) status.textContent = "🎙️ Listening...";
     }
 
     function stopVoiceCapture() {
       if (recognition) recognition.stop();
       isRecording = false;
 
-      /* update whichever button is inside the active suite */
       const activeBtn = document.querySelector('.suite.active .voice-btn');
-      if (activeBtn) activeBtn.textContent = '🎤';
+      if (activeBtn) activeBtn.textContent = "🎤";
 
-      const status = document.getElementById('saveStatus');
-      status.textContent = '🎙 Voice capture stopped.';
+      const status = document.getElementById("saveStatus");
+      if (status) status.textContent = "🎙️ Voice capture stopped.";
     }
 
     /* attach once after DOM ready */
