@@ -1401,26 +1401,6 @@
         console.log("📝 Recovered and cleaned note draft");
       }
 
-      document.addEventListener("DOMContentLoaded", () => {
-        // Track mode for styling/context
-        if (document.body.classList.contains("dark-mode")) {
-          // badge styles itself
-        }
-
-        const activeSuite = document.querySelector('.suite.active');
-        const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
-        console.log("🧠 SideThoughts now tracking mode:", mode);
-
-        // 👇 Hook up the badge click to toggle the popup
-        const badge = document.getElementById("sideThoughtsBadge");
-        const popup = document.getElementById("thoughtPopup");
-        if (badge && popup) {
-          badge.addEventListener("click", () => {
-            popup.classList.toggle("hidden");
-          });
-        }
-      });
-
       // Auto‑save every 30s
       setInterval(() => autoSave(getActiveEditor()), 30_000);
     });
@@ -2962,6 +2942,26 @@
       document.getElementById("sideThoughtTextarea").value = "";
       alert("🧠 Thought saved!");
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Track mode for styling/context
+        if (document.body.classList.contains("dark-mode")) {
+          // badge styles itself
+        }
+
+        const activeSuite = document.querySelector('.suite.active');
+        const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
+        console.log("🧠 SideThoughts now tracking mode:", mode);
+
+        // 👇 Hook up the badge click to toggle the popup
+        const badge = document.getElementById("sideThoughtsBadge");
+        const popup = document.getElementById("thoughtPopup");
+        if (badge && popup) {
+          badge.addEventListener("click", () => {
+            popup.classList.toggle("hidden");
+          });
+        }
+      });
 
     document.addEventListener("click", () => {
       setTimeout(() => {
