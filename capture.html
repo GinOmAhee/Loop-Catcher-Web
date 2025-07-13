@@ -978,9 +978,8 @@
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
 
-        <button id="paperSizeSelectBtn" title="Select Paper Size">📄</label>
-
-        <select id="paperSizeSelectDropdown" onchange="setPaperSize(this.value)">
+        <label for="paperSizeSelect">📄 Paper Size:</label>
+        <select id="paperSizeSelect">
           <option value="letter">Letter (8.5in × 11in)</option>
           <option value="legal">Legal (8.5in × 14in)</option>
           <option value="a3">A3 (11.7in × 16.5in)</option>
@@ -1366,7 +1365,6 @@
       sizeDropdown?.classList.add("hidden");
       textColorDropdown?.classList.add("hidden");
       highlightDropdown?.classList.add("hidden");
-      paperSizeSelectDropdown?.classlist.add("hidden");
 
       const btnId = event.currentTarget.id;
 
@@ -1380,10 +1378,6 @@
         case "highlightBtn":
           highlightDropdown?.classList.toggle("hidden");
           break;
-        case "paperSizeSelectBtn":
-          highlightDropdown?.classList.toggle("hidden");
-          break;
-        
       }
     }
 
@@ -1447,7 +1441,7 @@
       });
 
       /* Font / color dropdowns now query the ACTIVE suite */
-    document.querySelectorAll('#fontMenuBtn, #textColorBtn, #highlightBtn', #paperSizeSelectBtn)
+    document.querySelectorAll('#fontMenuBtn, #textColorBtn, #highlightBtn')
       .forEach(btn => btn?.addEventListener('click', handleDropdown));
     }
 
@@ -1519,8 +1513,7 @@
       const idMap = {
         fontMenuBtn:     '#fontDropdown',
         textColorBtn:    '#textColorDropdown',
-        highlightBtn:    '#highlightDropdown',
-        paperSizeSelectBtn:     '#paperSizeSelectDropdown'
+        highlightBtn:    '#highlightDropdown'
       };
 
       // Which dropdown do we need?
@@ -1550,7 +1543,7 @@
 
     /* Attach the handler once after DOM is ready */
     document.addEventListener('DOMContentLoaded', () => {
-      ['#fontMenuBtn', '#textColorBtn', '#highlightBtn', '#paperSizeSelectBtn'].forEach(sel => {
+      ['#fontMenuBtn', '#textColorBtn', '#highlightBtn'].forEach(sel => {
         document.querySelectorAll(sel).forEach(btn => {
           btn.addEventListener('click', handleDropdown);
         });
