@@ -2367,6 +2367,7 @@
       console.log('🌀 Toggling preview visibility');
 
       const activeSuite = document.querySelector('.suite.active');
+      console.log("🧩 Active suite innerHTML:", activeSuite?.innerHTML); // ⬅️ Drop it here
       const preview = activeSuite?.querySelector('.preview-overlay');
       const isNoteMode = activeSuite?.id === "noteSuite";
       const mode = isNoteMode ? "notepad" : "document";
@@ -2390,12 +2391,14 @@
           if (mode === "notepad" || mode === "note") {
             updateGrouping?.(); // ✅ Pull in the latest notes
           } else if (mode === "document") {
-            const marginBox = activeSuite?.querySelector('#marginBox');
-            if (!marginBox) {
-              console.warn("⚠️ Cannot update preview — missing marginBox");
-              return;
-            }
-            setTimeout(updateDocumentPreview, 50); // 👈 Inserted here
+            setTimeout(() => {
+              const marginBox = activeSuite?.querySelector("#marginBox");
+              if (!marginBox) {
+                console.warn("⚠️ Cannot update preview — missing marginBox (delayed)");
+                return;
+              }
+              updateDocumentPreview();
+            }, 50); // Or tweak delay as needed
           }
         } catch (err) {
           console.error("❌ Failed to update preview:", err);
