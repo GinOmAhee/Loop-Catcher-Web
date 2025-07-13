@@ -417,29 +417,6 @@
     pointer-events: none;
   }
 
-  /* Margin overlay (stays inside #docEditor) */
-  .margin-box {
-    position: absolute;
-    inset: var(--margin-top, 1in)
-           var(--margin-right, 1in)
-           var(--margin-bottom, 1in)
-           var(--margin-left, 1in);
-    border: 2px dashed rgba(0,0,0,.2);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* optional inside border if you still want a dotted line
-     inside the margin-box itself */
-  .margin-box::before {
-    content: "";
-    position: absolute;
-    inset: 0;                         /* full size of margin‑box */
-    border: 2px dashed rgba(0,0,0,.2);
-    pointer-events: none;
-    z-index: 2;
-  }
-
   #mainEditor:not(.hidden-editor) {
     opacity: 1;
     pointer-events: auto;
@@ -2370,7 +2347,7 @@
           if (mode === "notepad" || mode === "note") {
             updateGrouping?.(); // ✅ Pull in the latest notes
           } else if (mode === "document") {
-            setTimeout(() => updateDocumentPreview(), 50);
+            updateDocumentPreview?.(); // ✅ Update layout/margins/fonts, etc.
           }
         } catch (err) {
           console.error("❌ Failed to update preview:", err);
@@ -2395,12 +2372,13 @@
       const docEditor = document.getElementById("docEditor");
       const previewDocBody = document.getElementById("previewDocBody");
 
-      if (!docEditor || !previewDocBody) return;
+      if (!docEditor || !previewDocBody) {
+        console.warn("⚠️ Cannot update preview — missing preview container or editor");
+        return;
+      }
 
-      const clone = docEditor.cloneNode(true);
-
-      // Remove old visual-only stuff (marginBox now removed from DOM, this stays clean anyway)
-      previewDocBody.innerHTML = clone.innerHTML;
+      const html = docEditor.innerHTML;
+      previewDocBody.innerHTML = renderPreviewHTML?.(html) || html;
     }
 
     function getActiveEditorContent() {
