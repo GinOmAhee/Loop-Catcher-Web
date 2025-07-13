@@ -978,15 +978,18 @@
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
 
-        <label for="paperSizeSelect">📄</label>
-        <select id="paperSizeSelect">
-          <option value="letter">Letter (8.5in × 11in)</option>
-          <option value="legal">Legal (8.5in × 14in)</option>
-          <option value="a3">A3 (11.7in × 16.5in)</option>
-          <option value="a4" selected>A4 (8.3in × 11.7in)</option>
-          <option value="a5">A5 (5.8in × 8.3in)</option>
-        </select>
-        
+        <!-- 📄 Paper Size Toggle Button -->
+        <button id="paperSizeSelectBtn" class="toolbar-btn" title="Paper Size">📄</button>
+
+        <!-- Custom Paper Size Dropdown -->
+        <div id="paperSizeDropdown" class="dropdown hidden">
+          <div class="dropdown-item" onclick="setPaperSize('letter')">Letter (8.5in × 11in)</div>
+          <div class="dropdown-item" onclick="setPaperSize('legal')">Legal (8.5in × 14in)</div>
+          <div class="dropdown-item" onclick="setPaperSize('a3')">A3 (11.7in × 16.5in)</div>
+          <div class="dropdown-item" onclick="setPaperSize('a4')">A4 (8.3in × 11.7in)</div>
+          <div class="dropdown-item" onclick="setPaperSize('a5')">A5 (5.8in × 8.3in)</div>
+        </div>
+
         <!-- Margin Button -->
         <button id="marginBtn" title="Set Margins">📏</button>
 
@@ -1519,6 +1522,7 @@
         fontMenuBtn:     '#fontDropdown',
         textColorBtn:    '#textColorDropdown',
         highlightBtn:    '#highlightDropdown'
+        paperSizeSelectBtn: '#paperSizeDropdown'  // ➕ add this
       };
 
       // Which dropdown do we need?
@@ -2910,35 +2914,28 @@
       a5:    { width: 583, height: 823 }    // 5.8in x 8.3in
     };
 
-    function updatePaperSize() {
-      const mode = getCurrentEditorMode?.() || "document";
-      if (mode !== "document") return;
+    function setPaperSize(size) {
+      const docEditor = document.getElementById("docEditor");
 
-      const selectedSize = paperSizeSelect?.value;
-      if (!selectedSize) return;
+      const sizes = {
+        letter: { width: "8.5in", height: "11in" },
+        legal:  { width: "8.5in", height: "14in" },
+        a3:     { width: "11.7in", height: "16.5in" },
+        a4:     { width: "8.3in", height: "11.7in" },
+        a5:     { width: "5.8in", height: "8.3in" }
+      };
 
-      switch (selectedSize) {
-        case "letter":
-          mainEditor.style.width = "8.5in";
-          mainEditor.style.minHeight = "11in";
-          break;
-        case "legal":
-          mainEditor.style.width = "8.5in";
-          mainEditor.style.minHeight = "14in";
-          break;
-        case "a3":
-          mainEditor.style.width = "11.7in";
-          mainEditor.style.minHeight = "16.5in";
-          break;
-        case "a4":
-          mainEditor.style.width = "8.27in";
-          mainEditor.style.minHeight = "11.69in";
-          break;
-        case "a5":
-          mainEditor.style.width = "5.8in";
-          mainEditor.style.minHeight = "8.3in";
-          break;
+      const selected = sizes[size.toLowerCase()];
+      if (selected) {
+        docEditor.style.width = selected.width;
+        docEditor.style.minHeight = selected.height;
+
+        localStorage.setItem("paperSize", size); // persist selection
+        console.log(`📄 Paper size set to ${size.toUpperCase()} (${selected.width} × ${selected.height})`);
       }
+
+      // Hide dropdown after selection
+      document.getElementById("paperSizeDropdown")?.classList.add("hidden");
     }
 
     function saveSideThought() {
