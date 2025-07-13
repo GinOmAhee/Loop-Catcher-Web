@@ -898,7 +898,7 @@
     <div class="controls">
       <button onclick="saveText()" title="Save">💾</button>
       <button id="voiceBtnDoc"   class="voice-btn" title="Start Voice">🎤</button>
-      <button id="printBtnDoc" title="Print Note">🖨️</button>
+      <button onclick="printEditor()">🖨️</button>
     </div>
 
     <div id="toolbar">
@@ -1068,7 +1068,7 @@
     <div class="controls">
       <button onclick="saveText()" title="Save">💾</button>
       <button id="voiceBtnNote"  class="voice-btn" title="Start Voice">🎤</button>
-      <button id="printBtnNote" title="Print Note">🖨️</button>
+      <button onclick="printEditor()">🖨️</button>
     </div>
 
     <div class="main-container">
@@ -1295,11 +1295,20 @@
 
       if (docEditor && docDraft) {
         console.log("🧠 Draft before cleanup:", docDraft);
-        // Clean the draft
-        docDraft = docDraft.replace(/<div[^>]*id=["']?marginBox["']?[^>]*>[\s\S]*?<\/div>/gi, '');
-        console.log("🧼 Draft after cleanup:", docDraft);
-        docEditor.innerHTML = docDraft;
-        
+
+        // 1️⃣ Grab the raw draft (still using docDraft as source)
+        const rawDraft = docDraft || "";
+
+        // 2️⃣ Remove marginBox safely
+        const cleanedDraft = rawDraft.replace(
+          /<div[^>]*id=["']?marginBox["']?[^>]*>[\s\S]*?<\/div>/gi,
+          ""
+        );
+
+        console.log("🧼 Draft after cleanup:", cleanedDraft);
+
+        // 3️⃣ Inject into editor
+        docEditor.innerHTML = cleanedDraft;
       }
 
       if (noteEditor && noteDraft) {
@@ -2614,23 +2623,21 @@
 
 
     function printEditor() {
-      const isNoteMode = document.getElementById('noteSuite').classList.contains('active');
-      const content = isNoteMode
-            ? document.getElementById('noteEditor').innerHTML
-            : document.getElementById('docEditor').innerHTML;
+      const useNote = document.getElementById("noteSuite").classList.contains("active");
+      const html = useNote
+        ? document.getElementById("noteEditor").innerHTML
+        : document.getElementById("docEditor").innerHTML;
 
-      const win = window.open('', '_blank');
-      win.document.write(`
+      const w = window.open("", "_blank");
+      w.document.write(`
         <html><head><title>Print</title>
           <style>
-            body{font-family:Arial,sans-serif;padding:1in;font-size:12pt;color:#000;}
-            ul,ol{margin-left:1.5em;}  h1,h2,h3,h4,h5{margin:1rem 0 .5rem;}
-            a{color:#007bff;text-decoration:underline;}
+            body{font-family:Arial,sans-serif;padding:1in;font-size:12pt}
+            ul,ol{margin-left:1.5em;} h1,h2,h3{margin:1rem 0 .5rem}
           </style>
-        </head><body>${content}</body></html>`);
-      win.document.close();
-      win.focus();
-      setTimeout(()=>{ win.print(); win.close(); }, 300);
+        </head><body>${html}</body></html>`);
+      w.document.close(); w.focus();
+      setTimeout(()=>{ w.print(); w.close(); }, 300);
     }
 
     function toggleBold() {
