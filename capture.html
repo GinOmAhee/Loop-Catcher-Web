@@ -1288,6 +1288,47 @@
       initThemeToggle();         // your existing dark‑theme logic
       initializeFirebase();      // backend just works
 
+      // 🔁 Mode-switch logic belongs here
+      const docSuite = document.getElementById("docSuite");
+      const noteSuite = document.getElementById("noteSuite");
+      const switchToDoc = document.getElementById("switchToDoc");
+      const switchToNote = document.getElementById("switchToNote");
+
+      // Click handler for Document Mode
+      switchToDoc.addEventListener("click", () => {
+        docSuite.classList.add("active");
+        noteSuite.classList.remove("active");
+
+        switchToDoc.classList.add("active");
+        switchToNote.classList.remove("active");
+
+        localStorage.setItem("editorMode", "document");
+
+        **switchEditorMode("document");** // ← ✨ Add this here
+      });
+
+      // Click handler for Note Mode
+      switchToNote.addEventListener("click", () => {
+        noteSuite.classList.add("active");
+        docSuite.classList.remove("active");
+
+        switchToNote.classList.add("active");
+        switchToDoc.classList.remove("active");
+
+        localStorage.setItem("editorMode", "notepad");
+
+        **switchEditorMode("notepad");** // ← ✨ And add this here
+      });
+
+      // Auto-apply last opened mode
+      const lastMode = localStorage.getItem("editorMode");
+      if (lastMode === "notepad") {
+        switchToNote.click();
+      } else {
+        switchToDoc.click();
+      }
+    });
+
       // 🔁 Recover unsaved drafts on load
       const docEditor = document.getElementById("docEditor");
       const noteEditor = document.getElementById("noteEditor");
@@ -1380,16 +1421,6 @@
           `💾 Auto‑saved at ${new Date().toLocaleTimeString()}`);
       }, 1000);
     }
-
-    document.getElementById("switchToDoc").addEventListener("click", () => {
-      document.getElementById("docSuite").classList.add("active");
-      document.getElementById("noteSuite").classList.remove("active");
-    });
-
-    document.getElementById("switchToNote").addEventListener("click", () => {
-      document.getElementById("noteSuite").classList.add("active");
-      document.getElementById("docSuite").classList.remove("active");
-    });
 
     function forceEditorRecovery() {
       const editor = getActiveEditor();
