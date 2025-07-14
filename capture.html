@@ -873,16 +873,17 @@
     <button id="switchToNote" class="mode-btn">✏️ Scribble</button>
   </div>
 
-  <!-- =========  DOCUMENT SUITE  ========= -->
-  <div id="docSuite" class="suite active">
+  <div class="suite-wrapper">
+    <!-- =========  DOCUMENT SUITE  ========= -->
+    <div id="docSuite" class="suite active">
 
-    <div class="controls">
-      <button onclick="saveText()" title="Save">💾</button>
-      <button id="voiceBtnDoc"   class="voice-btn" title="Start Voice">🎤</button>
-      <button onclick="printEditor()">🖨️</button>
-    </div>
+      <div class="controls">
+        <button onclick="saveText()" title="Save">💾</button>
+        <button id="voiceBtnDoc"   class="voice-btn" title="Start Voice">🎤</button>
+        <button onclick="printEditor()">🖨️</button>
+      </div>
 
-    <div id="toolbar">
+      <div id="toolbar">
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
         /*
@@ -981,150 +982,148 @@
         </div>
 
         <button onclick="removeFormatting()">🚫</button>
+
+        <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
+
+        <div id="attachedFilesList"></div>
+
+      </div>
+
+      <div class="main-container">
+        <div class="editor-area">
+          <!-- 🧭 Preview Toggle Button -->
+          <button class="toggle-preview-btn" onclick="togglePreview('doc')">☰</button>
+
+          <div id="docEditor" class="editor document-mode" contenteditable="true">
         </div>
       </div>
 
-      <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
-
-      <div id="attachedFilesList"></div>
-
-
-    <div class="main-container">
-      <div class="editor-area">
-        <!-- 🧭 Preview Toggle Button -->
-        <button class="toggle-preview-btn" onclick="togglePreview('doc')">☰</button>
-
-        <div id="docEditor" class="editor document-mode" contenteditable="true">
-      </div>
-    </div>
-
-    <!-- 📋 Preview Overlay -->
-    <div id="docPreview" class="preview-overlay">
-      <div class="preview-top">
-        <a href="holdingbay.html">🔄 Holding Bay</a>
-        <a href="actnow.html">🚀 Act Now</a>
-        <a href="buildmomentum.html">🌿 Build Momentum</a>
-        <a href="worthitlater.html">⏳ Worth It Later</a>
-        <a href="parkedpotential.html">📦 Parked Potential</a>
-      </div>
-
-      <div class="preview-middle">
-        <div class="preview-sortbar">
-          <span title="Group Notes">📂</span>
-          <select class="groupSelector" onchange="updateGrouping()">
-            <option value="date">Date</option>
-            <option value="title">Title</option>
-            <option value="project">Project</option>
-            <option value="unresolved">Unresolved Ideas</option>
-            <option value="forgotten">Forgotten Ideas</option>
-          </select>
+      <!-- 📋 Preview Overlay -->
+      <div id="docPreview" class="preview-overlay">
+        <div class="preview-top">
+          <a href="holdingbay.html">🔄 Holding Bay</a>
+          <a href="actnow.html">🚀 Act Now</a>
+          <a href="buildmomentum.html">🌿 Build Momentum</a>
+          <a href="worthitlater.html">⏳ Worth It Later</a>
+          <a href="parkedpotential.html">📦 Parked Potential</a>
         </div>
 
-        <div id="groupedNotes" class="groupedNotes"></div>
-
-        <div class="preview-sortbar bottom-searchbar">
-          <div class="search-wrapper">
-            <input type="text" class="searchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
-            <select class="searchScope" onchange="updateGrouping()">
-              <option value="group">Grouped</option>
-              <option value="all">Search All</option>
+        <div class="preview-middle">
+          <div class="preview-sortbar">
+            <span title="Group Notes">📂</span>
+            <select class="groupSelector" onchange="updateGrouping()">
+              <option value="date">Date</option>
+              <option value="title">Title</option>
+              <option value="project">Project</option>
+              <option value="unresolved">Unresolved Ideas</option>
+              <option value="forgotten">Forgotten Ideas</option>
             </select>
           </div>
-        </div>
 
-        <div class="preview-settings">
-          <a href="settings.html">⚙️ Settings</a>
-          <a href="profile.html">👤 Profile</a>
+          <div id="groupedNotes" class="groupedNotes"></div>
+
+          <div class="preview-sortbar bottom-searchbar">
+            <div class="search-wrapper">
+              <input type="text" class="searchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
+              <select class="searchScope" onchange="updateGrouping()">
+                <option value="group">Grouped</option>
+                <option value="all">Search All</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="preview-settings">
+            <a href="settings.html">⚙️ Settings</a>
+            <a href="profile.html">👤 Profile</a>
+          </div>
         </div>
-      </div>
-    </div><!-- /#docPreview -->
-  </div><!-- /#docSuite -->
+      </div><!-- /#docPreview -->
+    </div><!-- /#docSuite -->
   
+    <!-- =========  NOTEPAD SUITE  ========= -->
+    <div id="noteSuite" class="suite">
 
-  <!-- =========  NOTEPAD SUITE  ========= -->
-  <div id="noteSuite" class="suite">
-
-    <div class="controls">
-      <button onclick="saveText()" title="Save">💾</button>
-      <button id="voiceBtnNote"  class="voice-btn" title="Start Voice">🎤</button>
-      <button onclick="printEditor()">🖨️</button>
-    </div>
-
-    <div class="main-container">
-      <div class="editor-area">
-        <!-- 🧭 Preview Toggle Button -->
-        <button class="toggle-preview-btn" onclick="togglePreview('note')">☰</button>
-
-        <div id="noteEditor" class="editor notepad-mode" contenteditable="true"></div>
-      </div>
-    </div>
-
-    <!-- 📋 Preview Overlay -->
-    <div id="notePreview" class="preview-overlay">
-      <div class="preview-top">
-        <a href="holdingbay.html">🔄 Holding Bay</a>
-        <a href="actnow.html">🚀 Act Now</a>
-        <a href="buildmomentum.html">🌿 Build Momentum</a>
-        <a href="worthitlater.html">⏳ Worth It Later</a>
-        <a href="parkedpotential.html">📦 Parked Potential</a>
+      <div class="controls">
+        <button onclick="saveText()" title="Save">💾</button>
+        <button id="voiceBtnNote"  class="voice-btn" title="Start Voice">🎤</button>
+        <button onclick="printEditor()">🖨️</button>
       </div>
 
-      <div class="preview-middle">
-        <div class="preview-sortbar">
-          <span title="Group Notes">📂</span>
-          <select class="noteGroupSelector" onchange="updateGrouping()">
-            <option value="date">Date</option>
-            <option value="title">Title</option>
-            <option value="project">Project</option>
-            <option value="unresolved">Unresolved Ideas</option>
-            <option value="forgotten">Forgotten Ideas</option>
-          </select>
+      <div class="main-container">
+        <div class="editor-area">
+          <!-- 🧭 Preview Toggle Button -->
+          <button class="toggle-preview-btn" onclick="togglePreview('note')">☰</button>
+
+          <div id="noteEditor" class="editor notepad-mode" contenteditable="true"></div>
+        </div>
+      </div>
+
+      <!-- 📋 Preview Overlay -->
+      <div id="notePreview" class="preview-overlay">
+        <div class="preview-top">
+          <a href="holdingbay.html">🔄 Holding Bay</a>
+          <a href="actnow.html">🚀 Act Now</a>
+          <a href="buildmomentum.html">🌿 Build Momentum</a>
+          <a href="worthitlater.html">⏳ Worth It Later</a>
+          <a href="parkedpotential.html">📦 Parked Potential</a>
         </div>
 
-        <div id="groupedNotes" class="groupedNotes"></div>
-
-        <div class="preview-sortbar bottom-searchbar">
-          <div class="search-wrapper">
-            <input type="text" class="noteSearchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
-            <select class="noteSearchScope" onchange="updateGrouping()">
-              <option value="group">Grouped</option>
-              <option value="all">Search All</option>
+        <div class="preview-middle">
+          <div class="preview-sortbar">
+            <span title="Group Notes">📂</span>
+            <select class="noteGroupSelector" onchange="updateGrouping()">
+              <option value="date">Date</option>
+              <option value="title">Title</option>
+              <option value="project">Project</option>
+              <option value="unresolved">Unresolved Ideas</option>
+              <option value="forgotten">Forgotten Ideas</option>
             </select>
           </div>
+
+          <div id="groupedNotes" class="groupedNotes"></div>
+
+          <div class="preview-sortbar bottom-searchbar">
+            <div class="search-wrapper">
+              <input type="text" class="noteSearchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
+              <select class="noteSearchScope" onchange="updateGrouping()">
+                <option value="group">Grouped</option>
+                <option value="all">Search All</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="preview-settings">
+            <a href="settings.html">⚙️ Settings</a>
+            <a href="profile.html">👤 Profile</a>
+          </div>
         </div>
+      </div><!-- /#notePreview -->
+    </div><!-- /#noteSuite -->
 
-        <div class="preview-settings">
-          <a href="settings.html">⚙️ Settings</a>
-          <a href="profile.html">👤 Profile</a>
-        </div>
-      </div>
-    </div><!-- /#notePreview -->
-  </div><!-- /#noteSuite -->
+    <!-- Theme toggle stays at top level -->
+    <div class="dark-theme-switch">
+       <label class="theme-toggle">
+         <input type="checkbox" id="themeSwitch" />
+         <span class="slider"></span>
+       </label>
+    </div>
 
-  <!-- Theme toggle stays at top level -->
-  <div class="dark-theme-switch">
-     <label class="theme-toggle">
-       <input type="checkbox" id="themeSwitch" />
-       <span class="slider"></span>
-     </label>
+    <div class="save-time" id="saveStatus"></div>
+
+    <!-- 🧠 The Side Thoughts Badge -->
+    <div id="sideThoughtsBadge">
+      <span class="emoji"></span>
+      Side Thoughts
+    </div>
+
+    <!-- 💬 The Thought Popup -->
+    <div id="thoughtPopup" class="hidden">
+      <textarea id="sideThoughtTextarea" placeholder="Drop your thought here..."></textarea>
+      <button onclick="saveSideThought()">Save Thought</button>
+    </div>
+
+    <!-- Your main HTML content above -->
   </div>
-
-  <div class="save-time" id="saveStatus"></div>
-
-  <!-- 🧠 The Side Thoughts Badge -->
-  <div id="sideThoughtsBadge">
-    <span class="emoji"></span>
-    Side Thoughts
-  </div>
-
-  <!-- 💬 The Thought Popup -->
-  <div id="thoughtPopup" class="hidden">
-    <textarea id="sideThoughtTextarea" placeholder="Drop your thought here..."></textarea>
-    <button onclick="saveSideThought()">Save Thought</button>
-  </div>
-
-  <!-- Your main HTML content above -->
-
 </body>
 
   <script>
