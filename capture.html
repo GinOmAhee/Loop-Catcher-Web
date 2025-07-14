@@ -287,18 +287,32 @@
   }
 
   /* === EDITOR & INPUT === */
+  #mainEditor{
+    position: relative; 
+    width: 8.27in;
+    min-height: 11.69in;
+    font-family: "Arial", sans-serif;
+    
+  }
+
+  #coEditor{
+    position: relative; 
+    font-family: "Courier New", monospace;
+    width: 4.14in;
+    height: 5.38in;
+  }
+    
   #mainEditor,
   #coEditor{
-    min-height:300px;
     padding:1rem;
-    font-size:0.9rem;
+    font-size:1rem;
     border:1px solid #ccc;
     border-radius:8px;
     background:var(--editor-bg,#fff);
     color:var(--editor-text,#000);
     overflow-y:auto;
-    width:100%;
     box-sizing:border-box;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
 
   .hidden-editor {
@@ -957,51 +971,50 @@
 
       <div class="main-only">
       <!-- Only shows in main editor mode -->
-        <div class="format-toolbar" style="margin-bottom: 1rem;">
+         <div class="format-toolbar" style="margin-bottom: 1rem;">
         
-        <!-- Margin Button -->
-        <button id="marginBtn" title="Set Margins">📏</button>
+         <!-- Margin Button -->
+         <button id="marginBtn" title="Set Margins">📏</button>
 
-        <!-- Margin Dropdown -->
-        <div id="marginDropdown" class="dropdown hidden">
-          <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
-          <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
-          <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
-          <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
-          <button id="applyMarginBtn">✅ Apply</button>
-        </div>
-        <!-- Icon Button -->
-        <button id="fontMenuBtn" title="Choose Font">🅰️</button>
+         <!-- Margin Dropdown -->
+         <div id="marginDropdown" class="dropdown hidden">
+           <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
+           <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
+           <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
+           <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
+           <button id="applyMarginBtn">✅ Apply</button>
+         </div>
+         <!-- Icon Button -->
+         <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
-        <select id="fontDropdown" onchange="setFont(this.value)">
-          <option value="'Arial', sans-serif">Arial</option>
-          <option value="'Georgia', serif">Georgia</option>
-          <option value="'Courier New', monospace">Courier New</option>
-          <option value="'Times New Roman', serif">Times New Roman</option>
-        </select>
+         <select id="fontDropdown" onchange="setFont(this.value)">
+           <option value="'Arial', sans-serif">Arial</option>
+           <option value="'Georgia', serif">Georgia</option>
+           <option value="'Courier New', monospace">Courier New</option>
+           <option value="'Times New Roman', serif">Times New Roman</option>
+         </select>
 
-        <!-- Font Size Icon Button -->
-        <button id="fontSizeBtn" title="Font Size">🔠</button>
+         <!-- Font Size Icon Button -->
+         <button id="fontSizeBtn" title="Font Size">🔠</button>
 
-        <div id="fontSizeDropdownPanel" class="dropdown hidden">
-          <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
-          <select id="fontSizeSelect">
-            <option value="" disabled selected>Select font size</option>
-            <option value="8pt">8</option>
-            <option value="10pt">10</option>
-            <option value="12pt" selected>12</option>
-            <option value="14pt">14</option>
-            <option value="16pt">16</option>
-            <option value="18pt">18</option>
-            <option value="24pt">24</option>
-            <option value="36pt">36</option>
-          </select>
+         <div id="fontSizeDropdownPanel" class="dropdown hidden">
+           <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
+           <select id="fontSizeSelect">
+             <option value="" disabled selected>Select font size</option>
+             <option value="8pt">8</option>
+             <option value="10pt">10</option>
+             <option value="12pt" selected>12</option>
+             <option value="14pt">14</option>
+             <option value="16pt">16</option>
+             <option value="18pt">18</option>
+             <option value="24pt">24</option>
+             <option value="36pt">36</option>
+           </select>
           <button id="applyFontSize">Apply</button>
-        </div>
-        <button onclick="cleanEditor()">🧹</button>
-        <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
-        <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
-        <div id="attachedFilesList"></div>
+          <button onclick="cleanEditor()">🧹</button>
+          <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
+          <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
+          <div id="attachedFilesList"></div>
       </div>  
 
       <button onclick="toggleBold()"><b>B</b></button>
