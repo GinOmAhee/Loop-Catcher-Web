@@ -1263,45 +1263,42 @@
       initThemeToggle();         // your existing dark‑theme logic
       initializeFirebase();      // backend just works
 
-      // 🔁 Mode-switch logic belongs here
-      const docSuite = document.getElementById("docSuite");
-      const noteSuite = document.getElementById("noteSuite");
-      const switchToDoc = document.getElementById("switchToDoc");
+      // grab the DOM nodes once
+      const docSuite     = document.getElementById("docSuite");
+      const noteSuite    = document.getElementById("noteSuite");
+      const switchToDoc  = document.getElementById("switchToDoc");
       const switchToNote = document.getElementById("switchToNote");
 
-      // Click handler for Document Mode
-      switchToDoc.addEventListener("click", () => {
-        docSuite.classList.add("active");
-        noteSuite.classList.remove("active");
-
-        switchToDoc.classList.add("active");
-        switchToNote.classList.remove("active");
-
-        localStorage.setItem("editorMode", "document");
-
-        switchEditorMode("document"); // ← ✨ Add this here
-      });
-
-      // Click handler for Note Mode
-      switchToNote.addEventListener("click", () => {
-        noteSuite.classList.add("active");
-        docSuite.classList.remove("active");
-
-        switchToNote.classList.add("active");
-        switchToDoc.classList.remove("active");
-
-        localStorage.setItem("editorMode", "notepad");
-
-        switchEditorMode("notepad"); // ← ✨ And add this here
-      });
-
-      // Auto-apply last opened mode
-      const lastMode = localStorage.getItem("editorMode");
-      if (lastMode === "notepad") {
-        switchToNote.click();
-      } else {
-        switchToDoc.click();
+      // helper → shows one suite, hides the other
+      function activateSuite(showDoc) {
+        if (showDoc) {
+          docSuite .classList.add   ("active-suite");
+          noteSuite.classList.remove("active-suite");
+          switchToDoc .classList.add   ("active");      // highlight button
+          switchToNote.classList.remove("active");
+          localStorage.setItem("editorMode", "document");
+        } else {
+          noteSuite.classList.add   ("active-suite");
+          docSuite .classList.remove("active-suite");
+          switchToNote.classList.add   ("active");
+          switchToDoc .classList.remove("active");
+          localStorage.setItem("editorMode", "notepad");
+        }
       }
+
+      /*  ────────────────────────────────────────────
+      Event listeners
+      */
+      switchToDoc .addEventListener("click", () => activateSuite(true));
+      switchToNote.addEventListener("click", () => activateSuite(false));
+
+      /*  ────────────────────────────────────────────
+      Restore the last mode on page‑load
+      */
+      window.addEventListener("DOMContentLoaded", () => {
+        const lastMode = localStorage.getItem("editorMode") || "document";
+        activateSuite(lastMode === "document");
+      });
 
       // 🔁 Recover unsaved drafts on load
       const docEditor = document.getElementById("docEditor");
@@ -2146,15 +2143,23 @@
     }
 
     function switchEditorMode(mode) {
-      const docEditor = document.getElementById("docEditor");
+      const docEditor  = document.getElementById("docEditor");
       const noteEditor = document.getElementById("noteEditor");
+      const docSuite  = document.getElementById("docSuite");
+      const noteSuite = document.getElementById("noteSuite");
 
       if (mode === "document") {
         docEditor.style.display = "block";
         noteEditor.style.display = "none";
+
+        docSuite.classList.add("active-suite");
+        noteSuite.classList.remove("active-suite");
       } else if (mode === "notepad") {
         docEditor.style.display = "none";
         noteEditor.style.display = "block";
+
+        noteSuite.classList.add("active-suite");
+        docSuite.classList.remove("active-suite");
       }
 
       localStorage.setItem("editorMode", mode);
