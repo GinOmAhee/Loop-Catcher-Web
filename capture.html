@@ -1384,14 +1384,24 @@
     }
 
     let debounceTimer;
-    function debouncedSave(editor){
+    function debouncedSave(editor) {
       clearTimeout(debounceTimer);
+
       debounceTimer = setTimeout(() => {
-        localStorage.setItem("capturedText", editor.innerHTML);
+        // 🚿 Clean out marginBox before saving
+        const rawHTML = editor.innerHTML;
+        const cleanedHTML = rawHTML.replace(
+          /<div[^>]*id=["']?marginBox["']?[^>]*>[\s\S]*?<\/div>/gi,
+          ''
+        );
+
+        localStorage.setItem("capturedText", cleanedHTML);
         localStorage.setItem("lastSaved", new Date().toISOString());
+
         const saveStatus = document.getElementById('saveStatus');
-        saveStatus && (saveStatus.textContent =
-          `💾 Auto‑saved at ${new Date().toLocaleTimeString()}`);
+        if (saveStatus) {
+          saveStatus.textContent = `💾 Auto‑saved at ${new Date().toLocaleTimeString()}`;
+        }
       }, 1000);
     }
 
@@ -1669,12 +1679,13 @@
       const attached = JSON.parse(localStorage.getItem("attachedFiles") || "[]");
 
       // Load draft content
-      const savedContent = localStorage.getItem(draftKey);
-      if (savedContent) {
-        editor.innerHTML = savedContent;
-      } else {
-        editor.innerHTML = ""; // fresh new
-      }
+      const savedContent = localStorage.getItem(draftKey) || "";
+      const cleanedContent = savedContent.replace(
+        /<div[^>]*id=["']?marginBox["']?[^>]*>[\s\S]*?<\/div>/gi,
+        ""
+      );
+
+      editor.innerHTML = cleanedContent;
 
       // Optional save time feedback
       if (saveStatus && lastSaved) {
@@ -2782,7 +2793,7 @@
       }
       return false;
     }
-    
+
     /*
     const paperSizes = {
       letter: { width: 816, height: 1056 }, // 8.5in x 11in at 96dpi
