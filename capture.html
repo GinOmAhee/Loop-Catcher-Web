@@ -301,6 +301,14 @@
     display: block;
   }
 
+  #noteSuite.suite.active {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* or auto, if that fits better */
+  }
+
+
+
   #documentTabContainer {
     display: flex;
     flex-direction: row;
@@ -406,8 +414,10 @@
   /* === LAYOUT === */
   .main-container {
     display: flex;
-    height: 100vh;
-  }
+    flex: 1;
+    min-height: 300px;
+  } 
+  
   .editor-area {
     display: flex;
     flex-direction: column;
