@@ -301,14 +301,6 @@
     display: block;
   }
 
-  #noteSuite.suite.active {
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* or auto, if that fits better */
-  }
-
-
-
   #documentTabContainer {
     display: flex;
     flex-direction: row;
@@ -2089,20 +2081,22 @@
       }
     }
 
-    document.querySelector('#noteSuite').style.display = 'block';
-    document.querySelector('#noteSuite').style.height = '100vh';
+    window.addEventListener("DOMContentLoaded", () => {
+      document.querySelector('#noteSuite').style.display = 'block';
+      document.querySelector('#noteSuite').style.height = '100vh';
 
-    document.querySelector('#noteSuite .main-container').style.display = 'flex';
-    document.querySelector('#noteSuite .main-container').style.height = '100%';
+      document.querySelector('#noteSuite .main-container').style.display = 'flex';
+      document.querySelector('#noteSuite .main-container').style.height = '100%';
 
-    document.querySelector('#noteSuite .editor-area').style.display = 'flex';
-    document.querySelector('#noteSuite .editor-area').style.height = '100%';
+      document.querySelector('#noteSuite .editor-area').style.display = 'flex';
+      document.querySelector('#noteSuite .editor-area').style.height = '100%';
 
-    const noteEditor = document.querySelector('#noteEditor');
-    noteEditor.style.display = 'block';
-    noteEditor.style.minHeight = '400px';
-    noteEditor.style.background = 'lightyellow';
-    noteEditor.innerHTML = '✅ HELLO from NOTEPAD';
+      const noteEditor = document.querySelector('#noteEditor');
+      noteEditor.style.display = 'block';
+      noteEditor.style.minHeight = '400px';
+      noteEditor.style.background = 'lightyellow';
+      noteEditor.innerHTML = '✅ HELLO from NOTEPAD';
+    });
 
     function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
       const docEditor = document.getElementById("docEditor");
