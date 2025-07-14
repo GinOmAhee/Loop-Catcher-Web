@@ -1421,7 +1421,18 @@
       // ✅ Auto-close paper size dropdown after selection
       document.querySelector('#paperSizeSelect')
         ?.addEventListener('change', e => e.target.blur());
-     
+
+      /* Attach the handler once after DOM is ready */
+      ['#fontMenuBtn', '#textColorBtn', '#highlightBtn'].forEach(sel => {
+          document.querySelectorAll(sel).forEach(btn => {
+            btn.addEventListener('click', handleDropdown);
+          });
+  
+          // Click anywhere else → close all dropdowns
+          document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown').forEach(dd => dd.classList.add('hidden'));
+          });
+      });
     });
 
     /* ---------------- Suite‑specific listeners --------------- */
@@ -1545,20 +1556,6 @@
         dropdown.style.zIndex   = 9999;
       }
     }
-
-    /* Attach the handler once after DOM is ready */
-    document.addEventListener('DOMContentLoaded', () => {
-      ['#fontMenuBtn', '#textColorBtn', '#highlightBtn'].forEach(sel => {
-        document.querySelectorAll(sel).forEach(btn => {
-          btn.addEventListener('click', handleDropdown);
-        });
-      });
-
-      // Click anywhere else → close all dropdowns
-      document.addEventListener('click', () => {
-        document.querySelectorAll('.dropdown').forEach(dd => dd.classList.add('hidden'));
-      });
-    });
 
 
     const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
