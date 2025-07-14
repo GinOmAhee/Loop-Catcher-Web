@@ -1352,7 +1352,7 @@
 
         /* click outside to close */
         document.addEventListener("click", e => {
-          const activeSuite = document.querySelector(".suite.active");
+          const activeSuite = document.querySelector(".active-suite");
           if (!activeSuite) return;
 
           const preview   = activeSuite.querySelector(".preview-overlay");
@@ -1377,7 +1377,7 @@
 
     /* ---------------- Helpers --------------- */
     function getActiveSuite() {
-      return document.querySelector('.suite.active');
+      return document.querySelector('.active.suite');
     }
 
     let debounceTimer;
@@ -1442,7 +1442,7 @@
       if (!dropdownSelector) return;
 
       // Always look **inside the active suite** (doc or note)
-      const activeSuite = document.querySelector('.suite.active');
+      const activeSuite = document.querySelector('.active.suite');
       const dropdown    = activeSuite?.querySelector(dropdownSelector);
       if (!dropdown) {
         console.warn('⚠️ Dropdown element not found for', btn.id);
@@ -1584,7 +1584,7 @@
       let projectName = prompt("📌 Enter project name (optional):");
       projectName = projectName?.trim() || "📂 Unlabeled";
 
-      const activeSuite = document.querySelector('.suite.active');
+      const activeSuite = document.querySelector('.active.suite');
       const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
 
       const newNote = {
@@ -1710,7 +1710,7 @@
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) return alert("Voice capture not supported");
 
-      const activeSuite = document.querySelector('.suite.active');
+      const activeSuite = document.querySelector('.active.suite');
       const editor = activeSuite?.querySelector('.editor');
       const btn = activeSuite?.querySelector('.voice-btn');
       const status = document.getElementById('saveStatus');
@@ -1776,7 +1776,7 @@
       if (recognition) recognition.stop();
       isRecording = false;
 
-      const activeBtn = document.querySelector('.suite.active .voice-btn');
+      const activeBtn = document.querySelector('.active.suite.voice-btn');
       if (activeBtn) activeBtn.textContent = "🎤";
 
       const status = document.getElementById("saveStatus");
@@ -2097,7 +2097,7 @@
     function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
       const docEditor = document.getElementById("docEditor");
       const noteEditor = document.getElementById("noteEditor");
-      const preview     = document.querySelector('.suite.active .preview-overlay');
+      const preview     = document.querySelector('.active.suite.preview-overlay');
       const saveStatus  = document.getElementById('saveStatus');
 
       if (!docEditor || !noteEditor) {
@@ -2173,7 +2173,7 @@
 
     function updateGrouping() {
       /* 1️⃣  Figure out where we are */
-      const activeSuite   = document.querySelector('.suite.active');     // docSuite or noteSuite
+      const activeSuite   = document.querySelector('.active.suite');     // docSuite or noteSuite
       const preview       = activeSuite?.querySelector('.preview-overlay');
       if (!preview) return console.warn("⚠️ No preview overlay found");
 
@@ -2270,7 +2270,7 @@
     function togglePreview() {
       console.log('🌀 Toggling preview visibility');
 
-      const activeSuite = document.querySelector('.suite.active');
+      const activeSuite = document.querySelector('.active.suite');
 
       const preview = activeSuite?.querySelector('.preview-overlay');
       const isNoteMode = activeSuite?.id === "noteSuite";
@@ -2835,7 +2835,7 @@
     */
 
     function saveSideThought() {
-      const activeSuite = document.querySelector('.suite.active');
+      const activeSuite = document.querySelector('.active.suite');
       const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
       const text = document.getElementById("sideThoughtTextarea").value.trim();
 
@@ -2861,7 +2861,7 @@
           // badge styles itself
         }
 
-        const activeSuite = document.querySelector('.suite.active');
+        const activeSuite = document.querySelector('.active.suite');
         const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
         console.log("🧠 SideThoughts now tracking mode:", mode);
 
