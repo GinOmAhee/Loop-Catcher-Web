@@ -521,7 +521,7 @@
     border: 1px solid #ccc;
     cursor: pointer;
   }
-
+  /*
   .margin-dropdown {
     position: absolute;
     background: white;
@@ -532,7 +532,7 @@
     font-size: 0.85rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   }
-
+  */
   .delete-notes-btn {
     position: sticky;
     bottom: 10px;
@@ -916,7 +916,7 @@
           <div class="dropdown-item" onclick="setPaperSize('a4')">A4 (8.3in × 11.7in)</div>
           <div class="dropdown-item" onclick="setPaperSize('a5')">A5 (5.8in × 8.3in)</div>
         </div>
-        */
+        
         <!-- Margin Button -->
         <button id="marginBtn" title="Set Margins">📏</button>
 
@@ -937,7 +937,7 @@
           <option value="'Courier New', monospace">Courier New</option>
           <option value="'Times New Roman', serif">Times New Roman</option>
         </select>
-
+        */
         <!-- Font Size Icon Button -->
         <button id="fontSizeBtn" title="Font Size">🔠</button>
 
@@ -2343,7 +2343,7 @@
         preview.innerHTML = html;
       }
     }
-    
+
     function getActiveEditorContent() {
       const mode = getCurrentEditorMode?.() || "document";
 
@@ -2659,7 +2659,7 @@
       });
     });
 
-
+    
     function printEditor() {
       const useNote = document.getElementById("noteSuite").classList.contains("active");
       const html = useNote
@@ -2716,7 +2716,7 @@
         selection.addRange(newRange);
       }
     }
-
+    /*
     document.addEventListener("DOMContentLoaded", () => {
       const docSuite = document.getElementById("docSuite");
       const marginBtn = docSuite?.querySelector("#marginBtn");
@@ -2771,11 +2771,11 @@
         }
       });
     });
-
+    */
     function inchesToPixels(inches) {
         return parseFloat(inches) * 96;
     }  
-
+    /*
     function applyCustomMargins() {
       const saved = JSON.parse(localStorage.getItem("customMargins") || "{}");
 
@@ -2796,7 +2796,7 @@
       editor.style.paddingLeft = `${left}px`;
       editor.style.paddingRight = `${right}px`;
     }
-
+    */
     function abortIfRenaming() {
       if (isRenamingTab) {
         console.warn("⛔ Aborting: rename input is still active");
