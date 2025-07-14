@@ -1479,7 +1479,8 @@
       const sel = window.getSelection();
       if (sel && sel.rangeCount > 0) {
         const mode = localStorage.getItem("editorMode") || "document";
-        savedSelections[mode] = sel.getRangeAt(0).cloneRange();   // 👈 FIX
+        savedSelections[mode] = sel.getRangeAt(0).c
+        loneRange();   // 👈 FIX
       }
     }
 
@@ -2449,6 +2450,21 @@
         }
 
         loadSavedText(); // 📂 Load tab content
+
+        const docSuite = document.getElementById("docSuite");
+        const noteSuite = document.getElementById("noteSuite");
+
+        new MutationObserver(muts => {
+          muts.forEach(m => {
+            if ([...m.addedNodes, ...m.removedNodes].includes(noteSuite)) {
+              console.warn("🔍 noteSuite moved!", {
+                newParent: noteSuite.parentElement.id,
+                mutation: m
+              });
+            }
+          });
+        }).observe(document.body, { childList: true, subtree: true });
+
 
         // 🔗 Make links in document editor clickable
         docEditor?.addEventListener("click", function (e) {
