@@ -2334,9 +2334,16 @@
       }
 
       const html = docEditor.innerHTML;
-      preview.innerHTML = renderPreviewHTML?.(html) || html;
-    }
 
+      // ✅ Use fallback if function is missing
+      if (typeof renderPreviewHTML === "function") {
+        preview.innerHTML = renderPreviewHTML(html);
+      } else {
+        console.warn("⚠️ renderPreviewHTML is not defined. Falling back to raw HTML.");
+        preview.innerHTML = html;
+      }
+    }
+    
     function getActiveEditorContent() {
       const mode = getCurrentEditorMode?.() || "document";
 
