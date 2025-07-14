@@ -823,6 +823,55 @@
 
       <div class="main-container" onclick="maybeClosePreview(event)">
         <div id="tabBar" class="tab-bar"></div>
+
+        <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
+        <div class="preview-overlay" id="preview">
+            <div class="preview-top">
+              <a href="holdingbay.html">🔄 Holding Bay</a>
+              <a href="actnow.html">🚀 Act Now</a>
+              <a href="buildmomentum.html">🌿 Build Momentum</a>
+              <a href="worthitlater.html">⏳ Worth It Later</a>
+              <a href="parkedpotential.html">📦 Parked Potential</a>
+            </div>
+
+          <div class="preview-middle">
+            <!-- 1. Top: Group selector -->
+            <div class="preview-sortbar">
+              <span title="Group Notes">📂</span>
+              <select id="groupSelector" onchange="updateGrouping()">
+                <option value="date">Date</option>
+                <option value="title">Title</option>
+                <option value="project">Project</option>
+                <option value="unresolved">Unresolved Ideas</option>
+                <option value="forgotten">Forgotten Ideas</option>
+              </select>
+            </div>
+
+            <!-- 2. Scrollable notes area -->
+            <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
+
+            <!-- 3. Bottom: search input anchored in its own bar -->
+            <div class="preview-sortbar bottom-searchbar">
+              <div class="search-wrapper">
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="🔍 Search notes..."
+                  oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
+                <select id="searchScope" onchange="updateGrouping()" ...>
+                  <option value="group">Grouped</option>
+                  <option value="all">Search All</option>
+                </select>
+              </div>
+            </div>
+
+          <!-- 4. Very bottom: settings/profile links -->
+          <div class="preview-settings">
+            <a href="settings.html">⚙️ Settings</a>
+            <a href="profile.html">👤 Profile</a>
+          </div>
+        </div>
+
         <div class="editor-area">
           <button id="previewToggle">☰</button>
           <!-- 🎨 Toolbar -->
@@ -915,55 +964,6 @@
 
           <button onclick="removeFormatting()">🚫</button>
 
-          <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
-          <div class="preview-overlay" id="preview">
-            <div class="preview-top">
-              <a href="holdingbay.html">🔄 Holding Bay</a>
-              <a href="actnow.html">🚀 Act Now</a>
-              <a href="buildmomentum.html">🌿 Build Momentum</a>
-              <a href="worthitlater.html">⏳ Worth It Later</a>
-              <a href="parkedpotential.html">📦 Parked Potential</a>
-            </div>
-
-          <div class="preview-middle">
-            <!-- 1. Top: Group selector -->
-            <div class="preview-sortbar">
-              <span title="Group Notes">📂</span>
-              <select id="groupSelector" onchange="updateGrouping()">
-                <option value="date">Date</option>
-                <option value="title">Title</option>
-                <option value="project">Project</option>
-                <option value="unresolved">Unresolved Ideas</option>
-                <option value="forgotten">Forgotten Ideas</option>
-              </select>
-            </div>
-
-            <!-- 2. Scrollable notes area -->
-            <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
-
-            <!-- 3. Bottom: search input anchored in its own bar -->
-            <div class="preview-sortbar bottom-searchbar">
-              <div class="search-wrapper">
-                <input
-                  type="text"
-                  id="searchInput"
-                  placeholder="🔍 Search notes..."
-                  oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
-                <select id="searchScope" onchange="updateGrouping()" ...>
-                  <option value="group">Grouped</option>
-                  <option value="all">Search All</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- 4. Very bottom: settings/profile links -->
-            <div class="preview-settings">
-              <a href="settings.html">⚙️ Settings</a>
-              <a href="profile.html">👤 Profile</a>
-            </div>
-
-          </div>
-
           <!-- 📝 Rich Text Editor -->
           <div id="mainEditor" class="hidden-editor" contenteditable="true"></div>
 
@@ -982,6 +982,54 @@
 
       <div class="main-container co-pane hidden">
         <div id="tabBar" class="tab-bar"></div>
+
+        <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
+        <div class="preview-overlay" id="preview">
+          <div class="preview-top">
+            <a href="holdingbay.html">🔄 Holding Bay</a>
+            <a href="actnow.html">🚀 Act Now</a>
+            <a href="buildmomentum.html">🌿 Build Momentum</a>
+            <a href="worthitlater.html">⏳ Worth It Later</a>
+            <a href="parkedpotential.html">📦 Parked Potential</a>
+          </div>
+
+          <div class="preview-middle">
+            <!-- 1. Top: Group selector -->
+            <div class="preview-sortbar">
+              <span title="Group Notes">📂</span>
+              <select id="groupSelector" onchange="updateGrouping()">
+                <option value="date">Date</option>
+                <option value="title">Title</option>
+                <option value="project">Project</option>
+                <option value="unresolved">Unresolved Ideas</option>
+                <option value="forgotten">Forgotten Ideas</option>
+              </select>
+            </div>
+            <!-- 2. Scrollable notes area -->
+            <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>  
+
+            <!-- 3. Bottom: search input anchored in its own bar -->
+            <div class="preview-sortbar bottom-searchbar">
+              <div class="search-wrapper">
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="🔍 Search notes..."
+                  oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
+                <select id="searchScope" onchange="updateGrouping()" ...>
+                  <option value="group">Grouped</option>
+                  <option value="all">Search All</option>
+                </select>
+              </div>
+            </div>
+          </div>  
+
+          <!-- 4. Very bottom: settings/profile links -->
+          <div class="preview-settings">
+            <a href="settings.html">⚙️ Settings</a>
+            <a href="profile.html">👤 Profile</a>
+          </div>
+
         <div class="editor-area">  
           <button id="previewToggle">☰</button>
           <!-- 🎨 Toolbar -->
@@ -1014,52 +1062,7 @@
             <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
           </div>
           
-          <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
-          <div class="preview-overlay" id="preview">
-            <div class="preview-top">
-              <a href="holdingbay.html">🔄 Holding Bay</a>
-              <a href="actnow.html">🚀 Act Now</a>
-              <a href="buildmomentum.html">🌿 Build Momentum</a>
-              <a href="worthitlater.html">⏳ Worth It Later</a>
-              <a href="parkedpotential.html">📦 Parked Potential</a>
-            </div>
-
-          <div class="preview-middle">
-            <!-- 1. Top: Group selector -->
-            <div class="preview-sortbar">
-              <span title="Group Notes">📂</span>
-              <select id="groupSelector" onchange="updateGrouping()">
-                <option value="date">Date</option>
-                <option value="title">Title</option>
-                <option value="project">Project</option>
-                <option value="unresolved">Unresolved Ideas</option>
-                <option value="forgotten">Forgotten Ideas</option>
-              </select>
-            </div>
-
-            <!-- 2. Scrollable notes area -->
-            <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
-
-            <!-- 3. Bottom: search input anchored in its own bar -->
-            <div class="preview-sortbar bottom-searchbar">
-              <div class="search-wrapper">
-                <input
-                  type="text"
-                  id="searchInput"
-                  placeholder="🔍 Search notes..."
-                  oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
-                <select id="searchScope" onchange="updateGrouping()" ...>
-                  <option value="group">Grouped</option>
-                  <option value="all">Search All</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- 4. Very bottom: settings/profile links -->
-            <div class="preview-settings">
-              <a href="settings.html">⚙️ Settings</a>
-              <a href="profile.html">👤 Profile</a>
-            </div>
+         
 
           </div>
 
@@ -1160,6 +1163,30 @@
           document.body.classList.remove('dark-theme');
           localStorage.setItem('theme', 'light');
         }
+      });
+
+      const mainEditor = document.getElementById("mainEditor");
+      const coEditor = document.getElementById("coEditor");
+
+      // Set the default visible editor
+      activeEditor = mainEditor;
+      coEditor.classList.add("hidden"); // ensure coEditor is hidden
+
+      // Button click logic
+      document.getElementById("modeSwitchBtn").addEventListener("click", () => {
+        // Toggle visibility
+        if (!mainEditor.classList.contains("hidden")) {
+          mainEditor.classList.add("hidden");
+          coEditor.classList.remove("hidden");
+          activeEditor = coEditor;
+        } else {
+          coEditor.classList.add("hidden");
+          mainEditor.classList.remove("hidden");
+          activeEditor = mainEditor;
+        }
+
+        activeEditor.focus();
+        console.log("Switched to:", activeEditor.id);
       });
 
       applyMoodTheme(); // This should already exist globally
