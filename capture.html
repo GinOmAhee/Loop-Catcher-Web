@@ -1433,6 +1433,11 @@
             document.querySelectorAll('.dropdown').forEach(dd => dd.classList.add('hidden'));
           });
       });
+
+      document.querySelectorAll('.voice-btn').forEach(btn => {
+        btn.addEventListener('click', toggleVoiceCapture);
+      });
+      
     });
 
     /* ---------------- Suite‑specific listeners --------------- */
@@ -1880,13 +1885,6 @@
       const status = document.getElementById("saveStatus");
       if (status) status.textContent = "🎙️ Voice capture stopped.";
     }
-
-    /* attach once after DOM ready */
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.voice-btn').forEach(btn => {
-        btn.addEventListener('click', toggleVoiceCapture);
-      });
-    });
 
     async function handleFileAttachment() {
       // 🟢 figure out which suite is active
