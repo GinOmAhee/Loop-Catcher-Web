@@ -873,31 +873,30 @@
     <button id="switchToNote" class="mode-btn">✏️ Scribble</button>
   </div>
 
-  <div class="suite-wrapper">
-    <!-- =========  DOCUMENT SUITE  ========= -->
-    <div id="docSuite" class="suite active">
+  <!-- =========  DOCUMENT SUITE  ========= -->
+  <div id="docSuite" class="suite active">
+    <div class="tab-bar">
+      <div id="documentTabContainer" class="tab-container document-tabs"></div>
+    </div>
 
-      <div class="controls">
-        <button onclick="saveText()" title="Save">💾</button>
-        <button id="voiceBtnDoc"   class="voice-btn" title="Start Voice">🎤</button>
-        <button onclick="printEditor()">🖨️</button>
-      </div>
+    <div class="controls">
+      <button onclick="saveText()" title="Save">💾</button>
+      <button id="voiceBtnDoc"   class="voice-btn" title="Start Voice">🎤</button>
+      <button id="printBtn" title="Print Note">🖨️</button>
+    </div>
 
-      <div id="toolbar">
+    <div id="toolbar">
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
-        /*
-        <!-- 📄 Paper Size Toggle Button -->
-        <button id="paperSizeSelectBtn" class="toolbar-btn" title="Paper Size">📄</button>
 
-        <!-- Custom Paper Size Dropdown -->
-        <div id="paperSizeDropdown" class="dropdown hidden">
-          <div class="dropdown-item" onclick="setPaperSize('letter')">Letter (8.5in × 11in)</div>
-          <div class="dropdown-item" onclick="setPaperSize('legal')">Legal (8.5in × 14in)</div>
-          <div class="dropdown-item" onclick="setPaperSize('a3')">A3 (11.7in × 16.5in)</div>
-          <div class="dropdown-item" onclick="setPaperSize('a4')">A4 (8.3in × 11.7in)</div>
-          <div class="dropdown-item" onclick="setPaperSize('a5')">A5 (5.8in × 8.3in)</div>
-        </div>
+        <label for="paperSizeSelect">📄 Paper Size:</label>
+        <select id="paperSizeSelect">
+          <option value="letter">Letter (8.5in × 11in)</option>
+          <option value="legal">Legal (8.5in × 14in)</option>
+          <option value="a3">A3 (11.7in × 16.5in)</option>
+          <option value="a4" selected>A4 (8.3in × 11.7in)</option>
+          <option value="a5">A5 (5.8in × 8.3in)</option>
+        </select>
         
         <!-- Margin Button -->
         <button id="marginBtn" title="Set Margins">📏</button>
@@ -919,7 +918,7 @@
           <option value="'Courier New', monospace">Courier New</option>
           <option value="'Times New Roman', serif">Times New Roman</option>
         </select>
-        */
+
         <!-- Font Size Icon Button -->
         <button id="fontSizeBtn" title="Font Size">🔠</button>
 
@@ -982,148 +981,152 @@
         </div>
 
         <button onclick="removeFormatting()">🚫</button>
-
-        <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
-
-        <div id="attachedFilesList"></div>
-
-      </div>
-
-      <div class="main-container">
-        <div class="editor-area">
-          <!-- 🧭 Preview Toggle Button -->
-          <button class="toggle-preview-btn" onclick="togglePreview('doc')">☰</button>
-
-          <div id="docEditor" class="editor document-mode" contenteditable="true">
         </div>
       </div>
 
-      <!-- 📋 Preview Overlay -->
-      <div id="docPreview" class="preview-overlay">
-        <div class="preview-top">
-          <a href="holdingbay.html">🔄 Holding Bay</a>
-          <a href="actnow.html">🚀 Act Now</a>
-          <a href="buildmomentum.html">🌿 Build Momentum</a>
-          <a href="worthitlater.html">⏳ Worth It Later</a>
-          <a href="parkedpotential.html">📦 Parked Potential</a>
+      <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
+
+      <div id="attachedFilesList"></div>
+
+
+    <div class="main-container">
+      <div class="editor-area">
+        <!-- 🧭 Preview Toggle Button -->
+        <button class="toggle-preview-btn" onclick="togglePreview('doc')">☰</button>
+
+        <div id="docEditor" class="editor document-mode" contenteditable="true">
+          <div id="marginBox" class="margin-box" contenteditable="false" tabindex="-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📋 Preview Overlay -->
+    <div id="docPreview" class="preview-overlay">
+      <div class="preview-top">
+        <a href="holdingbay.html">🔄 Holding Bay</a>
+        <a href="actnow.html">🚀 Act Now</a>
+        <a href="buildmomentum.html">🌿 Build Momentum</a>
+        <a href="worthitlater.html">⏳ Worth It Later</a>
+        <a href="parkedpotential.html">📦 Parked Potential</a>
+      </div>
+
+      <div class="preview-middle">
+        <div class="preview-sortbar">
+          <span title="Group Notes">📂</span>
+          <select class="groupSelector" onchange="updateGrouping()">
+            <option value="date">Date</option>
+            <option value="title">Title</option>
+            <option value="project">Project</option>
+            <option value="unresolved">Unresolved Ideas</option>
+            <option value="forgotten">Forgotten Ideas</option>
+          </select>
         </div>
 
-        <div class="preview-middle">
-          <div class="preview-sortbar">
-            <span title="Group Notes">📂</span>
-            <select class="groupSelector" onchange="updateGrouping()">
-              <option value="date">Date</option>
-              <option value="title">Title</option>
-              <option value="project">Project</option>
-              <option value="unresolved">Unresolved Ideas</option>
-              <option value="forgotten">Forgotten Ideas</option>
+        <div id="groupedNotes" class="groupedNotes"></div>
+
+        <div class="preview-sortbar bottom-searchbar">
+          <div class="search-wrapper">
+            <input type="text" class="searchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
+            <select class="searchScope" onchange="updateGrouping()">
+              <option value="group">Grouped</option>
+              <option value="all">Search All</option>
             </select>
           </div>
-
-          <div id="groupedNotes" class="groupedNotes"></div>
-
-          <div class="preview-sortbar bottom-searchbar">
-            <div class="search-wrapper">
-              <input type="text" class="searchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
-              <select class="searchScope" onchange="updateGrouping()">
-                <option value="group">Grouped</option>
-                <option value="all">Search All</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="preview-settings">
-            <a href="settings.html">⚙️ Settings</a>
-            <a href="profile.html">👤 Profile</a>
-          </div>
         </div>
-      </div><!-- /#docPreview -->
-    </div><!-- /#docSuite -->
-  
-    <!-- =========  NOTEPAD SUITE  ========= -->
-    <div id="noteSuite" class="suite">
 
-      <div class="controls">
-        <button onclick="saveText()" title="Save">💾</button>
-        <button id="voiceBtnNote"  class="voice-btn" title="Start Voice">🎤</button>
-        <button onclick="printEditor()">🖨️</button>
-      </div>
-
-      <div class="main-container">
-        <div class="editor-area">
-          <!-- 🧭 Preview Toggle Button -->
-          <button class="toggle-preview-btn" onclick="togglePreview('note')">☰</button>
-
-          <div id="noteEditor" class="editor notepad-mode" contenteditable="true"></div>
+        <div class="preview-settings">
+          <a href="settings.html">⚙️ Settings</a>
+          <a href="profile.html">👤 Profile</a>
         </div>
       </div>
+    </div><!-- /#docPreview -->
+  </div><!-- /#docSuite -->
 
-      <!-- 📋 Preview Overlay -->
-      <div id="notePreview" class="preview-overlay">
-        <div class="preview-top">
-          <a href="holdingbay.html">🔄 Holding Bay</a>
-          <a href="actnow.html">🚀 Act Now</a>
-          <a href="buildmomentum.html">🌿 Build Momentum</a>
-          <a href="worthitlater.html">⏳ Worth It Later</a>
-          <a href="parkedpotential.html">📦 Parked Potential</a>
+  <!-- =========  NOTEPAD SUITE  ========= -->
+  <div id="noteSuite" class="suite">
+    <div class="tab-bar">
+      <div id="notepadTabContainer" class="tab-container notepad-tabs"></div>
+    </div>
+
+    <div class="controls">
+      <button onclick="saveText()" title="Save">💾</button>
+      <button id="voiceBtnNote"  class="voice-btn" title="Start Voice">🎤</button>
+      <button id="printBtn" title="Print Note">🖨️</button>
+    </div>
+
+    <div class="main-container">
+      <div class="editor-area">
+        <!-- 🧭 Preview Toggle Button -->
+        <button class="toggle-preview-btn" onclick="togglePreview('note')">☰</button>
+
+        <div id="noteEditor" class="editor notepad-mode" contenteditable="true"></div>
+      </div>
+    </div>
+
+    <!-- 📋 Preview Overlay -->
+    <div id="notePreview" class="preview-overlay">
+      <div class="preview-top">
+        <a href="holdingbay.html">🔄 Holding Bay</a>
+        <a href="actnow.html">🚀 Act Now</a>
+        <a href="buildmomentum.html">🌿 Build Momentum</a>
+        <a href="worthitlater.html">⏳ Worth It Later</a>
+        <a href="parkedpotential.html">📦 Parked Potential</a>
+      </div>
+
+      <div class="preview-middle">
+        <div class="preview-sortbar">
+          <span title="Group Notes">📂</span>
+          <select class="noteGroupSelector" onchange="updateGrouping()">
+            <option value="date">Date</option>
+            <option value="title">Title</option>
+            <option value="project">Project</option>
+            <option value="unresolved">Unresolved Ideas</option>
+            <option value="forgotten">Forgotten Ideas</option>
+          </select>
         </div>
 
-        <div class="preview-middle">
-          <div class="preview-sortbar">
-            <span title="Group Notes">📂</span>
-            <select class="noteGroupSelector" onchange="updateGrouping()">
-              <option value="date">Date</option>
-              <option value="title">Title</option>
-              <option value="project">Project</option>
-              <option value="unresolved">Unresolved Ideas</option>
-              <option value="forgotten">Forgotten Ideas</option>
+        <div id="groupedNotes" class="groupedNotes"></div>
+
+        <div class="preview-sortbar bottom-searchbar">
+          <div class="search-wrapper">
+            <input type="text" class="noteSearchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
+            <select class="noteSearchScope" onchange="updateGrouping()">
+              <option value="group">Grouped</option>
+              <option value="all">Search All</option>
             </select>
           </div>
-
-          <div id="groupedNotes" class="groupedNotes"></div>
-
-          <div class="preview-sortbar bottom-searchbar">
-            <div class="search-wrapper">
-              <input type="text" class="noteSearchInput" placeholder="🔍 Search notes…" oninput="updateGrouping()" />
-              <select class="noteSearchScope" onchange="updateGrouping()">
-                <option value="group">Grouped</option>
-                <option value="all">Search All</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="preview-settings">
-            <a href="settings.html">⚙️ Settings</a>
-            <a href="profile.html">👤 Profile</a>
-          </div>
         </div>
-      </div><!-- /#notePreview -->
-    </div><!-- /#noteSuite -->
 
-    <!-- Theme toggle stays at top level -->
-    <div class="dark-theme-switch">
-       <label class="theme-toggle">
-         <input type="checkbox" id="themeSwitch" />
-         <span class="slider"></span>
-       </label>
-    </div>
+        <div class="preview-settings">
+          <a href="settings.html">⚙️ Settings</a>
+          <a href="profile.html">👤 Profile</a>
+        </div>
+      </div>
+    </div><!-- /#notePreview -->
+  </div><!-- /#noteSuite -->
 
-    <div class="save-time" id="saveStatus"></div>
-
-    <!-- 🧠 The Side Thoughts Badge -->
-    <div id="sideThoughtsBadge">
-      <span class="emoji"></span>
-      Side Thoughts
-    </div>
-
-    <!-- 💬 The Thought Popup -->
-    <div id="thoughtPopup" class="hidden">
-      <textarea id="sideThoughtTextarea" placeholder="Drop your thought here..."></textarea>
-      <button onclick="saveSideThought()">Save Thought</button>
-    </div>
-
-    <!-- Your main HTML content above -->
+  <!-- Theme toggle stays at top level -->
+  <div class="dark-theme-switch">
+     <label class="theme-toggle">
+       <input type="checkbox" id="themeSwitch" />
+       <span class="slider"></span>
+     </label>
   </div>
+
+  <div class="save-time" id="saveStatus"></div>
+
+  <!-- ===== SIDE NOTES PANEL ===== -->
+  <div id="sideNotesPanel" class="side-notes-panel">
+    <h3>💡 Side Thoughts</h3>
+    <textarea id="sideNoteInput" placeholder="Type your idea without breaking flow..."></textarea>
+    <button onclick="saveSideNote()">Save</button>
+    <div id="savedSideNotes"></div>
+  </div>
+
+  </div>
+  </div>
+
+  <!-- Your main HTML content above -->
 </body>
 
   <script>
