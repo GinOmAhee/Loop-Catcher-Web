@@ -1437,7 +1437,7 @@
       document.querySelectorAll('.voice-btn').forEach(btn => {
         btn.addEventListener('click', toggleVoiceCapture);
       });
-      
+
     });
 
     /* ---------------- Suite‑specific listeners --------------- */
@@ -2344,7 +2344,7 @@
        groupedNotes.innerHTML = html;
     }
 
-    function togglePreview() {
+    function togglePreview(attempt = 0) {
       console.log('🌀 Toggling preview visibility');
 
       const activeSuite = document.querySelector('.suite.active');
@@ -2357,7 +2357,12 @@
       console.log("🧠 Detected mode:", mode);
 
       if (!preview || !editor) {
-        console.warn("⚠️ Missing preview or editor reference");
+        if (attempt < 5) {
+          // 🕒 Wait 100ms and try again — up to 5 times
+          setTimeout(() => togglePreview(attempt + 1), 100);
+        } else {
+          console.warn("⚠️ Still missing preview or editor after multiple attempts");
+        }
         return;
       }
 
