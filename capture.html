@@ -20,6 +20,8 @@
     --editor-bg: #ffffff;
     --editor-text: #222;
     --preview-text-color: #333;
+    --btn-bg: #f0f0f0;
+    --btn-text: #000;
     --badge-bg: #fff5cc;
     --badge-text: #333;
     --popup-bg: #fff;
@@ -44,30 +46,18 @@
     --badge-bg: #333;
     --badge-text: #fff7d1;
     --popup-bg: #444;
-    --popup-button-bg: #1a1a1a;
-    --popup-border: #FF69B4;
+    --popup-button-bg: #ffce5c;
+    --popup-border: #777;
     --popup-text-color: #fff;
     --switcher-bg: #1f1f1f;
     --btn-bg: #333;
     --btn-text: #ddd;
-    --btn-active-bg: #FF69B4;
+    --btn-active-bg: #81c784;
     background-color: #000;
     color: #f1f1f1;
   }
 
   /* === DARK MODE ADJUSTMENTS === */
-
-  body.dark-theme textarea {
-    background: #222;
-    color: #eee;
-    border-color: #444;
-  }
-
-  body.dark-theme #thoughtPopup button {
-    background: #333;
-    color: #eee;
-  }
-
   body.dark-theme button {
     background: #1e1e1e;
     color: #f1f1f1;
@@ -80,6 +70,20 @@
   body.dark-theme .nudge,
   body.dark-theme p {
     color: #bbb;
+  }
+  body.dark-theme #mainEditor {
+    background: #222 !important;
+    color: #ddd !important;
+    caret-color: #eee !important;
+  }
+
+  body.dark-theme .tab {
+    background-color: transparent;
+    color: #ccc;
+  }
+
+  body.dark-theme .tab.active {
+    box-shadow: inset 0 -2px 0 hotpink;
   }
 
 
@@ -216,7 +220,7 @@
   
   /* 💡 Dark theme override */
   body.dark-theme .delete-notes-btn {
-    background: #1a1a1a;
+    background: #aa4444;
     color: #fff;
     box-shadow: 0 2px 6px rgba(255,255,255,0.1);
   }
@@ -255,7 +259,7 @@
     --tab-active-bg: #b2f5ea;
     --tab-border: #81e6d9;
     --editor-bg: #f1f0ed;
-    --editor-text: #2E2E2E;
+    --editor-text: #2E2E2E
     background-color: #d7d7da;
     color: #2e2e32;
   }
@@ -293,12 +297,21 @@
 
   /* === EDITOR & INPUT === */
 
-  .suite-wrapper > div {
+  .suite {
     display: none;
   }
 
-  .suite-wrapper > .active-suite {
+  .suite.active {
     display: block;
+  }
+
+  #documentTabContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
   }
 
   #docEditor {
@@ -306,6 +319,7 @@
     width: 8.27in;
     min-height: 11.69in;
     padding: 0;
+    margin: 0rem auto;
     font-family: "Arial", sans-serif;
     font-size: 1rem;
     border: 1px solid #ccc;
@@ -316,17 +330,35 @@
   }
 
   #noteEditor {
-    border: 1px solid #ccc;
-    position: relative; 
     font-family: "Courier New", monospace;
     font-size: 1rem;
     padding: 0.9rem;
     width: 4.14in;
     height: 5.38in;
-    border: 1px solid #ccc;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    border: none;
+    box-shadow: none;
     background-color: var(--editor-bg);
     color: var(--editor-text);
+  }
+
+
+  #mainEditor::before {
+    content: "";
+    position: absolute;
+    top: var(--paddingTop);
+    bottom: var(--paddingBottom);
+    left: var(--paddingLeft);
+    right: var(--paddingRight);
+    border: 1px dashed rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --btn-bg: #333;
+      --btn-text: #fff;
+    }
   }
 
   /* Generic inheritance-friendly rules */
@@ -340,8 +372,8 @@
   .preview-sortbar.bottom-searchbar,
   #searchInput,
   #searchInput:focus,
-  #modeToggleBtn,
-  #toggle-preview-btn,
+  #modeToggleBtn
+  #toggle-preview-btn
   .mode-btn.active,
   .preview-bottom {
   
@@ -375,6 +407,56 @@
     border: 1px solid currentColor;
   }
 
+  .page-break-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: 1px dotted #aaa;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Margin overlay (stays inside #docEditor) */
+  .margin-box {
+    position: absolute;
+    inset: var(--margin-top, 1in)
+           var(--margin-right, 1in)
+           var(--margin-bottom, 1in)
+           var(--margin-left, 1in);
+    border: 2px dashed rgba(0,0,0,.2);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* optional inside border if you still want a dotted line
+     inside the margin-box itself */
+  .margin-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;                         /* full size of margin‑box */
+    border: 2px dashed rgba(0,0,0,.2);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  #mainEditor:not(.hidden-editor) {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  .hidden-editor {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .hidden-editor.visible {
+    visibility: visible;
+    opacity: 1;
+  }
+
   textarea {
     width: 60%;
     height: 300px;
@@ -388,10 +470,8 @@
   /* === LAYOUT === */
   .main-container {
     display: flex;
-    flex: 1;
-    min-height: 300px;
-  } 
-  
+    height: 100vh;
+  }
   .editor-area {
     display: flex;
     flex-direction: column;
@@ -505,7 +585,7 @@
     border: 1px solid #ccc;
     cursor: pointer;
   }
-  /*
+
   .margin-dropdown {
     position: absolute;
     background: white;
@@ -516,7 +596,7 @@
     font-size: 0.85rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   }
-  */
+
   .delete-notes-btn {
     position: sticky;
     bottom: 10px;
@@ -761,6 +841,15 @@
     animation: shimmerPulse 1.4s ease-in-out infinite alternate;
   }
 
+  @keyframes shimmerPulse {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 100% center;
+    }
+  }
+
   /* === DROPDOWN MENU === */
   .dropdown {
     position: absolute;
@@ -790,7 +879,7 @@
     position: sticky;
     align-self: flex-end;
     margin-right: 1rem;
-    margin-left: .3rem;
+    margin-left: .3rem
     top: 5rem; /* just below your tab bar */
     z-index: 9;
   }
@@ -799,7 +888,7 @@
     position: fixed;
     top: 5rem;
     right: 1rem;
-    left: .3rem;
+    left: .3rem
     z-index: 1000;
   }
 
@@ -888,8 +977,8 @@
     <div id="toolbar">
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
-        /*
-        <label for="paperSizeSelect">📄 Paper Size:</label>
+
+        <label for="paperSizeSelect">📄</label>
         <select id="paperSizeSelect">
           <option value="letter">Letter (8.5in × 11in)</option>
           <option value="legal">Legal (8.5in × 14in)</option>
@@ -909,9 +998,7 @@
           <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
           <button id="applyMarginBtn">✅ Apply</button>
         </div>
-        */
-
-        <!-- Icon Button -->
+          <!-- Icon Button -->
         <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
         <select id="fontDropdown" onchange="setFont(this.value)">
@@ -997,6 +1084,7 @@
         <button class="toggle-preview-btn" onclick="togglePreview('doc')">☰</button>
 
         <div id="docEditor" class="editor document-mode" contenteditable="true">
+          <div id="marginBox" class="margin-box" contenteditable="false" tabindex="-1"></div>
         </div>
       </div>
     </div>
@@ -1116,39 +1204,42 @@
 
   <div class="save-time" id="saveStatus"></div>
 
-  <!-- ===== SIDE NOTES PANEL ===== -->
-  <div id="sideNotesPanel" class="side-notes-panel">
-    <h3>💡 Side Thoughts</h3>
-    <textarea id="sideNoteInput" placeholder="Type your idea without breaking flow..."></textarea>
-    <button onclick="saveSideNote()">Save</button>
-    <div id="savedSideNotes"></div>
   </div>
 
+  <!-- 🧠 The Side Thoughts Badge -->
+  <div id="sideThoughtsBadge">
+    <span class="emoji"></span>
+    Side Thoughts
   </div>
+
+  <!-- 💬 The Thought Popup -->
+  <div id="thoughtPopup" class="hidden">
+    <textarea id="sideThoughtTextarea" placeholder="Drop your thought here..."></textarea>
+    <button onclick="saveSideThought()">Save Thought</button>
   </div>
 
   <!-- Your main HTML content above -->
+
 </body>
 
   <script>
     let isRenamingTab = false;
 
     let db = null;
-    let highlightDropdown = document.getElementById("highlightDropdown");
+
+    let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
 
     let toggleBtn;
     let saveStatus;
-    let editor;
-    let maineditor;
+    let editor, maineditor
     let attachedFilesList;
     let groupedNotes;
     let fontBtn;
-    let fontDropdown       = document.getElementById('fontDropdown');
-    let textColorDropdown  = document.getElementById('textColorDropdown');
+    let fontDropdown;
     let fontSizeBtn;
     let sizeDropdown;
     let textColorBtn;
-  
+    let textColorDropdown;
     let justifyBtn;
     let toolbar;
     let status;
@@ -1161,6 +1252,12 @@
 
     const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
     const notesForMode = notes.filter(n => (n.mode || "document") === currentMode);
+
+    // Then render notesForMode inside groupedNotes
+
+
+    const marginBox = document.getElementById("marginBox"); // 💡 safe reference
+    mainEditor = document.getElementById("docEditor");
 
 
     async function initializeFirebase() {
@@ -1218,7 +1315,9 @@
     }
 
     function initThemeToggle() {
-      const switchEl = document.getElementById('themeSwitch');
+      const switchEl
+      
+      = document.getElementById('themeSwitch');
       if (!switchEl) return;
 
       const savedTheme = localStorage.getItem('theme');
@@ -1258,47 +1357,34 @@
 
     window.addEventListener('DOMContentLoaded', initThemeToggle);
 
+    function handleDropdown(event) {
+      event.stopPropagation();
+
+      // Hide all dropdowns first
+      fontDropdown?.classList.add("hidden");
+      sizeDropdown?.classList.add("hidden");
+      textColorDropdown?.classList.add("hidden");
+      highlightDropdown?.classList.add("hidden");
+
+      const btnId = event.currentTarget.id;
+
+      switch (btnId) {
+        case "fontMenuBtn":
+          fontDropdown?.classList.toggle("hidden");
+          break;
+        case "textColorBtn":
+          textColorDropdown?.classList.toggle("hidden");
+          break;
+        case "highlightBtn":
+          highlightDropdown?.classList.toggle("hidden");
+          break;
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       hookSuiteEvents();         // attach listeners to both suites
       initThemeToggle();         // your existing dark‑theme logic
       initializeFirebase();      // backend just works
-
-      // grab the DOM nodes once
-      const docSuite     = document.getElementById("docSuite");
-      const noteSuite    = document.getElementById("noteSuite");
-      const switchToDoc  = document.getElementById("switchToDoc");
-      const switchToNote = document.getElementById("switchToNote");
-
-      // helper → shows one suite, hides the other
-      function activateSuite(showDoc) {
-        if (showDoc) {
-          docSuite .classList.add   ("active-suite");
-          noteSuite.classList.remove("active-suite");
-          switchToDoc .classList.add   ("active");      // highlight button
-          switchToNote.classList.remove("active");
-          localStorage.setItem("editorMode", "document");
-        } else {
-          noteSuite.classList.add   ("active-suite");
-          docSuite .classList.remove("active-suite");
-          switchToNote.classList.add   ("active");
-          switchToDoc .classList.remove("active");
-          localStorage.setItem("editorMode", "notepad");
-        }
-      }
-
-      /*  ────────────────────────────────────────────
-      Event listeners
-      */
-      switchToDoc .addEventListener("click", () => activateSuite(true));
-      switchToNote.addEventListener("click", () => activateSuite(false));
-
-      /*  ────────────────────────────────────────────
-      Restore the last mode on page‑load
-      */
-      window.addEventListener("DOMContentLoaded", () => {
-        const lastMode = localStorage.getItem("editorMode") || "document";
-        activateSuite(lastMode === "document");
-      });
 
       // 🔁 Recover unsaved drafts on load
       const docEditor = document.getElementById("docEditor");
@@ -1308,21 +1394,20 @@
       const noteDraft = localStorage.getItem("noteDraft");
 
       if (docEditor && docDraft) {
-        console.log("🧠 Draft before cleanup:", docDraft);
+        // Remove existing margin box to prevent duplication
+        const oldMargin = docEditor.querySelector("#marginBox");
+        if (oldMargin) oldMargin.remove();
 
-        // 1️⃣ Grab the raw draft (still using docDraft as source)
-        const rawDraft = docDraft || "";
+        // Inject saved content
+        docEditor.innerHTML = docDraft;
 
-        // 2️⃣ Remove marginBox safely
-        const cleanedDraft = rawDraft.replace(
-          /<div[^>]*id=["']?marginBox["']?[^>]*>[\s\S]*?<\/div>/gi,
-          ""
-        );
-
-        console.log("🧼 Draft after cleanup:", cleanedDraft);
-
-        // 3️⃣ Inject into editor
-        docEditor.innerHTML = cleanedDraft;
+        // Re-attach clean margin box
+        const newMargin = document.createElement("div");
+        newMargin.id = "marginBox";
+        newMargin.className = "margin-box";
+        newMargin.contentEditable = "false";
+        newMargin.tabIndex = -1;
+        docEditor.appendChild(newMargin);
       }
 
       if (noteEditor && noteDraft) {
@@ -1336,6 +1421,7 @@
       // ✅ Auto-close paper size dropdown after selection
       document.querySelector('#paperSizeSelect')
         ?.addEventListener('change', e => e.target.blur());
+     
     });
 
     /* ---------------- Suite‑specific listeners --------------- */
@@ -1351,56 +1437,51 @@
         editor.addEventListener('input', () => debouncedSave(editor));
 
         /* click outside to close */
-        document.addEventListener("click", e => {
-          const activeSuite = document.querySelector(".active-suite");
-          if (!activeSuite) return;
-
-          const preview   = activeSuite.querySelector(".preview-overlay");
-          const toggleBtn = activeSuite.querySelector(".toggle-preview-btn");
-
-          if (
-            preview?.classList.contains("preview-visible") &&
-            !preview.contains(e.target) &&
-            !toggleBtn.contains(e.target)
-          ) {
-            preview.classList.remove("preview-visible");
-            toggleBtn.textContent = "☰";         // reset icon
-            console.log("🔒 Closed preview by clicking outside");
+        document.addEventListener('click', e => {
+          if (!preview.contains(e.target) && !toggle.contains(e.target)) {
+            preview.classList.remove('active');
+            toggle.textContent = '☰';
           }
         });
       });
 
       /* Font / color dropdowns now query the ACTIVE suite */
-      document.querySelectorAll('#fontMenuBtn, #textColorBtn, #highlightBtn', '#paperSizeSelectBtn')
-        .forEach(btn => btn?.addEventListener('click', handleDropdown));
+    document.querySelectorAll('#fontMenuBtn, #textColorBtn, #highlightBtn')
+      .forEach(btn => btn?.addEventListener('click', handleDropdown));
     }
 
     /* ---------------- Helpers --------------- */
     function getActiveSuite() {
-      return document.querySelector('.active.suite');
+      return document.querySelector('.suite.active');
     }
 
     let debounceTimer;
-    function debouncedSave(editor) {
+    function debouncedSave(editor){
       clearTimeout(debounceTimer);
-
       debounceTimer = setTimeout(() => {
-        // 🚿 Clean out marginBox before saving
-        const rawHTML = editor.innerHTML;
-        const cleanedHTML = rawHTML.replace(
-          /<div[^>]*id=["']?marginBox["']?[^>]*>[\s\S]*?<\/div>/gi,
-          ''
-        );
-
-        localStorage.setItem("capturedText", cleanedHTML);
+        localStorage.setItem("capturedText", editor.innerHTML);
         localStorage.setItem("lastSaved", new Date().toISOString());
-
         const saveStatus = document.getElementById('saveStatus');
-        if (saveStatus) {
-          saveStatus.textContent = `💾 Auto‑saved at ${new Date().toLocaleTimeString()}`;
-        }
+        saveStatus && (saveStatus.textContent =
+          `💾 Auto‑saved at ${new Date().toLocaleTimeString()}`);
       }, 1000);
     }
+
+    document.getElementById("switchToDoc").addEventListener("click", () => {
+      document.getElementById("docSuite").classList.add("active");
+      document.getElementById("noteSuite").classList.remove("active");
+
+      document.getElementById("switchToDoc").classList.add("active");
+      document.getElementById("switchToNote").classList.remove("active");
+    });
+
+    document.getElementById("switchToNote").addEventListener("click", () => {
+      document.getElementById("noteSuite").classList.add("active");
+      document.getElementById("docSuite").classList.remove("active");
+
+      document.getElementById("switchToNote").classList.add("active");
+      document.getElementById("switchToDoc").classList.remove("active");
+    });
 
     function forceEditorRecovery() {
       const editor = getActiveEditor();
@@ -1418,6 +1499,10 @@
       return localStorage.getItem("editorMode") || "document";
     }
 
+    function getMarginBox() {
+      return document.querySelector('#docSuite .margin-box');
+    }
+
     function getSelectedPaperSize() {
       const selector = document.querySelector('#docSuite #paperSizeSelector');
       return selector?.value || "a4"; // ← give a sane default
@@ -1433,8 +1518,7 @@
       const idMap = {
         fontMenuBtn:     '#fontDropdown',
         textColorBtn:    '#textColorDropdown',
-        highlightBtn:    '#highlightDropdown',
-        paperSizeSelectBtn: '#paperSizeDropdown'  // ➕ add this
+        highlightBtn:    '#highlightDropdown'
       };
 
       // Which dropdown do we need?
@@ -1442,7 +1526,7 @@
       if (!dropdownSelector) return;
 
       // Always look **inside the active suite** (doc or note)
-      const activeSuite = document.querySelector('.active.suite');
+      const activeSuite = document.querySelector('.suite.active');
       const dropdown    = activeSuite?.querySelector(dropdownSelector);
       if (!dropdown) {
         console.warn('⚠️ Dropdown element not found for', btn.id);
@@ -1464,7 +1548,7 @@
 
     /* Attach the handler once after DOM is ready */
     document.addEventListener('DOMContentLoaded', () => {
-      ['#fontMenuBtn', '#textColorBtn', '#highlightBtn', '#paperSizeSelectBtn'].forEach(sel => {
+      ['#fontMenuBtn', '#textColorBtn', '#highlightBtn'].forEach(sel => {
         document.querySelectorAll(sel).forEach(btn => {
           btn.addEventListener('click', handleDropdown);
         });
@@ -1488,9 +1572,7 @@
     function saveSelection() {
       const sel = window.getSelection();
       if (sel && sel.rangeCount > 0) {
-        const mode = localStorage.getItem("editorMode") || "document";
-        savedSelections[mode] = sel.getRangeAt(0).c
-        loneRange();   // 👈 FIX
+        savedSelection = sel.getRangeAt(0).cloneRange();
       }
     }
 
@@ -1504,7 +1586,7 @@
     }
 
     function justifyText() {
-      docEditor.focus(); // ensure editor is active
+      mainEditor.focus(); // ensure editor is active
       document.execCommand("justifyFull", false, null);
     }
 
@@ -1535,41 +1617,58 @@
     }
 
     function setHighlightColor(color) {
-      docEditor.focus();
+      mainEditor.focus();
       restoreSelection();
-
       const range = getValidSelectionRange();
       if (!range) return;
 
       const selectedText = range.extractContents();
+      
       const mark = document.createElement("mark");
-      mark.classList.add("highlight-glow");
+      requestAnimationFrame(() => {
+        mark.classList.add("highlight-glow");
+      });
+
       mark.appendChild(selectedText);
       range.insertNode(mark);
 
-      const sel = window.getSelection();           // 👈 FIX
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
-      sel.removeAllRanges();
-      sel.addRange(newRange);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
 
+      // Hide dropdown (if exists)
+      const highlightDropdown = document.getElementById("highlightDropdown");
       highlightDropdown?.classList.add("hidden");
-      saveStatus.textContent = `🖍️ Highlighted in ${color}`;
+
+      // Update status
+      const saveStatus = document.getElementById("saveStatus");
+      if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
+
+      // Optional fallback
+      try {
+        document.execCommand("hiliteColor", false, color);
+      } catch (e) {
+        console.warn("execCommand fallback failed", e);
+      }
     }
 
     async function saveText() {
-      now = new Date();
+      const now = new Date();
 
       // ⬇️ Determine active suite/editor
       const isDocMode = document.getElementById("docSuite").classList.contains("active");
       const editor = isDocMode ? document.getElementById("docEditor") : document.getElementById("noteEditor");
       const suiteType = isDocMode ? "Document" : "Note";
 
-      // ✅ Clone editor for clean save
       const clone = editor.cloneNode(true);
-      const noteHTML = clone.innerHTML.replace(/&nbsp;/g, " ");
-      const noteText = editor.innerText.trim();
+      const margin = clone.querySelector("#marginBox");
+      if (margin) margin.remove(); // ✂️ remove layout junk before saving
+
+      const noteHTML = clone.innerHTML.replace(/&nbsp;/g, " "); // 👈 clean only your text content
       const saveStatus = document.getElementById("saveStatus");
+
+      const noteText = editor.innerText.trim();
 
       if (!noteText) return;
 
@@ -1584,7 +1683,7 @@
       let projectName = prompt("📌 Enter project name (optional):");
       projectName = projectName?.trim() || "📂 Unlabeled";
 
-      const activeSuite = document.querySelector('.active.suite');
+      const activeSuite = document.querySelector('.suite.active');
       const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
 
       const newNote = {
@@ -1594,8 +1693,8 @@
         project: projectName,
         resolved: false,
         tags: [],
-        type: suiteType.toLowerCase(),
-        mode
+        type: suiteType.toLowerCase(), // Save type for later filtering
+        mode  // ✅ add this line to tag the mode
       };
 
       existingNotes.unshift(newNote);
@@ -1613,18 +1712,20 @@
         console.error("❌ Failed to save to Firestore:", error);
       }
 
-      // Clean up editor after save
+      // Reset layout and content
       editor.style.padding = "0";
       editor.style.margin = "0";
       editor.innerHTML = '';
+
       localStorage.removeItem("customMargins");
 
       if (saveStatus) {
         saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
       }
 
-      updateGrouping(); // ✅ Refresh preview UI
+      updateGrouping();
     }
+
 
     function autoSave() {
       const now = new Date();
@@ -1676,13 +1777,12 @@
       const attached = JSON.parse(localStorage.getItem("attachedFiles") || "[]");
 
       // Load draft content
-      const savedContent = localStorage.getItem(draftKey) || "";
-      const cleanedContent = savedContent.replace(
-        /<div[^>]*id=["']?marginBox["']?[^>]*>[\s\S]*?<\/div>/gi,
-        ""
-      );
-
-      editor.innerHTML = cleanedContent;
+      const savedContent = localStorage.getItem(draftKey);
+      if (savedContent) {
+        editor.innerHTML = savedContent;
+      } else {
+        editor.innerHTML = ""; // fresh new
+      }
 
       // Optional save time feedback
       if (saveStatus && lastSaved) {
@@ -1710,7 +1810,7 @@
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) return alert("Voice capture not supported");
 
-      const activeSuite = document.querySelector('.active.suite');
+      const activeSuite = document.querySelector('.suite.active');
       const editor = activeSuite?.querySelector('.editor');
       const btn = activeSuite?.querySelector('.voice-btn');
       const status = document.getElementById('saveStatus');
@@ -1776,7 +1876,7 @@
       if (recognition) recognition.stop();
       isRecording = false;
 
-      const activeBtn = document.querySelector('.active.suite.voice-btn');
+      const activeBtn = document.querySelector('.suite.active .voice-btn');
       if (activeBtn) activeBtn.textContent = "🎤";
 
       const status = document.getElementById("saveStatus");
@@ -2097,31 +2197,20 @@
     function loadNoteIntoEditor(noteHTML, mode = getCurrentEditorMode()) {
       const docEditor = document.getElementById("docEditor");
       const noteEditor = document.getElementById("noteEditor");
-      const preview     = document.querySelector('.active.suite.preview-overlay');
-      const saveStatus  = document.getElementById('saveStatus');
+      const marginBox = document.getElementById("marginBox");
 
-      if (!docEditor || !noteEditor) {
+      if (!docEditor || !noteEditor || !marginBox) {
         console.error("❌ Cannot load note — one or more editor elements missing");
         return;
       }
 
-      // ⏪ Normalize mode alias
-      if (mode === "note") mode = "notepad"; // Make sure switchEditorMode() won't break
+      switchEditorMode(mode); // ✅ Activate correct mode
 
-      // ✅ Activate correct editor
-      switchEditorMode(mode);
-
-      // 🧼 Clean the noteHTML before injecting
-      const SAFE_NOTE = noteHTML
-        .replace(/<div[^>]*id=["']?(?:docSuite|noteSuite)["']?[^>]*>[\s\S]*?<\/div>/gi, '')
-        .replace(/<script[\s\S]*?<\/script>/gi, '');
-
-      // 🎯 Inject into correct editor
-      if (mode === "notepad") {
-        noteEditor.innerHTML = SAFE_NOTE;
+      if (mode === "note") {
+        noteEditor.innerHTML = noteHTML;
         noteEditor.focus();
       } else if (mode === "document") {
-        docEditor.innerHTML = SAFE_NOTE;
+        marginBox.innerHTML = noteHTML;
         docEditor.focus();
       }
 
@@ -2131,9 +2220,9 @@
       undoStack.push(noteHTML);
       redoStack = [];
 
-      // 🏷 Title extraction
+      // 💡 Extract first line as title
       const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = SAFE_NOTE;
+      tempDiv.innerHTML = noteHTML;
       const text = tempDiv.innerText || "";
       const titleLine = text.split("\n")[0]?.trim() || "Note";
 
@@ -2143,23 +2232,15 @@
     }
 
     function switchEditorMode(mode) {
-      const docEditor  = document.getElementById("docEditor");
+      const docEditor = document.getElementById("docEditor");
       const noteEditor = document.getElementById("noteEditor");
-      const docSuite  = document.getElementById("docSuite");
-      const noteSuite = document.getElementById("noteSuite");
 
       if (mode === "document") {
         docEditor.style.display = "block";
         noteEditor.style.display = "none";
-
-        docSuite.classList.add("active-suite");
-        noteSuite.classList.remove("active-suite");
       } else if (mode === "notepad") {
         docEditor.style.display = "none";
         noteEditor.style.display = "block";
-
-        noteSuite.classList.add("active-suite");
-        docSuite.classList.remove("active-suite");
       }
 
       localStorage.setItem("editorMode", mode);
@@ -2173,7 +2254,7 @@
 
     function updateGrouping() {
       /* 1️⃣  Figure out where we are */
-      const activeSuite   = document.querySelector('.active.suite');     // docSuite or noteSuite
+      const activeSuite   = document.querySelector('.suite.active');     // docSuite or noteSuite
       const preview       = activeSuite?.querySelector('.preview-overlay');
       if (!preview) return console.warn("⚠️ No preview overlay found");
 
@@ -2270,27 +2351,26 @@
     function togglePreview() {
       console.log('🌀 Toggling preview visibility');
 
-      const activeSuite = document.querySelector('.active.suite');
-
+      const activeSuite = document.querySelector('.suite.active');
       const preview = activeSuite?.querySelector('.preview-overlay');
       const isNoteMode = activeSuite?.id === "noteSuite";
       const mode = isNoteMode ? "notepad" : "document";
       const editor = activeSuite?.querySelector('.editor');
+      const marginBox = document.getElementById("marginBox");
 
       console.log("🧠 Detected mode:", mode);
 
       if (!preview || !editor) {
-        console.warn("⚠️ Missing preview or editor");
+        console.warn("⚠️ Missing preview or editor reference");
         return;
       }
 
       const isVisible = preview.classList.toggle("preview-visible");
 
       const toggleBtn = preview?.closest('.suite')?.querySelector('.toggle-preview-btn');
-      if (toggleBtn) {
-        toggleBtn.textContent = isVisible ? '✖ Close' : '☰';
-      }
-
+        if (toggleBtn) {
+          toggleBtn.textContent = isVisible ? '✖ Close' : '☰';
+        }
       if (isVisible) {
         try {
           if (mode === "notepad" || mode === "note") {
@@ -2304,12 +2384,13 @@
         }
       } else {
         requestAnimationFrame(() => {
+          // ⛑️ Recovery display logic after preview closes
           editor.classList.remove("hidden-editor");
           editor.style.display = "block";
           editor.style.opacity = "1";
           editor.style.pointerEvents = "auto";
 
-          editor.scrollTop = 0;
+          if (marginBox) marginBox.scrollTop = 0;
           editor.offsetHeight; // force reflow
         });
       }
@@ -2318,31 +2399,24 @@
     }
 
     function updateDocumentPreview() {
-      const preview = document.getElementById("docPreview");
-      const docEditor = document.getElementById("docEditor");
+      const preview = document.querySelector(".preview-overlay");
+      const marginBox = document.getElementById("marginBox");
 
-      if (!preview || !docEditor) {
-        console.warn("⚠️ Cannot update preview — missing preview or editor");
+      if (!preview || !marginBox) {
+        console.warn("⚠️ Cannot update preview — missing preview or marginBox");
         return;
       }
 
-      const html = docEditor.innerHTML;
-
-      // ✅ Use fallback if function is missing
-      if (typeof renderPreviewHTML === "function") {
-        preview.innerHTML = renderPreviewHTML(html);
-      } else {
-        console.warn("⚠️ renderPreviewHTML is not defined. Falling back to raw HTML.");
-        preview.innerHTML = html;
-      }
+      const html = marginBox.innerHTML;
+      preview.innerHTML = renderPreviewHTML?.(html) || html;
     }
 
     function getActiveEditorContent() {
       const mode = getCurrentEditorMode?.() || "document";
 
       if (mode === "document") {
-        const docEditor = document.getElementById("docEditor");
-        return docEditor?.innerHTML || "";
+        const marginBox = document.getElementById("marginBox");
+        return marginBox?.innerHTML || "";
       }
 
       if (mode === "note") {
@@ -2350,7 +2424,7 @@
         return noteEditor?.innerHTML || "";
       }
 
-      return ""; // fallback
+      return ""; // fallback if no known mode
     }
 
     function toggleItalic() {
@@ -2454,54 +2528,53 @@
 
         console.log("✅ User is signed in:", user.email);
 
-        const docEditor = document.getElementById("docEditor");
-        const noteEditor = document.getElementById("noteEditor");
-
-        // ⛏️ Unhide editors if hidden (fail-safe)
-        if (docEditor?.classList.contains('hidden-editor')) {
-          docEditor.classList.remove('hidden-editor');
-          docEditor.style.display = 'block';
+        const editor = document.getElementById('mainEditor');
+        if (editor && editor.classList.contains('hidden-editor')) {
+          editor.classList.remove('hidden-editor');
+          editor.style.display = 'block';
+          editor.getBoundingClientRect(); // force reflow
+          editor.classList.add('visible');
         }
 
-        if (noteEditor?.classList.contains('hidden-editor')) {
-          noteEditor.classList.remove('hidden-editor');
-          noteEditor.style.display = 'block';
-        }
+        loadSavedText(); // Load saved tab content
 
-        loadSavedText(); // 📂 Load tab content
+        mainEditor.addEventListener("input", () => {
+          hasUnsavedChanges = true;
 
-        const docSuite = document.getElementById("docSuite");
-        const noteSuite = document.getElementById("noteSuite");
+          const currentMode = getCurrentEditorMode();
+          const text = mainEditor.innerText || "";
 
-        new MutationObserver(muts => {
-          muts.forEach(m => {
-            if ([...m.addedNodes, ...m.removedNodes].includes(noteSuite)) {
-              console.warn("🔍 noteSuite moved!", {
-                newParent: noteSuite.parentElement.id,
-                mutation: m
-              });
-            }
-          });
-        }).observe(document.body, { childList: true, subtree: true });
+          if (currentMode === "document") {
+            const newTitle = text.split("\n")[0]?.trim() || "Untitled";
 
-
-        // 🔗 Make links in document editor clickable
-        docEditor?.addEventListener("click", function (e) {
-          const currentMode = getCurrentEditorMode?.() || "document";
-          if (currentMode !== "document") return;
-
-          const el = e.target.closest("a");
-          if (el?.href) {
-            e.preventDefault();
-            window.open(el.href, "_blank", "noopener");
+          if (tabs[activeTabIndex]) {
+            tabs[activeTabIndex].title = newTitle;
+            localStorage.setItem("tabs", JSON.stringify(tabs));
+            console.log("📝 Tab title updated:", newTitle);
           }
-        });
-
-        applyMoodTheme();
-        updateGrouping();
-        setInterval(autoSave, 30000); // 💾 Auto-save every 30s
+        } else {
+          console.log("🧠 Notepad mode — skipping title auto-update");
+        }
       });
+
+      applyMoodTheme();
+      updateGrouping();
+      setInterval(autoSave, 30000); // Auto-save every 30s
+     });
     };
+
+
+    mainEditor.addEventListener("click", function (e) {
+      const currentMode = getCurrentEditorMode?.() || "document";
+      if (currentMode !== "document") return;
+
+      const el = e.target.closest("a");
+      if (el && el.href) {
+        e.preventDefault();
+        window.open(el.href, "_blank", "noopener");
+      }
+    });
+
 
     function deleteSelectedNotes() {
       const checkboxes = document.querySelectorAll('.note-delete-checkbox:checked');
@@ -2512,8 +2585,7 @@
 
       const confirmDelete = confirm(`Are you sure you want to delete ${checkboxes.length} selected note(s)?`);
       if (!confirmDelete) return;
-      
-      
+
       let savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       const timesToDelete = Array.from(checkboxes).map(cb => cb.getAttribute('data-time'));
 
@@ -2521,7 +2593,6 @@
       localStorage.setItem('savedNotes', JSON.stringify(savedNotes));
 
       updateGrouping();
-      const saveStatus = document.getElementById('saveStatus');
       saveStatus.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
     }
 
@@ -2543,12 +2614,11 @@
       const el = document.createElement(tagName);
       el.appendChild(selectedText);
       range.insertNode(el);
-      
-      const sel = window.getSelection();
-      sel.removeAllRanges();
+
+      selection.removeAllRanges();
       const newRange = document.createRange();
       newRange.selectNodeContents(el);
-      sel.addRange(newRange);
+      selection.addRange(newRange);
     }
 
     function removeFormatting() {
@@ -2573,17 +2643,14 @@
       range.insertNode(textNode);
 
       // 🔄 Reset selection AFTER inserted text
-      const sel = window.getSelection();
-      sel.removeAllRanges();
+      selection.removeAllRanges();
       const newRange = document.createRange();
       newRange.setStartAfter(textNode);
       newRange.setEndAfter(textNode);
-      sel.addRange(newRange);
+      selection.addRange(newRange);
 
       saveStatus.innerText = "🚫 Formatting removed.";
     }
-
-    let savedRange = null;
 
     document.addEventListener("selectionchange", () => {
       if (getCurrentEditorMode?.() !== "document") return;
@@ -2653,23 +2720,59 @@
       });
     });
 
-    
-    function printEditor() {
-      const useNote = document.getElementById("noteSuite").classList.contains("active");
-      const html = useNote
-        ? document.getElementById("noteEditor").innerHTML
-        : document.getElementById("docEditor").innerHTML;
 
-      const w = window.open("", "_blank");
-      w.document.write(`
-        <html><head><title>Print</title>
-          <style>
-            body{font-family:Arial,sans-serif;padding:1in;font-size:12pt}
-            ul,ol{margin-left:1.5em;} h1,h2,h3{margin:1rem 0 .5rem}
-          </style>
-        </head><body>${html}</body></html>`);
-      w.document.close(); w.focus();
-      setTimeout(()=>{ w.print(); w.close(); }, 300);
+    function printNote() {
+      const mode = getCurrentEditorMode?.() || "document";
+
+      let noteContent = "";
+      if (mode === "notepad") {
+        noteContent = mainEditor.innerHTML;
+      } else if (mode === "document") {
+        noteContent = marginBox?.innerHTML || mainEditor.innerHTML; // fallback if marginBox missing
+      }
+
+      const printWindow = window.open('', '_blank');
+
+      const styles = `
+        <style>
+          body {
+            font-family: 'Arial', sans-serif;
+            padding: 1in;
+            font-size: 12pt;
+            color: #000;
+          }
+          ul, ol {
+            margin-left: 1.5em;
+          }
+          h1, h2, h3, h4, h5 {
+            margin: 1rem 0 0.5rem;
+          }
+          a {
+            color: #007bff;
+            text-decoration: underline;
+          }
+        </style>
+      `;
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Note</title>
+            ${styles}
+          </head>
+          <body>
+            ${noteContent}
+          </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+      printWindow.focus();
+
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 300);
     }
 
     function toggleBold() {
@@ -2710,7 +2813,7 @@
         selection.addRange(newRange);
       }
     }
-    /*
+
     document.addEventListener("DOMContentLoaded", () => {
       const docSuite = document.getElementById("docSuite");
       const marginBtn = docSuite?.querySelector("#marginBtn");
@@ -2790,7 +2893,7 @@
       editor.style.paddingLeft = `${left}px`;
       editor.style.paddingRight = `${right}px`;
     }
-    */
+
     function abortIfRenaming() {
       if (isRenamingTab) {
         console.warn("⛔ Aborting: rename input is still active");
@@ -2799,7 +2902,6 @@
       return false;
     }
 
-    /*
     const paperSizes = {
       letter: { width: 816, height: 1056 }, // 8.5in x 11in at 96dpi
       legal: { width: 816, height: 1344 },  // 8.5in x 14in
@@ -2807,35 +2909,40 @@
       a4:    { width: 794, height: 1123 },  // 8.3in x 11.7in
       a5:    { width: 583, height: 823 }    // 5.8in x 8.3in
     };
-    
-    
-    function setPaperSize(size) {
-      const docEditor = document.getElementById("docEditor");
 
-      const sizes = {
-        letter: { width: "8.5in", height: "11in" },
-        legal:  { width: "8.5in", height: "14in" },
-        a3:     { width: "11.7in", height: "16.5in" },
-        a4:     { width: "8.3in", height: "11.7in" },
-        a5:     { width: "5.8in", height: "8.3in" }
-      };
+    function updatePaperSize() {
+      const mode = getCurrentEditorMode?.() || "document";
+      if (mode !== "document") return;
 
-      const selected = sizes[size.toLowerCase()];
-      if (selected) {
-        docEditor.style.width = selected.width;
-        docEditor.style.minHeight = selected.height;
+      const selectedSize = paperSizeSelect?.value;
+      if (!selectedSize) return;
 
-        localStorage.setItem("paperSize", size); // persist selection
-        console.log(`📄 Paper size set to ${size.toUpperCase()} (${selected.width} × ${selected.height})`);
+      switch (selectedSize) {
+        case "letter":
+          mainEditor.style.width = "8.5in";
+          mainEditor.style.minHeight = "11in";
+          break;
+        case "legal":
+          mainEditor.style.width = "8.5in";
+          mainEditor.style.minHeight = "14in";
+          break;
+        case "a3":
+          mainEditor.style.width = "11.7in";
+          mainEditor.style.minHeight = "16.5in";
+          break;
+        case "a4":
+          mainEditor.style.width = "8.27in";
+          mainEditor.style.minHeight = "11.69in";
+          break;
+        case "a5":
+          mainEditor.style.width = "5.8in";
+          mainEditor.style.minHeight = "8.3in";
+          break;
       }
-
-      // Hide dropdown after selection
-      document.getElementById("paperSizeDropdown")?.classList.add("hidden");
     }
-    */
 
     function saveSideThought() {
-      const activeSuite = document.querySelector('.active.suite');
+      const activeSuite = document.querySelector('.suite.active');
       const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
       const text = document.getElementById("sideThoughtTextarea").value.trim();
 
@@ -2861,7 +2968,7 @@
           // badge styles itself
         }
 
-        const activeSuite = document.querySelector('.active.suite');
+        const activeSuite = document.querySelector('.suite.active');
         const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
         console.log("🧠 SideThoughts now tracking mode:", mode);
 
