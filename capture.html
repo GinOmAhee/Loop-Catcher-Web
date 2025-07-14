@@ -315,7 +315,6 @@
     width: 8.27in;
     min-height: 11.69in;
     padding: 0;
-    margin: 0rem auto;
     font-family: "Arial", sans-serif;
     font-size: 1rem;
     border: 1px solid #ccc;
@@ -333,7 +332,6 @@
     padding: 0.9rem;
     width: 4.14in;
     height: 5.38in;
-    margin: 0 auto;
     border: 1px solid #ccc;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: var(--editor-bg);
@@ -906,7 +904,7 @@
     <div id="toolbar">
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
-
+        /*
         <!-- 📄 Paper Size Toggle Button -->
         <button id="paperSizeSelectBtn" class="toolbar-btn" title="Paper Size">📄</button>
 
@@ -918,7 +916,7 @@
           <div class="dropdown-item" onclick="setPaperSize('a4')">A4 (8.3in × 11.7in)</div>
           <div class="dropdown-item" onclick="setPaperSize('a5')">A5 (5.8in × 8.3in)</div>
         </div>
-
+        */
         <!-- Margin Button -->
         <button id="marginBtn" title="Set Margins">📏</button>
 
@@ -2807,7 +2805,8 @@
       a4:    { width: 794, height: 1123 },  // 8.3in x 11.7in
       a5:    { width: 583, height: 823 }    // 5.8in x 8.3in
     };
-
+    
+    /*
     function setPaperSize(size) {
       const docEditor = document.getElementById("docEditor");
 
@@ -2831,6 +2830,7 @@
       // Hide dropdown after selection
       document.getElementById("paperSizeDropdown")?.classList.add("hidden");
     }
+    */
 
     function saveSideThought() {
       const activeSuite = document.querySelector('.suite.active');
