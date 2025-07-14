@@ -301,15 +301,6 @@
     display: block;
   }
 
-  #documentTabContainer {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    flex-wrap: wrap;
-  }
-
   #docEditor {
     position: relative; 
     width: 8.27in;
@@ -336,13 +327,6 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: var(--editor-bg);
     color: var(--editor-text);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --btn-bg: #333;
-      --btn-text: #fff;
-    }
   }
 
   /* Generic inheritance-friendly rules */
@@ -891,9 +875,6 @@
 
   <!-- =========  DOCUMENT SUITE  ========= -->
   <div id="docSuite" class="suite active">
-    <div class="tab-bar">
-      <div id="documentTabContainer" class="tab-container document-tabs"></div>
-    </div>
 
     <div class="controls">
       <button onclick="saveText()" title="Save">💾</button>
@@ -1062,9 +1043,6 @@
 
   <!-- =========  NOTEPAD SUITE  ========= -->
   <div id="noteSuite" class="suite">
-    <div class="tab-bar">
-      <div id="notepadTabContainer" class="tab-container notepad-tabs"></div>
-    </div>
 
     <div class="controls">
       <button onclick="saveText()" title="Save">💾</button>
@@ -1153,13 +1131,12 @@
     let isRenamingTab = false;
 
     let db = null;
-
-    let tabs = JSON.parse(localStorage.getItem("tabs") || "[]");
     let highlightDropdown = document.getElementById("highlightDropdown");
 
     let toggleBtn;
     let saveStatus;
-    let editor, maineditor
+    let editor;
+    let maineditor;
     let attachedFilesList;
     let groupedNotes;
     let fontBtn;
@@ -2461,53 +2438,39 @@
 
         console.log("✅ User is signed in:", user.email);
 
-        const editor = document.getElementById('mainEditor');
-        if (editor && editor.classList.contains('hidden-editor')) {
-          editor.classList.remove('hidden-editor');
-          editor.style.display = 'block';
-          editor.getBoundingClientRect(); // force reflow
-          editor.classList.add('visible');
+        const docEditor = document.getElementById("docEditor");
+        const noteEditor = document.getElementById("noteEditor");
+
+        // ⛏️ Unhide editors if hidden (fail-safe)
+        if (docEditor?.classList.contains('hidden-editor')) {
+          docEditor.classList.remove('hidden-editor');
+          docEditor.style.display = 'block';
         }
 
-        loadSavedText(); // Load saved tab content
+        if (noteEditor?.classList.contains('hidden-editor')) {
+          noteEditor.classList.remove('hidden-editor');
+          noteEditor.style.display = 'block';
+        }
 
-        mainEditor.addEventListener("input", () => {
-          hasUnsavedChanges = true;
+        loadSavedText(); // 📂 Load tab content
 
-          const currentMode = getCurrentEditorMode();
-          const text = mainEditor.innerText || "";
+        // 🔗 Make links in document editor clickable
+        docEditor?.addEventListener("click", function (e) {
+          const currentMode = getCurrentEditorMode?.() || "document";
+          if (currentMode !== "document") return;
 
-          if (currentMode === "document") {
-            const newTitle = text.split("\n")[0]?.trim() || "Untitled";
-
-          if (tabs[activeTabIndex]) {
-            tabs[activeTabIndex].title = newTitle;
-            localStorage.setItem("tabs", JSON.stringify(tabs));
-            console.log("📝 Tab title updated:", newTitle);
+          const el = e.target.closest("a");
+          if (el?.href) {
+            e.preventDefault();
+            window.open(el.href, "_blank", "noopener");
           }
-        } else {
-          console.log("🧠 Notepad mode — skipping title auto-update");
-        }
+        });
+
+        applyMoodTheme();
+        updateGrouping();
+        setInterval(autoSave, 30000); // 💾 Auto-save every 30s
       });
-
-      applyMoodTheme();
-      updateGrouping();
-      setInterval(autoSave, 30000); // Auto-save every 30s
-     });
     };
-
-
-    mainEditor.addEventListener("click", function (e) {
-      const currentMode = getCurrentEditorMode?.() || "document";
-      if (currentMode !== "document") return;
-
-      const el = e.target.closest("a");
-      if (el && el.href) {
-        e.preventDefault();
-        window.open(el.href, "_blank", "noopener");
-      }
-    });
-
 
     function deleteSelectedNotes() {
       const checkboxes = document.querySelectorAll('.note-delete-checkbox:checked');
