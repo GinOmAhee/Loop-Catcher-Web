@@ -1591,6 +1591,7 @@
     }
 
     function setFont(font) {
+      const fontDropdown = document.getElementById("fontDropdown");
       document.execCommand("fontName", false, font);
       fontDropdown.classList.add("hidden");
     }
