@@ -888,7 +888,7 @@
     <div id="toolbar">
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
-
+        /*
         <label for="paperSizeSelect">📄 Paper Size:</label>
         <select id="paperSizeSelect">
           <option value="letter">Letter (8.5in × 11in)</option>
@@ -909,7 +909,9 @@
           <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
           <button id="applyMarginBtn">✅ Apply</button>
         </div>
-          <!-- Icon Button -->
+        */
+
+        <!-- Icon Button -->
         <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
         <select id="fontDropdown" onchange="setFont(this.value)">
@@ -995,7 +997,6 @@
         <button class="toggle-preview-btn" onclick="togglePreview('doc')">☰</button>
 
         <div id="docEditor" class="editor document-mode" contenteditable="true">
-          <div id="marginBox" class="margin-box" contenteditable="false" tabindex="-1"></div>
         </div>
       </div>
     </div>
@@ -2748,11 +2749,11 @@
         }
       });
     });
-    */
+
     function inchesToPixels(inches) {
         return parseFloat(inches) * 96;
     }  
-    /*
+
     function applyCustomMargins() {
       const saved = JSON.parse(localStorage.getItem("customMargins") || "{}");
 
@@ -2781,7 +2782,8 @@
       }
       return false;
     }
-
+    
+    /*
     const paperSizes = {
       letter: { width: 816, height: 1056 }, // 8.5in x 11in at 96dpi
       legal: { width: 816, height: 1344 },  // 8.5in x 14in
@@ -2790,7 +2792,7 @@
       a5:    { width: 583, height: 823 }    // 5.8in x 8.3in
     };
     
-    /*
+    
     function setPaperSize(size) {
       const docEditor = document.getElementById("docEditor");
 
