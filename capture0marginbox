@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capture UI</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+
+  /* === ROOT VARIABLES & BASE === */
+  :root {
+    --editor-bg: #ffffff;
+    --editor-text: #222;
+    --tab-bg: #f9f9f9;
+    --tab-text: #333;
+    --tab-border: #ccc;
+    --tab-active-bg: #ffffff;
+    --preview-text-color: #333;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    color: #333;
+    background: #f4f1ea;
+    margin: 0;
+    padding: 0;
+  }
+
+  body.dark-theme {
+    --editor-bg: #1a1a1a;
+    --editor-text: #ffffff;
+    --tab-bg: #121212;
+    --tab-text: #eee;
+    --tab-border: #555;
+    --tab-active-bg: #2d3b44;
+    background-color: #000;
+    color: #f1f1f1;
+  }
+
+  /* === DARK MODE ADJUSTMENTS === */
+  body.dark-theme button {
+    background: #1e1e1e;
+    color: #f1f1f1;
+    border-color: #444;
+  }
+  body.dark-theme .floating-nudge {
+    background: rgba(30, 30, 30, 0.95);
+    color: #bbb;
+  }
+  body.dark-theme .nudge,
+  body.dark-theme p {
+    color: #bbb;
+  }
+  body.dark-theme #mainEditor {
+    background: #222 !important;
+    color: #ddd !important;
+    caret-color: #eee !important;
+  }
+
+  body.dark-theme .tab {
+    background-color: transparent;
+    color: #ccc;
+  }
+
+  body.dark-theme .tab.active {
+    box-shadow: inset 0 -2px 0 hotpink;
+  }
+
+  body.dark-theme .tab-rename-input {
+    background: #1e1e1e;
+    color: #eee;
+    border: none
+    caret-color: hotpink;
+    outline: none;
+    box-shadow: inset 0 -2px 0 hotpink
+    transition: all 0.2s ease-in-out;
+
+    position: relative;
+    z-index: 9999;
+    display: block;
+  }
+
+  body.dark-theme .preview-overlay {
+    background: #1a1a1a; /* darker overlay */
+    color: #ddd; /* adjust text if needed */
+  }
+
+  body.dark-theme .preview-overlay input,
+  body.dark-theme .preview-overlay textarea {
+    background: #222;
+    color: #eee;
+    border: 1px solid #444;
+  }
+
+  body.dark-theme .preview-overlay button {
+    background-color: #333;
+    color: #181A1B;
+    border: 1px solid #555;
+  }
+
+  body.dark-theme .search-wrapper {
+    background: #1e1e1e;
+    border-color: none;
+  }
+
+  body.dark-theme #searchInput {
+    background: #1e1e1e;
+    color: #fff;
+    border-color: #555;
+  }
+
+  body.dark-theme .search-dropdown {
+    background-color: #1e1e1e;
+    color: #eee;
+    border: none;
+  }
+
+  body.dark-theme #searchInput:focus {
+    border-color: #888;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+  }
+
+  body.dark-theme .preview-top a,
+  body.dark-theme .preview-settings a {
+    background: #111; /* or #1a1a1a if you want a softer black */
+    color: #eee;
+    box-shadow: none; /* kill that light glow */
+    text-shadow: none !important;
+  }
+
+  body.dark-theme .preview-top a:hover,
+  body.dark-theme .preview-settings a:hover {
+    background-color: #222;
+    transform: translateX(2px);
+  }
+
+  body.dark-theme .dropdown,
+  body.dark-theme .dropdown div {
+    background-color: #1a1a1a;
+    color: #eee;
+  }
+
+  body.dark-theme .dropdown div:hover {
+   background-color: #333;
+  }
+
+  body.dark-theme select {
+    background-color: #1e1e1e;
+    color: #eee;
+    border: 1px solid #444;
+  }
+
+  body.dark-theme select option {
+    background-color: #1e1e1e;
+    color: #eee;
+  }
+
+  body.dark-theme select {
+    background-color: #1e1e1e;
+    color: #eee;
+    border: 1px solid #444;
+    padding-right: 1.5rem; /* leaves space for the arrow */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23ccc" viewBox="0 0 24 24" ... />');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+  }
+
+  body.dark-theme .preview-sortbar,
+  body.dark-theme .preview-sortbar.bottom-searchbar {
+    background: transparent;
+    color: none;
+    border-top: none;
+  }
+
+  .search-dropdown {
+    border: none;
+    background: transparent;
+    color: var(--text-color, #f0f0f0); /* Light text for dark background */
+    appearance: none;
+    padding: 0.6rem;
+    padding-right: 1.5rem;
+    font-size: 0.95rem;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  /* Optional: override the container background */
+  .preview-sortbar.bottom-searchbar {
+    background: #1e1e1e;
+    border-top: 1px solid #333;
+  }
+
+  body.dark-theme .search-wrapper::after {
+    color: var(--text-color, #f1f1f1);
+  }
+
+  body.dark-theme #groupedNotes {
+    color: #f1f1f1; /* or whatever light color suits your theme */
+  }
+
+  body.dark-theme #groupedNotes li,
+  body.dark-theme #groupedNotes div {
+    color: #f1f1f1;
+  }
+
+  body.dark-theme.theme-strategic #groupedNotes {
+    color: #eee;
+  }
+  
+  /* 💡 Dark theme override */
+  body.dark-theme .delete-notes-btn {
+    background: #aa4444;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(255,255,255,0.1);
+  }
+
+  /* 🖤 DARK THEME */
+  body.dark-theme .dropdown {
+    background: #1a1a1a;
+    border-color: #444;
+    color: #f1f1f1;
+  }
+
+  body.dark-theme .dropdown div:hover {
+    background-color: #333;
+  }
+
+  body.dark-theme .note-preview {
+    color: #ddd; /* or #f1f1f1 if you want max contrast */
+  }
+
+  /* === THEME CLASSES === */
+  .theme-calm {
+    --tab-bg: #dceefb;
+    --tab-hover: #c5e1e1;
+    --tab-text: #2b6cb0;
+    --tab-active-bg: #bee3f8;
+    --tab-border: #90cdf4;
+    background-color: #cfe3d5;
+    color: #2f4633;
+  }
+  .theme-strategic {
+    --tab-bg: #e6fffa;
+    --tab-hover: #a2c4f5;
+    --tab-text: #2c7a7b;
+    --tab-active-bg: #b2f5ea;
+    --tab-border: #81e6d9;
+    background-color: #d7d7da;
+    color: #2e2e32;
+  }
+  .theme-reflective {
+    --tab-bg: #fefcbf;
+    --tab-hover: #e0d4f5;
+    --tab-text: #744210;
+    --tab-active-bg: #faf089;
+    --tab-border: #ecc94b;
+    background-color: #e2dfc9;
+    color: #443f1d;
+  }
+  .theme-bold {
+    --tab-bg: #fed7d7;
+    --tab-hover: #f59d9d;
+    --tab-text: #9b2c2c;
+    --tab-active-bg: #feb2b2;
+    --tab-border: #fc8181;
+    background-color: #f7ddb4;
+    color: #5d3e0a;
+  }
+  .theme-playful {
+    --tab-bg: #fbd38d;
+    --tab-hover: #ffe066;
+    --tab-text: #b7791f;
+    --tab-active-bg: #f6ad55;
+    --tab-border: #f6ad55;
+    background-color: #ffd6e8;
+    color: #7e2b4e;
+  }
+
+  /* === EDITOR & INPUT === */
+  #mainEditor {
+    width: 60%;
+    min-height: 300px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: var(--editor-bg, #fff);
+    color: var(--editor-text, #000);
+    overflow-y: auto;
+  }
+
+  .hidden-editor {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .hidden-editor.visible {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  textarea {
+    width: 60%;
+    height: 300px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: none;
+  }
+
+  /* === LAYOUT === */
+  .main-container {
+    display: flex;
+    height: 100vh;
+  }
+  .editor-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2rem;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  /* === TABS === */
+  .tab-bar {
+    display: flex;
+    align-items: center;
+    padding-left: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid #ccc;
+    position: sticky;
+    top: 0;
+    z-index: 10; /* Make sure it stays above other elements */
+    background-color: var(--tab-bg);
+    border-color: var(--tab-border);
+    transition: background-color 0.3s ease;
+  }
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem; /* ← this creates space between label & close button */
+    min-width: 150px;
+    max-width: 150px;
+    width: 150px; /* optional for clarity */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+    margin-right: 4px;
+    border-radius: 8px 8px 0 0;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: var(--tab-bg);
+    color: var(--tab-text);
+    border: 1px solid var(--tab-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+
+  .tab.add-tab {
+    display: inline-flex;
+    min-width: auto; /* remove that 80px minimum */
+    width: 2.2rem;    /* small square size */
+    padding: 0.4rem;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    background-color: var(--tab-bg);
+    color: var(--tab-text);
+    border: 1px solid var(--tab-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+    
+  .tab.add-tab:hover {
+    background-color: var(--tab-hover);
+    border-color: var(--tab-border);
+  }
+
+  .tab:hover {
+    background-color: var(--tab-hover);
+  }
+
+  .tab.active {
+    background-color: var(--tab-active-bg);
+  }
+
+  body:not(.dark-theme) .tab-rename-input {
+    background: lightgoldenrodyellow;
+    border: 2px dashed red;
+    position: relative;
+    z-index: 9999;
+    display: block;
+  }
+
+  .tab-label {
+    flex-grow: 1;
+    display: inline-block;
+    max-width: 145px; /* or whatever size fits your layout */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+    pointer-events: auto !important;
+    user-select: text !important;
+    cursor: text;
+    padding: 0.2rem;
+  }
+
+  .tab-close-btn {
+    flex-shrink: 0;
+    all: unset;
+    font-size: 0.85rem;
+    margin-left: 6px;
+    padding: 2px 6px;
+    line-height: 1;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--tab-text);
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .tab button:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* === TOOLBAR & CONTROLS === */
+  .format-toolbar select,
+  .preview-sortbar select {
+    padding: 0.3rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    background-color: #f2f2f2;
+    color: #333;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+
+  .margin-dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 0.8rem;
+    border-radius: 6px;
+    z-index: 999;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .delete-notes-btn {
+    position: sticky;
+    bottom: 10px;
+    right: 10px;
+    float: right;
+    background: #d46a6a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    z-index: 999;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    align-items: center;
+  }
+  .controls button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .add-tab-btn {
+    margin-left: auto;
+    background: #fff59d;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .add-tab-btn:hover {
+    background: #fff176;
+  }
+  .save-time {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  /* === PREVIEW PANEL === */
+  .preview-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 420px;
+    height: 100vh;
+    display: none;
+    flex-direction: column;
+    background: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    z-index: 999;
+  }
+  .preview-top a,
+  .preview-settings a {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.8rem;
+    margin: 0.25rem 0;
+    font-weight: 600;
+    color: #444;
+    text-decoration: none;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+  }
+  .preview-top a:hover,
+  .preview-settings a:hover {
+    background-color: #f3f3f3;
+    transform: translateX(2px);
+  }
+  .preview-middle {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 1.5rem; /* so arrow doesn’t overlap text */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23eee" ... />');
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+  }
+
+  .note-preview {
+    flex: 1;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    color: var(--preview-text-color); /* Add fallback below */
+  }
+
+  #groupedNotes {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0.8rem 1rem 0.4rem;
+  }  
+
+  .preview-sortbar {
+    margin: 0.3rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+  }
+  .preview-sortbar label {
+    font-size: 0.85rem;
+  }
+  .preview-sortbar.bottom-searchbar {
+    padding: 0.6rem 1rem;
+    margin-top: 0.2rem;
+    border-top: 1px solid #ddd;
+    background: #fafafa;
+  }
+
+  .search-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;         /* Needed for ::after and input glow alignment */
+    overflow: visible;          /* Lets glow shine outside the box */
+    border: none;               /* Fixed the missing semicolon */
+    border-radius: 0;
+    background: var(--input-bg, #fafafa);
+    padding: 0.2rem 0.4rem;
+    box-sizing: border-box;
+  }
+
+  /* Input takes up most space */
+  #searchInput {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    border: none;
+    background: transparent;
+    color: var(--text-color, #333);
+    font-size: 1rem;
+  }
+
+  #searchInput:focus {
+    outline: none;
+    border-color: #999;
+    box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.1);
+  }
+
+  /* Dropdown styled like it's inside the same input */
+  .search-dropdown {
+    border: none;
+    padding: 0.6rem 1.5rem 0.6rem 0.6rem;
+    background: transparent;
+    color: var(--text-color, #333);
+    appearance: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  #previewToggle {
+    align-self: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  #attachedFilesList {
+    margin-top: 1rem;
+    max-width: 60%;
+    font-size: 0.9rem;
+    color: #444;
+    word-wrap: break-word;
+  }
+  #attachedFilesList ul {
+    padding-left: 1.2rem;
+  }
+  .file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .file-item span {
+    flex: 1;
+  }
+  .file-item button {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+  }
+
+  .preview-bottom {
+    padding: 1rem;
+    border-top: 1px solid #ccc;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .preview-bottom input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0.3rem 0.5rem;
+    font-size: 1rem;
+  }
+
+  .highlight-glow {
+    display: inline-block;
+    background: linear-gradient(90deg, hotpink 0%, deeppink 50%, hotpink 100%);
+    background-size: 200% auto;
+    color: white;
+    padding: 0 2px;
+    border-radius: 3px;
+    animation: shimmerPulse 1.4s ease-in-out infinite alternate;
+  }
+
+  @keyframes shimmerPulse {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 100% center;
+    }
+  }
+
+  /* === DROPDOWN MENU === */
+  .dropdown {
+    position: absolute;
+    z-index: 999;
+    padding: 0.3rem 0;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    box-shadow: none;
+    font-size: 0.85rem;
+  }
+  .dropdown div {
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+  }
+  .dropdown div:hover {
+    background-color: #eee;
+  }
+
+  #tabBar button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+  }
+  #tabBar button:hover {
+    color: #000;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  /* === THEME TOGGLE SWITCH === */
+  .theme-toggle {
+    position: fixed;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    z-index: 10001;
+  }
+  .theme-toggle input {
+    display: none;
+  }
+  .theme-toggle .slider {
+    width: 50px;
+    height: 25px;
+    border-radius: 25px;
+    background-color: #ccc;
+    position: relative;
+    display: block;
+    cursor: pointer;
+  }
+  .theme-toggle .slider::before {
+    content: "";
+    position: absolute;
+    width: 21px;
+    height: 21px;
+    top: 2px;
+    left: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+  .theme-toggle input:checked + .slider {
+    background-color: #555;
+  }
+  .theme-toggle input:checked + .slider::before {
+    transform: translateX(25px);
+  }
+
+  body:not(.dark-theme) .preview-overlay,
+  body:not(.dark-theme) .preview-middle,
+  body:not(.dark-theme) .preview-sortbar,
+  body:not(.dark-theme) .preview-top a,
+  body:not(.dark-theme) .preview-settings a,
+  body:not(.dark-theme) .note-preview,
+  body:not(.dark-theme) #groupedNotes,
+  body:not(.dark-theme) #searchInput {
+    color: #222;
+    font-weight: 400;
+  }
+
+  body.dark-theme select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #1e1e1e;
+    color: #eee;
+    border: 1px solid #444;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg fill='%23ccc' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+  }
+    
+  body.dark-theme select {
+    box-shadow: inset 0 -1px 0 hotpink;
+  }
+
+  </style>
+</head>
+<body>
+
+  <div style="position: absolute; top: 1rem; right: 1rem; z-index: 9999;">
+    <label class="theme-toggle">
+      <input type="checkbox" id="themeSwitch" />
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
+  <div class="preview-overlay" id="preview">
+    <div class="preview-top">
+      <a href="holdingbay.html">🔄 Holding Bay</a>
+      <a href="actnow.html">🚀 Act Now</a>
+      <a href="buildmomentum.html">🌿 Build Momentum</a>
+      <a href="worthitlater.html">⏳ Worth It Later</a>
+      <a href="parkedpotential.html">📦 Parked Potential</a>
+    </div>
+
+    <div class="preview-middle">
+      <!-- 1. Top: Group selector -->
+      <div class="preview-sortbar">
+        <span title="Group Notes">📂</span>
+        <select id="groupSelector" onchange="updateGrouping()">
+          <option value="date">Date</option>
+          <option value="title">Title</option>
+          <option value="project">Project</option>
+          <option value="unresolved">Unresolved Ideas</option>
+          <option value="forgotten">Forgotten Ideas</option>
+        </select>
+      </div>
+
+      <!-- 2. Scrollable notes area -->
+      <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
+
+      <!-- 3. Bottom: search input anchored in its own bar -->
+      <div class="preview-sortbar bottom-searchbar">
+        <div class="search-wrapper">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 Search notes..."
+            oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
+          <select id="searchScope" onchange="updateGrouping()" ...>
+            <option value="group">Grouped</option>
+            <option value="all">Search All</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 4. Very bottom: settings/profile links -->
+      <div class="preview-settings">
+        <a href="settings.html">⚙️ Settings</a>
+        <a href="profile.html">👤 Profile</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="tabBar" class="tab-bar"></div>
+
+  <!-- 📝 Main Editor (always visible) -->
+  <div class="main-container" onclick="maybeClosePreview(event)">
+    <div class="editor-area">
+      <button id="previewToggle">☰</button>
+      <!-- 🎨 Toolbar -->
+
+      <button id="printBtn" title="Print Note">🖨️ Print</button>
+    
+      <div class="format-toolbar" style="margin-bottom: 1rem;">
+        
+      <!-- Margin Button -->
+      <button id="marginBtn" title="Set Margins">📏</button>
+
+      <!-- Margin Dropdown -->
+      <div id="marginDropdown" class="dropdown hidden">
+        <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
+        <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
+        <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
+        <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
+        <button id="applyMarginBtn">✅ Apply</button>
+      </div>
+        <!-- Icon Button -->
+      <button id="fontMenuBtn" title="Choose Font">🅰️</button>
+
+      <select id="fontDropdown" onchange="setFont(this.value)">
+        <option value="'Arial', sans-serif">Arial</option>
+        <option value="'Georgia', serif">Georgia</option>
+        <option value="'Courier New', monospace">Courier New</option>
+        <option value="'Times New Roman', serif">Times New Roman</option>
+      </select>
+
+      <!-- Font Size Icon Button -->
+      <button id="fontSizeBtn" title="Font Size">🔠</button>
+
+      <div id="fontSizeDropdownPanel" class="dropdown hidden">
+        <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
+        <select id="fontSizeSelect">
+          <option value="" disabled selected>Select font size</option>
+          <option value="8pt">8</option>
+          <option value="10pt">10</option>
+          <option value="12pt" selected>12</option>
+          <option value="14pt">14</option>
+          <option value="16pt">16</option>
+          <option value="18pt">18</option>
+          <option value="24pt">24</option>
+          <option value="36pt">36</option>
+        </select>
+        <button id="applyFontSize">Apply</button>
+      </div>
+
+        <button onclick="toggleBold()"><b>B</b></button>
+        <button onclick="toggleItalic()"><i>I</i></button>
+        <button onclick="toggleUnderline()"><u>U</u></button>
+        <button onclick="toggleStrikeThrough()">S̶</button>
+        <button onclick="alignText('left')">←</button>
+        <button onclick="alignText('center')">⇔</button>
+        <button onclick="alignText('right')">→</button>
+        <button onclick="justifyText()" title="Justify Text">📰</button>
+        <button onclick="toggleUnorderedList()">• List</button>
+        <button onclick="undo()">↩️</button>
+        <button onclick="redo()">↪️</button>
+        <button onclick="cleanEditor()">🧹</button>
+        <button onclick="insertModernLink()">🔗</button>
+        
+    
+      <!-- Text Color Icon Button -->
+      <button id="textColorBtn" title="Text Color">🎨</button>
+
+      <!-- Text Color Dropdown -->
+      <div id="textColorDropdown" class="dropdown hidden">
+        <div onclick="setTextColor('black')" style="color: black;">Black</div>
+        <div onclick="setTextColor('red')" style="color: red;">Red</div>
+        <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
+        <div onclick="setTextColor('green')" style="color: green;">Green</div>
+        <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
+        <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
+        <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
+      </div>
+
+      <!-- Highlight Color Icon Button -->
+      <button id="highlightBtn" title="Highlight">🖍️</button>
+
+      <!-- Highlight Color Dropdown -->
+      <div id="highlightDropdown" class="dropdown hidden">
+        <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+        <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+        <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+        <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+        <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
+      </div>
+
+        <button onclick="removeFormatting()">🚫</button>
+      </div>
+
+      <!-- 📝 Rich Text Editor -->
+      <div id="mainEditor" class="hidden-editor" contenteditable="true"></div>
+
+      <div class="controls">
+       <button onclick="saveText()" title="Save">💾</button>
+       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
+       <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
+      </div>
+
+      <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
+
+      <div id="attachedFilesList"></div>
+      <div class="save-time" id="saveStatus"></div>
+    </div>
+  </div>
+
+  <!-- Your main HTML content above -->
+
+</body>
+
+  <script>
+    let isRenamingTab = false;
+
+    let db = null;
+
+    async function initializeFirebase() {
+      try {
+        const res = await fetch("https://us-central1-loop-catcher-firebase.cloudfunctions.net/getAPIKey");
+
+        // ✅ CORS/network error handling
+        if (!res.ok) throw new Error(`API key fetch failed: ${res.status} ${res.statusText}`);
+
+        const { apiKey } = await res.json();
+
+        const firebaseConfig = {
+          apiKey,
+          authDomain: "loop-catcher-firebase.firebaseapp.com",
+          projectId: "loop-catcher-firebase",
+          storageBucket: "loop-catcher-firebase.firebasestorage.app"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        console.log("✅ Firebase initialized");
+      } catch (error) {
+        console.error("❌ Failed to initialize Firebase:", error);
+        alert("Firebase failed to initialize. Please check your connection or CORS settings.");
+      }
+    }
+    
+    const moodThemeMap = {
+      "Calm & Clear": "theme-calm",
+      "Focused & Strategic": "theme-strategic",
+      "Open & Reflective": "theme-reflective",
+      "Driven & Bold": "theme-bold",
+      "Playful & Inventive": "theme-playful"
+    };
+
+    function applyMoodTheme() {
+      const vibe = localStorage.getItem('vibeLabel');
+      const themeClass = moodThemeMap[vibe];
+
+      // Remove all mood theme classes first
+      Object.values(moodThemeMap).forEach(cls =>
+        document.body.classList.remove(cls)
+      );
+
+      // Add the selected theme class
+      if (themeClass) document.body.classList.add(themeClass);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const switchEl = document.getElementById('themeSwitch');
+
+      function loadTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+
+        if (useDark) {
+          document.body.classList.add('dark-theme');
+          switchEl.checked = true;
+        } else {
+          document.body.classList.remove('dark-theme');
+          switchEl.checked = false;
+        }
+      }
+
+      switchEl.addEventListener('change', () => {
+        if (switchEl.checked) {
+          document.body.classList.add('dark-theme');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          document.body.classList.remove('dark-theme');
+          localStorage.setItem('theme', 'light');
+        }
+      });
+
+      applyMoodTheme(); // This should already exist globally
+      loadTheme();
+    });
+
+    function maybeClosePreview(e) {
+      if (e.target.classList.contains("tab-rename-input")) return;
+      if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
+        preview.style.display = 'none';
+      }
+    }
+
+    let tabs = [
+      { title: "Untitled", content: "" }
+    ];
+    let activeTabIndex = 0;
+
+    function safeRenderTabs() {
+      if (!isRenamingTab) {
+        renderTabs(); // ✅ Call the real function that draws the tabs
+      } else {
+        console.warn("⛔ renderTabs() skipped due to active rename");
+      }
+    }
+
+    function renderTabs() {
+      if (isRenamingTab) {
+        console.warn("⛔ Skipping renderTabs(): rename input is still active");
+        return;
+      }
+
+      const tabBar = document.querySelector(".tab-bar");
+      if (!tabBar) return;
+
+      if (
+        document.activeElement &&
+        document.activeElement.classList.contains("tab-rename-input")
+      ) {
+        console.warn("⛔ Skipping render: rename input is active");
+        return;
+      }
+
+      tabBar.innerHTML = "";
+
+      tabs.forEach((tab, index) => {
+        const tabBtn = document.createElement("div");
+        tabBtn.className = "tab";
+
+        if (index === activeTabIndex) {
+          tabBtn.classList.add("active");
+        }
+
+        const tabLabel = document.createElement("span");
+        tabLabel.innerText = tab.title;
+        tabLabel.className = "tab-label";
+        tabLabel.addEventListener("click", () => switchTab(index));
+
+        // Handle rename flow on double-click
+        tabLabel.addEventListener("dblclick", (e) => {
+          e.stopPropagation();
+          isRenamingTab = true;
+          console.log("🖱️ Double-clicked on tab:", tab.title);
+
+          const input = document.createElement("input");
+          input.className = "tab-rename-input";
+          input.value = tab.title;
+
+          if (document.body.classList.contains("dark-theme")) {
+            input.style.background = "#1e1e1e";
+            input.style.color = "#eee";
+            input.style.border = "1px dashed hotpink";
+            input.style.caretColor = "hotpink";
+          }
+
+          input.addEventListener("click", (e) => e.stopPropagation());
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") input.blur();
+            if (e.key === "Escape") renderTabs();
+          });
+
+          input.addEventListener("blur", (e) => {
+            const newTitle = e.target.value.trim();
+            if (newTitle && newTitle !== tab.title) {
+              tabs[index].title = newTitle;
+              localStorage.setItem("tabs", JSON.stringify(tabs));
+              console.log("✅ title saved:", newTitle);
+              hasUnsavedChanges = true; // <-- 🧠 this is the magic line
+            } else {
+              console.log("❌ title unchanged or empty");
+            }
+            isRenamingTab = false;
+            setTimeout(renderTabs, 100);
+          });
+
+          const observer = new MutationObserver(() => {
+            if (document.body.classList.contains("dark-theme")) {
+              input.style.background = "#1e1e1e";
+              input.style.color = "#eee";
+              input.style.border = "1px dashed hotpink";
+              input.style.caretColor = "hotpink";
+            }
+            observer.disconnect(); // Only run once
+          });
+
+          observer.observe(tabBtn, { childList: true });
+
+          tabBtn.replaceChild(input, tabLabel);
+          setTimeout(() => {
+            input.focus();
+            input.select();
+          }, 100);
+        });
+
+        const closeBtn = document.createElement("button");
+        closeBtn.innerText = "⨯"; // tight and clean
+        closeBtn.className = "tab-close-btn";
+        closeBtn.title = "Close Tab";
+        closeBtn.onclick = (e) => {
+          e.stopPropagation();
+          closeTab(index);
+        };
+
+        tabBtn.appendChild(tabLabel);
+        tabBtn.appendChild(closeBtn);
+        tabBar.appendChild(tabBtn);
+      });
+
+      const addTabBtn = document.createElement("div");
+      addTabBtn.innerText = "+";
+      addTabBtn.className = "tab add-tab";
+      addTabBtn.onclick = addNewTab;
+      tabBar.appendChild(addTabBtn);
+    }
+
+    function markUnsaved() {
+      hasUnsavedChanges = true;
+    }
+
+    function switchTab(index) {
+      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      activeTabIndex = index;
+      mainEditor.innerHTML = tabs[index].content;
+      safeRenderTabs();
+    }
+
+    function closeTab(index) {
+      if (index === activeTabIndex && hasUnsavedChanges) {
+        const confirmClose = confirm("⚠️ You have unsaved changes. Close this tab anyway?");
+        if (!confirmClose) return;
+      }
+
+      tabs.splice(index, 1);
+
+      // Always have at least one tab
+      if (tabs.length === 0) {
+        tabs.push({ title: "Untitled", content: "" });
+        activeTabIndex = 0;
+      } else if (index <= activeTabIndex) {
+        activeTabIndex = Math.max(0, activeTabIndex - 1);
+      }
+
+      mainEditor.innerHTML = tabs[activeTabIndex].content || "";
+      hasUnsavedChanges = false;
+
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      localStorage.setItem("activeTabIndex", activeTabIndex);
+
+      safeRenderTabs(); // or renderTabs(), depending on your setup
+    } 
+
+    let hasUnsavedChanges = false;
+
+    function addNewTab() {
+      tabs.push({ title: "Untitled", content: "" });
+      switchTab(tabs.length - 1); // Switch to new tab
+    }
+
+    const vibe = localStorage.getItem('vibeLabel') || "Calm & Clear";
+    const newThemeClass = moodThemeMap[vibe] || "theme-calm"; // Define it first
+
+    document.body.className = ""; // Remove old
+    document.body.classList.add(newThemeClass); // Add new
+    safeRenderTabs(); // Re-render tabs to refresh their classes if needed
+
+    const preview = document.getElementById('preview');
+    const toggleBtn = document.getElementById('previewToggle');
+    const saveStatus = document.getElementById('saveStatus');
+    const mainEditor = document.getElementById("mainEditor");
+    const attachedFilesList = document.getElementById('attachedFilesList');
+    const groupedNotes = document.getElementById('groupedNotes');
+    const fontBtn = document.getElementById("fontMenuBtn");
+    const fontDropdown = document.getElementById("fontDropdown");
+    const fontSizeBtn = document.getElementById("fontSizeBtn");
+    const sizeDropdown = document.getElementById("sizeDropdown");
+    const textColorBtn = document.getElementById("textColorBtn");
+    const textColorDropdown = document.getElementById("textColorDropdown");
+    const justifyBtn = document.getElementById("justifyBtn");
+
+    
+    let recognition;
+    let isRecording = false;
+    let debounceTimer;
+
+    mainEditor.addEventListener("input", () => {
+      // Undo/redo
+      undoStack.push(mainEditor.innerHTML);
+      redoStack = [];
+
+      // Debounced auto-save
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        localStorage.setItem("capturedText", mainEditor.innerHTML);
+        localStorage.setItem("lastSaved", new Date().toISOString());
+        updateGrouping();
+        saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
+      }, 1000);
+    });
+
+    let savedSelection = null;
+
+    function saveSelection() {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        savedSelection = sel.getRangeAt(0).cloneRange();
+      }
+    }
+
+    function restoreSelection() {
+      if (savedSelection) {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(savedSelection);
+      }
+    }
+
+    function justifyText() {
+      mainEditor.focus(); // ensure editor is active
+      document.execCommand("justifyFull", false, null);
+    }
+
+    fontBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fontDropdown.classList.toggle("hidden");
+      const rect = fontBtn.getBoundingClientRect();
+      fontDropdown.style.left = `${rect.left}px`;
+      fontDropdown.style.top = `${rect.bottom + 5}px`;
+    });
+
+    fontDropdown.addEventListener("click", (e) => {
+    e.stopPropagation();
+    });
+
+    function setFont(font) {
+      document.execCommand("fontName", false, font);
+      fontDropdown.classList.add("hidden");
+    }
+
+    textColorBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      saveSelection();
+      textColorDropdown.classList.toggle("hidden");
+
+      const rect = textColorBtn.getBoundingClientRect();
+      textColorDropdown.style.left = `${rect.left}px`;
+      textColorDropdown.style.top = `${rect.bottom + 5}px`;
+    });
+
+    function setTextColor(color) {
+      mainEditor.focus();
+      restoreSelection();
+      document.execCommand("styleWithCSS", false, true);
+      document.execCommand("foreColor", false, color);
+      textColorDropdown.classList.add("hidden");
+    }
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      preview.style.display = preview.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    const highlightBtn = document.getElementById("highlightBtn");
+    const highlightDropdown = document.getElementById("highlightDropdown");
+
+    highlightBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      saveSelection();
+      highlightDropdown.classList.toggle("hidden");
+      const rect = highlightBtn.getBoundingClientRect();
+      highlightDropdown.style.left = `${rect.left}px`;
+      highlightDropdown.style.top = `${rect.bottom + 5}px`;
+    });
+
+    function setHighlightColor(color) {
+      mainEditor.focus();
+      restoreSelection();
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const selectedText = range.extractContents();
+
+      const mark = document.createElement("mark");
+      requestAnimationFrame(() => {
+        mark.classList.add("highlight-glow");
+      });
+      mark.appendChild(selectedText);
+
+      range.insertNode(mark);
+
+      const newRange = document.createRange();
+      newRange.selectNodeContents(mark);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
+
+      // Hide dropdown (if exists)
+      const highlightDropdown = document.getElementById("highlightDropdown");
+      highlightDropdown?.classList.add("hidden");
+
+      // Update status
+      const saveStatus = document.getElementById("saveStatus");
+      if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
+
+      // Optional fallback
+      try {
+        document.execCommand("hiliteColor", false, color);
+      } catch (e) {
+        console.warn("execCommand fallback failed", e);
+      }
+    }
+
+   async function saveText() {
+     const now = new Date();
+     const noteText = mainEditor.innerText.trim();
+     const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
+     const noteHTML = mainEditor.innerHTML;
+     if (!noteText) return;
+
+     const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+
+     // ✅ Allow save only if different from last saved note
+     if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
+       saveStatus.innerText = `⚠️ Not saved — no changes detected`;
+       return;
+     }
+
+
+     let projectName = prompt("📌 Enter project name (optional):");
+     projectName = projectName?.trim() || "📂 Unlabeled";
+
+     const newNote = {
+       text: noteHTML,
+       timestamp: now.toISOString(),
+       title: tabs[activeTabIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
+       project: projectName,
+       resolved: false,
+       tags: []
+     };
+
+     existingNotes.unshift(newNote);
+     localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
+
+     try {
+       if (db && firebase.auth().currentUser) {
+         const uid = firebase.auth().currentUser.uid;
+         await db.collection("users").doc(uid).collection("notes").add(newNote);
+         console.log("✅ Note saved to Firestore under user:", uid);
+       } else {
+         console.warn("⚠️ User not logged in or Firebase not ready");
+       }
+     } catch (error) {
+       console.error("❌ Failed to save note to Firestore:", error);
+     }
+
+      mainEditor.innerHTML = '';
+      tabs[activeTabIndex].content = '';
+      tabs[activeTabIndex].title = 'Untitled';
+      localStorage.setItem('tabs', JSON.stringify(tabs));
+      safeRenderTabs();
+      saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
+      updateGrouping();
+    }
+
+    function autoSave() {
+      console.log("✅ autoSave() was called");
+      const now = new Date();
+
+      if (!mainEditor) return;
+
+      // Save current content into the active tab
+      tabs[activeTabIndex].content = mainEditor.innerHTML;
+
+      // Save full tabs array
+      localStorage.setItem('tabs', JSON.stringify(tabs));
+      localStorage.setItem('activeTabIndex', activeTabIndex);
+      localStorage.setItem('lastSaved', now.toISOString());
+
+      saveStatus.innerText = `Auto-saved at ${now.toLocaleTimeString()}`;
+
+      hasUnsavedChanges = false; // Reset after save
+    }
+
+    window.addEventListener("beforeunload", (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = ""; // Required for most browsers
+      }
+    });
+
+    function loadSavedText() {
+      const savedTabs = JSON.parse(localStorage.getItem('tabs') || '[]');
+      const savedIndex = parseInt(localStorage.getItem('activeTabIndex')) || 0;
+      const lastSaved = localStorage.getItem('lastSaved');
+      const attached = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
+
+      if (savedTabs.length) {
+        tabs = savedTabs;
+        activeTabIndex = savedIndex;
+        mainEditor.innerHTML = tabs[activeTabIndex].content;
+        safeRenderTabs();
+
+      } else {
+        // ✅ in case there's nothing saved yet
+        tabs = [{ title: "Note 1", content: "" }];
+        activeTabIndex = 0;
+        safeRenderTabs(); // safely render fresh default
+      }
+
+      if (lastSaved) saveStatus.innerText = `Last saved at ${new Date(lastSaved).toLocaleTimeString()}`;
+      updateFileDisplay(attached);
+    }
+
+    function toggleVoiceCapture() {
+      if (isRecording) {
+        stopVoiceCapture();
+      } else {
+        startVoiceCapture();
+      }
+    }
+
+    function startVoiceCapture() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('🎙️ Voice capture is not supported in this browser. Try using Chrome.');
+        return;
+      }
+
+      recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.continuous = true;
+      recognition.interimResults = false;
+
+      console.log("🎤 SpeechRecognition is starting...");
+      recognition.start();
+      isRecording = true;
+      document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
+      saveStatus.innerText = "🎙️ Voice capture started...";
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            let text = event.results[i][0].transcript.trim();
+            if (text.toLowerCase().includes("stop")) {
+              stopVoiceCapture();
+              saveText();
+              return;
+            }
+            transcript += text + '\n';
+          }
+        }
+        mainEditor.innerHTML += (mainEditor.innerHTML ? '\n' : '') + transcript.trim();
+      };
+
+      recognition.onerror = (e) => {
+        console.error("Speech recognition error:", e.error);
+        stopVoiceCapture();
+      };
+    }
+
+    function stopVoiceCapture() {
+      if (recognition) {
+        recognition.stop();
+        recognition = null;
+      }
+      isRecording = false;
+      document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
+      saveText();
+      saveStatus.innerText = "🎤 Voice capture stopped.";
+    }
+
+    async function handleFileAttachment() {
+      const input = document.getElementById('fileInput');
+      const files = Array.from(input.files);
+      const stored = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
+
+      let updated = [...stored];
+      let duplicateCount = 0;
+
+      if (!firebase.auth().currentUser || !firebase.storage) {
+        alert("⚠️ You must be logged in to upload files.");
+        return;
+      }
+
+      const storageRef = firebase.storage().ref();
+
+      for (const file of files) {
+        const fileName = file.name;
+
+        // ✅ Check for duplicates by name
+        const isDuplicate = stored.some(f => f.originalName === fileName);
+        if (isDuplicate) {
+          duplicateCount++;
+          continue; // skip to next file
+        }
+
+        const uniqueId = crypto?.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        const storedName = `${fileName}__${uniqueId}`;
+        const fileRef = storageRef.child(`userFiles/${firebase.auth().currentUser.uid}/${storedName}`);
+
+        try {
+          await fileRef.put(file);
+          const downloadURL = await fileRef.getDownloadURL();
+          updated.push({
+            originalName: fileName,
+            storedName: storedName,
+            downloadURL: downloadURL
+          });
+
+        } catch (err) {
+          console.error(`❌ Failed to upload ${fileName}:`, err);
+          alert(`❌ Upload failed for ${fileName}`);
+        }
+    }
+
+      if (duplicateCount > 0) {
+        alert(`⚠️ ${duplicateCount} file(s) already attached and were skipped.`);
+      }
+
+      console.log("📎 Final attached files:", updated);
+      localStorage.setItem('attachedFiles', JSON.stringify(updated));
+      updateFileDisplay(updated);
+      input.value = ''; // clear input for future uploads
+    }
+
+    function removeFile(storedName) {
+      const files = JSON.parse(localStorage.getItem('attachedFiles') || '[]');
+      const updated = files.filter(f => f.storedName !== storedName);
+      localStorage.setItem('attachedFiles', JSON.stringify(updated));
+      updateFileDisplay(updated);
+    }
+
+    function applyStyle(styleProp, value) {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const selectedText = range.extractContents();
+
+      const span = document.createElement("span");
+      span.style[styleProp] = value;
+      span.appendChild(selectedText);
+      range.insertNode(span);
+
+      selection.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.selectNodeContents(span);
+      selection.addRange(newRange);
+    }
+
+    function insertModernLink() {
+      const url = prompt("🔗 Enter URL:");
+      if (!url) return;
+
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return;
+
+      const range = selection.getRangeAt(0);
+      let selectedText = range.toString().trim();
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.title = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.style.color = "#007bff";
+      a.style.textDecoration = "underline";
+      a.style.cursor = "pointer";
+
+      if (selectedText) {
+        a.textContent = selectedText;
+        range.deleteContents();
+        range.insertNode(a);
+      } else {
+        a.textContent = url;
+        range.insertNode(a);
+      }
+
+      selection.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.selectNodeContents(a);
+      selection.addRange(newRange);
+    }
+
+    function toggleUnorderedList() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const contents = range.extractContents();
+
+      const ul = document.createElement("ul");
+      const li = document.createElement("li");
+      li.appendChild(contents);
+      ul.appendChild(li);
+
+      range.insertNode(ul);
+      selection.removeAllRanges();
+      selection.selectAllChildren(li);
+    }
+
+    let undoStack = [];
+    let redoStack = [];
+
+    function undo() {
+      if (undoStack.length === 0) return;
+      redoStack.push(mainEditor.innerHTML);
+      const last = undoStack.pop();
+      mainEditor.innerHTML = last || '';
+    }
+
+    function redo() {
+      if (redoStack.length === 0) return;
+      undoStack.push(mainEditor.innerHTML);
+      const next = redoStack.pop();
+      mainEditor.innerHTML = next || '';
+    }
+
+    function cleanEditor() {
+      const walker = document.createTreeWalker(mainEditor, NodeFilter.SHOW_ELEMENT, null, false);
+      const toRemove = [];
+
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        if (node.tagName === "SPAN" && !node.attributes.length) {
+          toRemove.push(node);
+        }
+      }
+
+      toRemove.forEach(node => {
+        const parent = node.parentNode;
+        while (node.firstChild) parent.insertBefore(node.firstChild, node);
+        parent.removeChild(node);
+      });
+
+      saveStatus.innerText = "🧹 Cleaned extra formatting.";
+    }
+
+    function alignText(direction) {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const container = document.createElement("div");
+      container.style.textAlign = direction;
+
+      const contents = range.extractContents();
+      container.appendChild(contents);
+      range.insertNode(container);
+
+      // Re-select the container so user can keep typing there
+      selection.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.selectNodeContents(container);
+      selection.addRange(newRange);
+    }
+
+    function toggleStrikeThrough() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const commonAncestor = range.commonAncestorContainer;
+      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+
+      // 🔍 Check if already struck through
+      const isAlreadyStruck = parentElement.closest('s, strike, del');
+      if (isAlreadyStruck) {
+        const strikeElement = isAlreadyStruck;
+        const parent = strikeElement.parentNode;
+        while (strikeElement.firstChild) {
+          parent.insertBefore(strikeElement.firstChild, strikeElement);
+        }
+        parent.removeChild(strikeElement);
+      } else {
+        const contents = range.extractContents();
+        const s = document.createElement('s'); // or 'strike' or 'del'
+        s.appendChild(contents);
+        range.insertNode(s);
+
+        selection.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.selectNodeContents(s);
+        selection.addRange(newRange);
+      }
+    }
+
+    function updateFileDisplay(fileList) {
+      if (fileList.length === 0) {
+        attachedFilesList.innerHTML = '';
+        return;
+      }
+
+      attachedFilesList.innerHTML = `
+        <strong>📎 Attached Files:</strong>
+        <ul>
+          ${fileList.map(f => `
+            <li class="file-item">
+              <span><a href="${f.downloadURL}" target="_blank">${f.originalName}</a></span>
+              <button onclick="removeFile('${f.storedName}')">🗑️</button>
+            </li>
+         `).join('')}
+       </ul>
+     `;
+    }
+
+    function loadNoteIntoEditor(noteHTML) {
+      mainEditor.innerHTML = noteHTML;
+      mainEditor.focus();
+      saveStatus.innerText = "📝 Loaded note from preview";
+      preview.style.display = 'none';
+      undoStack.push(noteHTML);
+      redoStack = [];
+
+      // 💡 Extract the first line to use as tab title
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = noteHTML;
+      const text = tempDiv.innerText || "";
+      const titleLine = text.split("\n")[0]?.trim() || "Note";
+
+      // ⬇️ INSERT THIS BLOCK HERE
+      tabs[activeTabIndex].title = titleLine;
+      localStorage.setItem("tabs", JSON.stringify(tabs));
+      safeRenderTabs(); // to update UI tab name
+      document.title = titleLine;
+    }
+
+    function escapeHTML(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    function updateGrouping() {
+      const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+      const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
+      const scope = document.getElementById("searchScope")?.value || "group";
+      const groupBy = document.getElementById("groupSelector").value;
+      const now = Date.now();
+
+      if (notes.length === 0) {
+        groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
+        return;
+      }
+
+      const highlightText = (text, keyword) => {
+        if (!keyword) return escapeHTML(text).replace(/\n/g, "<br>");
+        const safe = escapeHTML(text);
+        const regex = new RegExp(`(${keyword})`, "gi");
+        return safe.replace(regex, '<mark class="highlight-glow">$1</mark>').replace(/\n/g, "<br>");
+      };
+
+      const renderNoteItem = (note) => `
+        <li style="margin-bottom:1rem; display: flex; align-items: start;">
+          <input type="checkbox" class="note-delete-checkbox" data-time="${note.timestamp}" style="margin-right: 10px; margin-top: 4px;" />
+          <div class="note-preview" onclick='loadNoteIntoEditor(${JSON.stringify(note.text)})'>
+            ${highlightText(note.text, keyword)}
+          </div>
+        </li>
+      `;
+
+      const renderGroupedSection = (titleIcon, label, notes) => {
+        let section = `<h4>${titleIcon} ${escapeHTML(label)}</h4><ul>`;
+        section += notes.map(renderNoteItem).join("");
+        section += "</ul>";
+        return section;
+      };
+
+      let filteredNotes = scope === "all"
+        ? keyword
+          ? notes.filter(({ text = "", title = "", project = "" }) =>
+              `${text} ${title} ${project}`.toLowerCase().includes(keyword))
+          : notes
+        : keyword
+          ? notes.filter(n =>
+              n.text?.toLowerCase().includes(keyword) ||
+              n.project?.toLowerCase().includes(keyword))
+          : notes;
+
+      let html = "";
+
+      if (scope === "all") {
+        if (filteredNotes.length === 0) {
+          html = `<p>😶 No results found for '${escapeHTML(keyword)}'</p>`;
+          groupedNotes.innerHTML = html;
+          return;
+        }
+
+        html += renderGroupedSection("🌐", "Search Results (All Notes)", filteredNotes);
+      } else {
+        const grouped = {};
+
+        switch (groupBy) {
+          case "date":
+            filteredNotes.forEach(note => {
+              const date = new Date(note.timestamp || note.time).toLocaleDateString();
+              grouped[date] = grouped[date] || [];
+              grouped[date].push(note);
+            });
+            for (const date in grouped) {
+              html += renderGroupedSection("🗓️", date, grouped[date]);
+            }
+            break;
+
+          case "title":
+            filteredNotes.forEach(note => {
+              const title = (note.title || "Untitled").trim();
+              grouped[title] = grouped[title] || [];
+              grouped[title].push(note);
+            });
+            Object.keys(grouped).sort().forEach(title => {
+              html += renderGroupedSection("📘", title, grouped[title]);
+            });
+            break;
+
+          case "project":
+            filteredNotes.forEach(note => {
+              const project = note.project || "📂 Unlabeled";
+              grouped[project] = grouped[project] || [];
+              grouped[project].push(note);
+            });
+            for (const project in grouped) {
+              html += renderGroupedSection("📁", project, grouped[project]);
+            }
+            break;
+
+          case "unresolved":
+            const unresolved = filteredNotes.filter(note => note.resolved === false);
+            if (unresolved.length === 0) {
+              groupedNotes.innerHTML = "<p>✅ No unresolved notes!</p>";
+              return;
+            }
+            html += renderGroupedSection("🧩", "Unresolved Ideas", unresolved);
+            break;
+
+          case "forgotten":
+            const forgotten = filteredNotes.filter(note => {
+              const age = now - new Date(note.timestamp || note.time).getTime();
+              return age > 3 * 24 * 60 * 60 * 1000;
+            });
+            if (forgotten.length === 0) {
+              groupedNotes.innerHTML = "<p>🧠 Nothing forgotten yet!</p>";
+              return;
+            }
+            html += renderGroupedSection("🧠", "Forgotten Ideas", forgotten);
+            break;
+        }
+
+        html += `
+          <button class="delete-notes-btn" onclick="deleteSelectedNotes()" title="Delete Selected">🗑️</button>
+        `;
+      }
+
+      groupedNotes.innerHTML = html;
+    }
+
+    function toggleItalic() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const commonAncestor = range.commonAncestorContainer;
+      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+
+      const isAlreadyItalic = parentElement.closest('i, em');
+
+      if (isAlreadyItalic) {
+        const italicElement = isAlreadyItalic;
+        const parent = italicElement.parentNode;
+        while (italicElement.firstChild) {
+          parent.insertBefore(italicElement.firstChild, italicElement);
+        }
+        parent.removeChild(italicElement);
+      } else {
+        const contents = range.extractContents();
+        const i = document.createElement('i');
+        i.appendChild(contents);
+        range.insertNode(i);
+        selection.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.selectNodeContents(i);
+        selection.addRange(newRange);
+      }
+    }
+
+    function toggleUnderline() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const commonAncestor = range.commonAncestorContainer;
+      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+
+      const isAlreadyUnderlined = parentElement.closest('u');
+
+      if (isAlreadyUnderlined) {
+        const uElement = isAlreadyUnderlined;
+        const parent = uElement.parentNode;
+        while (uElement.firstChild) {
+          parent.insertBefore(uElement.firstChild, uElement);
+        }
+        parent.removeChild(uElement);
+      } else {
+        const contents = range.extractContents();
+        const u = document.createElement('u');
+        u.appendChild(contents);
+        range.insertNode(u);
+        selection.removeAllRanges();
+        const newRange = document.createRange();
+        newRange.selectNodeContents(u);
+        selection.addRange(newRange);
+      }
+    }
+
+    function deleteNoteByTime(time) {
+      const notes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      const updated = notes.filter(n => n.timestamp !== time);
+      localStorage.setItem('savedNotes', JSON.stringify(updated));
+      updateGrouping();
+    }
+
+    window.onload = async function () {
+      await initializeFirebase();
+
+      firebase.auth().onAuthStateChanged(user => {
+        if (!user) {
+          alert("Please sign in first.");
+          window.location.href = "signin.html";
+        } else {
+          console.log("✅ User is signed in:", user.email);
+
+          const editor = document.querySelector('.hidden-editor');
+          if (editor) {
+            editor.style.display = 'block'; // ensure it's in flow, if it might have been none
+            editor.getBoundingClientRect(); // force reflow
+            editor.classList.add('visible');
+          }
+
+          loadSavedText();
+
+          mainEditor.addEventListener("input", () => {
+            hasUnsavedChanges = true; // ✅ still needed
+
+            const text = mainEditor.innerText || "";
+            const newTitle = text.split("\n")[0]?.trim() || "Untitled";
+
+            console.log("Updating tab title to:", newTitle);
+            if (tabs[activeTabIndex]) {
+              tabs[activeTabIndex].title = newTitle;
+              localStorage.setItem("tabs", JSON.stringify(tabs));
+              safeRenderTabs();
+            }
+          });
+
+          applyMoodTheme();
+          updateGrouping();
+          safeRenderTabs();
+          setInterval(autoSave, 30000);
+        }
+      });
+
+      mainEditor.addEventListener("click", function (e) {
+        const el = e.target.closest("a");
+        if (el && el.href) {
+          e.preventDefault();
+          window.open(el.href, "_blank", "noopener");
+        }
+      });
+    };
+
+    function deleteSelectedNotes() {
+      const checkboxes = document.querySelectorAll('.note-delete-checkbox:checked');
+      if (checkboxes.length === 0) {
+        alert("⚠️ No notes selected for deletion.");
+        return;
+      }
+
+      const confirmDelete = confirm(`Are you sure you want to delete ${checkboxes.length} selected note(s)?`);
+      if (!confirmDelete) return;
+
+      let savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      const timesToDelete = Array.from(checkboxes).map(cb => cb.getAttribute('data-time'));
+
+      savedNotes = savedNotes.filter(note => !timesToDelete.includes(note.timestamp));
+      localStorage.setItem('savedNotes', JSON.stringify(savedNotes));
+
+      updateGrouping();
+      saveStatus.innerText = `🗑️ Deleted ${timesToDelete.length} note(s).`;
+    }
+
+    function applyFormat(type) {
+      const tagMap = {
+        bold: 'strong',
+        italic: 'em',
+        underline: 'u',
+        strikeThrough: 's'
+      };
+
+      const tagName = tagMap[type];
+      if (!tagName) return;
+
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const selectedText = range.extractContents();
+      const el = document.createElement(tagName);
+      el.appendChild(selectedText);
+      range.insertNode(el);
+
+      selection.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.selectNodeContents(el);
+      selection.addRange(newRange);
+    }
+
+    function removeFormatting() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const content = range.cloneContents();
+
+      // Extract just the text (no tags)
+      let plainText = "";
+      content.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          plainText += node.textContent;
+        } else {
+          plainText += node.innerText || node.textContent || "";
+        }
+     });
+
+     // Replace the selection with plain text
+     range.deleteContents();
+     range.insertNode(document.createTextNode(plainText));
+
+     // Reset selection to end of inserted text
+     selection.removeAllRanges();
+     const newRange = document.createRange();
+     newRange.setStartAfter(range.endContainer);
+     selection.addRange(newRange);
+    }
+
+    document.addEventListener("selectionchange", () => {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+        savedRange = selection.getRangeAt(0).cloneRange();
+      }
+    });
+
+      const fontSizeDropdown = document.getElementById("fontSizeDropdownPanel");
+      const applyBtn = document.getElementById("applyFontSize");
+      const dropdownSelect = document.getElementById("fontSizeSelect");
+      const customInput = document.getElementById("customFontSize");
+
+      fontSizeDropdown.addEventListener("mousedown", (e) => {
+        const tag = e.target.tagName;
+        if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
+          e.preventDefault(); // only block blur on non-interactive elements
+        }
+      });
+
+      fontSizeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        saveSelection();
+        fontSizeDropdown.classList.toggle("hidden");
+
+        const rect = fontSizeBtn.getBoundingClientRect();
+        fontSizeDropdown.style.left = `${rect.left}px`;
+        fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
+
+        setTimeout(() => customInput.focus(), 0);
+      });
+
+      applyBtn.addEventListener("click", () => {
+        restoreSelection();
+
+        const customValue = customInput.value.trim();
+        const selectedSize = dropdownSelect.value;
+        const fontSize = customValue !== "" ? `${customValue}pt` : selectedSize;
+
+        if (!fontSize) return; // Nothing selected or entered
+
+        const selection = window.getSelection();
+        if (!selection.rangeCount || selection.isCollapsed) return;
+
+        const range = selection.getRangeAt(0);
+        const span = document.createElement("span");
+        span.style.fontSize = fontSize;
+        span.textContent = range.toString();
+
+        range.deleteContents();
+        range.insertNode(span);
+
+        fontSizeDropdown.classList.add("hidden");
+        customInput.value = "";
+        dropdownSelect.selectedIndex = 0; // reset dropdown
+      });
+
+      // Hide dropdown when clicking outside
+      document.addEventListener("click", (e) => {
+        if (!fontSizeDropdown.contains(e.target) && !fontSizeBtn.contains(e.target)) {
+          fontSizeDropdown.classList.add("hidden");
+        }
+      });
+
+    function printNote() {
+      const printWindow = window.open('', '_blank');
+      const noteContent = mainEditor.innerHTML;
+
+      const styles = `
+        <style>
+          body {
+            font-family: 'Arial', sans-serif;
+            padding: 1in;
+            font-size: 12pt;
+            color: #000;
+          }
+          ul, ol {
+            margin-left: 1.5em;
+          }
+          h1, h2, h3, h4, h5 {
+            margin: 1rem 0 0.5rem;
+          }
+          a {
+            color: #007bff;
+            text-decoration: underline;
+          }
+        </style>
+      `;
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Note</title>
+            ${styles}
+          </head>
+          <body>
+            ${noteContent}
+          </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+      printWindow.focus();
+
+      // Delay to ensure styles render
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 300);
+    }
+
+    function toggleBold() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const commonAncestor = range.commonAncestorContainer;
+      let parentElement = commonAncestor.nodeType === 3 ? commonAncestor.parentElement : commonAncestor;
+
+      // 🔍 Check if we're already bolded
+      const isAlreadyBold = parentElement.closest('b, strong');
+
+      if (isAlreadyBold) {
+       // 🧼 Unbold: replace <b>/<strong> with its inner content
+       const boldElement = isAlreadyBold;
+       const parent = boldElement.parentNode;
+       while (boldElement.firstChild) {
+         parent.insertBefore(boldElement.firstChild, boldElement);
+       }
+       parent.removeChild(boldElement);
+     } else {
+       // 💥 Bold: wrap in <b>
+       const contents = range.extractContents();
+       const b = document.createElement('b');
+       b.appendChild(contents);
+       range.insertNode(b);
+
+       // Reset selection to newly inserted element
+       selection.removeAllRanges();
+       const newRange = document.createRange();
+       newRange.selectNodeContents(b);
+       selection.addRange(newRange);
+     }
+    }
+
+    // ✅ Margin Input UI logic
+    document.addEventListener("DOMContentLoaded", () => {
+      const marginBtn = document.getElementById("marginBtn");
+      const marginDropdown = document.getElementById("marginDropdown");
+      const editor = document.getElementById("mainEditor");
+
+      marginBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        marginDropdown.classList.toggle("hidden");
+        const rect = marginBtn.getBoundingClientRect();
+        marginDropdown.style.top = `${rect.bottom + 5}px`;
+        marginDropdown.style.left = `${rect.left}px`;
+      });
+
+      function inchesToPixels(inches) {
+        return parseFloat(inches) * 96;
+      }
+
+      document.getElementById("applyMarginBtn").addEventListener("click", () => {
+        const top = inchesToPixels(document.getElementById("marginTop").value || 0);
+        const bottom = inchesToPixels(document.getElementById("marginBottom").value || 0);
+        const left = inchesToPixels(document.getElementById("marginLeft").value || 0);
+        const right = inchesToPixels(document.getElementById("marginRight").value || 0);
+
+        editor.style.paddingTop = `${top}px`;
+        editor.style.paddingBottom = `${bottom}px`;
+        editor.style.paddingLeft = `${left}px`;
+        editor.style.paddingRight = `${right}px`;
+
+        marginDropdown.classList.add("hidden");
+      });
+
+      // Close dropdown if clicked outside
+      document.addEventListener("click", (e) => {
+        if (!marginDropdown.contains(e.target) && !marginBtn.contains(e.target)) {
+          marginDropdown.classList.add("hidden");
+        }
+      });
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("mainEditor")?.classList.add("visible");
+
+      document.getElementById("printBtn").addEventListener("click", printNote);
+
+    });
+
+    document.addEventListener("click", () => {
+      setTimeout(() => {
+        fontDropdown?.classList.add("hidden");
+        sizeDropdown?.classList.add("hidden");
+        textColorDropdown?.classList.add("hidden");
+        highlightDropdown?.classList.add("hidden");
+      }, 100); // this gives time for clicks inside dropdowns to register
+    });
+
+  </script>
+
+ </body>
+</html>
