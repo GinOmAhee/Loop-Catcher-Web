@@ -287,8 +287,8 @@
   }
 
   /* === EDITOR & INPUT === */
-  #mainEditor {
-    width: 60%;
+  #mainEditor,
+  #coEditor {
     min-height: 300px;
     padding: 1rem;
     font-size: 0.9rem;
@@ -297,20 +297,14 @@
     background: var(--editor-bg, #fff);
     color: var(--editor-text, #000);
     overflow-y: auto;
-  }
-
-  .suite-wrapper {
-    display: flex;            /* side‑by‑side when dual mode is on  */
-    gap: 1rem;
     width: 100%;
-    height: 100%;
+    box-sizing: border-box;
   }
-  .co-pane.hidden { display: none; }  /* keep second pane invisible until needed */
 
-  /* Optional: make each pane share the width 50‑50 */
-  .suite-wrapper .main-container {
-    flex: 1 1 0;
+  .hidden {
+    display: none !important;
   }
+
 
   .hidden-editor {
     opacity: 0;
@@ -745,10 +739,6 @@
     color: #000;
   }
 
-  .hidden {
-    display: none;
-  }
-
   /* === THEME TOGGLE SWITCH === */
   .theme-toggle {
     position: fixed;
@@ -829,9 +819,10 @@
           </label>
       </div>
 
-      <button id="dualModeBtn" onclick="toggleDualMode()" title="Toggle Dual Mode">🖥️↗️</button>
+      <button onclick="toggleEditorMode()" title="Switch Editor">🔁 Switch</button>
 
       <div class="main-container" onclick="maybeClosePreview(event)">
+        <div id="tabBar" class="tab-bar"></div>
         <div class="editor-area">
           <button id="previewToggle">☰</button>
           <!-- 🎨 Toolbar -->
@@ -973,8 +964,6 @@
 
           </div>
 
-          <div id="tabBar" class="tab-bar"></div>
-
           <!-- 📝 Rich Text Editor -->
           <div id="mainEditor" class="hidden-editor" contenteditable="true"></div>
 
@@ -992,7 +981,8 @@
       </div>
 
       <div class="main-container co-pane hidden">
-        <div class="editor-area">
+        <div id="tabBar" class="tab-bar"></div>
+        <div class="editor-area">  
           <button id="previewToggle">☰</button>
           <!-- 🎨 Toolbar -->
 
@@ -1073,10 +1063,8 @@
 
           </div>
 
-          <div id="tabBar" class="tab-bar"></div>
-
           <!-- 📝 Rich Text Editor -->
-          <div id="coEditor" contenteditable="true" class="hidden-editor"></div>
+          <div id="coEditor" class="hidden-editor hidden" contenteditable="true"></div>
 
           <div class="controls">
             <button onclick="saveText()" title="Save">💾</button>
@@ -1091,8 +1079,6 @@
         </div>
       </div>
     </div>
-    
-
 
   <!-- Your main HTML content above -->
 
@@ -1182,50 +1168,30 @@
 
     let activeEditor = document.getElementById("mainEditor"); // default
 
-    // 🚀 Call this to flip into dual mode
-    function enableDualMode() {
-      document.querySelector(".co-pane").classList.remove("hidden");
-      document.getElementById("suiteWrapper").classList.add("dual");
-      activeEditor = document.getElementById("mainEditor"); // start focus on main
-    }
-
-    // 🔁 Toggle focus between panes
-    function switchFocus() {
-    activeEditor = (activeEditor.id === "mainEditor")
-      ? document.getElementById("coEditor")
-      : document.getElementById("mainEditor");
-      activeEditor.focus();
-    }
-
     // Patch any formatting ops to use activeEditor
     function execOnActive(cmd, value = null) {
       document.execCommand(cmd, false, value);
       activeEditor.focus();
     }
 
-    // Example tweaks:
-    function toggleBold() { execOnActive("bold"); }
-    function toggleItalic() { execOnActive("italic"); }
-    // …keep the rest identical, just reroute through execOnActive
+    let activeEditor = document.getElementById("mainEditor"); // default
 
-    let dualModeOn = false;
+    function toggleEditorMode() {
+      const mainEditor = document.getElementById("mainEditor");
+      const coEditor = document.getElementById("coEditor");
 
-    function toggleDualMode() {
-      const coPane = document.querySelector(".co-pane");
-      const wrapper = document.getElementById("suiteWrapper");
-
-      if (dualModeOn) {
-        coPane.classList.add("hidden");
-        wrapper.classList.remove("dual");
-        document.getElementById("dualModeBtn").innerText = "🖥️↗️";
+      // Toggle visibility
+      if (activeEditor === mainEditor) {
+        mainEditor.classList.add("hidden");
+        coEditor.classList.remove("hidden");
+        activeEditor = coEditor;
       } else {
-        coPane.classList.remove("hidden");
-        wrapper.classList.add("dual");
-        document.getElementById("dualModeBtn").innerText = "🖥️⬌🖥️"; // or another icon to show it's ON
+        coEditor.classList.add("hidden");
+        mainEditor.classList.remove("hidden");
+        activeEditor = mainEditor;
       }
 
-      dualModeOn = !dualModeOn;
-      activeEditor = document.getElementById("mainEditor"); // reset focus to main
+      activeEditor.focus();
     }
 
     function maybeClosePreview(e) {
