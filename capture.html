@@ -1159,10 +1159,6 @@
     const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
     const notesForMode = notes.filter(n => (n.mode || "document") === currentMode);
 
-    // Then render notesForMode inside groupedNotes
-
-    mainEditor = document.getElementById("docEditor");
-
 
     async function initializeFirebase() {
       try {
@@ -1497,7 +1493,7 @@
     }
 
     function justifyText() {
-      mainEditor.focus(); // ensure editor is active
+      docEditor.focus(); // ensure editor is active
       document.execCommand("justifyFull", false, null);
     }
 
@@ -1528,7 +1524,7 @@
     }
 
     function setHighlightColor(color) {
-      mainEditor.focus();
+      docEditor.focus();
       restoreSelection();
 
       const range = getValidSelectionRange();
