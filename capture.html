@@ -299,6 +299,19 @@
     overflow-y: auto;
   }
 
+  .suite-wrapper {
+    display: flex;            /* side‑by‑side when dual mode is on  */
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
+  }
+  .co-pane.hidden { display: none; }  /* keep second pane invisible until needed */
+
+  /* Optional: make each pane share the width 50‑50 */
+  .suite-wrapper .main-container {
+    flex: 1 1 0;
+  }
+
   .hidden-editor {
     opacity: 0;
     pointer-events: none;
@@ -807,175 +820,279 @@
   </style>
 </head>
 <body>
-
-  <div style="position: absolute; top: 1rem; right: 1rem; z-index: 9999;">
-    <label class="theme-toggle">
-      <input type="checkbox" id="themeSwitch" />
-      <span class="slider"></span>
-    </label>
-  </div>
-
-  <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
-  <div class="preview-overlay" id="preview">
-    <div class="preview-top">
-      <a href="holdingbay.html">🔄 Holding Bay</a>
-      <a href="actnow.html">🚀 Act Now</a>
-      <a href="buildmomentum.html">🌿 Build Momentum</a>
-      <a href="worthitlater.html">⏳ Worth It Later</a>
-      <a href="parkedpotential.html">📦 Parked Potential</a>
-    </div>
-
-    <div class="preview-middle">
-      <!-- 1. Top: Group selector -->
-      <div class="preview-sortbar">
-        <span title="Group Notes">📂</span>
-        <select id="groupSelector" onchange="updateGrouping()">
-          <option value="date">Date</option>
-          <option value="title">Title</option>
-          <option value="project">Project</option>
-          <option value="unresolved">Unresolved Ideas</option>
-          <option value="forgotten">Forgotten Ideas</option>
-        </select>
+    <!-- 🌐 Dual‑Suite Wrapper -->
+    <div id="suiteWrapper" class="suite-wrapper">
+      <div style="position: absolute; top: 1rem; right: 1rem; z-index: 9999;">
+        <label class="theme-toggle">
+          <input type="checkbox" id="themeSwitch" />
+            <span class="slider"></span>
+          </label>
       </div>
 
-      <!-- 2. Scrollable notes area -->
-      <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
+      <button id="dualModeBtn" onclick="toggleDualMode()" title="Toggle Dual Mode">🖥️↗️</button>
 
-      <!-- 3. Bottom: search input anchored in its own bar -->
-      <div class="preview-sortbar bottom-searchbar">
-        <div class="search-wrapper">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="🔍 Search notes..."
-            oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
-          <select id="searchScope" onchange="updateGrouping()" ...>
-            <option value="group">Grouped</option>
-            <option value="all">Search All</option>
+      <div class="main-container" onclick="maybeClosePreview(event)">
+        <div class="editor-area">
+          <button id="previewToggle">☰</button>
+          <!-- 🎨 Toolbar -->
+
+          <button id="printBtn" title="Print Note">🖨️ Print</button>
+    
+          <div class="format-toolbar" style="margin-bottom: 1rem;">
+        
+          <!-- Margin Button -->
+          <button id="marginBtn" title="Set Margins">📏</button>
+
+          <!-- Margin Dropdown -->
+          <div id="marginDropdown" class="dropdown hidden">
+            <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
+            <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
+            <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
+            <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
+            <button id="applyMarginBtn">✅ Apply</button>
+          </div>
+          
+          <!-- Icon Button -->
+          <button id="fontMenuBtn" title="Choose Font">🅰️</button>
+
+          <select id="fontDropdown" onchange="setFont(this.value)">
+            <option value="'Arial', sans-serif">Arial</option>
+            <option value="'Georgia', serif">Georgia</option>
+            <option value="'Courier New', monospace">Courier New</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
           </select>
+
+          <!-- Font Size Icon Button -->
+          <button id="fontSizeBtn" title="Font Size">🔠</button>
+
+          <div id="fontSizeDropdownPanel" class="dropdown hidden">
+            <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
+            <select id="fontSizeSelect">
+              <option value="" disabled selected>Select font size</option>
+              <option value="8pt">8</option>
+              <option value="10pt">10</option>
+              <option value="12pt" selected>12</option>
+              <option value="14pt">14</option>
+              <option value="16pt">16</option>
+              <option value="18pt">18</option>
+              <option value="24pt">24</option>
+              <option value="36pt">36</option>
+            </select>
+              <button id="applyFontSize">Apply</button>
+          </div>
+
+          <button onclick="toggleBold()"><b>B</b></button>
+          <button onclick="toggleItalic()"><i>I</i></button>
+          <button onclick="toggleUnderline()"><u>U</u></button>
+          <button onclick="toggleStrikeThrough()">S̶</button>
+          <button onclick="alignText('left')">←</button>
+          <button onclick="alignText('center')">⇔</button>
+          <button onclick="alignText('right')">→</button>
+          <button onclick="justifyText()" title="Justify Text">📰</button>
+          <button onclick="toggleUnorderedList()">• List</button>
+          <button onclick="undo()">↩️</button>
+          <button onclick="redo()">↪️</button>
+          <button onclick="cleanEditor()">🧹</button>
+          <button onclick="insertModernLink()">🔗</button>
+        
+    
+          <!-- Text Color Icon Button -->
+          <button id="textColorBtn" title="Text Color">🎨</button>
+
+          <!-- Text Color Dropdown -->
+          <div id="textColorDropdown" class="dropdown hidden">
+            <div onclick="setTextColor('black')" style="color: black;">Black</div>
+            <div onclick="setTextColor('red')" style="color: red;">Red</div>
+            <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
+            <div onclick="setTextColor('green')" style="color: green;">Green</div>
+            <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
+            <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
+            <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
+          </div>
+
+          <!-- Highlight Color Icon Button -->
+          <button id="highlightBtn" title="Highlight">🖍️</button>
+
+          <!-- Highlight Color Dropdown -->
+          <div id="highlightDropdown" class="dropdown hidden">
+            <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+            <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+            <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+            <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+            <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
+          </div>
+
+          <button onclick="removeFormatting()">🚫</button>
+
+          <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
+          <div class="preview-overlay" id="preview">
+            <div class="preview-top">
+              <a href="holdingbay.html">🔄 Holding Bay</a>
+              <a href="actnow.html">🚀 Act Now</a>
+              <a href="buildmomentum.html">🌿 Build Momentum</a>
+              <a href="worthitlater.html">⏳ Worth It Later</a>
+              <a href="parkedpotential.html">📦 Parked Potential</a>
+            </div>
+
+          <div class="preview-middle">
+            <!-- 1. Top: Group selector -->
+            <div class="preview-sortbar">
+              <span title="Group Notes">📂</span>
+              <select id="groupSelector" onchange="updateGrouping()">
+                <option value="date">Date</option>
+                <option value="title">Title</option>
+                <option value="project">Project</option>
+                <option value="unresolved">Unresolved Ideas</option>
+                <option value="forgotten">Forgotten Ideas</option>
+              </select>
+            </div>
+
+            <!-- 2. Scrollable notes area -->
+            <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
+
+            <!-- 3. Bottom: search input anchored in its own bar -->
+            <div class="preview-sortbar bottom-searchbar">
+              <div class="search-wrapper">
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="🔍 Search notes..."
+                  oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
+                <select id="searchScope" onchange="updateGrouping()" ...>
+                  <option value="group">Grouped</option>
+                  <option value="all">Search All</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 4. Very bottom: settings/profile links -->
+            <div class="preview-settings">
+              <a href="settings.html">⚙️ Settings</a>
+              <a href="profile.html">👤 Profile</a>
+            </div>
+
+          </div>
+
+          <div id="tabBar" class="tab-bar"></div>
+
+          <!-- 📝 Rich Text Editor -->
+          <div id="mainEditor" class="hidden-editor" contenteditable="true"></div>
+
+          <div class="controls">
+            <button onclick="saveText()" title="Save">💾</button>
+            <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
+            <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
+          </div>
+
+          <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
+
+          <div id="attachedFilesList"></div>
+          <div class="save-time" id="saveStatus"></div>
         </div>
       </div>
 
-      <!-- 4. Very bottom: settings/profile links -->
-      <div class="preview-settings">
-        <a href="settings.html">⚙️ Settings</a>
-        <a href="profile.html">👤 Profile</a>
-      </div>
+      <div class="main-container co-pane hidden">
+        <div class="editor-area">
+          <button id="previewToggle">☰</button>
+          <!-- 🎨 Toolbar -->
 
+          <button id="printBtn" title="Print Note">🖨️ Print</button>
+
+          <!-- Text Color Icon Button -->
+          <button id="textColorBtn" title="Text Color">🎨</button>
+
+          <!-- Text Color Dropdown -->
+          <div id="textColorDropdown" class="dropdown hidden">
+            <div onclick="setTextColor('black')" style="color: black;">Black</div>
+            <div onclick="setTextColor('red')" style="color: red;">Red</div>
+            <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
+            <div onclick="setTextColor('green')" style="color: green;">Green</div>
+            <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
+            <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
+            <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
+          </div>
+
+          <!-- Highlight Color Icon Button -->
+          <button id="highlightBtn" title="Highlight">🖍️</button>
+
+          <!-- Highlight Color Dropdown -->
+          <div id="highlightDropdown" class="dropdown hidden">
+            <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+            <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+            <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+            <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+            <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
+          </div>
+          
+          <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
+          <div class="preview-overlay" id="preview">
+            <div class="preview-top">
+              <a href="holdingbay.html">🔄 Holding Bay</a>
+              <a href="actnow.html">🚀 Act Now</a>
+              <a href="buildmomentum.html">🌿 Build Momentum</a>
+              <a href="worthitlater.html">⏳ Worth It Later</a>
+              <a href="parkedpotential.html">📦 Parked Potential</a>
+            </div>
+
+          <div class="preview-middle">
+            <!-- 1. Top: Group selector -->
+            <div class="preview-sortbar">
+              <span title="Group Notes">📂</span>
+              <select id="groupSelector" onchange="updateGrouping()">
+                <option value="date">Date</option>
+                <option value="title">Title</option>
+                <option value="project">Project</option>
+                <option value="unresolved">Unresolved Ideas</option>
+                <option value="forgotten">Forgotten Ideas</option>
+              </select>
+            </div>
+
+            <!-- 2. Scrollable notes area -->
+            <div id="groupedNotes" style="flex-grow: 1; overflow-y: auto;"></div>
+
+            <!-- 3. Bottom: search input anchored in its own bar -->
+            <div class="preview-sortbar bottom-searchbar">
+              <div class="search-wrapper">
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="🔍 Search notes..."
+                  oninput="updateGrouping()" />  <!-- ← THIS LINE must be here -->
+                <select id="searchScope" onchange="updateGrouping()" ...>
+                  <option value="group">Grouped</option>
+                  <option value="all">Search All</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 4. Very bottom: settings/profile links -->
+            <div class="preview-settings">
+              <a href="settings.html">⚙️ Settings</a>
+              <a href="profile.html">👤 Profile</a>
+            </div>
+
+          </div>
+
+          <div id="tabBar" class="tab-bar"></div>
+
+          <!-- 📝 Rich Text Editor -->
+          <div id="coEditor" contenteditable="true" class="hidden-editor"></div>
+
+          <div class="controls">
+            <button onclick="saveText()" title="Save">💾</button>
+            <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
+            <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
+          </div>
+
+          <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
+
+          <div id="attachedFilesList"></div>
+          <div class="save-time" id="saveStatus"></div>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <div id="tabBar" class="tab-bar"></div>
-
-  <!-- 📝 Main Editor (always visible) -->
-  <div class="main-container" onclick="maybeClosePreview(event)">
-    <div class="editor-area">
-      <button id="previewToggle">☰</button>
-      <!-- 🎨 Toolbar -->
-
-      <button id="printBtn" title="Print Note">🖨️ Print</button>
     
-      <div class="format-toolbar" style="margin-bottom: 1rem;">
-        
-      <!-- Margin Button -->
-      <button id="marginBtn" title="Set Margins">📏</button>
 
-      <!-- Margin Dropdown -->
-      <div id="marginDropdown" class="dropdown hidden">
-        <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
-        <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
-        <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
-        <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
-        <button id="applyMarginBtn">✅ Apply</button>
-      </div>
-        <!-- Icon Button -->
-      <button id="fontMenuBtn" title="Choose Font">🅰️</button>
-
-      <select id="fontDropdown" onchange="setFont(this.value)">
-        <option value="'Arial', sans-serif">Arial</option>
-        <option value="'Georgia', serif">Georgia</option>
-        <option value="'Courier New', monospace">Courier New</option>
-        <option value="'Times New Roman', serif">Times New Roman</option>
-      </select>
-
-      <!-- Font Size Icon Button -->
-      <button id="fontSizeBtn" title="Font Size">🔠</button>
-
-      <div id="fontSizeDropdownPanel" class="dropdown hidden">
-        <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
-        <select id="fontSizeSelect">
-          <option value="" disabled selected>Select font size</option>
-          <option value="8pt">8</option>
-          <option value="10pt">10</option>
-          <option value="12pt" selected>12</option>
-          <option value="14pt">14</option>
-          <option value="16pt">16</option>
-          <option value="18pt">18</option>
-          <option value="24pt">24</option>
-          <option value="36pt">36</option>
-        </select>
-        <button id="applyFontSize">Apply</button>
-      </div>
-
-        <button onclick="toggleBold()"><b>B</b></button>
-        <button onclick="toggleItalic()"><i>I</i></button>
-        <button onclick="toggleUnderline()"><u>U</u></button>
-        <button onclick="toggleStrikeThrough()">S̶</button>
-        <button onclick="alignText('left')">←</button>
-        <button onclick="alignText('center')">⇔</button>
-        <button onclick="alignText('right')">→</button>
-        <button onclick="justifyText()" title="Justify Text">📰</button>
-        <button onclick="toggleUnorderedList()">• List</button>
-        <button onclick="undo()">↩️</button>
-        <button onclick="redo()">↪️</button>
-        <button onclick="cleanEditor()">🧹</button>
-        <button onclick="insertModernLink()">🔗</button>
-        
-    
-      <!-- Text Color Icon Button -->
-      <button id="textColorBtn" title="Text Color">🎨</button>
-
-      <!-- Text Color Dropdown -->
-      <div id="textColorDropdown" class="dropdown hidden">
-        <div onclick="setTextColor('black')" style="color: black;">Black</div>
-        <div onclick="setTextColor('red')" style="color: red;">Red</div>
-        <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
-        <div onclick="setTextColor('green')" style="color: green;">Green</div>
-        <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
-        <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
-        <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
-      </div>
-
-      <!-- Highlight Color Icon Button -->
-      <button id="highlightBtn" title="Highlight">🖍️</button>
-
-      <!-- Highlight Color Dropdown -->
-      <div id="highlightDropdown" class="dropdown hidden">
-        <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
-        <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
-        <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
-        <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
-        <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
-      </div>
-
-        <button onclick="removeFormatting()">🚫</button>
-      </div>
-
-      <!-- 📝 Rich Text Editor -->
-      <div id="mainEditor" class="hidden-editor" contenteditable="true"></div>
-
-      <div class="controls">
-       <button onclick="saveText()" title="Save">💾</button>
-       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
-       <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
-      </div>
-
-      <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
-
-      <div id="attachedFilesList"></div>
-      <div class="save-time" id="saveStatus"></div>
-    </div>
-  </div>
 
   <!-- Your main HTML content above -->
 
@@ -1062,6 +1179,54 @@
       applyMoodTheme(); // This should already exist globally
       loadTheme();
     });
+
+    let activeEditor = document.getElementById("mainEditor"); // default
+
+    // 🚀 Call this to flip into dual mode
+    function enableDualMode() {
+      document.querySelector(".co-pane").classList.remove("hidden");
+      document.getElementById("suiteWrapper").classList.add("dual");
+      activeEditor = document.getElementById("mainEditor"); // start focus on main
+    }
+
+    // 🔁 Toggle focus between panes
+    function switchFocus() {
+    activeEditor = (activeEditor.id === "mainEditor")
+      ? document.getElementById("coEditor")
+      : document.getElementById("mainEditor");
+      activeEditor.focus();
+    }
+
+    // Patch any formatting ops to use activeEditor
+    function execOnActive(cmd, value = null) {
+      document.execCommand(cmd, false, value);
+      activeEditor.focus();
+    }
+
+    // Example tweaks:
+    function toggleBold() { execOnActive("bold"); }
+    function toggleItalic() { execOnActive("italic"); }
+    // …keep the rest identical, just reroute through execOnActive
+
+    let dualModeOn = false;
+
+    function toggleDualMode() {
+      const coPane = document.querySelector(".co-pane");
+      const wrapper = document.getElementById("suiteWrapper");
+
+      if (dualModeOn) {
+        coPane.classList.add("hidden");
+        wrapper.classList.remove("dual");
+        document.getElementById("dualModeBtn").innerText = "🖥️↗️";
+      } else {
+        coPane.classList.remove("hidden");
+        wrapper.classList.add("dual");
+        document.getElementById("dualModeBtn").innerText = "🖥️⬌🖥️"; // or another icon to show it's ON
+      }
+
+      dualModeOn = !dualModeOn;
+      activeEditor = document.getElementById("mainEditor"); // reset focus to main
+    }
 
     function maybeClosePreview(e) {
       if (e.target.classList.contains("tab-rename-input")) return;
