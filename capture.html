@@ -1392,17 +1392,11 @@
     document.getElementById("switchToDoc").addEventListener("click", () => {
       document.getElementById("docSuite").classList.add("active");
       document.getElementById("noteSuite").classList.remove("active");
-
-      document.getElementById("switchToDoc").classList.add("active");
-      document.getElementById("switchToNote").classList.remove("active");
     });
 
     document.getElementById("switchToNote").addEventListener("click", () => {
       document.getElementById("noteSuite").classList.add("active");
       document.getElementById("docSuite").classList.remove("active");
-
-      document.getElementById("switchToNote").classList.add("active");
-      document.getElementById("switchToDoc").classList.remove("active");
     });
 
     function forceEditorRecovery() {
