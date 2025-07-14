@@ -1165,30 +1165,6 @@
         }
       });
 
-      const mainEditor = document.getElementById("mainEditor");
-      const coEditor = document.getElementById("coEditor");
-
-      // Set the default visible editor
-      activeEditor = mainEditor;
-      coEditor.classList.add("hidden"); // ensure coEditor is hidden
-
-      // Button click logic
-      document.getElementById("modeSwitchBtn").addEventListener("click", () => {
-        // Toggle visibility
-        if (!mainEditor.classList.contains("hidden")) {
-          mainEditor.classList.add("hidden");
-          coEditor.classList.remove("hidden");
-          activeEditor = coEditor;
-        } else {
-          coEditor.classList.add("hidden");
-          mainEditor.classList.remove("hidden");
-          activeEditor = mainEditor;
-        }
-
-        activeEditor.focus();
-        console.log("Switched to:", activeEditor.id);
-      });
-
       applyMoodTheme(); // This should already exist globally
       loadTheme();
     });
