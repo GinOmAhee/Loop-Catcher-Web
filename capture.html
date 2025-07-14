@@ -809,6 +809,79 @@
     box-shadow: inset 0 -1px 0 hotpink;
   }
 
+  /* hide stuff in co-editor mode */
+  body.co-mode .main-only {
+    display: none !important;
+  }
+
+  #sideThoughtsBadge {
+    background-color: var(--badge-bg);
+    color: var(--badge-text);
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    border-radius: 50px;
+    padding: 0.7rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    z-index: 9999;
+  }
+
+  #sideThoughtsBadge .emoji::before {
+    content: "🤔"; /* default emoji */
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  #sideThoughtsBadge:hover .emoji::before {
+    content: "🥰"; /* emoji on hover */
+  }
+
+  #thoughtPopup {
+    background: var(--popup-bg);
+    border: 1px solid var(--popup-border);
+    color: var(--popup-text-color);
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem;
+    border-radius: 12px;
+    padding: 1rem;
+    width: 250px;
+    z-index: 9999;
+  }
+  #thoughtPopup.hidden {
+    display: none;
+  }
+  #thoughtPopup textarea {
+    background: var(--popup-bg);
+    color: var(--popup-text-color);
+    border: 1px solid var(--popup-border);
+    display: block;
+    margin: 0 auto; /* ⬅️ centers it */
+    width: 85%;
+    height: 80px;
+    border-radius: 6px;
+    padding: 0.5rem;
+    resize: none;
+    font-size: 0.9rem;
+  }
+  #thoughtPopup button {
+    margin-top: 0.5rem;
+    width: 100%;
+    background: var(--popup-button-bg);
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
   </style>
 </head>
 <body>
@@ -881,64 +954,69 @@
       <!-- 🎨 Toolbar -->
 
       <button id="printBtn" title="Print Note">🖨️ Print</button>
-    
-      <div class="format-toolbar" style="margin-bottom: 1rem;">
-        
-      <!-- Margin Button -->
-      <button id="marginBtn" title="Set Margins">📏</button>
 
-      <!-- Margin Dropdown -->
-      <div id="marginDropdown" class="dropdown hidden">
-        <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
-        <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
-        <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
-        <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
-        <button id="applyMarginBtn">✅ Apply</button>
-      </div>
+      <div class="main-only">
+      <!-- Only shows in main editor mode -->
+        <div class="format-toolbar" style="margin-bottom: 1rem;">
+        
+        <!-- Margin Button -->
+        <button id="marginBtn" title="Set Margins">📏</button>
+
+        <!-- Margin Dropdown -->
+        <div id="marginDropdown" class="dropdown hidden">
+          <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
+          <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
+          <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
+          <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
+          <button id="applyMarginBtn">✅ Apply</button>
+        </div>
         <!-- Icon Button -->
-      <button id="fontMenuBtn" title="Choose Font">🅰️</button>
+        <button id="fontMenuBtn" title="Choose Font">🅰️</button>
 
-      <select id="fontDropdown" onchange="setFont(this.value)">
-        <option value="'Arial', sans-serif">Arial</option>
-        <option value="'Georgia', serif">Georgia</option>
-        <option value="'Courier New', monospace">Courier New</option>
-        <option value="'Times New Roman', serif">Times New Roman</option>
-      </select>
-
-      <!-- Font Size Icon Button -->
-      <button id="fontSizeBtn" title="Font Size">🔠</button>
-
-      <div id="fontSizeDropdownPanel" class="dropdown hidden">
-        <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
-        <select id="fontSizeSelect">
-          <option value="" disabled selected>Select font size</option>
-          <option value="8pt">8</option>
-          <option value="10pt">10</option>
-          <option value="12pt" selected>12</option>
-          <option value="14pt">14</option>
-          <option value="16pt">16</option>
-          <option value="18pt">18</option>
-          <option value="24pt">24</option>
-          <option value="36pt">36</option>
+        <select id="fontDropdown" onchange="setFont(this.value)">
+          <option value="'Arial', sans-serif">Arial</option>
+          <option value="'Georgia', serif">Georgia</option>
+          <option value="'Courier New', monospace">Courier New</option>
+          <option value="'Times New Roman', serif">Times New Roman</option>
         </select>
-        <button id="applyFontSize">Apply</button>
-      </div>
 
-        <button onclick="toggleBold()"><b>B</b></button>
-        <button onclick="toggleItalic()"><i>I</i></button>
-        <button onclick="toggleUnderline()"><u>U</u></button>
-        <button onclick="toggleStrikeThrough()">S̶</button>
-        <button onclick="alignText('left')">←</button>
-        <button onclick="alignText('center')">⇔</button>
-        <button onclick="alignText('right')">→</button>
-        <button onclick="justifyText()" title="Justify Text">📰</button>
-        <button onclick="toggleUnorderedList()">• List</button>
-        <button onclick="undo()">↩️</button>
-        <button onclick="redo()">↪️</button>
+        <!-- Font Size Icon Button -->
+        <button id="fontSizeBtn" title="Font Size">🔠</button>
+
+        <div id="fontSizeDropdownPanel" class="dropdown hidden">
+          <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
+          <select id="fontSizeSelect">
+            <option value="" disabled selected>Select font size</option>
+            <option value="8pt">8</option>
+            <option value="10pt">10</option>
+            <option value="12pt" selected>12</option>
+            <option value="14pt">14</option>
+            <option value="16pt">16</option>
+            <option value="18pt">18</option>
+            <option value="24pt">24</option>
+            <option value="36pt">36</option>
+          </select>
+          <button id="applyFontSize">Apply</button>
+        </div>
         <button onclick="cleanEditor()">🧹</button>
-        <button onclick="insertModernLink()">🔗</button>
+        <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
+        <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
+        <div id="attachedFilesList"></div>
+      </div>  
+
+      <button onclick="toggleBold()"><b>B</b></button>
+      <button onclick="toggleItalic()"><i>I</i></button>
+      <button onclick="toggleUnderline()"><u>U</u></button>
+      <button onclick="toggleStrikeThrough()">S̶</button>
+      <button onclick="alignText('left')">←</button>
+      <button onclick="alignText('center')">⇔</button>
+      <button onclick="alignText('right')">→</button>
+      <button onclick="justifyText()" title="Justify Text">📰</button>
+      <button onclick="toggleUnorderedList()">• List</button>
+      <button onclick="undo()">↩️</button>
+      <button onclick="redo()">↪️</button>
         
-    
+      <button onclick="insertModernLink()">🔗</button>
       <!-- Text Color Icon Button -->
       <button id="textColorBtn" title="Text Color">🎨</button>
 
@@ -974,16 +1052,24 @@
 
       <div class="controls">
        <button onclick="saveText()" title="Save">💾</button>
-       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button>
-       <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
+       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button> 
       </div>
-
-      <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
-
-      <div id="attachedFilesList"></div>
+  
       <div class="save-time" id="saveStatus"></div>
     </div>
-  </div>
+
+    <!-- 🧠 The Side Thoughts Badge -->
+    <div id="sideThoughtsBadge">
+      <span class="emoji"></span>
+      Side Thoughts
+    </div>
+
+    <!-- 💬 The Thought Popup -->
+    <div id="thoughtPopup" class="hidden">
+      <textarea id="sideThoughtTextarea" placeholder="Drop your thought here..."></textarea>
+      <button onclick="saveSideThought()">Save Thought</button>
+    </div>
+    </div>
 
   <!-- Your main HTML content above -->
 
@@ -1075,29 +1161,97 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       const mainEd = document.getElementById("mainEditor");
-      const coEd   = document.getElementById("coEditor");
-      activeEditor = mainEd;                  // default visible
+      const coEd = document.getElementById("coEditor");
+      const badge = document.getElementById("sideThoughtsBadge");
+      const popup = document.getElementById("thoughtPopup");
+      const modeSwitchBtn = document.getElementById("modeSwitchBtn");
 
-      // mode switch button
-      document.getElementById("modeSwitchBtn")
-              .addEventListener("click", () => {
-                if (activeEditor === mainEd) {
-                  mainEd.classList.add("hidden");
-                  coEd.classList.remove("hidden");
-                  activeEditor = coEd;
-              } else {
-                coEd.classList.add("hidden");
-                mainEd.classList.remove("hidden");
-                activeEditor = mainEd;
-              }
-                activeEditor.focus();
-            });
+      // Set initial active editor
+      let activeEditor = mainEd;
+      mainEd.classList.remove("hidden");
+      coEd.classList.add("hidden");
+      document.body.classList.remove("co-mode");
+
+      // 🔁 Editor toggle logic
+      if (modeSwitchBtn) {
+        modeSwitchBtn.addEventListener("click", () => {
+          if (activeEditor === mainEd) {
+            mainEd.classList.add("hidden");
+            coEd.classList.remove("hidden");
+            activeEditor = coEd;
+            document.body.classList.add("co-mode");
+          } else {
+            coEd.classList.add("hidden");
+            mainEd.classList.remove("hidden");
+            activeEditor = mainEd;
+            document.body.classList.remove("co-mode");
+          }
+          activeEditor.focus();
+        });
+      }
+
+      // 🌙 Handle dark mode badge styling (optional – adjust as needed)
+      if (document.body.classList.contains("dark-mode")) {
+        // badge.style or dark-specific logic if needed
+      }
+
+      // 🧠 Determine current suite mode (notepad or document)
+      const activeSuite = document.querySelector('.suite.active');
+      const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
+      console.log("🧠 SideThoughts now tracking mode:", mode);
+
+      // 🧠 Badge toggle
+      if (badge && popup) {
+        badge.addEventListener("click", () => {
+          popup.classList.toggle("hidden");
+        });
+      }
     });
 
     // generic exec wrapper
     function execOnActive(cmd, val=null){
       document.execCommand(cmd,false,val);
       activeEditor.focus();
+    }
+
+    function toggleEditorMode() {
+      const mainEd = document.getElementById("mainEditor");
+      const coEd = document.getElementById("coEditor");
+
+      if (activeEditor === mainEd) {
+        mainEd.classList.add("hidden");
+        coEd.classList.remove("hidden");
+        activeEditor = coEd;
+        document.body.classList.add("co-mode");  // ← mark we're in coEditor mode
+      } else {
+        coEd.classList.add("hidden");
+        mainEd.classList.remove("hidden");
+        activeEditor = mainEd;
+        document.body.classList.remove("co-mode");
+      }
+
+      activeEditor.focus();
+    }
+
+    function saveSideThought() {
+      const activeSuite = document.querySelector('.suite.active');
+      const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
+      const text = document.getElementById("sideThoughtTextarea").value.trim();
+
+      if (!text) return;
+
+      const existing = JSON.parse(localStorage.getItem("sideThoughts") || "[]");
+
+      existing.unshift({
+        text,
+        mode,
+        timestamp: new Date().toISOString(),
+      });
+
+      localStorage.setItem("sideThoughts", JSON.stringify(existing));
+
+      document.getElementById("sideThoughtTextarea").value = "";
+      alert("🧠 Thought saved!");
     }
 
     function maybeClosePreview(e) {
