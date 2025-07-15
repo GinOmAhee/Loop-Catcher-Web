@@ -488,14 +488,6 @@
     cursor: pointer;
   }
 
-  .format-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    align-items: center;
-    margin-bottom: .2rem; /* this controls spacing between toolbar and editor */
-  }
-
   .margin-dropdown {
     position: absolute;
     background: white;
@@ -916,55 +908,20 @@
 
   <div id="tabBar" class="tab-bar"></div>
 
-      <button onclick="toggleBold()"><b>B</b></button>
-      <button onclick="toggleItalic()"><i>I</i></button>
-      <button onclick="toggleUnderline()"><u>U</u></button>
-      <button onclick="toggleStrikeThrough()">S̶</button>
-      <button onclick="alignText('left')">←</button>
-      <button onclick="alignText('center')">⇔</button>
-      <button onclick="alignText('right')">→</button>
-      <button onclick="justifyText()" title="Justify Text">📰</button>
-      <button onclick="toggleUnorderedList()">• List</button>
-      <button onclick="undo()">↩️</button>
-      <button onclick="redo()">↪️</button>
-        
-      <button onclick="insertModernLink()">🔗</button>
-      <!-- Text Color Icon Button -->
-      <button id="textColorBtn" title="Text Color">🎨</button>
-
-      <!-- Text Color Dropdown -->
-      <div id="textColorDropdown" class="dropdown hidden">
-        <div onclick="setTextColor('black')" style="color: black;">Black</div>
-        <div onclick="setTextColor('red')" style="color: red;">Red</div>
-        <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
-        <div onclick="setTextColor('green')" style="color: green;">Green</div>
-        <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
-        <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
-        <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
-      </div>
-
-      <!-- Highlight Color Icon Button -->
-      <button id="highlightBtn" title="Highlight">🖍️</button>
-
-      <!-- Highlight Color Dropdown -->
-      <div id="highlightDropdown" class="dropdown hidden">
-        <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
-        <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
-        <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
-        <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
-        <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
-      </div>
-
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
+
       <button id="previewToggle">☰</button>
+
+      <div class="controls">
+       <button onclick="saveText()" title="Save">💾</button>
+       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button> 
+       <button id="printBtn" title="Print Note">🖨️ Print</button>
+      </div>
+
       <!-- 🎨 Toolbar -->
-
-      <button id="printBtn" title="Print Note">🖨️ Print</button>
-
-      <div class="main-only">
-      <!-- Only shows in main editor mode -->
+      <div class="format-toolbar" style="margin-bottom: 1rem;"></div>
         
         <!-- Margin Button -->
         <button id="marginBtn" title="Set Margins">📏</button>
@@ -1009,19 +966,52 @@
         <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
         <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
         <div id="attachedFilesList"></div>
-      </div>  
 
-      <button onclick="removeFormatting()">🚫</button>
+        <button onclick="toggleBold()"><b>B</b></button>
+        <button onclick="toggleItalic()"><i>I</i></button>
+        <button onclick="toggleUnderline()"><u>U</u></button>
+        <button onclick="toggleStrikeThrough()">S̶</button>
+        <button onclick="alignText('left')">←</button>
+        <button onclick="alignText('center')">⇔</button>
+        <button onclick="alignText('right')">→</button>
+        <button onclick="justifyText()" title="Justify Text">📰</button>
+        <button onclick="toggleUnorderedList()">• List</button>
+        <button onclick="undo()">↩️</button>
+        <button onclick="redo()">↪️</button>
+        
+      <button onclick="insertModernLink()">🔗</button>
+      <!-- Text Color Icon Button -->
+      <button id="textColorBtn" title="Text Color">🎨</button>
+
+      <!-- Text Color Dropdown -->
+      <div id="textColorDropdown" class="dropdown hidden">
+        <div onclick="setTextColor('black')" style="color: black;">Black</div>
+        <div onclick="setTextColor('red')" style="color: red;">Red</div>
+        <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
+        <div onclick="setTextColor('green')" style="color: green;">Green</div>
+        <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
+        <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
+        <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
+      </div>
+
+      <!-- Highlight Color Icon Button -->
+      <button id="highlightBtn" title="Highlight">🖍️</button>
+
+      <!-- Highlight Color Dropdown -->
+      <div id="highlightDropdown" class="dropdown hidden">
+        <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+        <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+        <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+        <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+        <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
+      </div>
+
+        <button onclick="removeFormatting()">🚫</button>
       </div>
 
       <!-- 📝 Rich Text Editor -->
       <div id="mainEditor" contenteditable="true"></div>
       <div id="coEditor"  contenteditable="true" class="hidden"></div>
-
-      <div class="controls">
-       <button onclick="saveText()" title="Save">💾</button>
-       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button> 
-      </div>
   
       <div class="save-time" id="saveStatus"></div>
     </div>
