@@ -908,7 +908,7 @@
 
   <div id="tabBar" class="tab-bar"></div>
 
-  
+  <div class="format-toolbar" style="margin-bottom: 1rem;"></div>  
       <button onclick="toggleBold()"><b>B</b></button>
       <button onclick="toggleItalic()"><i>I</i></button>
       <button onclick="toggleUnderline()"><u>U</u></button>
@@ -947,7 +947,7 @@
         <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
         <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
       </div>
-
+  </div>
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
@@ -958,7 +958,6 @@
 
       <div class="main-only">
       <!-- Only shows in main editor mode -->
-        <div class="format-toolbar" style="margin-bottom: 1rem;">
         
         <!-- Margin Button -->
         <button id="marginBtn" title="Set Margins">📏</button>
@@ -1005,7 +1004,7 @@
         <div id="attachedFilesList"></div>
       </div>  
 
-        <button onclick="removeFormatting()">🚫</button>
+      <button onclick="removeFormatting()">🚫</button>
       </div>
 
       <!-- 📝 Rich Text Editor -->
