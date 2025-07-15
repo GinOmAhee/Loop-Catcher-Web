@@ -911,17 +911,14 @@
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
-
       <button id="previewToggle">☰</button>
-
-      <div class="controls">
-       <button onclick="saveText()" title="Save">💾</button>
-       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button> 
-       <button id="printBtn" title="Print Note">🖨️ Print</button>
-      </div>
-
       <!-- 🎨 Toolbar -->
-      <div class="format-toolbar" style="margin-bottom: 1rem;"></div>
+
+      <button id="printBtn" title="Print Note">🖨️ Print</button>
+
+      <div class="main-only">
+      <!-- Only shows in main editor mode -->
+        <div class="format-toolbar" style="margin-bottom: 1rem;">
         
         <!-- Margin Button -->
         <button id="marginBtn" title="Set Margins">📏</button>
@@ -966,18 +963,19 @@
         <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
         <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
         <div id="attachedFilesList"></div>
+      </div>  
 
-        <button onclick="toggleBold()"><b>B</b></button>
-        <button onclick="toggleItalic()"><i>I</i></button>
-        <button onclick="toggleUnderline()"><u>U</u></button>
-        <button onclick="toggleStrikeThrough()">S̶</button>
-        <button onclick="alignText('left')">←</button>
-        <button onclick="alignText('center')">⇔</button>
-        <button onclick="alignText('right')">→</button>
-        <button onclick="justifyText()" title="Justify Text">📰</button>
-        <button onclick="toggleUnorderedList()">• List</button>
-        <button onclick="undo()">↩️</button>
-        <button onclick="redo()">↪️</button>
+      <button onclick="toggleBold()"><b>B</b></button>
+      <button onclick="toggleItalic()"><i>I</i></button>
+      <button onclick="toggleUnderline()"><u>U</u></button>
+      <button onclick="toggleStrikeThrough()">S̶</button>
+      <button onclick="alignText('left')">←</button>
+      <button onclick="alignText('center')">⇔</button>
+      <button onclick="alignText('right')">→</button>
+      <button onclick="justifyText()" title="Justify Text">📰</button>
+      <button onclick="toggleUnorderedList()">• List</button>
+      <button onclick="undo()">↩️</button>
+      <button onclick="redo()">↪️</button>
         
       <button onclick="insertModernLink()">🔗</button>
       <!-- Text Color Icon Button -->
@@ -1012,6 +1010,11 @@
       <!-- 📝 Rich Text Editor -->
       <div id="mainEditor" contenteditable="true"></div>
       <div id="coEditor"  contenteditable="true" class="hidden"></div>
+
+      <div class="controls">
+       <button onclick="saveText()" title="Save">💾</button>
+       <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button> 
+      </div>
   
       <div class="save-time" id="saveStatus"></div>
     </div>
