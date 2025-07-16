@@ -1031,12 +1031,6 @@
 <body data-mode="main-only">
 
   <div class="bottom-control-bar">
-    <div class="dark-theme-switch">
-      <label class="theme-toggle">
-        <input type="checkbox" id="themeSwitch" />
-        <span class="slider"></span>
-      </label>
-    </div>
 
     <button id="previewToggle">☰</button>
 
@@ -1137,7 +1131,14 @@
     </div>
   </div>
 
-  <div id="tabBar" class="tab-bar"></div>
+  <div id="tabBar" class="tab-bar">
+    <div class="dark-theme-switch">
+      <label class="theme-toggle">
+        <input type="checkbox" id="themeSwitch" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
 
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
