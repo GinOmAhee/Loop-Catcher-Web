@@ -1510,9 +1510,9 @@
     }
 
     function switchTab(index) {
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      tabs[activeTabIndex].content = activeEditor.innerHTML;
       activeTabIndex = index;
-      mainEditor.innerHTML = tabs[index].content;
+      activeEditor.innerHTML = tabs[index].content;
       safeRenderTabs();
     }
 
@@ -1532,7 +1532,7 @@
         activeTabIndex = Math.max(0, activeTabIndex - 1);
       }
 
-      mainEditor.innerHTML = tabs[activeTabIndex].content || "";
+      activeEditor.innerHTML = tabs[activeTabIndex].content || "";
       hasUnsavedChanges = false;
 
       localStorage.setItem("tabs", JSON.stringify(tabs));
@@ -1574,15 +1574,15 @@
     let isRecording = false;
     let debounceTimer;
 
-    mainEditor.addEventListener("input", () => {
+    activeEditor.addEventListener("input", () => {
       // Undo/redo
-      undoStack.push(mainEditor.innerHTML);
+      undoStack.push(activeEditor.innerHTML);
       redoStack = [];
 
       // Debounced auto-save
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        localStorage.setItem("capturedText", mainEditor.innerHTML);
+        localStorage.setItem("capturedText", activeEditor.innerHTML);
         localStorage.setItem("lastSaved", new Date().toISOString());
         updateGrouping();
         saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
@@ -1607,7 +1607,7 @@
     }
 
     function justifyText() {
-      mainEditor.focus(); // ensure editor is active
+      activeEditor.focus(); // ensure editor is active
       document.execCommand("justifyFull", false, null);
     }
 
@@ -1639,7 +1639,7 @@
     });
 
     function setTextColor(color) {
-      mainEditor.focus();
+      activeEditor.focus();
       restoreSelection();
       document.execCommand("styleWithCSS", false, true);
       document.execCommand("foreColor", false, color);
@@ -1664,7 +1664,7 @@
     });
 
     function setHighlightColor(color) {
-      mainEditor.focus();
+      activeEditor.focus();
       restoreSelection();
       const selection = window.getSelection();
       if (!selection.rangeCount || selection.isCollapsed) return;
@@ -1703,9 +1703,9 @@
 
     async function saveText() {
       const now = new Date();
-      const noteText = mainEditor.innerText.trim();
+      const noteText = activeEditor.innerText.trim();
       const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
-      const noteHTML = mainEditor.innerHTML;
+      const noteHTML = activeEditor.innerHTML;
       if (!noteText) return;
 
       const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
@@ -1744,7 +1744,7 @@
         console.error("❌ Failed to save note to Firestore:", error);
       }
 
-       mainEditor.innerHTML = '';
+       activeEditor.innerHTML = '';
        tabs[activeTabIndex].content = '';
        tabs[activeTabIndex].title = 'Untitled';
        localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -1757,10 +1757,10 @@
       console.log("✅ autoSave() was called");
       const now = new Date();
 
-      if (!mainEditor) return;
+      if (!activeEditor) return;
 
       // Save current content into the active tab
-      tabs[activeTabIndex].content = mainEditor.innerHTML;
+      tabs[activeTabIndex].content = activeEditor.innerHTML;
 
       // Save full tabs array
       localStorage.setItem('tabs', JSON.stringify(tabs));
@@ -1788,7 +1788,7 @@
       if (savedTabs.length) {
         tabs = savedTabs;
         activeTabIndex = savedIndex;
-        mainEditor.innerHTML = tabs[activeTabIndex].content;
+        activeEditor.innerHTML = tabs[activeTabIndex].content;
         safeRenderTabs();
 
       } else {
@@ -2033,20 +2033,20 @@
 
     function undo() {
       if (undoStack.length === 0) return;
-      redoStack.push(mainEditor.innerHTML);
+      redoStack.push(activeEditor.innerHTML);
       const last = undoStack.pop();
-      mainEditor.innerHTML = last || '';
+      activeEditor.innerHTML = last || '';
     }
 
     function redo() {
       if (redoStack.length === 0) return;
-      undoStack.push(mainEditor.innerHTML);
+      undoStack.push(activeEditor.innerHTML);
       const next = redoStack.pop();
-      mainEditor.innerHTML = next || '';
+      activeEditor.innerHTML = next || '';
     }
 
     function cleanEditor() {
-      const walker = document.createTreeWalker(mainEditor, NodeFilter.SHOW_ELEMENT, null, false);
+      const walker = document.createTreeWalker(activeEditor, NodeFilter.SHOW_ELEMENT, null, false);
       const toRemove = [];
 
       while (walker.nextNode()) {
@@ -2134,8 +2134,8 @@
     }
 
     function loadNoteIntoEditor(noteHTML) {
-      mainEditor.innerHTML = noteHTML;
-      mainEditor.focus();
+      activeEditor.innerHTML = noteHTML;
+      activeEditor.focus();
       saveStatus.innerText = "📝 Loaded note from preview";
       preview.style.display = 'none';
       undoStack.push(noteHTML);
@@ -2367,10 +2367,10 @@
 
           loadSavedText();
 
-          mainEditor.addEventListener("input", () => {
+          activeEditor.addEventListener("input", () => {
             hasUnsavedChanges = true; // ✅ still needed
 
-            const text = mainEditor.innerText || "";
+            const text = activeEditor.innerText || "";
             const newTitle = text.split("\n")[0]?.trim() || "Untitled";
 
             console.log("Updating tab title to:", newTitle);
@@ -2388,7 +2388,7 @@
         }
       });
 
-      mainEditor.addEventListener("click", function (e) {
+      activeEditor.addEventListener("click", function (e) {
         const el = e.target.closest("a");
         if (el && el.href) {
           e.preventDefault();
@@ -2536,7 +2536,7 @@
 
     function printNote() {
       const printWindow = window.open('', '_blank');
-      const noteContent = mainEditor.innerHTML;
+      const noteContent = activeEditor.innerHTML;
 
       const styles = `
         <style>
@@ -2619,7 +2619,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const marginBtn = document.getElementById("marginBtn");
       const marginDropdown = document.getElementById("marginDropdown");
-      const editor = document.getElementById("mainEditor");
+      const editor = document.getElementById("activeEditor");
 
       marginBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -2656,7 +2656,7 @@
     });
 
     window.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("mainEditor")?.classList.add("visible");
+      document.getElementById("activeEditor")?.classList.add("visible");
 
       document.getElementById("printBtn").addEventListener("click", printNote);
 
