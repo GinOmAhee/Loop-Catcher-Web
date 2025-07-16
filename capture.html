@@ -398,24 +398,16 @@
   .tab-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* new: tabs left, switch right */
-    padding: 0.5rem 1rem;
-    gap: 0.5rem;
+    padding-left: 0.5rem;
+    margin-bottom: 0.5rem;
     border-bottom: 2px solid #ccc;
     position: sticky;
     top: 0;
+    z-index: 10; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
-    z-index: 10;
+    transition: background-color 0.3s ease;
   }
-
-  .tabs-container {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 0.3rem;
-    align-items: center;
-  }
-
   .tab {
     display: inline-flex;
     align-items: center;
@@ -452,7 +444,6 @@
     color: var(--tab-text);
     border: 1px solid var(--tab-border);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    margin-left: 0; /* ⛔ kill the auto margin */
   }
     
   .tab.add-tab:hover {
@@ -856,20 +847,19 @@
   /* === THEME TOGGLE SWITCH === */
    .theme-toggle {
     display: block;
-    display: inline-flex;
-    align-items: center;
+    position: sticky;
+    align-self: flex-end;
     margin-right: 1rem;
     margin-left: .3rem;
     top: 5rem; /* just below your tab bar */
     z-index: 9;
-    cursor: pointer;
   }
 
   .dark-theme-switch {
-    position: relative; /* NOT fixed anymore */
-    margin-left: auto;  /* pushes it to the right inside tab-bar */
-    display: flex;
-    align-items: center;
+    position: fixed;
+    top: 5rem;
+    right: .3rem;
+    z-index: 1000;
   }
 
   .theme-toggle input {
@@ -1039,6 +1029,13 @@
   </style>
 </head>
 <body data-mode="main-only">
+    
+    <div class="dark-theme-switch">
+      <label class="theme-toggle">
+        <input type="checkbox" id="themeSwitch" />
+        <span class="slider"></span>
+      </label>
+    </div>
 
   <div class="bottom-control-bar">
 
@@ -1141,20 +1138,7 @@
     </div>
   </div>
 
-  <div id="tabBar" class="tab-bar">
-    <div class="tabs-container">
-      <div class="tab">Tab 1</div>
-      <div class="tab">Tab 2</div>
-      <div class="tab add-tab">+</div>
-    </div>
-
-    <div class="dark-theme-switch">
-      <label class="theme-toggle">
-        <input type="checkbox" id="themeSwitch" />
-        <span class="slider"></span>
-      </label>
-    </div>
-  </div>
+  <div id="tabBar" class="tab-bar"></div>
 
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
