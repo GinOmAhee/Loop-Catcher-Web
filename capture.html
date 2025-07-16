@@ -826,7 +826,6 @@
     position: fixed;
     top: 5rem;
     right: .3rem;
-    left: 1rem;
     z-index: 1000;
   }
 
@@ -920,6 +919,19 @@
     content: "🥰"; /* emoji on hover */
   }
 
+  #thoughtPopup {
+    background: var(--popup-bg);f
+    border: 1px solid var(--popup-border);
+    color: var(--popup-text-color);
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem;
+    border-radius: 12px;
+    padding: 1rem;
+    width: 250px;
+    z-index: 9999;
+  }
+
   #thoughtPopup.hidden {
     display: none;
   }
@@ -953,6 +965,13 @@
     display: none;
   }
 
+  #modeSwitchBtn {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1000; /* Make sure it stays above other elements */
+  }
+
   </style>
 </head>
 <body data-mode="main-only">
@@ -964,7 +983,7 @@
     </label>
   </div>
 
-  <button id="modeSwitchBtn" title="Switch Editor">🔁 Switch</button>
+  <button id="modeSwitchBtn" title="Switch Editor">🔁</button>
 
   <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
   <div class="preview-overlay" id="preview">
