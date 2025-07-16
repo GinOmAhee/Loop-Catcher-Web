@@ -2741,22 +2741,25 @@
       const dropdown = document.getElementById(dropdownId);
       if (!btn || !dropdown) return;
 
-      const isVisible = dropdown.style.display === "block";
+      const isCurrentlyVisible = dropdown.style.display === "block";
 
-      // Hide all dropdowns first (in case another one is open)
+      // Hide both dropdowns first
       document.getElementById("highlightDropdown").style.display = "none";
       document.getElementById("textColorDropdown").style.display = "none";
 
-      if (!isVisible) {
-        // Show this one
-        dropdown.style.visibility = 'hidden';
-        dropdown.style.display = 'block';
+      if (isCurrentlyVisible) {
+        // If it's already visible, just close it
+        dropdown.style.display = "none";
+      } else {
+        // Show it above the button
+        dropdown.style.visibility = "hidden";
+        dropdown.style.display = "block";
 
         const rect = btn.getBoundingClientRect();
         dropdown.style.left = `${rect.left}px`;
         dropdown.style.top = `${rect.top - dropdown.offsetHeight - 8}px`;
 
-        dropdown.style.visibility = 'visible';
+        dropdown.style.visibility = "visible";
       }
     }
 
