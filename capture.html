@@ -1834,12 +1834,6 @@
       const text = textarea.value.trim();
       if (!text) return;
 
-      const activeEditor = document.querySelector(".editor:not(.hidden)");
-      const noteMode = activeEditor?.id === "mainEditor" ? "document" : "scribble";
-      const noteSource = document.body.classList.contains("side-thought-active") 
-                       ? "sideThought" 
-                       : "main";
-
       const now = new Date();
       const note = {
         text,
