@@ -1508,6 +1508,14 @@
     }
 
     function switchTab(index) {
+      if (!activeEditor) {
+        activeEditor = document.getElementById("mainEditor"); // or coEditor depending on your default
+        if (!activeEditor) {
+          console.error("🚨 activeEditor is still undefined");
+          return;
+        }
+      }
+
       tabs[activeTabIndex].content = activeEditor.innerHTML;
       activeTabIndex = index;
       activeEditor.innerHTML = tabs[index].content;
@@ -2351,6 +2359,8 @@
       updateGrouping();
     }
 
+    let activeEditor; // 🔓 global declaration
+
     window.onload = async function () {
       await initializeFirebase();
 
@@ -2358,45 +2368,52 @@
         if (!user) {
           alert("Please sign in first.");
           window.location.href = "signin.html";
-        } else {
-          console.log("✅ User is signed in:", user.email);
+          return;
+        }
 
-          const editor = document.querySelector('.hidden-editor');
-          if (editor) {
-            editor.style.display = 'block'; // ensure it's in flow, if it might have been none
-            editor.getBoundingClientRect(); // force reflow
-            editor.classList.add('visible');
+        console.log("✅ User is signed in:", user.email);
+
+        const mainEditor = document.getElementById("mainEditor");
+        const coEditor = document.getElementById("coEditor");
+
+        activeEditor = mainEditor; // 🧠 set the initial editor
+
+        const editor = document.querySelector('.hidden-editor');
+        if (editor) {
+          editor.style.display = 'block';
+          editor.getBoundingClientRect(); // force reflow
+          editor.classList.add('visible');
+        }
+
+        loadSavedText();
+
+        // 📝 Input listener for content & title update
+        activeEditor.addEventListener("input", () => {
+          hasUnsavedChanges = true;
+
+          const text = activeEditor.innerText || "";
+          const newTitle = text.split("\n")[0]?.trim() || "Untitled";
+
+          if (tabs[activeTabIndex]) {
+            tabs[activeTabIndex].title = newTitle;
+            localStorage.setItem("tabs", JSON.stringify(tabs));
+            safeRenderTabs();
           }
+        });
 
-          loadSavedText();
+        // 🌐 External link click handler
+        activeEditor.addEventListener("click", function (e) {
+          const el = e.target.closest("a");
+          if (el && el.href) {
+            e.preventDefault();
+            window.open(el.href, "_blank", "noopener");
+          }
+        });
 
-          activeEditor.addEventListener("input", () => {
-            hasUnsavedChanges = true; // ✅ still needed
-
-            const text = activeEditor.innerText || "";
-            const newTitle = text.split("\n")[0]?.trim() || "Untitled";
-
-            console.log("Updating tab title to:", newTitle);
-            if (tabs[activeTabIndex]) {
-              tabs[activeTabIndex].title = newTitle;
-              localStorage.setItem("tabs", JSON.stringify(tabs));
-              safeRenderTabs();
-            }
-          });
-
-          applyMoodTheme();
-          updateGrouping();
-          safeRenderTabs();
-          setInterval(autoSave, 30000);
-        }
-      });
-
-      activeEditor.addEventListener("click", function (e) {
-        const el = e.target.closest("a");
-        if (el && el.href) {
-          e.preventDefault();
-          window.open(el.href, "_blank", "noopener");
-        }
+        applyMoodTheme();
+        updateGrouping();
+        safeRenderTabs();
+        setInterval(autoSave, 30000);
       });
     };
 
