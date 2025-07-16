@@ -1096,8 +1096,8 @@
       <button onclick="undo()">↩️</button>
       <button onclick="redo()">↪️</button>
       <button onclick="insertModernLink()">🔗</button>
-      <button id="textColorBtn" onclick="toggleDropdown('textColorBtn', 'textColorDropdown')" title="Text Color">🎨</button>
-      <button id="highlightBtn" onclick="toggleDropdown('highlightBtn', 'highlightDropdown')" title="Highlight">🖍️</button>
+      <button id="textColorBtn" title="Text Color">🎨</button>
+      <button id="highlightBtn" title="Highlight">🖍️</button>
       <button id="modeSwitchBtn" title="Switch Editor">🔁</button>
     </div>
   </div>
@@ -1370,6 +1370,8 @@
 
       document.getElementById("activeEditor")?.classList.add("visible");
       document.getElementById("printBtn").addEventListener("click", printNote);
+
+      console.log("📦 Dropdown logic loaded");
 
       document.getElementById("textColorBtn").addEventListener("click", () => {
         toggleDropdown("textColorBtn", "textColorDropdown");
@@ -2737,6 +2739,8 @@
     }
 
     function toggleDropdown(btnId, dropdownId) {
+      console.log("🎯 Button clicked:", btnId);
+
       const btn = document.getElementById(btnId);
       const dropdown = document.getElementById(dropdownId);
       if (!btn || !dropdown) return;
