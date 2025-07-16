@@ -2754,7 +2754,7 @@
       dropdown.style.display = "block";
     }
 
-    document.addEventListener("click", (e) => {
+    document.addEventListener("mousedown", (e) => {
       const isDropdown = e.target.closest("#highlightDropdown, #textColorDropdown");
       const isTrigger = e.target.closest("#highlightBtn, #textColorBtn");
 
