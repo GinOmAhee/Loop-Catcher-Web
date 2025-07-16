@@ -23,6 +23,7 @@
     --tab-text: #333;
     --tab-border: #ccc;
     --tab-active-bg: #ffffff;
+    --popup-bg
     --#sideThoughtsBadge
     --preview-text-color: #333;
     font-family: 'Inter', system-ui, sans-serif;
@@ -40,6 +41,7 @@
     --tab-text: #eee;
     --tab-border: #555;
     --tab-active-bg: #2d3b44;
+    --popup-bg
     --#sideThoughtsBadge
     background-color: #000;
     color: #f1f1f1;
@@ -823,8 +825,8 @@
   .dark-theme-switch {
     position: fixed;
     top: 5rem;
-    right: 1rem;
-    left: .3rem;
+    right: .3rem;
+    left: 1rem;
     z-index: 1000;
   }
 
@@ -916,19 +918,6 @@
 
   #sideThoughtsBadge:hover .emoji::before {
     content: "🥰"; /* emoji on hover */
-  }
-
-  #thoughtPopup {
-    background: var(--popup-bg);f
-    border: 1px solid var(--popup-border);
-    color: var(--popup-text-color);
-    position: fixed;
-    bottom: 6rem;
-    right: 2rem;
-    border-radius: 12px;
-    padding: 1rem;
-    width: 250px;
-    z-index: 9999;
   }
 
   #thoughtPopup.hidden {
@@ -1754,13 +1743,11 @@
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) return alert("Voice capture not supported");
 
-      const activeSuite = document.querySelector('.active.suite');
-      const editor = activeSuite?.querySelector('.editor');
-      const btn = activeSuite?.querySelector('.voice-btn');
+      const btn = document.getElementById('voiceBtn'); // assuming single voice button
       const status = document.getElementById('saveStatus');
 
-      if (!editor) {
-        console.warn("🛑 Editor not found in active suite.");
+      if (!activeEditor) {
+        console.warn("🛑 activeEditor not defined.");
         return;
       }
 
@@ -1786,13 +1773,13 @@
             }
 
             if (command === "new paragraph") {
-              editor.innerHTML += "<br><br>";
+              activeEditor.innerHTML += "<br><br>";
               speakOutLoud("Starting a new paragraph.");
               return;
             }
 
             if (command === "bold") {
-              document.execCommand("bold");
+              execOnActive("bold");
               speakOutLoud("Bold enabled.");
               return;
             }
@@ -1802,7 +1789,7 @@
         }
 
         // Append final transcript
-        editor.innerHTML += (editor.innerHTML ? '\n' : '') + transcript.trim();
+        activeEditor.innerHTML += (activeEditor.innerHTML ? '\n' : '') + transcript.trim();
       };
 
       recognition.onerror = (e) => {
