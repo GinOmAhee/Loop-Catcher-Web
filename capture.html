@@ -979,20 +979,19 @@
     z-index: 1000; /* Make sure it stays above other elements */
   }
 
-  .bottom-control-bar {
-    position: fixed;
-    display: flex;
-    align-items: center;
-    padding-left: 0.5rem;
-    margin-bottom: 0.5rem;
-    border-bottom: 2px solid #ccc;
-    position: sticky;
-    bottom: 0;
-    z-index: 10; /* Make sure it stays above other elements */
-    background-color: var(--tab-bg);
-    border-color: var(--tab-border);
-    transition: background-color 0.3s ease;
-  }
+.bottom-control-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* or whatever layout */
+  padding: 0.75rem 1rem;
+  background-color: var(--tab-bg);
+  border-top: 2px solid var(--tab-border);
+  z-index: 100;
+}
 
   body.dark-theme .bottom-control-bar {
     background: #1a1a1a;
