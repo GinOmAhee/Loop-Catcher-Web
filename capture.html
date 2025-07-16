@@ -1764,36 +1764,33 @@
     }
 
     async function saveText() {
-      activeEditor = document.querySelector(".editor:not(.hidden)");
-
+      const activeEditor = document.querySelector(".editor:not(.hidden)");
       if (!activeEditor) {
         console.warn("🚫 No active editor detected");
         return;
       }
 
       const now = new Date();
-      const noteMode = activeEditor.id === "mainEditor" ? "document" : "scribble";
-      const noteSource = document.body.classList.contains("side-thought-active") 
-                   ? "sideThought" 
-                   : "main";
       const noteText = activeEditor.innerText.trim();
-      const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
       const noteHTML = activeEditor.innerHTML;
+      const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
       if (!noteText) return;
 
-      const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      // 🧠 DETERMINE MODE & SOURCE
+      const noteMode = activeEditor.id === "mainEditor" ? "document" : "scribble";
+      const noteSource = document.querySelector("#thoughtPopup")?.classList.contains("side-thought-active")
+        ? "sideThought"
+        : "main";
 
-      // ✅ Allow save only if different from last saved note
+      // ✅ Avoid duplicates
+      const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
       if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
         saveStatus.innerText = `⚠️ Not saved — no changes detected`;
         return;
       }
 
-
       let projectName = prompt("📌 Enter project name (optional):");
       projectName = projectName?.trim() || "📂 Unlabeled";
-
-      const noteMode = document.body.classList.contains("co-mode") ? "scribble" : "document";
 
       const newNote = {
         text: noteHTML,
@@ -1802,13 +1799,14 @@
         project: projectName,
         resolved: false,
         tags: [],
-        mode: noteMode,  // ← 🔥 NEW: adds the label "document" or "scribble"
-        source: noteSource     // 🧠 this is key
+        mode: noteMode,      // "document" or "scribble"
+        source: noteSource   // "main" or "sideThought"
       };
 
       existingNotes.unshift(newNote);
       localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
 
+      // 🔥 Save to Firestore if user is signed in
       try {
         if (db && firebase.auth().currentUser) {
           const uid = firebase.auth().currentUser.uid;
@@ -1821,13 +1819,14 @@
         console.error("❌ Failed to save note to Firestore:", error);
       }
 
-       activeEditor.innerHTML = '';
-       tabs[activeTabIndex].content = '';
-       tabs[activeTabIndex].title = 'Untitled';
-       localStorage.setItem('tabs', JSON.stringify(tabs));
-       safeRenderTabs();
-       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
-       updateGrouping();
+      // 🧹 Reset editor + update tabs + feedback
+      activeEditor.innerHTML = '';
+      tabs[activeTabIndex].content = '';
+      tabs[activeTabIndex].title = 'Untitled';
+      localStorage.setItem('tabs', JSON.stringify(tabs));
+      safeRenderTabs();
+      saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
+      updateGrouping();
     }
 
     function autoSave() {
