@@ -1096,8 +1096,8 @@
       <button onclick="undo()">↩️</button>
       <button onclick="redo()">↪️</button>
       <button onclick="insertModernLink()">🔗</button>
-      <button id="textColorBtn" onclick="showDropdownAbove('textColorBtn', 'textColorDropdown')" title="Text Color">🎨</button>
-      <button id="highlightBtn" onclick="showDropdownAbove('highlightBtn', 'highlightDropdown')" title="Highlight">🖍️</button>
+      <button id="textColorBtn" onclick="toggleDropdown('textColorBtn', 'textColorDropdown')" title="Text Color">🎨</button>
+      <button id="highlightBtn" onclick="toggleDropdown('highlightBtn', 'highlightDropdown')" title="Highlight">🖍️</button>
       <button id="modeSwitchBtn" title="Switch Editor">🔁</button>
     </div>
   </div>
@@ -1372,11 +1372,11 @@
       document.getElementById("printBtn").addEventListener("click", printNote);
 
       document.getElementById("textColorBtn").addEventListener("click", () => {
-        showDropdownAbove("textColorBtn", "textColorDropdown");
+        toggleDropdown("textColorBtn", "textColorDropdown");
       });
 
       document.getElementById("highlightBtn").addEventListener("click", () => {
-        showDropdownAbove("highlightBtn", "highlightDropdown");
+        toggleDropdown("highlightBtn", "highlightDropdown");
       });
 
       // 🧠 Badge toggle (SideThoughts popup)
@@ -2736,29 +2736,35 @@
      }
     }
 
-    function showDropdownAbove(btnId, dropdownId) {
-      console.log("🎯 Button clicked:", btnId);
-
+    function toggleDropdown(btnId, dropdownId) {
       const btn = document.getElementById(btnId);
       const dropdown = document.getElementById(dropdownId);
       if (!btn || !dropdown) return;
 
-      // 🔥 Fix: define btnRect first!
-      const btnRect = btn.getBoundingClientRect();
-      const dropdownHeight = dropdown.offsetHeight;
+      const isVisible = dropdown.style.display === "block";
 
-      dropdown.style.position = "fixed"; // make sure it's on screen
-      dropdown.style.left = `${btnRect.left}px`;
-      dropdown.style.top = `${btnRect.top - dropdownHeight - 8}px`;
+      // Hide all dropdowns first (in case another one is open)
+      document.getElementById("highlightDropdown").style.display = "none";
+      document.getElementById("textColorDropdown").style.display = "none";
 
-      dropdown.style.display = "block";
+      if (!isVisible) {
+        // Show this one
+        dropdown.style.visibility = 'hidden';
+        dropdown.style.display = 'block';
+
+        const rect = btn.getBoundingClientRect();
+        dropdown.style.left = `${rect.left}px`;
+        dropdown.style.top = `${rect.top - dropdown.offsetHeight - 8}px`;
+
+        dropdown.style.visibility = 'visible';
+      }
     }
 
     document.addEventListener("mousedown", (e) => {
       const isDropdown = e.target.closest("#highlightDropdown, #textColorDropdown");
       const isTrigger = e.target.closest("#highlightBtn, #textColorBtn");
 
-      if (!isDropdown && !isButton) {
+      if (!isDropdown && !isTrigger) {
         document.getElementById("highlightDropdown").style.display = "none";
         document.getElementById("textColorDropdown").style.display = "none";
       }
