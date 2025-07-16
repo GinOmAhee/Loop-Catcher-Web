@@ -1744,56 +1744,95 @@
       }
     }
 
+    function speakOutLoud(text) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 1;
+      synth.speak(utter);
+    }
+
     function startVoiceCapture() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert('🎙️ Voice capture is not supported in this browser. Try using Chrome.');
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return alert("Voice capture not supported");
+
+      const activeSuite = document.querySelector('.active.suite');
+      const editor = activeSuite?.querySelector('.editor');
+      const btn = activeSuite?.querySelector('.voice-btn');
+      const status = document.getElementById('saveStatus');
+
+      if (!editor) {
+        console.warn("🛑 Editor not found in active suite.");
         return;
       }
 
-      recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition = new SR();
       recognition.lang = 'en-US';
       recognition.continuous = true;
       recognition.interimResults = false;
-
-      console.log("🎤 SpeechRecognition is starting...");
-      recognition.start();
-      isRecording = true;
-      document.getElementById("voiceBtn").innerText = "🛑 Stop Voice";
-      saveStatus.innerText = "🎙️ Voice capture started...";
 
       recognition.onresult = (event) => {
         let transcript = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
             let text = event.results[i][0].transcript.trim();
-            if (text.toLowerCase().includes("stop")) {
+            let command = text.toLowerCase().replace(/[^\w\s]/gi, ""); // normalize
+
+            console.log("🧠 Command Heard:", command);
+
+            // 🔊 Voice Commands
+            if (command === "stop") {
+              speakOutLoud("Stopping now.");
               stopVoiceCapture();
-              saveText();
               return;
             }
+
+            if (command === "new paragraph") {
+              editor.innerHTML += "<br><br>";
+              speakOutLoud("Starting a new paragraph.");
+              return;
+            }
+
+            if (command === "bold") {
+              document.execCommand("bold");
+              speakOutLoud("Bold enabled.");
+              return;
+            }
+
             transcript += text + '\n';
           }
         }
-        mainEditor.innerHTML += (mainEditor.innerHTML ? '\n' : '') + transcript.trim();
+
+        // Append final transcript
+        editor.innerHTML += (editor.innerHTML ? '\n' : '') + transcript.trim();
       };
 
       recognition.onerror = (e) => {
-        console.error("Speech recognition error:", e.error);
+        console.error("Speech error:", e.error);
         stopVoiceCapture();
       };
+
+      recognition.start();
+      isRecording = true;
+      if (btn) btn.textContent = "🛑 Stop Voice";
+      if (status) status.textContent = "🎙️ Listening...";
     }
 
     function stopVoiceCapture() {
-      if (recognition) {
-        recognition.stop();
-        recognition = null;
-      }
+      if (recognition) recognition.stop();
       isRecording = false;
-      document.getElementById("voiceBtn").innerText = "🎤 Start Voice";
-      saveText();
-      saveStatus.innerText = "🎤 Voice capture stopped.";
+
+      const activeBtn = document.querySelector('.active.suite.voice-btn');
+      if (activeBtn) activeBtn.textContent = "🎤";
+
+      const status = document.getElementById("saveStatus");
+      if (status) status.textContent = "🎙️ Voice capture stopped.";
     }
+
+    /* attach once after DOM ready */
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.voice-btn').forEach(btn => {
+        btn.addEventListener('click', toggleVoiceCapture);
+      });
+    });
 
     async function handleFileAttachment() {
       const input = document.getElementById('fileInput');
