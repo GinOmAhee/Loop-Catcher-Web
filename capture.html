@@ -1713,6 +1713,13 @@
     }
 
     async function saveText() {
+      activeEditor = document.querySelector(".editor:not(.hidden)");
+
+      if (!activeEditor) {
+        console.warn("🚫 No active editor detected");
+        return;
+      }
+
       const now = new Date();
       const noteText = activeEditor.innerText.trim();
       const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
