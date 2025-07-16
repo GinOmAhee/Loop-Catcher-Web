@@ -2256,7 +2256,14 @@
     }
 
     function updateGrouping() {
-      const notes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+      const allNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+      const selectedFilter = document.getElementById("groupSelector").value;
+
+      // Only show sideThoughts if "side thoughts" is selected
+      const notes = selectedFilter === "side thoughts"
+        ? allNotes
+        : allNotes.filter(note => note.source !== "sideThought");
+
       const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
       const scope = document.getElementById("searchScope")?.value || "group";
       const groupBy = document.getElementById("groupSelector").value;
