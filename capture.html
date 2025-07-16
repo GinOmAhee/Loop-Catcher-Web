@@ -1835,6 +1835,7 @@
       if (!text) return;
 
       const now = new Date();
+
       const note = {
         text,
         timestamp: now.toISOString(),
@@ -1842,8 +1843,7 @@
         project: "🧠 Side Thoughts",
         resolved: false,
         tags: [],
-        mode: noteMode,
-        source: noteSource
+        source: "sideThought" // ✅ Always tag this
       };
 
       const saved = JSON.parse(localStorage.getItem("savedNotes") || "[]");
@@ -2382,27 +2382,31 @@
             }
             break;
 
-          case "side thoughts":
+          case "side thoughts": {
             const allNotes = JSON.parse(localStorage.getItem("savedNotes") || "[]");
-            const sideThoughts = allNotes.filter(note =>
-              note.source === "sideThought"
-            );
+            const sideThoughts = allNotes.filter(note => note.source === "sideThought");
 
-            if (sideThoughts.length === 0) {
+            if (!sideThoughts.length) {
               groupedNotes.innerHTML = "<p>🧠 No saved side thoughts found.</p>";
               return;
             }
 
+            const grouped = {};
+
             sideThoughts.forEach(note => {
-              const project = note.project || "📂 Unlabeled";
-              grouped[project] = grouped[project] || [];
+            const project = note.project || "📂 Unlabeled";
+            if (!grouped[project]) grouped[project] = [];
               grouped[project].push(note);
             });
-            
+
+            let html = "";
             for (const project in grouped) {
               html += renderGroupedSection("🧠", project, grouped[project]);
             }
+
+            groupedNotes.innerHTML = html;
             break;
+          }
 
           case "unresolved":
             const unresolved = filteredNotes.filter(note => note.resolved === false);
