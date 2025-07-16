@@ -1776,11 +1776,7 @@
       const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
       if (!noteText) return;
 
-      // 🧠 DETERMINE MODE & SOURCE
       const noteMode = activeEditor.id === "mainEditor" ? "document" : "scribble";
-      const noteSource = !document.getElementById("thoughtPopup")?.classList.contains("hidden")
-        ? "sideThought"
-        : undefined;
 
       // ✅ Avoid duplicates
       const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
@@ -1800,7 +1796,6 @@
         resolved: false,
         tags: [],
         mode: noteMode,      // "document" or "scribble"
-        source: noteSource   // "main" or "sideThought"
       };
 
       existingNotes.unshift(newNote);
