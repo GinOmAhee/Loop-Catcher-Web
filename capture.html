@@ -537,7 +537,7 @@
     max-width: 100%;
     margin: 1rem auto;
   }
-  
+
   .add-tab-btn {
     margin-left: auto;
     background: #fff59d;
@@ -780,15 +780,27 @@
   }
 
   /* === THEME TOGGLE SWITCH === */
-  .theme-toggle {
-    position: fixed;
-    top: 50%;
-    right: 1rem;
-    transform: translateY(-50%);
-    z-index: 10001;
+   .theme-toggle {
+    display: block;
+    position: sticky;
+    align-self: flex-end;
+    margin-right: 1rem;
+    margin-left: .3rem;
+    top: 5rem; /* just below your tab bar */
+    z-index: 9;
   }
+
+  .dark-theme-switch {
+    position: fixed;
+    top: 5rem;
+    right: 1rem;
+    left: .3rem;
+    z-index: 1000;
+  }
+
   .theme-toggle input {
     display: none;
+    
   }
   .theme-toggle .slider {
     width: 50px;
@@ -856,8 +868,8 @@
 </head>
 <body>
 
-  <div style="position: absolute; top: 1rem; right: 1rem; z-index: 9999;">
-    <label class="theme-toggle">
+  <div class="dark-theme-switch">
+    <label class="theme-toggle"></label>  
       <input type="checkbox" id="themeSwitch" />
       <span class="slider"></span>
     </label>
