@@ -1789,6 +1789,8 @@
       let projectName = prompt("📌 Enter project name (optional):");
       projectName = projectName?.trim() || "📂 Unlabeled";
 
+      const noteMode = document.body.classList.contains("co-mode") ? "scribble" : "document";
+
       const newNote = {
         text: noteHTML,
         timestamp: now.toISOString(),
