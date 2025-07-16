@@ -2365,7 +2365,8 @@
               grouped[project] = grouped[project] || [];
               grouped[project].push(note);
             });
-
+            
+            let html = ""; // ✅ Reset HTML for just this case
             for (const project in grouped) {
               html += renderGroupedSection("🧠", project, grouped[project]);
             }
