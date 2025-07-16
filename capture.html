@@ -30,6 +30,8 @@
     --badge-bg: #f5f5f5;
     --badge-text: #222;
     --preview-text-color: #333;
+    --toolbar-bg: #f5f5f5;
+    --toolbar-border: #ddd;
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px;
     color: #333;
@@ -51,6 +53,8 @@
     --popup-button-bg: #333;
     --badge-bg: #333;
     --badge-text: #eee;
+    --toolbar-bg: #1a1a1a;
+    --toolbar-border: #444;
     background-color: #000;
     color: #f1f1f1;
   }
@@ -509,13 +513,21 @@
 
   .shared-toolbar {
     display: flex;
-    flex-wrap: wrap;          /* handles overflow and responsiveness */
-    left: .75rem;
-    background-color: #f5f5f5;  /* light neutral background */
-    border: 1px solid #ddd;
+    flex-wrap: nowrap;        /* 🔁 prevents wrapping */
+    gap: 0.75rem;             /* 🔥 spacing between buttons/tools */
+    align-items: center;
+    justify-content: flex-start;
+    background-color: var(--toolbar-bg, #f5f5f5);
+    border: 1px solid var(--toolbar-border, #ddd);
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    padding: 0.5rem 1rem;
     max-width: 100%;
+    overflow-x: auto;         /* ⬅️ allows scroll if content overflows */
+  }
+
+  .shared-toolbar > * {
+    flex-shrink: 0;                   /* prevent items from squishing */
   }
 
   .margin-dropdown {
