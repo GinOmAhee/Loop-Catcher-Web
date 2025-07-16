@@ -2741,25 +2741,21 @@
       const dropdown = document.getElementById(dropdownId);
       if (!btn || !dropdown) return;
 
-      const isCurrentlyVisible = dropdown.style.display === "block";
+      const isVisible = dropdown.style.display === "block";
 
-      // Hide both dropdowns first
-      document.getElementById("highlightDropdown").style.display = "none";
-      document.getElementById("textColorDropdown").style.display = "none";
+      // Hide all dropdowns first
+      document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
 
-      if (isCurrentlyVisible) {
-        // If it's already visible, just close it
-        dropdown.style.display = "none";
-      } else {
-        // Show it above the button
-        dropdown.style.visibility = "hidden";
-        dropdown.style.display = "block";
+      if (!isVisible) {
+        // Temporarily show to measure
+        dropdown.style.visibility = 'hidden';
+        dropdown.style.display = 'block';
 
         const rect = btn.getBoundingClientRect();
         dropdown.style.left = `${rect.left}px`;
         dropdown.style.top = `${rect.top - dropdown.offsetHeight - 8}px`;
 
-        dropdown.style.visibility = "visible";
+        dropdown.style.visibility = 'visible';
       }
     }
 
@@ -2768,8 +2764,7 @@
       const isTrigger = e.target.closest("#highlightBtn, #textColorBtn");
 
       if (!isDropdown && !isTrigger) {
-        document.getElementById("highlightDropdown").style.display = "none";
-        document.getElementById("textColorDropdown").style.display = "none";
+        document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
       }
     });
 
