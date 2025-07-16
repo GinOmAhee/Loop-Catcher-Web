@@ -1332,22 +1332,18 @@
         });
       }
 
-      // 🌙 Handle dark mode badge styling (optional – adjust as needed)
-      if (document.body.classList.contains("dark-mode")) {
-        // badge.style or dark-specific logic if needed
-      }
-
-      // 🧠 Determine current suite mode (notepad or document)
-      const activeSuite = document.querySelector('.suite.active');
-      const mode = activeSuite?.id === "noteSuite" ? "notepad" : "document";
-      console.log("🧠 SideThoughts now tracking mode:", mode);
-
-      // 🧠 Badge toggle
+      // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
         badge.addEventListener("click", () => {
           popup.classList.toggle("hidden");
         });
       }
+
+      // 🧠 Make mode globally accessible if needed
+      window.SideThoughts = {
+        getActiveEditor: () => activeEditor,
+        getMode: () => mode
+      };
     });
 
     // generic exec wrapper
