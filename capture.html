@@ -398,17 +398,22 @@
   .tab-bar {
     display: flex;
     align-items: center;
-    padding-left: 0.5rem;
-    margin-bottom: 0.5rem;
+    justify-content: space-between; /* new: tabs left, switch right */
+    padding: 0.5rem 1rem;
+    gap: 0.5rem;
     border-bottom: 2px solid #ccc;
     position: sticky;
     top: 0;
-    overflow: visible; /* important if switch is getting clipped */
-    justify-content: space-between; /* ensures space distribution */
-    z-index: 10; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
-    transition: background-color 0.3s ease;
+    z-index: 10;
+  }
+
+  .tabs-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.3rem;
+    align-items: center;
   }
 
   .tab {
@@ -447,7 +452,7 @@
     color: var(--tab-text);
     border: 1px solid var(--tab-border);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    margin-left: auto;
+    margin-left: 0; /* ⛔ kill the auto margin */
   }
     
   .tab.add-tab:hover {
@@ -1137,6 +1142,12 @@
   </div>
 
   <div id="tabBar" class="tab-bar">
+    <div class="tabs-container">
+      <div class="tab">Tab 1</div>
+      <div class="tab">Tab 2</div>
+      <div class="tab add-tab">+</div>
+    </div>
+
     <div class="dark-theme-switch">
       <label class="theme-toggle">
         <input type="checkbox" id="themeSwitch" />
