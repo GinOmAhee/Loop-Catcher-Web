@@ -1778,9 +1778,9 @@
 
       // 🧠 DETERMINE MODE & SOURCE
       const noteMode = activeEditor.id === "mainEditor" ? "document" : "scribble";
-      const noteSource = document.querySelector("#thoughtPopup")?.classList.contains("side-thought-active")
+      const noteSource = !document.getElementById("thoughtPopup")?.classList.contains("hidden")
         ? "sideThought"
-        : "main";
+        : undefined;
 
       // ✅ Avoid duplicates
       const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
