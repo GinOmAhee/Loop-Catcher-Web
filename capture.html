@@ -410,7 +410,7 @@
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
   }
-  
+
   .tab {
     display: inline-flex;
     align-items: center;
@@ -447,6 +447,7 @@
     color: var(--tab-text);
     border: 1px solid var(--tab-border);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    margin-left: auto;
   }
     
   .tab.add-tab:hover {
@@ -850,12 +851,13 @@
   /* === THEME TOGGLE SWITCH === */
    .theme-toggle {
     display: block;
-    position: sticky;
-    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
     margin-right: 1rem;
     margin-left: .3rem;
     top: 5rem; /* just below your tab bar */
     z-index: 9;
+    cursor: pointer;
   }
 
   .dark-theme-switch {
