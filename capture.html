@@ -2683,18 +2683,26 @@
       const dropdown = document.getElementById(dropdownId);
       if (!btn || !dropdown) return;
 
-      // Show offscreen temporarily so we can measure height
-      dropdown.style.visibility = 'hidden';
+      // Append dropdown to <body> so fixed positioning behaves consistently
+      document.body.appendChild(dropdown);
+
       dropdown.style.display = 'block';
+      dropdown.style.visibility = 'hidden'; // hide it for accurate measurement
 
       const rect = btn.getBoundingClientRect();
+
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const scrollX = window.scrollX || document.documentElement.scrollLeft;
+
       const dropdownHeight = dropdown.offsetHeight;
 
-      // Position it just above the button
+      dropdown.style.position = 'fixed';
       dropdown.style.left = `${rect.left}px`;
       dropdown.style.top = `${rect.top - dropdownHeight - 8}px`;
 
-      // Reveal it
+      // 🐞 DEBUG HERE
+      console.log("📍Dropdown position:", dropdown.style.top, dropdown.style.left);
+
       dropdown.style.visibility = 'visible';
     }
 
