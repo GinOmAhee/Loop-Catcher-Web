@@ -1829,6 +1829,39 @@
       updateGrouping();
     }
 
+    function saveSideThought() {
+      const textarea = document.getElementById("sideThoughtTextarea");
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      const activeEditor = document.querySelector(".editor:not(.hidden)");
+      const noteMode = activeEditor?.id === "mainEditor" ? "document" : "scribble";
+      const noteSource = document.body.classList.contains("side-thought-active") 
+                       ? "sideThought" 
+                       : "main";
+
+      const now = new Date();
+      const note = {
+        text,
+        timestamp: now.toISOString(),
+        title: "Side Thought",
+        project: "🧠 Side Thoughts",
+        resolved: false,
+        tags: [],
+        mode: noteMode,
+        source: noteSource
+      };
+
+      const saved = JSON.parse(localStorage.getItem("savedNotes") || "[]");
+      saved.unshift(note);
+      localStorage.setItem("savedNotes", JSON.stringify(saved));
+
+      textarea.value = "";
+      document.getElementById("thoughtPopup").classList.add("hidden");
+      console.log("💾 Side thought saved");
+      updateGrouping("side thoughts");
+    }
+
     function autoSave() {
       console.log("✅ autoSave() was called");
       const now = new Date();
