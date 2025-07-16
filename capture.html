@@ -2737,29 +2737,21 @@
     }
 
     function showDropdownAbove(btnId, dropdownId) {
+      console.log("🎯 Button clicked:", btnId);
+
       const btn = document.getElementById(btnId);
       const dropdown = document.getElementById(dropdownId);
       if (!btn || !dropdown) return;
 
-      console.log("🎯 Button clicked:", btnId); // ✅ Add it here to trace the trigger
-
-      // Append dropdown to <body> so fixed positioning behaves consistently
-      document.body.appendChild(dropdown);
-
-      dropdown.style.display = 'block';
-      dropdown.style.visibility = 'hidden'; // hide it for accurate measurement
-
-      const rect = btn.getBoundingClientRect();
+      // 🔥 Fix: define btnRect first!
+      const btnRect = btn.getBoundingClientRect();
       const dropdownHeight = dropdown.offsetHeight;
 
-      dropdown.style.position = 'fixed';
-      dropdown.style.left = `${rect.left}px`;
-      dropdown.style.top = `${btnRect.top - dropdownHeight - 8}px`; // ↑ above the button
-      dropdown.style.top = `${rect.top - dropdownHeight - 8}px`;
+      dropdown.style.position = "fixed"; // make sure it's on screen
+      dropdown.style.left = `${btnRect.left}px`;
+      dropdown.style.top = `${btnRect.top - dropdownHeight - 8}px`;
 
-      console.log("📍Dropdown position:", dropdown.style.top, dropdown.style.left);
-      dropdown.style.visibility = 'visible';
-
+      dropdown.style.display = "block";
     }
 
     document.addEventListener("click", (e) => {
