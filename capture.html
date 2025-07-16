@@ -523,6 +523,7 @@
     padding: 0.2rem .3rem;
     max-width: 100%;
     width: fit-content;              /* only as wide as needed */
+    flex-shrink: 1;
   }
 
   .margin-dropdown {
@@ -596,7 +597,7 @@
     max-width: 100%;
     bottom: 1rem;
     left: .20rem;
-    flex-grow: 1;   
+    flex-shrink: 0; /* don’t let it squish */
   }
 
   .add-tab-btn {
@@ -1013,12 +1014,13 @@
    display: flex;
    flex-wrap: nowrap; /* 💥 Prevent wrapping */
    align-items: center;
-   gap: 1rem;
+   gap: 0.5rem;
    padding: 0.75rem 1rem;
    background-color: var(--tab-bg);
    border-top: 2px solid var(--tab-border);
    z-index: 100;
    overflow-x: auto; /* 🌊 Safe overflow handling */
+   justify-content: flex-start;
  }
 
   body.dark-theme .bottom-control-bar {
@@ -1570,20 +1572,25 @@
     let isRecording = false;
     let debounceTimer;
 
-    activeEditor.addEventListener("input", () => {
-      // Undo/redo
-      undoStack.push(activeEditor.innerHTML);
-      redoStack = [];
+    function attachInputListener(editor) {
+      editor.addEventListener("input", () => {
+        if (editor !== activeEditor) return; // Only respond if it's the active one
 
-      // Debounced auto-save
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        localStorage.setItem("capturedText", activeEditor.innerHTML);
-        localStorage.setItem("lastSaved", new Date().toISOString());
-        updateGrouping();
-        saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
-      }, 1000);
-    });
+        undoStack.push(editor.innerHTML);
+        redoStack = [];
+
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          localStorage.setItem("capturedText", editor.innerHTML);
+          localStorage.setItem("lastSaved", new Date().toISOString());
+          updateGrouping();
+          saveStatus.innerText = `💾 Auto-saved at ${new Date().toLocaleTimeString()}`;
+        }, 1000);
+      });
+    }
+
+    attachInputListener(mainEditor);
+    attachInputListener(coEditor);
 
     let savedSelection = null;
 
