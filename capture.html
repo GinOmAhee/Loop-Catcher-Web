@@ -1030,10 +1030,10 @@
   <div id="tabBar" class="tab-bar"></div>
 
   <!-- 📝 Main Editor (always visible) -->
-  <div class="main-container">
+  <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
 
-      <button id="previewToggle" onclick="maybeClosePreview(event)">☰</button>
+      <button id="previewToggle">☰</button>
 
       <div class="controls">
         <button onclick="saveText()" title="Save">💾</button>
@@ -1635,56 +1635,56 @@
       }
     }
 
-   async function saveText() {
-     const now = new Date();
-     const noteText = mainEditor.innerText.trim();
-     const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
-     const noteHTML = mainEditor.innerHTML;
-     if (!noteText) return;
+    async function saveText() {
+      const now = new Date();
+      const noteText = mainEditor.innerText.trim();
+      const currentTabTitle = tabs[activeTabIndex]?.title || "Untitled";
+      const noteHTML = mainEditor.innerHTML;
+      if (!noteText) return;
 
-     const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
+      const existingNotes = JSON.parse(localStorage.getItem('savedNotes') || '[]');
 
-     // ✅ Allow save only if different from last saved note
-     if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
-       saveStatus.innerText = `⚠️ Not saved — no changes detected`;
-       return;
-     }
+      // ✅ Allow save only if different from last saved note
+      if (existingNotes.length > 0 && existingNotes[0].text === noteText) {
+        saveStatus.innerText = `⚠️ Not saved — no changes detected`;
+        return;
+      }
 
 
-     let projectName = prompt("📌 Enter project name (optional):");
-     projectName = projectName?.trim() || "📂 Unlabeled";
+      let projectName = prompt("📌 Enter project name (optional):");
+      projectName = projectName?.trim() || "📂 Unlabeled";
 
-     const newNote = {
-       text: noteHTML,
-       timestamp: now.toISOString(),
-       title: tabs[activeTabIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
-       project: projectName,
-       resolved: false,
-       tags: []
-     };
+      const newNote = {
+        text: noteHTML,
+        timestamp: now.toISOString(),
+        title: tabs[activeTabIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
+        project: projectName,
+        resolved: false,
+        tags: []
+      };
 
-     existingNotes.unshift(newNote);
-     localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
+      existingNotes.unshift(newNote);
+      localStorage.setItem('savedNotes', JSON.stringify(existingNotes));
 
-     try {
-       if (db && firebase.auth().currentUser) {
-         const uid = firebase.auth().currentUser.uid;
-         await db.collection("users").doc(uid).collection("notes").add(newNote);
-         console.log("✅ Note saved to Firestore under user:", uid);
-       } else {
-         console.warn("⚠️ User not logged in or Firebase not ready");
-       }
-     } catch (error) {
-       console.error("❌ Failed to save note to Firestore:", error);
-     }
+      try {
+        if (db && firebase.auth().currentUser) {
+          const uid = firebase.auth().currentUser.uid;
+          await db.collection("users").doc(uid).collection("notes").add(newNote);
+          console.log("✅ Note saved to Firestore under user:", uid);
+        } else {
+          console.warn("⚠️ User not logged in or Firebase not ready");
+        }
+      } catch (error) {
+        console.error("❌ Failed to save note to Firestore:", error);
+      }
 
-      mainEditor.innerHTML = '';
-      tabs[activeTabIndex].content = '';
-      tabs[activeTabIndex].title = 'Untitled';
-      localStorage.setItem('tabs', JSON.stringify(tabs));
-      safeRenderTabs();
-      saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
-      updateGrouping();
+       mainEditor.innerHTML = '';
+       tabs[activeTabIndex].content = '';
+       tabs[activeTabIndex].title = 'Untitled';
+       localStorage.setItem('tabs', JSON.stringify(tabs));
+       safeRenderTabs();
+       saveStatus.innerText = `✅ Saved to ${projectName} at ${now.toLocaleTimeString()}`;
+       updateGrouping();
     }
 
     function autoSave() {
