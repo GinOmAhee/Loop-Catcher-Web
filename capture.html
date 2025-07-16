@@ -23,8 +23,12 @@
     --tab-text: #333;
     --tab-border: #ccc;
     --tab-active-bg: #ffffff;
-    --popup-bg
-    --#sideThoughtsBadge
+    --popup-bg: #fff;
+    --popup-border: #ccc;
+    --popup-text-color: #333;
+    --popup-button-bg: #eee;
+    --badge-bg: #f5f5f5;
+    --badge-text: #222;
     --preview-text-color: #333;
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px;
@@ -41,8 +45,12 @@
     --tab-text: #eee;
     --tab-border: #555;
     --tab-active-bg: #2d3b44;
-    --popup-bg
-    --#sideThoughtsBadge
+    --popup-bg: #1a1a1a;
+    --popup-border: #555;
+    --popup-text-color: #eee;
+    --popup-button-bg: #333;
+    --badge-bg: #333;
+    --badge-text: #eee;
     background-color: #000;
     color: #f1f1f1;
   }
@@ -920,7 +928,7 @@
   }
 
   #thoughtPopup {
-    background: var(--popup-bg);f
+    background: var(--popup-bg);
     border: 1px solid var(--popup-border);
     color: var(--popup-text-color);
     position: fixed;
@@ -972,18 +980,88 @@
     z-index: 1000; /* Make sure it stays above other elements */
   }
 
+  .bottom-control-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-end;
+    align-items: center;
+    background: var(--tab-bg, #f9f9f9);
+    border-top: 1px solid var(--tab-border, #ccc);
+    z-index: 1000;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  body.dark-theme .bottom-control-bar {
+    background: #1a1a1a;
+    border-color: #444;
+  }
+
   </style>
 </head>
 <body data-mode="main-only">
 
-  <div class="dark-theme-switch">
-    <label class="theme-toggle">
-      <input type="checkbox" id="themeSwitch" />
-      <span class="slider"></span>
-    </label>
-  </div>
+  <div class="bottom-control-bar">
+    <div class="dark-theme-switch">
+      <label class="theme-toggle">
+        <input type="checkbox" id="themeSwitch" />
+        <span class="slider"></span>
+      </label>
+    </div>
 
-  <button id="modeSwitchBtn" title="Switch Editor">🔁</button>
+    <button id="previewToggle">☰</button>
+
+    <div class="controls">
+      <button onclick="saveText()" title="Save">💾</button>
+      <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button> 
+      <button id="printBtn" title="Print Note">🖨️</button>
+    </div>
+
+    <!-- 🔧 Shared Toolbar -->
+    <div class="shared-toolbar">
+      <button onclick="toggleBold()"><b>B</b></button>
+      <button onclick="toggleItalic()"><i>I</i></button>
+      <button onclick="toggleUnderline()"><u>U</u></button>
+      <button onclick="toggleStrikeThrough()">S̶</button>
+      <button onclick="alignText('left')">←</button>
+      <button onclick="alignText('center')">⇔</button>
+      <button onclick="alignText('right')">→</button>
+      <button onclick="justifyText()" title="Justify Text">📰</button>
+      <button onclick="toggleUnorderedList()">• List</button>
+      <button onclick="undo()">↩️</button>
+      <button onclick="redo()">↪️</button>
+      <button onclick="insertModernLink()">🔗</button>
+
+      <!-- Text Color -->
+      <button id="textColorBtn" title="Text Color">🎨</button>
+      <div id="textColorDropdown" class="dropdown hidden">
+        <div onclick="setTextColor('black')" style="color: black;">Black</div>
+        <div onclick="setTextColor('red')" style="color: red;">Red</div>
+        <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
+        <div onclick="setTextColor('green')" style="color: green;">Green</div>
+        <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
+        <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
+        <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
+      </div>
+
+      <!-- Highlight -->
+      <button id="highlightBtn" title="Highlight">🖍️</button>
+      <div id="highlightDropdown" class="dropdown hidden">
+        <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+        <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+        <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+        <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+        <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
+      </div>
+      </div>
+
+      <button id="modeSwitchBtn" title="Switch Editor">🔁</button>
+    </div>
 
   <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
   <div class="preview-overlay" id="preview">
@@ -1041,14 +1119,6 @@
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
 
-      <button id="previewToggle">☰</button>
-
-      <div class="controls">
-        <button onclick="saveText()" title="Save">💾</button>
-        <button id="voiceBtn" onclick="toggleVoiceCapture()" title="Start Voice">🎤</button> 
-        <button id="printBtn" title="Print Note">🖨️</button>
-      </div>
-
       <div class="main-only">
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
@@ -1095,43 +1165,6 @@
           <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
           <div id="attachedFilesList"></div>
           <button onclick="removeFormatting()">🚫</button>
-        </div>
-      </div>
-      <!-- 🔧 Shared Toolbar -->
-      <div class="shared-toolbar">
-        <button onclick="toggleBold()"><b>B</b></button>
-        <button onclick="toggleItalic()"><i>I</i></button>
-        <button onclick="toggleUnderline()"><u>U</u></button>
-        <button onclick="toggleStrikeThrough()">S̶</button>
-        <button onclick="alignText('left')">←</button>
-        <button onclick="alignText('center')">⇔</button>
-        <button onclick="alignText('right')">→</button>
-        <button onclick="justifyText()" title="Justify Text">📰</button>
-        <button onclick="toggleUnorderedList()">• List</button>
-        <button onclick="undo()">↩️</button>
-        <button onclick="redo()">↪️</button>
-        <button onclick="insertModernLink()">🔗</button>
-
-        <!-- Text Color -->
-        <button id="textColorBtn" title="Text Color">🎨</button>
-        <div id="textColorDropdown" class="dropdown hidden">
-          <div onclick="setTextColor('black')" style="color: black;">Black</div>
-          <div onclick="setTextColor('red')" style="color: red;">Red</div>
-          <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
-          <div onclick="setTextColor('green')" style="color: green;">Green</div>
-          <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
-          <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
-          <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
-        </div>
-
-        <!-- Highlight -->
-        <button id="highlightBtn" title="Highlight">🖍️</button>
-        <div id="highlightDropdown" class="dropdown hidden">
-          <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
-          <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
-          <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
-          <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
-          <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
         </div>
       </div>
 
