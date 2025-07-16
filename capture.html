@@ -2683,6 +2683,8 @@
       const dropdown = document.getElementById(dropdownId);
       if (!btn || !dropdown) return;
 
+      console.log("🎯 Button clicked:", btnId); // ✅ Add it here to trace the trigger
+
       // Append dropdown to <body> so fixed positioning behaves consistently
       document.body.appendChild(dropdown);
 
@@ -2690,20 +2692,15 @@
       dropdown.style.visibility = 'hidden'; // hide it for accurate measurement
 
       const rect = btn.getBoundingClientRect();
-
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const scrollX = window.scrollX || document.documentElement.scrollLeft;
-
       const dropdownHeight = dropdown.offsetHeight;
 
       dropdown.style.position = 'fixed';
       dropdown.style.left = `${rect.left}px`;
       dropdown.style.top = `${rect.top - dropdownHeight - 8}px`;
 
-      // 🐞 DEBUG HERE
       console.log("📍Dropdown position:", dropdown.style.top, dropdown.style.left);
-
       dropdown.style.visibility = 'visible';
+
     }
 
     document.addEventListener("click", (e) => {
