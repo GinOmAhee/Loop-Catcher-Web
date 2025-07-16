@@ -2238,6 +2238,7 @@
       const scope = document.getElementById("searchScope")?.value || "group";
       const groupBy = document.getElementById("groupSelector").value;
       const now = Date.now();
+      let html = "";
 
       if (notes.length === 0) {
         groupedNotes.innerHTML = "<p>📭 No saved notes yet.</p>";
@@ -2277,8 +2278,6 @@
               n.text?.toLowerCase().includes(keyword) ||
               n.project?.toLowerCase().includes(keyword))
           : notes;
-
-      let html = "";
 
       if (scope === "all") {
         if (filteredNotes.length === 0) {
