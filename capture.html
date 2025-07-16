@@ -403,11 +403,14 @@
     border-bottom: 2px solid #ccc;
     position: sticky;
     top: 0;
+    overflow: visible; /* important if switch is getting clipped */
+    justify-content: space-between; /* ensures space distribution */
     z-index: 10; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
     transition: background-color 0.3s ease;
   }
+  
   .tab {
     display: inline-flex;
     align-items: center;
@@ -856,10 +859,10 @@
   }
 
   .dark-theme-switch {
-    position: fixed;
-    top: 5rem;
-    right: .3rem;
-    z-index: 1000;
+    position: relative; /* NOT fixed anymore */
+    margin-left: auto;  /* pushes it to the right inside tab-bar */
+    display: flex;
+    align-items: center;
   }
 
   .theme-toggle input {
