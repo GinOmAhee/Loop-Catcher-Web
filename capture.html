@@ -822,26 +822,19 @@
     font-size: 0.85rem;
   }
 
-  .color-tool-wrapper {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   #highlightDropdown,
   #textColorDropdown {
-    position: absolute;
-    bottom: calc(100% + 0.5rem); /* ⬆️ position above the bar */
-    left: 0; /* or use JS to align exactly under the button */
-    z-index: 999;
+    position: fixed; /* allows escape from parent containers */
+    z-index: 9999;
     background: white;
     border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    font-size: 0.85rem;
-    min-width: 120px; /* optional, for nicer sizing */
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    min-width: 140px;
+    padding: 0.5rem 0;
+    display: none; /* toggled via JS */
   }
+
 
   body.dark-theme #highlightDropdown,
   body.dark-theme #textColorDropdown {
@@ -849,6 +842,18 @@
     border-color: #444;
     color: #eee;
   }
+
+  #highlightDropdown div,
+  #textColorDropdown div {
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+  }
+
+  #highlightDropdown div:hover,
+  #textColorDropdown div:hover {
+    background-color: var(--tab-hover, #eee);
+  }
+
 
   .dropdown div {
     padding: 0.4rem 1rem;
@@ -1091,33 +1096,28 @@
       <button onclick="undo()">↩️</button>
       <button onclick="redo()">↪️</button>
       <button onclick="insertModernLink()">🔗</button>
-
-      <div class="color-tool-wrapper">
-        <!-- Text Color -->
-        <button id="textColorBtn" title="Text Color">🎨</button>
-        <div id="textColorDropdown" class="dropdown hidden">
-          <div onclick="setTextColor('black')" style="color: black;">Black</div>
-          <div onclick="setTextColor('red')" style="color: red;">Red</div>
-          <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
-          <div onclick="setTextColor('green')" style="color: green;">Green</div>
-          <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
-          <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
-          <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
-        </div>
-
-        <!-- Highlight -->
-        <button id="highlightBtn" title="Highlight">🖍️</button>
-        <div id="highlightDropdown" class="dropdown hidden">
-          <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
-          <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
-          <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
-          <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
-          <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
-        </div>
-      </div>
-
+      <button id="textColorBtn" title="Text Color">🎨</button>
+      <button id="highlightBtn" title="Highlight">🖍️</button>
       <button id="modeSwitchBtn" title="Switch Editor">🔁</button>
     </div>
+  </div>
+
+  <div id="textColorDropdown" class="dropdown hidden">
+    <div onclick="setTextColor('black')" style="color: black;">Black</div>
+    <div onclick="setTextColor('red')" style="color: red;">Red</div>
+    <div onclick="setTextColor('blue')" style="color: blue;">Blue</div>
+    <div onclick="setTextColor('green')" style="color: green;">Green</div>
+    <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
+    <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
+    <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
+  </div>
+
+  <div id="highlightDropdown" class="dropdown hidden">
+    <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+    <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+    <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+    <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+    <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
   </div>
 
   <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
@@ -2677,6 +2677,28 @@
        selection.addRange(newRange);
      }
     }
+
+    function showDropdownAbove(btnId, dropdownId) {
+      const btn = document.getElementById(btnId);
+      const dropdown = document.getElementById(dropdownId);
+      if (!btn || !dropdown) return;
+
+      const rect = btn.getBoundingClientRect();
+
+      dropdown.style.left = `${rect.left}px`;
+      dropdown.style.top = `${rect.top - dropdown.offsetHeight - 8}px`; // ⬆️ place above the button
+      dropdown.style.display = "block";
+    }
+
+    document.addEventListener("click", (e) => {
+      const isDropdown = e.target.closest("#highlightDropdown, #textColorDropdown");
+      const isButton = e.target.closest("#highlightBtn, #textColorBtn");
+
+      if (!isDropdown && !isButton) {
+        document.getElementById("highlightDropdown").style.display = "none";
+        document.getElementById("textColorDropdown").style.display = "none";
+      }
+    });
 
     // ✅ Margin Input UI logic
     document.addEventListener("DOMContentLoaded", () => {
