@@ -492,7 +492,7 @@
     border: 1px solid #ccc;
     cursor: pointer;
   }
-  
+
   .shared-toolbar {
     display: flex;
     flex-wrap: wrap;          /* handles overflow and responsiveness */
@@ -984,7 +984,7 @@
             <option value="'Georgia', serif">Georgia</option>
             <option value="'Courier New', monospace">Courier New</option>
             <option value="'Times New Roman', serif">Times New Roman</option>
-          </select>
+          </select>  
         <!-- Font Size Icon Button -->
         <button id="fontSizeBtn" title="Font Size">🔠</button>
           <div id="fontSizeDropdownPanel" class="dropdown hidden">
@@ -1000,6 +1000,7 @@
               <option value="24pt">24</option>
               <option value="36pt">36</option>
             </select>
+          <div>  
         <button id="applyFontSize">Apply</button>
         <button onclick="cleanEditor()">🧹</button>
         <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
@@ -1031,7 +1032,7 @@
             <div onclick="setTextColor('orange')" style="color: orange;">Orange</div>
             <div onclick="setTextColor('purple')" style="color: purple;">Purple</div>
             <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
-        </div>
+          </div>
         <!-- Highlight Color Icon Button -->
         <button id="highlightBtn" title="Highlight">🖍️</button>
           <!-- Highlight Color Dropdown -->
@@ -1042,7 +1043,7 @@
             <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
             <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
           </div>
-        </div>
+
       <div>
 
       <!-- 📝 Rich Text Editor -->
