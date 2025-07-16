@@ -2683,11 +2683,19 @@
       const dropdown = document.getElementById(dropdownId);
       if (!btn || !dropdown) return;
 
-      const rect = btn.getBoundingClientRect();
+      // Show offscreen temporarily so we can measure height
+      dropdown.style.visibility = 'hidden';
+      dropdown.style.display = 'block';
 
+      const rect = btn.getBoundingClientRect();
+      const dropdownHeight = dropdown.offsetHeight;
+
+      // Position it just above the button
       dropdown.style.left = `${rect.left}px`;
-      dropdown.style.top = `${rect.top - dropdown.offsetHeight - 8}px`; // ⬆️ place above the button
-      dropdown.style.display = "block";
+      dropdown.style.top = `${rect.top - dropdownHeight - 8}px`;
+
+      // Reveal it
+      dropdown.style.visibility = 'visible';
     }
 
     document.addEventListener("click", (e) => {
