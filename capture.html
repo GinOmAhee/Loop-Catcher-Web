@@ -1135,11 +1135,14 @@
       <div class="preview-sortbar">
         <span title="Group Notes">📂</span>
         <select id="groupSelector" onchange="updateGrouping()">
-          <option value="date">Date</option>
-          <option value="title">Title</option>
-          <option value="project">Project</option>
-          <option value="unresolved">Unresolved Ideas</option>
-          <option value="forgotten">Forgotten Ideas</option>
+          <option value="date">🗓️ Date</option>
+          <option value="title">👑 Title</option>
+          <option value="project">🌱 Project</option>
+          <option value="mode: scribbles">✍️ Scribble</option>
+          <option value="mode: documents">📚 Documents</option>
+          <option value="side thoughts">🧐 Side Thoughts</option>
+          <option value="unresolved">⏳ All Unresolved</option>
+          <option value="forgotten">👻 All Forgotten</option>
         </select>
       </div>
 
@@ -1300,7 +1303,39 @@
       if (themeClass) document.body.classList.add(themeClass);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    let activeEditor;
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const mainEd = document.getElementById("mainEditor");
+      const coEd = document.getElementById("coEditor");
+      const badge = document.getElementById("sideThoughtsBadge");
+      const popup = document.getElementById("thoughtPopup");
+      const modeSwitchBtn = document.getElementById("modeSwitchBtn");
+
+      // Set initial active editor
+      activeEditor = mainEd;
+      mainEd.classList.remove("hidden");
+      coEd.classList.add("hidden");
+      document.body.classList.remove("co-mode");
+
+      // 🔁 Editor toggle logic
+      if (modeSwitchBtn) {
+        modeSwitchBtn.addEventListener("click", () => {
+          if (activeEditor === mainEd) {
+            mainEd.classList.add("hidden");
+            coEd.classList.remove("hidden");
+            activeEditor = coEd;
+            document.body.classList.add("co-mode");
+          } else {
+            coEd.classList.add("hidden");
+            mainEd.classList.remove("hidden");
+            activeEditor = mainEd;
+            document.body.classList.remove("co-mode");
+          }
+          activeEditor.focus();
+        });
+      }
+
       const switchEl = document.getElementById('themeSwitch');
 
       function loadTheme() {
@@ -1329,40 +1364,20 @@
 
       applyMoodTheme(); // This should already exist globally
       loadTheme();
-    });
 
-    let activeEditor;
+      const voiceBtn = document.querySelector('.voice-btn');
+      if (voiceBtn) voiceBtn.addEventListener('click', toggleVoiceCapture);
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const mainEd = document.getElementById("mainEditor");
-      const coEd = document.getElementById("coEditor");
-      const badge = document.getElementById("sideThoughtsBadge");
-      const popup = document.getElementById("thoughtPopup");
-      const modeSwitchBtn = document.getElementById("modeSwitchBtn");
+      document.getElementById("activeEditor")?.classList.add("visible");
+      document.getElementById("printBtn").addEventListener("click", printNote);
 
-      // Set initial active editor
-      let activeEditor = mainEd;
-      mainEd.classList.remove("hidden");
-      coEd.classList.add("hidden");
-      document.body.classList.remove("co-mode");
+      document.getElementById("textColorBtn").addEventListener("click", () => {
+        showDropdownAbove("textColorBtn", "textColorDropdown");
+      });
 
-      // 🔁 Editor toggle logic
-      if (modeSwitchBtn) {
-        modeSwitchBtn.addEventListener("click", () => {
-          if (activeEditor === mainEd) {
-            mainEd.classList.add("hidden");
-            coEd.classList.remove("hidden");
-            activeEditor = coEd;
-            document.body.classList.add("co-mode");
-          } else {
-            coEd.classList.add("hidden");
-            mainEd.classList.remove("hidden");
-            activeEditor = mainEd;
-            document.body.classList.remove("co-mode");
-          }
-          activeEditor.focus();
-        });
-      }
+      document.getElementById("highlightBtn").addEventListener("click", () => {
+        showDropdownAbove("highlightBtn", "highlightDropdown");
+      });
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
@@ -1374,7 +1389,7 @@
       // 🧠 Make mode globally accessible if needed
       window.SideThoughts = {
         getActiveEditor: () => activeEditor,
-        getMode: () => mode
+        getMode: () => activeEditor?.id === "coEditor" ? "scribble" : "document"
       };
     });
 
@@ -1775,10 +1790,12 @@
       const newNote = {
         text: noteHTML,
         timestamp: now.toISOString(),
-        title: tabs[activeTabIndex]?.title || "Untitled", // ← 💡 this line adds tab name as title
+        title: currentTabTitle,
         project: projectName,
         resolved: false,
-        tags: []
+        tags: [],
+        mode: noteMode  // ← 🔥 NEW: adds the label "document" or "scribble"
+        source: "sideThought"  // 🧠 this is key
       };
 
       existingNotes.unshift(newNote);
@@ -1948,11 +1965,6 @@
       const status = document.getElementById("saveStatus");
       if (status) status.textContent = "🛑 Voice capture stopped.";
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const voiceBtn = document.querySelector('.voice-btn');
-      if (voiceBtn) voiceBtn.addEventListener('click', toggleVoiceCapture);
-    });
 
     async function handleFileAttachment() {
       const input = document.getElementById('fileInput');
@@ -2306,6 +2318,52 @@
             });
             for (const project in grouped) {
               html += renderGroupedSection("📁", project, grouped[project]);
+            }
+            break;
+
+          case "mode: scribbles":
+            filteredNotes
+              .filter(note => note.mode === "scribble") // ✅ actual filtering
+              .forEach(note => {
+                 const project = note.project || "📂 Unlabeled";
+                 grouped[project] = grouped[project] || [];
+                 grouped[project].push(note);
+              });
+
+            for (const project in grouped) {
+               html += renderGroupedSection("📝", project, grouped[project]); // 🎨 feel free to change icon
+            }
+            break;
+
+          case "mode: documents":
+            filteredNotes
+              .filter(note => note.mode === "document") // ✅ actual filtering
+              .forEach(note => {
+                 const project = note.project || "📂 Unlabeled";
+                 grouped[project] = grouped[project] || [];
+                 grouped[project].push(note);
+              });
+
+            for (const project in grouped) {
+              html += renderGroupedSection("📄", project, grouped[project]); // 🎨 icon match
+            }
+            break;
+
+          case "side thoughts":
+            const sideThoughts = filteredNotes.filter(note => note.source === "sideThought");
+            if (sideThoughts.length === 0) {
+              groupedNotes.innerHTML = "<p>🧠 No saved side thoughts found.</p>";
+              return;
+            }
+
+            sideThoughts.forEach(note => {
+              const project = note.project || "📂 Unlabeled";
+              grouped[project] = grouped[project] || [];
+              grouped[project].push(note);
+            });
+
+            for (const project in grouped) {
+              html += renderGroupedSection("🧠", project, grouped[project]);
             }
             break;
 
@@ -2696,6 +2754,7 @@
 
       dropdown.style.position = 'fixed';
       dropdown.style.left = `${rect.left}px`;
+      dropdown.style.top = `${btnRect.top - dropdownHeight - 8}px`; // ↑ above the button
       dropdown.style.top = `${rect.top - dropdownHeight - 8}px`;
 
       console.log("📍Dropdown position:", dropdown.style.top, dropdown.style.left);
@@ -2705,7 +2764,7 @@
 
     document.addEventListener("click", (e) => {
       const isDropdown = e.target.closest("#highlightDropdown, #textColorDropdown");
-      const isButton = e.target.closest("#highlightBtn, #textColorBtn");
+      const isTrigger = e.target.closest("#highlightBtn, #textColorBtn");
 
       if (!isDropdown && !isButton) {
         document.getElementById("highlightDropdown").style.display = "none";
@@ -2751,13 +2810,6 @@
           marginDropdown.classList.add("hidden");
         }
       });
-    });
-
-    window.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("activeEditor")?.classList.add("visible");
-
-      document.getElementById("printBtn").addEventListener("click", printNote);
-
     });
 
     document.addEventListener("click", () => {
