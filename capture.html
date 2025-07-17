@@ -2091,85 +2091,63 @@
           if (event.results[i].isFinal) {
             let text = event.results[i][0].transcript.trim();
             let command = text.toLowerCase().replace(/[^\w\s]/gi, "");
-
             console.log("🎤 Heard:", command);
 
             // 🧠 Note mode toggle
             if (command === "note this" || command === "side thought") {
               isInNoteMode = true;
               speak("Noting your thoughts.");
+              document.getElementById("thoughtPopup").classList.remove("hidden");
               return;
             }
 
-            if (command === "stop note" || command === "stop noting") {
-              isInNoteMode = false;
-              speak("Stopped noting.");
-              return;
-            }
-
-            // 🧠 If in note mode, push to Side Thought input
-            if (isInNoteMode) {
-              const sideThoughtPanel = document.getElementById("thoughtPopup");
-              const sideThoughtToggleBtn = document.querySelector("sideThoughtsBadge"); // replace with your actual toggle selector
-
-              if (sideThoughtPanel && !sideThoughtPanel.classList.contains("open")) {
-                sideThoughtToggleBtn?.click(); // opens it programmatically
-              }
-
-              const sideThoughtInput = document.getElementById("sideThoughtTextarea");
-              if (sideThoughtInput) {
-                sideThoughtInput.value += finalTranscript + " ";
-                sideThoughtInput.scrollTop = sideThoughtInput.scrollHeight; // auto scroll to bottom
-              }
-
-              if (["done", "never mind", "abort"].includes(command)) {
-              const sideThoughtPanel = document.querySelector("thoughtPopup");
-              const sideThoughtInput = document.getElementById("sideThoughtTextarea");
-
-                if (sideThoughtPanel && sideThoughtPanel.classList.contains("open")) {
-                  // Optional: auto-save if there's content
-                  if (sideThoughtInput && sideThoughtInput.value.trim()) {
-                    saveSideThought();
-                    speak("Side thought saved and closed.");
-                  } else {
-                    speak("Closing side thought.");
-                  }
-
-                  sideThoughtPanel.classList.remove("open");
-                  sideThoughtInput.value = "";
-                  isInNoteMode = false; // exit note mode
-                  return;
+            // 📌 Exit Note Mode
+            if (["done", "never mind", "abort"].includes(command)) {
+              if (isInNoteMode) {
+                const input = document.getElementById("sideThoughtTextarea");
+                if (input.value.trim()) {
+                  saveSideThought();
+                  speak("Side thought saved and closed.");
+                } else {
+                  speak("Closing side thought.");
                 }
-
-                return;
+                input.value = "";
+                document.getElementById("thoughtPopup").classList.add("hidden");
+                isInNoteMode = false;
               }
-
-              // 🧠 Normal command + fallback text entry
-              const handled = handleVoiceCommand(command);
-              if (!handled) finalTranscript += text + " ";
+              return;
             }
-          }
 
-          // 🧠 Fallback to active editor
-          if (finalTranscript) {
-            const editor = getActiveEditor();
-            if (editor) {
-              editor.innerHTML += (editor.innerHTML ? "<br>" : "") + finalTranscript.trim();
-              editor.scrollTop = editor.scrollHeight;
+            if (isInNoteMode) {
+              const input = document.getElementById("sideThoughtTextarea");
+              input.value += text + " ";
+              input.scrollTop = input.scrollHeight;
+              return;
             }
+
+            // ✏️ If not in note mode, pass to editor
+            finalTranscript += text + " ";
           }
-        };
+        }
+        // ⌨️ Paste to active editor (main input)
+        if (finalTranscript) {
+          const editor = getActiveEditor();
+          if (editor) {
+            editor.innerHTML += (editor.innerHTML ? "<br>" : "") + finalTranscript.trim();
+            editor.scrollTop = editor.scrollHeight;
+          }
+        }
+      };
 
-        recognition.onerror = (event) => {
-          console.error("🎤 Voice error:", event.error);
-          stopVoiceCapture();
-        };
+      recognition.onerror = (event) => {
+        console.error("🎤 Voice error:", event.error);
+        stopVoiceCapture();
+      };
 
-        isRecording = true;
-        if (btn) btn.textContent = "🛑 Stop";
-        if (status) status.textContent = "🎙️ Listening...";
-      }
-    }  
+      isRecording = true;
+      if (btn) btn.textContent = "🛑 Stop";
+      if (status) status.textContent = "🎙️ Listening...";
+    }
 
     function stopVoiceCapture() {
       if (recognition) recognition.stop();
