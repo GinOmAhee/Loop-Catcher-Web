@@ -2126,49 +2126,50 @@
               const sideThoughtPanel = document.querySelector(".side-thought-panel");
               const sideThoughtInput = document.getElementById("sideThoughtTextarea");
 
-              if (sideThoughtPanel && sideThoughtPanel.classList.contains("open")) {
-                // Optional: auto-save if there's content
-                if (sideThoughtInput && sideThoughtInput.value.trim()) {
-                  saveSideThought();
-                  speak("Side thought saved and closed.");
-                } else {
-                  speak("Closing side thought.");
+                if (sideThoughtPanel && sideThoughtPanel.classList.contains("open")) {
+                  // Optional: auto-save if there's content
+                  if (sideThoughtInput && sideThoughtInput.value.trim()) {
+                    saveSideThought();
+                    speak("Side thought saved and closed.");
+                  } else {
+                    speak("Closing side thought.");
+                  }
+
+                  sideThoughtPanel.classList.remove("open");
+                  sideThoughtInput.value = "";
+                  isInNoteMode = false; // exit note mode
+                  return;
                 }
 
-                sideThoughtPanel.classList.remove("open");
-                sideThoughtInput.value = "";
-                isInNoteMode = false; // exit note mode
                 return;
               }
-              
-              return;
+
+              // 🧠 Normal command + fallback text entry
+              const handled = handleVoiceCommand(command);
+              if (!handled) finalTranscript += text + " ";
             }
-
-            // 🧠 Normal command + fallback text entry
-            const handled = handleVoiceCommand(command);
-            if (!handled) finalTranscript += text + " ";
           }
-        }
 
-        // 🧠 Fallback to active editor
-        if (finalTranscript) {
-          const editor = getActiveEditor();
-          if (editor) {
-            editor.innerHTML += (editor.innerHTML ? "<br>" : "") + finalTranscript.trim();
-            editor.scrollTop = editor.scrollHeight;
+          // 🧠 Fallback to active editor
+          if (finalTranscript) {
+            const editor = getActiveEditor();
+            if (editor) {
+              editor.innerHTML += (editor.innerHTML ? "<br>" : "") + finalTranscript.trim();
+              editor.scrollTop = editor.scrollHeight;
+            }
           }
-        }
-      };
+        };
 
-      recognition.onerror = (event) => {
-        console.error("🎤 Voice error:", event.error);
-        stopVoiceCapture();
-      };
+        recognition.onerror = (event) => {
+          console.error("🎤 Voice error:", event.error);
+          stopVoiceCapture();
+        };
 
-      isRecording = true;
-      if (btn) btn.textContent = "🛑 Stop";
-      if (status) status.textContent = "🎙️ Listening...";
-    }
+        isRecording = true;
+        if (btn) btn.textContent = "🛑 Stop";
+        if (status) status.textContent = "🎙️ Listening...";
+      }
+    }  
 
     function stopVoiceCapture() {
       if (recognition) recognition.stop();
