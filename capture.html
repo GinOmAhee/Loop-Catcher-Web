@@ -2100,6 +2100,15 @@
           }
         }
 
+        // 👇👇 Insert into Side Thought input if open
+        const sideThoughtInput = document.getElementById("sideThoughtTextarea");
+        const sideThoughtPanel = document.querySelector(".side-thought-panel"); // adjust selector if needed
+
+        if (sideThoughtInput && sideThoughtPanel && sideThoughtPanel.classList.contains("open")) {
+          sideThoughtInput.value += finalTranscript + " ";
+          sideThoughtInput.scrollTop = sideThoughtInput.scrollHeight; // auto scroll to bottom
+        }
+
         if (finalTranscript) {
           const editor = getActiveEditor();
           if (editor) {
