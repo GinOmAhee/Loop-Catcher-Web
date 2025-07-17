@@ -1432,6 +1432,14 @@
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
 
+      // 🔒 Force it to be hidden on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        const fontDropdown = document.getElementById("fontDropdown");
+        if (fontDropdown) {
+          fontDropdown.classList.add("hidden");
+        }
+      });
+
       const fontBtn = document.getElementById("fontMenuBtn");
       const fontDropdown = document.getElementById("fontDropdown");
 
@@ -1645,6 +1653,12 @@
       addTabBtn.onclick = addNewTab;
       tabBar.appendChild(addTabBtn);
     }
+
+    document.addEventListener("click", () => {
+      if (fontDropdown && !fontDropdown.classList.contains("hidden")) {
+        fontDropdown.classList.add("hidden");
+      }
+    });
 
     function markUnsaved() {
       hasUnsavedChanges = true;
