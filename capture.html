@@ -573,21 +573,13 @@
   }
 
   .format-toolbar {
-    position: relative;
+    display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;        /* 🔁 prevents wrapping */
-    align-items: center;
-    overflow-x: auto;
-    justify-content: flex-start;
-    padding: 0.2rem .3rem;
-    max-width: 100%;
-    width: fit-content;              /* only as wide as needed */
-    flex-shrink: 1;
-    z-index: 50;
-    /* Visuals */
-    background-color: var(--toolbar-bg, #fff);
-    border-top: 1px solid var(--tab-border);
-    border-bottom: 1px solid var(--tab-border);
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #ddd;
   }
  
   .controls {
@@ -1091,8 +1083,11 @@
   }
 
   .main-only {
-    height: 100vh; /* or custom height */
-    overflow-y: auto; /* Enables vertical scrolling */
+    height: 100vh;
+    overflow-y: auto;
+    width: 100%; /* 👈 ADD THIS */
+    display: flex;
+    flex-direction: column;
   }
 
   </style>
