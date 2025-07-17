@@ -32,6 +32,8 @@
     --preview-text-color: #333;
     --toolbar-bg: #f5f5f5;
     --toolbar-border: #ddd;
+    --hint-bg: #f0f0f0;
+    --hint-text: #444;
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px;
     color: #333;
@@ -55,6 +57,8 @@
     --badge-text: #eee;
     --toolbar-bg: #1a1a1a;
     --toolbar-border: #444;
+    --hint-bg: #1f1f1f;
+    --hint-text: #ddd;
     background-color: #000;
     color: #f1f1f1;
   }
@@ -1067,11 +1071,13 @@
     position: fixed;
     top: 60px;
     left: 20px;
-    background: #f0f0f0;
+    background-color: var(--hint-bg, #f0f0f0);
+    color: var(--hint-text, #444);
     padding: 6px 10px;
     border-radius: 6px;
     font-size: 0.85rem;
-    color: #444;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.3s ease, color 0.3s ease;
     z-index: 999;
     opacity: 0.9;
   }
