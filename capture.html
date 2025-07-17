@@ -1397,12 +1397,35 @@
     });
 
     let recognition;
-    let isRecording = false;
-    recognition.continuous = true;
-    recognition.interimResults = false;
-    recognition.lang = "en-US";
 
-    const synth = window.speechSynthesis;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event) => {
+        const voiceCommand = event.results[0][0].transcript.toLowerCase().trim();
+        handleVoiceCommand(voiceCommand);
+      };
+
+      recognition.onend = () => {
+        if (isRecording) {
+          recognition.start(); // auto-restart listening
+        }
+      };
+
+      // Optional: enable mic on any user interaction to satisfy browser requirement
+      document.body.addEventListener('click', () => {
+        if (!isRecording) {
+          startVoiceCapture();
+        }
+      });
+    } else {
+      alert("Speech recognition is not supported in this browser.");
+    }
 
     function getActiveEditor() {
       return document.querySelector('.editor:not(.hidden)');
