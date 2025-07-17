@@ -1417,6 +1417,19 @@
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
 
+      const fontBtn = document.getElementById("fontMenuBtn");
+      const fontDropdown = document.getElementById("fontDropdown");
+
+      if (fontBtn && fontDropdown) {
+        fontBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          fontDropdown.classList.toggle("hidden");
+          const rect = fontBtn.getBoundingClientRect();
+          fontDropdown.style.left = `${rect.left}px`;
+          fontDropdown.style.top = `${rect.bottom + 5}px`;
+        });
+      }
+
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
         badge.addEventListener("click", () => {
