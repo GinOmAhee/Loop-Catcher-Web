@@ -1938,10 +1938,30 @@
       }
     }
 
+    const synth = window.speechSynthesis;
+    let voices = [];
+
+    window.speechSynthesis.onvoiceschanged = () => {
+      voices = synth.getVoices();
+    };
+
     function speakOutLoud(text) {
-      const synth = window.speechSynthesis;
       if (!synth) return;
+  
       const utter = new SpeechSynthesisUtterance(text);
+
+      // Load voices if not already loaded
+      if (voices.length === 0) {
+        voices = synth.getVoices();
+      }
+
+      // Choose a preferred English voice
+      const preferredVoice = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes("google")) || voices[0];
+
+      if (preferredVoice) {
+        utter.voice = preferredVoice;
+      }
+
       synth.speak(utter);
     }
 
@@ -1968,7 +1988,7 @@
           return true;
 
         case "save note":
-          saveMainNote(); // make sure this exists
+          saveText(); // make sure this exists
           speakOutLoud("Say the project name.");
           return true;
 
@@ -1978,9 +1998,14 @@
           return true;
 
         case "enter side thought":
-          openSideThoughtPanel(); // make sure this exists
-          speakOutLoud("Ready for side thought entry.");
-          return true;
+          const sideBtn = document.getElementById("sideThoughtsBadge");
+          if (sideBtn) {
+            sideBtn.click();
+            speakOutLoud("Ready for side thought entry.");
+          } else {
+            speakOutLoud("Side thought button not found.");
+          }
+            return true;
 
         case "save thought":
           saveSideThought(); // make sure this exists
