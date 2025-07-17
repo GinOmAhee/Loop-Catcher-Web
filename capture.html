@@ -2053,6 +2053,12 @@
         }
     }
 
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      speechSynthesis.speak(utterance);
+    }
+
     function startVoiceCapture() {
       if (!recognition) {
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -2068,6 +2074,8 @@
       const status = document.getElementById('saveStatus');
 
       recognition.start();
+
+      speak("Voice command activated");
 
       recognition.onresult = (event) => {
         let finalTranscript = "";
