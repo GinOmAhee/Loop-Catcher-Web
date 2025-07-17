@@ -1020,7 +1020,7 @@
 
   #thoughtPopup button {
     margin-top: 0.5rem;
-    width: 100%;
+    width: 50%;
     background: var(--popup-button-bg);
     border: none;
     border-radius: 6px;
@@ -1245,7 +1245,7 @@
     <!-- 💬 The Thought Popup -->
     <div id="thoughtPopup" class="hidden">
       <textarea id="sideThoughtTextarea" placeholder="Drop your thought here..."></textarea>
-      <button onclick="saveSideThought()">Save Thought</button>
+      <button onclick="saveSideThought()">Save</button>
     </div>
   </div>
 
@@ -1395,6 +1395,15 @@
         getMode: () => activeEditor?.id === "coEditor" ? "scribble" : "document"
       };
     });
+
+    let recognition;
+    let isRecording = false;
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+
+    const synth = window.speechSynthesis;
 
     function getActiveEditor() {
       return document.querySelector('.editor:not(.hidden)');
@@ -1627,9 +1636,6 @@
     const textColorDropdown = document.getElementById("textColorDropdown");
     const justifyBtn = document.getElementById("justifyBtn");
 
-    
-    let recognition;
-    let isRecording = false;
     let debounceTimer;
 
     function attachInputListener(editor) {
@@ -1914,23 +1920,95 @@
       synth.speak(utter);
     }
 
+    function handleVoiceCommand(command) {
+      const editor = getActiveEditor();
+      if (!editor) return false;
+
+      command = command.toLowerCase().trim();
+
+      switch (command) {
+        case "stop":
+          speakOutLoud("Stopping now.");
+          stopVoiceCapture();
+        return true;
+
+        case "new paragraph":
+          editor.innerHTML += "<br><br>";
+          speakOutLoud("New paragraph.");
+          return true;
+
+        case "bold":
+          execOnActive("bold");
+          speakOutLoud("Bold enabled.");
+          return true;
+
+        case "save note":
+          saveMainNote(); // make sure this exists
+          speakOutLoud("Say the project name.");
+          return true;
+
+        case "create new note":
+          editor.innerHTML = "";
+          speakOutLoud("Editor ready for new entry.");
+          return true;
+
+        case "enter side thought":
+          openSideThoughtPanel(); // make sure this exists
+          speakOutLoud("Ready for side thought entry.");
+          return true;
+
+        case "save thought":
+          saveSideThought(); // make sure this exists
+          speakOutLoud("Thought saved.");
+          return true;
+
+        case "start voice command":
+          if (!isRecording) {
+            speakOutLoud("Voice command activated.");
+            startVoiceCapture();
+          return true;
+        }
+
+        break;
+
+        case "stop listening":
+          if (isRecording) {
+            recognition.stop();
+            isRecording = false;
+            speakOutLoud("Voice command stopped.");
+            return true;
+        }
+        break;
+
+        default:
+          if (command.startsWith("erase ")) {
+            const word = command.replace("erase ", "").trim();
+            if (word) {
+              const regex = new RegExp("\\b" + word + "\\b", "gi");
+              editor.innerHTML = editor.innerHTML.replace(regex, "");
+              speakOutLoud(`${word} erased. Continuing entry.`);
+              return true;
+            }
+          }
+          return false;
+        }
+    }
+
     function startVoiceCapture() {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert("Voice capture not supported");
+      if (!recognition) {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) return alert("Voice capture not supported");
+
+        recognition = new SR();
+        recognition.lang = 'en-US';
+        recognition.continuous = true;
+        recognition.interimResults = false;
+      }
 
       const btn = document.querySelector('.voice-btn');
       const status = document.getElementById('saveStatus');
-      const editor = getActiveEditor();
 
-      if (!editor) {
-        console.warn("🛑 No visible editor found.");
-        return;
-      }
-
-      recognition = new SR();
-      recognition.lang = 'en-US';
-      recognition.continuous = true;
-      recognition.interimResults = false;
+      recognition.start();
 
       recognition.onresult = (event) => {
         let finalTranscript = "";
@@ -1940,45 +2018,30 @@
             let text = event.results[i][0].transcript.trim();
             let command = text.toLowerCase().replace(/[^\w\s]/gi, "");
 
-            console.log("🧠 Command heard:", command);
+            console.log("🎤 Heard:", command);
 
-            if (command === "stop") {
-              speakOutLoud("Stopping now.");
-              stopVoiceCapture();
-              return;
+            const handled = handleVoiceCommand(command);
+            if (!handled) {
+              finalTranscript += text + " ";
             }
-
-            if (command === "new paragraph") {
-              editor.innerHTML += "<br><br>";
-              speakOutLoud("New paragraph.");
-              return;
-            }
-
-            if (command === "bold") {
-              execOnActive("bold");
-              speakOutLoud("Bold enabled.");
-              return;
-            }
-
-            // Append spoken text
-            finalTranscript += text + " ";
           }
         }
 
         if (finalTranscript) {
-          editor.innerHTML += (editor.innerHTML ? "<br>" : "") + finalTranscript.trim();
-          editor.scrollTop = editor.scrollHeight;
+          const editor = getActiveEditor();
+          if (editor) {
+            editor.innerHTML += (editor.innerHTML ? "<br>" : "") + finalTranscript.trim();
+            editor.scrollTop = editor.scrollHeight;
+          }
         }
       };
 
-      recognition.onerror = (e) => {
-        console.error("❌ Voice error:", e.error);
+      recognition.onerror = (event) => {
+        console.error("🎤 Voice error:", event.error);
         stopVoiceCapture();
       };
 
-      recognition.start();
       isRecording = true;
-
       if (btn) btn.textContent = "🛑 Stop";
       if (status) status.textContent = "🎙️ Listening...";
     }
