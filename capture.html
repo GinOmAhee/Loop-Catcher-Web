@@ -2123,14 +2123,24 @@
               }
 
               if (["done", "never mind", "abort"].includes(command)) {
-                const sideThoughtPanel = document.querySelector(".side-thought-panel");
-                if (sideThoughtPanel && sideThoughtPanel.classList.contains("open")) {
-                  sideThoughtPanel.classList.remove("open");
-                  document.getElementById("sideThoughtTextarea").value = "";
-                  speak("Side thought closed");
-                  return true;
+              const sideThoughtPanel = document.querySelector(".side-thought-panel");
+              const sideThoughtInput = document.getElementById("sideThoughtTextarea");
+
+              if (sideThoughtPanel && sideThoughtPanel.classList.contains("open")) {
+                // Optional: auto-save if there's content
+                if (sideThoughtInput && sideThoughtInput.value.trim()) {
+                  saveSideThought();
+                  speak("Side thought saved and closed.");
+                } else {
+                  speak("Closing side thought.");
                 }
+
+                sideThoughtPanel.classList.remove("open");
+                sideThoughtInput.value = "";
+                isInNoteMode = false; // exit note mode
+                return;
               }
+              
               return;
             }
 
