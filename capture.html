@@ -1221,10 +1221,8 @@
             <button class="tab">Side</button>
             <button class="detach-tab">⤴ Detach</button>
           </div>
-          <!-- 🎨 Toolbar -->
-          <div class="format-toolbar" style="margin-bottom: 1rem;">
+          <div class="format-toolbar">
             <button id="marginBtn" title="Set Margins">📏</button>
-
             <!-- Margin Dropdown -->
             <div id="marginDropdown" class="dropdown hidden">
               <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
@@ -1233,7 +1231,6 @@
               <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
               <button id="applyMarginBtn">✅ Apply</button>
             </div>
-
             <!-- Font Selection -->
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <select id="fontDropdown" onchange="setFont(this.value)">
@@ -1242,7 +1239,6 @@
               <option value="'Courier New', monospace">Courier New</option>
               <option value="'Times New Roman', serif">Times New Roman</option>
             </select>  
-
             <!-- Font Size Selection -->
             <button id="fontSizeBtn" title="Font Size">🔠</button>
             <div id="fontSizeDropdownPanel" class="dropdown hidden">
@@ -1260,7 +1256,6 @@
               </select>
               <button id="applyFontSize">Apply</button>
             </div>
-
             <button onclick="cleanEditor()">🧹</button>
             <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
             <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
