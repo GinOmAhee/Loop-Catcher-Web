@@ -310,7 +310,7 @@
   #mainEditor {
     position: relative; 
     width: var(--paper-width, 800px);
-    min-height: 100%;
+    min-height: 80%;
     font-family: "Arial", sans-serif;
     font-size: 1rem;
     border: 1px solid #ccc;
@@ -322,6 +322,7 @@
     color: var(--editor-text);
     box-sizing: border-box;
     overflow-y: auto;
+    flex-grow: 1;
   }
 
   #coEditor {
@@ -1091,8 +1092,9 @@
 
   .editor-wrapper {
     display: flex;
+    flex-direction: row; /* toolbar on left, editor on right */
+    flex-grow: 1;
     height: 100%;
-    position: relative;
   }
 
   </style>
@@ -1257,9 +1259,11 @@
               <div id="attachedFilesList"></div>
               <button onclick="removeFormatting()">🚫</button>
             </div>
-          </div> 
-        <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" class="editor" contenteditable="true"></div>
+          <!-- 📝 Rich Text Editor -->
+          <div id="mainEditor" class="editor" contenteditable="true">
+            Start typing here...
+          </div>
+        </div>     
       </div>
 
       <!-- 📝 Rich Text Editor -->
