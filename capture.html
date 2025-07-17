@@ -2080,7 +2080,7 @@
       const status = document.getElementById("saveStatus");
 
       recognition.start();
-      speak("Voice command activated");
+      speak("Microphones hot, I am all ears.");
 
       let isInNoteMode = false;
 
@@ -2096,8 +2096,14 @@
             // 🧠 Note mode toggle
             if (command === "note this" || command === "side thought") {
               isInNoteMode = true;
-              speak("Noting your thoughts.");
+              speak("Okok, catching your drift.");
               document.getElementById("thoughtPopup").classList.remove("hidden");
+              return;
+            }
+
+            if (command === "stop") {
+              speak("Microphones off, catch ya later.");
+              stopVoiceCapture();
               return;
             }
 
@@ -2126,6 +2132,60 @@
             }
 
             // ✏️ If not in note mode, pass to editor
+            // 🧠 Enhanced Commands
+            if (!isInNoteMode) {
+              switch (command) {
+                case "switch editor":
+                  const modeSwitchBtn = document.getElementById("modeSwitchBtn");
+                  if (modeSwitchBtn) {
+                    modeSwitchBtn.click();
+                    speak("Bet, switched editor.");
+                  }
+                  return;
+
+                case "switch tab":
+                  const tabs = document.querySelectorAll(".tab");
+                  let currentIndex = -1;
+                  tabs.forEach((tab, i) => {
+                    if (tab.classList.contains("active")) currentIndex = i;
+                  });
+                  const nextIndex = (currentIndex + 1) % tabs.length;
+                  tabs[nextIndex].click();
+                  speak(`Switched to tab ${nextIndex + 1}`);
+                  return;
+
+                case "open preview":
+                  const previewToggle = document.getElementById("previewToggle");
+                  if (previewToggle) {
+                    previewToggle.click();
+                    speak("Alright, preview's up.");
+                  }
+                  return;
+
+                case "group by command":
+                  const selector = document.getElementById("groupSelector");
+                  if (selector) {
+                    selector.value = "group-by-command"; // You can customize this value as per your `<option>` setup
+                    selector.dispatchEvent(new Event("change"));
+                    speak("Sorted by vibes, boss.");
+                  }
+                  return;
+
+                case "recite grouped notes":
+                  const notes = document.querySelectorAll(".grouped-note");
+                  if (notes.length === 0) {
+                    speak("No notes found");
+                  } else {
+                    let allNotes = Array.from(notes)
+                      .map(note => note.textContent.trim())
+                      .filter(Boolean)
+                      .join(". ");
+                    speak("Here's the tea on your notes " + allNotes);
+                  }
+                  return;
+              }
+            }
+
             finalTranscript += text + " ";
           }
         }
