@@ -578,7 +578,6 @@
     flex-direction: column;
     gap: 0.5rem;
     padding: 1rem 0.5rem;
-    align-items: stretch;
     background-color: #f4f4f4;
     border-right: 1px solid #ccc;
     min-width: 50px;
@@ -1071,7 +1070,7 @@
 
   .voice-hint-top {
     position: fixed;
-    bottom: 5px;
+    bottom: 10px;
     right: 100px;
     background-color: var(--hint-bg, #f0f0f0);
     color: var(--hint-text, #444);
@@ -1098,9 +1097,6 @@
 
   .editor-layout {
     display: flex;
-    flex-direction: row; /* horizontal layout */
-    align-items: flex-start;
-    gap: 10px; /* optional spacing */
     height: 100%; /* or set fixed height if needed */
   }
 
@@ -1236,9 +1232,39 @@
 
           <div class="format-toolbar-vertical">
             <button id="marginBtn" title="Set Margins">📏</button>
+            <div id="marginDropdown" class="dropdown hidden">
+              <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
+              <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
+              <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
+              <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
+              <button id="applyMarginBtn">✅ Apply</button>
+            </div>
+
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
+            <select id="fontDropdown" onchange="setFont(this.value)">
+              <option value="'Arial', sans-serif">Arial</option>
+              <option value="'Georgia', serif">Georgia</option>
+              <option value="'Courier New', monospace">Courier New</option>
+              <option value="'Times New Roman', serif">Times New Roman</option>
+            </select> 
+
             <button id="fontSizeBtn" title="Font Size">🔠</button>
             <div id="fontSizeDropdownPanel" class="dropdown hidden">
+              <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
+              <select id="fontSizeSelect">
+                <option value="" disabled selected>Select font size</option>
+                <option value="8pt">8</option>
+                <option value="10pt">10</option>
+                <option value="12pt" selected>12</option>
+                <option value="14pt">14</option>
+                <option value="16pt">16</option>
+                <option value="18pt">18</option>
+                <option value="24pt">24</option>
+                <option value="36pt">36</option>
+              </select>
+              <button id="applyFontSize">Apply</button>
+            </div>
+
             <button onclick="cleanEditor()">🧹</button>
             <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
             <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
@@ -1251,38 +1277,7 @@
                Start typing here...
             </div>
           </div>  
-        </div>
-        <div id="marginDropdown" class="dropdown hidden">
-          <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
-          <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
-          <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
-          <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
-          <button id="applyMarginBtn">✅ Apply</button>
-        </div>
-
-        <select id="fontDropdown" class="hidden" onchange="setFont(this.value)">
-          <option value="'Arial', sans-serif">Arial</option>
-          <option value="'Georgia', serif">Georgia</option>
-          <option value="'Courier New', monospace">Courier New</option>
-          <option value="'Times New Roman', serif">Times New Roman</option>
-        </select> 
-
-        </div>
-          <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
-          <select id="fontSizeSelect">
-            <option value="" disabled selected>Select font size</option>
-            <option value="8pt">8</option>
-            <option value="10pt">10</option>
-            <option value="12pt" selected>12</option>
-            <option value="14pt">14</option>
-            <option value="16pt">16</option>
-            <option value="18pt">18</option>
-            <option value="24pt">24</option>
-            <option value="36pt">36</option>
-          </select>
-          <button id="applyFontSize">Apply</button>
-        </div>
-        
+        </div>     
       </div>
 
       <!-- 📝 Rich Text Editor -->
@@ -1437,13 +1432,6 @@
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
 
-      document.addEventListener("DOMContentLoaded", () => {
-        const fontDropdown = document.getElementById("fontDropdown");
-        if (fontDropdown) {
-          fontDropdown.classList.add("hidden");
-        }
-      });
-
       const fontBtn = document.getElementById("fontMenuBtn");
       const fontDropdown = document.getElementById("fontDropdown");
 
@@ -1455,13 +1443,7 @@
           fontDropdown.style.left = `${rect.left}px`;
           fontDropdown.style.top = `${rect.bottom + 5}px`;
         });
-      } 
-
-      document.addEventListener("click", () => {
-        if (fontDropdown && !fontDropdown.classList.contains("hidden")) {
-          fontDropdown.classList.add("hidden");
-        }
-      });
+      }
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
