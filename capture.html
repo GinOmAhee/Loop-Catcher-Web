@@ -1398,7 +1398,6 @@
 
     let recognition;
     let isRecording = false;
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.continuous = true;
     recognition.interimResults = false;
     recognition.lang = "en-US";
