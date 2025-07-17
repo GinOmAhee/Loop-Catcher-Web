@@ -576,13 +576,11 @@
   .format-toolbar-vertical {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 0.5rem;
     padding: 1rem 0.5rem;
     background-color: #f4f4f4;
     border-right: 1px solid #ccc;
     min-width: 50px;
-    max-width: 60px;
   }
  
   .controls {
@@ -1092,9 +1090,21 @@
 
   .editor-wrapper {
     display: flex;
-    flex-direction: row; /* toolbar on left, editor on right */
+    flex: 1; /* takes up remaining space */
     flex-grow: 1;
-    height: 100%;
+    flex-direction: column;
+  }
+
+  .editor-layout {
+    display: flex;
+    height: 100%; /* or set fixed height if needed */
+  }
+
+  .editor {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    border: none;
   }
 
   </style>
@@ -1218,7 +1228,7 @@
       <div class="main-only">
         <div id="tabBar" class="tab-bar"></div>
 
-        <div class="editor-wrapper"></div>
+        <div class="editor-layout">
 
           <div class="format-toolbar-vertical">
             <button id="marginBtn" title="Set Margins">📏</button>
@@ -1254,16 +1264,19 @@
               </select>
               <button id="applyFontSize">Apply</button>
             </div>
+
             <button onclick="cleanEditor()">🧹</button>
             <input type="file" id="fileInput" style="display: none;" multiple onchange="handleFileAttachment()" />
             <button onclick="document.getElementById('fileInput').click()" title="Attach File">📎</button>
             <div id="attachedFilesList"></div>
             <button onclick="removeFormatting()">🚫</button>
-        </div>
-        
-        <!-- 📝 Rich Text Editor -->
-        <div id="mainEditor" class="editor" contenteditable="true">
-           Start typing here...
+          </div>
+
+          <div class="editor-wrapper">
+            <div id="mainEditor" class="editor" contenteditable="true">
+               Start typing here...
+            </div>
+          </div>  
         </div>     
       </div>
 
