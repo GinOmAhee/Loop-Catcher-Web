@@ -573,7 +573,7 @@
   }
 
   .format-toolbar {
-    display: flex;
+    position: relative;
     flex-direction: row;
     flex-wrap: nowrap;        /* 🔁 prevents wrapping */
     align-items: center;
@@ -583,7 +583,7 @@
     max-width: 100%;
     width: fit-content;              /* only as wide as needed */
     flex-shrink: 1;
-
+    z-index: 50;
     /* Visuals */
     background-color: var(--toolbar-bg, #fff);
     border-top: 1px solid var(--tab-border);
@@ -1039,6 +1039,7 @@
     font-weight: bold;
     cursor: pointer;
     align-items: center;
+    width: 100%; /* ✅ Add this */
   }
 
   body.co-mode .main-only {
