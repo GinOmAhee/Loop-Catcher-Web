@@ -1063,6 +1063,19 @@
     border-color: #444;
   }
 
+  .voice-hint-top {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #f0f0f0;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #444;
+    z-index: 999;
+    opacity: 0.9;
+  }
+
   </style>
 </head>
 <body data-mode="main-only">
@@ -1180,6 +1193,7 @@
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
     <div class="editor-area">
+    <div class="voice-hint-top">🗣️ Press <strong>V</strong> to activate voice commands!</div>
 
       <div class="main-only">
         <!-- 🎨 Toolbar -->
@@ -1420,12 +1434,7 @@
         }
       };
 
-      // Optional: enable mic on any user interaction to satisfy browser requirement
-      document.body.addEventListener('click', () => {
-        if (!isRecording) {
-          startVoiceCapture();
-        }
-      });
+     
     } else {
       alert("Speech recognition is not supported in this browser.");
     }
@@ -2106,6 +2115,15 @@
       const status = document.getElementById("saveStatus");
       if (status) status.textContent = "🛑 Voice capture stopped.";
     }
+
+    // 🎤 Voice hotkey: Press "V" to start listening
+    document.addEventListener('keydown', (event) => {
+      if (event.key.toLowerCase() === 'v') {
+        if (!isRecording) {
+          startVoiceCapture();
+        }
+      }
+    });
 
     async function handleFileAttachment() {
       const input = document.getElementById('fileInput');
