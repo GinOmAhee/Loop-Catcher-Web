@@ -1082,10 +1082,6 @@
     opacity: 0.9;
   }
 
-  body[data-mode="coEditor"] .tab-bar {
-    display: none;
-  }
-
   </style>
 </head>
 <body data-mode="main-only">
@@ -1198,7 +1194,6 @@
     </div>
   </div>
 
-  <div id="tabBar" class="tab-bar"></div>
   <div class="voice-hint-top">🗣️ Press <strong>V</strong> to activate voice commands!</div>
 
   <!-- 📝 Main Editor (always visible) -->
@@ -1206,6 +1201,7 @@
     <div class="editor-area">
 
       <div class="main-only">
+        <div id="tabBar" class="tab-bar"></div>
         <!-- 🎨 Toolbar -->
         <div class="format-toolbar" style="margin-bottom: 1rem;">
           <button id="marginBtn" title="Set Margins">📏</button>
