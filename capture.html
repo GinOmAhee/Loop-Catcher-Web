@@ -1070,8 +1070,8 @@
 
   .voice-hint-top {
     position: fixed;
-    top: 41px;
-    left: 20px;
+    bottom: 60px;
+    right: 20px;
     background-color: var(--hint-bg, #f0f0f0);
     color: var(--hint-text, #444);
     padding: 6px 10px;
@@ -1146,6 +1146,8 @@
       <button id="highlightBtn" title="Highlight">🖍️</button>
       <button id="modeSwitchBtn" title="Switch Editor">🔁</button>
     </div>
+
+    <div class="voice-hint-top">🗣️ Press <strong>V</strong> to activate voice commands!</div>
   </div>
 
   <div id="textColorDropdown" class="dropdown hidden">
@@ -1218,8 +1220,6 @@
 
     </div>
   </div>
-
-  <div class="voice-hint-top">🗣️ Press <strong>V</strong> to activate voice commands!</div>
 
   <!-- 📝 Main Editor (always visible) -->
   <div class="main-container" onclick="maybeClosePreview(event)">
