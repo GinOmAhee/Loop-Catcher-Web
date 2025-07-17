@@ -402,15 +402,8 @@
 
   /* === TABS === */
   .tab-bar {
-    gap: 8px;
-    display: flex;
-    padding: 4px 8px;
-    align-items: center;
-    border-radius: 8px 8px 0 0;
-    margin-bottom: 0.5rem;
-    border-bottom: 2px solid #ccc;
-    position: sticky;
     top: 0;
+    position: sticky;
     z-index: 10; /* Make sure it stays above other elements */
     background-color: var(--tab-bg);
     border-color: var(--tab-border);
@@ -1087,10 +1080,8 @@
   }
 
   .main-only {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* center everything horizontally */
-    gap: 8px;
+    height: 100vh; /* or custom height */
+    overflow-y: auto; /* Enables vertical scrolling */
   }
 
   </style>
