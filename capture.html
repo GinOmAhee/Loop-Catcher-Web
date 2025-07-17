@@ -2109,8 +2109,8 @@
 
             // 🧠 If in note mode, push to Side Thought input
             if (isInNoteMode) {
-              const sideThoughtPanel = document.querySelector(".side-thought-panel");
-              const sideThoughtToggleBtn = document.querySelector(".toggle-side-thought"); // replace with your actual toggle selector
+              const sideThoughtPanel = document.getElementById("thoughtPopup");
+              const sideThoughtToggleBtn = document.querySelector("sideThoughtsBadge"); // replace with your actual toggle selector
 
               if (sideThoughtPanel && !sideThoughtPanel.classList.contains("open")) {
                 sideThoughtToggleBtn?.click(); // opens it programmatically
@@ -2123,7 +2123,7 @@
               }
 
               if (["done", "never mind", "abort"].includes(command)) {
-              const sideThoughtPanel = document.querySelector(".side-thought-panel");
+              const sideThoughtPanel = document.querySelector("thoughtPopup");
               const sideThoughtInput = document.getElementById("sideThoughtTextarea");
 
                 if (sideThoughtPanel && sideThoughtPanel.classList.contains("open")) {
