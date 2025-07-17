@@ -2071,17 +2071,18 @@
         if (!SR) return alert("Voice capture not supported");
 
         recognition = new SR();
-        recognition.lang = 'en-US';
+        recognition.lang = "en-US";
         recognition.continuous = true;
         recognition.interimResults = false;
       }
 
-      const btn = document.querySelector('.voice-btn');
-      const status = document.getElementById('saveStatus');
+      const btn = document.querySelector(".voice-btn");
+      const status = document.getElementById("saveStatus");
 
       recognition.start();
-
       speak("Voice command activated");
+
+      let isInNoteMode = false;
 
       recognition.onresult = (event) => {
         let finalTranscript = "";
@@ -2093,22 +2094,53 @@
 
             console.log("🎤 Heard:", command);
 
-            const handled = handleVoiceCommand(command);
-            if (!handled) {
-              finalTranscript += text + " ";
+            // 🧠 Note mode toggle
+            if (command === "note this" || command === "side thought") {
+              isInNoteMode = true;
+              speak("Noting your thoughts.");
+              return;
             }
+
+            if (command === "stop note" || command === "stop noting") {
+              isInNoteMode = false;
+              speak("Stopped noting.");
+              return;
+            }
+
+            // 🧠 If in note mode, push to Side Thought input
+            if (isInNoteMode) {
+              const sideThoughtPanel = document.querySelector(".side-thought-panel");
+              const sideThoughtToggleBtn = document.querySelector(".toggle-side-thought"); // replace with your actual toggle selector
+
+              if (sideThoughtPanel && !sideThoughtPanel.classList.contains("open")) {
+                sideThoughtToggleBtn?.click(); // opens it programmatically
+              }
+
+              const sideThoughtInput = document.getElementById("sideThoughtTextarea");
+              if (sideThoughtInput) {
+                sideThoughtInput.value += finalTranscript + " ";
+                sideThoughtInput.scrollTop = sideThoughtInput.scrollHeight; // auto scroll to bottom
+              }
+
+              if (["done", "never mind", "abort"].includes(command)) {
+                const sideThoughtPanel = document.querySelector(".side-thought-panel");
+                if (sideThoughtPanel && sideThoughtPanel.classList.contains("open")) {
+                  sideThoughtPanel.classList.remove("open");
+                  document.getElementById("sideThoughtTextarea").value = "";
+                  speak("Side thought closed");
+                  return true;
+                }
+              }
+              return;
+            }
+
+            // 🧠 Normal command + fallback text entry
+            const handled = handleVoiceCommand(command);
+            if (!handled) finalTranscript += text + " ";
           }
         }
 
-        // 👇👇 Insert into Side Thought input if open
-        const sideThoughtInput = document.getElementById("sideThoughtTextarea");
-        const sideThoughtPanel = document.querySelector(".side-thought-panel"); // adjust selector if needed
-
-        if (sideThoughtInput && sideThoughtPanel && sideThoughtPanel.classList.contains("open")) {
-          sideThoughtInput.value += finalTranscript + " ";
-          sideThoughtInput.scrollTop = sideThoughtInput.scrollHeight; // auto scroll to bottom
-        }
-
+        // 🧠 Fallback to active editor
         if (finalTranscript) {
           const editor = getActiveEditor();
           if (editor) {
