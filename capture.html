@@ -1175,12 +1175,14 @@
     <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
     <button id="applyMarginBtn">✅ Apply</button>
   </div>
-
-  <div id="fontDropdown" onchange="setFont(this.value)">
-    <option value="'Arial', sans-serif">Arial</option>
-    <option value="'Georgia', serif">Georgia</option>
-    <option value="'Courier New', monospace">Courier New</option>
-    <option value="'Times New Roman', serif">Times New Roman</option>
+  
+  <div id="fontDropdownWrapper" class="dropdown hidden"></div>
+    <select id="fontDropdown" onchange="setFont(this.value)">
+      <option value="'Arial', sans-serif">Arial</option>
+      <option value="'Georgia', serif">Georgia</option>
+      <option value="'Courier New', monospace">Courier New</option>
+      <option value="'Times New Roman', serif">Times New Roman</option>
+    </select>  
   </div>
 
   <div id="fontSizeDropdownPanel" class="dropdown hidden">
