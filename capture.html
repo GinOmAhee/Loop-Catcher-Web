@@ -1535,41 +1535,16 @@
         range.deleteContents();
         range.insertNode(span);
 
-        // ❗ Hides the dropdown — make sure this runs
-        fontSizeDropdown.classList.add("hidden");
-        fontSizeDropdown.style.display = "none";
+        hideFontSizeDropdown();
 
-        // Clear inputs
         customInput.value = "";
         dropdownSelect.selectedIndex = 0;
       });
 
       fontSizeBtn.addEventListener("click", () => {
-        console.log("TOGGLE SHOW");
-
-        const isCurrentlyHidden =
-          fontSizeDropdown.classList.contains("hidden") ||
-          getComputedStyle(fontSizeDropdown).display === "none";
-
-        if (isCurrentlyHidden) {
-          fontSizeDropdown.classList.remove("hidden");
-          fontSizeDropdown.style.display = "flex"; // stack input + select vertically
-          fontSizeDropdown.style.flexDirection = "column";
-          fontSizeDropdown.style.gap = "8px";
-
-          // 🔽 Dynamically position it below the button
-          const btnRect = fontSizeBtn.getBoundingClientRect();
-          fontSizeDropdown.style.top = `${btnRect.bottom + window.scrollY}px`;
-          fontSizeDropdown.style.left = `${btnRect.left}px`;
-
-          setTimeout(() => {
-            console.log("CHECK VISIBLE", getComputedStyle(fontSizeDropdown).display);
-            customInput?.focus();
-          }, 100);
-        } else {
-          fontSizeDropdown.classList.add("hidden");
-          fontSizeDropdown.style.display = "none";
-        }
+        const isHidden = fontSizeDropdown.classList.contains("hidden") || 
+                         getComputedStyle(fontSizeDropdown).display === "none";
+        isHidden ? showFontSizeDropdown() : hideFontSizeDropdown();
       });
 
       document.addEventListener("click", (e) => {
@@ -1626,6 +1601,24 @@
 
     function getActiveEditor() {
       return document.querySelector('.editor:not(.hidden)');
+    }
+
+    function hideFontSizeDropdown() {
+      fontSizeDropdown.classList.add("hidden");
+      fontSizeDropdown.style.display = "none";
+    }
+
+    function showFontSizeDropdown() {
+      fontSizeDropdown.classList.remove("hidden");
+      fontSizeDropdown.style.display = "flex";
+      fontSizeDropdown.style.flexDirection = "column";
+      fontSizeDropdown.style.gap = "8px";
+
+      const btnRect = fontSizeBtn.getBoundingClientRect();
+      fontSizeDropdown.style.top = `${btnRect.bottom + window.scrollY}px`;
+      fontSizeDropdown.style.left = `${btnRect.left}px`;
+
+      setTimeout(() => customInput?.focus(), 100);
     }
 
     // generic exec wrapper
