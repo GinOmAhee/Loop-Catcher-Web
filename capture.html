@@ -1442,9 +1442,8 @@
         fontDropdown.classList.toggle("hidden");
 
         const rect = fontBtn.getBoundingClientRect();
-        fontDropdown.style.position = "absolute";
         fontDropdown.style.left = `${rect.left}px`;
-        fontDropdown.style.top = `${rect.bottom + 5}px`;
+        fontDropdown.style.top = `${rect.bottom + window.scrollY}px`; // include scroll position
       });
 
       fontDropdown.addEventListener("click", (e) => e.stopPropagation());
