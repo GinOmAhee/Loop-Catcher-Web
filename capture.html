@@ -1205,7 +1205,7 @@
     <div onclick="setFont('Times New Roman, serif')">Times New Roman</div>
   </div>
 
-  <div id="fontSizeDropdownPanel" class="dropdown">
+  <div id="fontSizeDropdownPanel" class="dropdown hidden">
     <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
     <select id="fontSizeSelect">
       <option value="" disabled selected>Select font size</option>
@@ -1487,6 +1487,11 @@
         return;
       }
 
+      if (!fontSizeBtn || !fontSizeDropdown) {
+        console.warn("Missing elements!");
+        return;
+      }
+
       fontSizeDropdown.addEventListener("mousedown", (e) => {
         const tag = e.target.tagName;
         if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
@@ -1495,13 +1500,11 @@
       });
 
       fontSizeBtn.addEventListener("click", (e) => {
-        console.log("fontSizeBtn clicked!");
+        console.log("fontSizeBtn clicked");
         e.stopPropagation();
-        saveSelection();
 
         const isHidden = fontSizeDropdown.classList.contains("hidden");
 
-        // Toggle dropdown
         if (isHidden) {
           fontSizeDropdown.classList.remove("hidden");
 
@@ -1540,9 +1543,11 @@
         dropdownSelect.selectedIndex = 0; // reset dropdown
       });
 
-      // Hide dropdown when clicking outside
       document.addEventListener("click", (e) => {
-        if (!fontSizeDropdown.contains(e.target) && !fontSizeBtn.contains(e.target)) {
+        if (
+          !fontSizeDropdown.contains(e.target) &&
+          !fontSizeBtn.contains(e.target)
+        ) {
           fontSizeDropdown.classList.add("hidden");
         }
       });
