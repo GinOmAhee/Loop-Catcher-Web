@@ -1749,9 +1749,6 @@
       document.execCommand("justifyFull", false, null);
     }
 
-    const fontBtn = document.getElementById("fontMenuBtn");
-    const fontDropdown = document.getElementById("fontDropdown");
-
     fontBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       fontDropdown.classList.toggle("hidden");
