@@ -1240,7 +1240,7 @@
               <button id="applyMarginBtn">✅ Apply</button>
             </div>
 
-            <div id="fontDropdownWrapper" class="dropdown hidden" title="Choose Font">🅰️</button>
+            <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <select id="fontDropdown" class="hidden" onchange="setFont(this.value)">
               <option value="'Arial', sans-serif">Arial</option>
               <option value="'Georgia', serif">Georgia</option>
@@ -1432,31 +1432,26 @@
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
 
-      const fontBtn = document.getElementById("fontMenuBtn");
-      const fontDropdownWrapper = document.getElementById("fontDropdownWrapper");
-
-      if (fontDropdownWrapper) {
-        fontDropdownWrapper.classList.add("hidden");
-      }
-
-      if (fontBtn && fontDropdownWrapper) {
-        fontBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          fontDropdownWrapper.classList.toggle("hidden");
-
-          const rect = fontBtn.getBoundingClientRect();
-          fontDropdownWrapper.style.position = "absolute";
-          fontDropdownWrapper.style.left = `${rect.left}px`;
-          fontDropdownWrapper.style.top = `${rect.bottom + 5}px`;
-        });
-      }
-
-      // Close dropdown when clicking outside
-      document.addEventListener("click", () => {
-        if (fontDropdownWrapper) {
-          fontDropdownWrapper.classList.add("hidden");
+      // 🔒 Force it to be hidden on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        const fontDropdown = document.getElementById("fontDropdown");
+        if (fontDropdown) {
+          fontDropdown.classList.add("hidden");
         }
       });
+
+      const fontBtn = document.getElementById("fontMenuBtn");
+      const fontDropdown = document.getElementById("fontDropdown");
+
+      if (fontBtn && fontDropdown) {
+        fontBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          fontDropdown.classList.toggle("hidden");
+          const rect = fontBtn.getBoundingClientRect();
+          fontDropdown.style.left = `${rect.left}px`;
+          fontDropdown.style.top = `${rect.bottom + 5}px`;
+        });
+      }
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
