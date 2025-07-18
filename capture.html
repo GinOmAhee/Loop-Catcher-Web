@@ -2932,6 +2932,7 @@
       });
 
       fontSizeBtn.addEventListener("click", (e) => {
+        console.log("clicked");
         e.stopPropagation();
         saveSelection();
         fontSizeDropdown.classList.toggle("hidden");
