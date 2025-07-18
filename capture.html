@@ -1477,6 +1477,10 @@
         fontDropdown.style.zIndex = "9999";
       });
 
+      } else {
+        console.warn("fontBtn or container not found in DOM");
+      }
+
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
         badge.addEventListener("click", () => {
