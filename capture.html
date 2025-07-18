@@ -1435,6 +1435,32 @@
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
 
+      const fontBtn = document.getElementById("fontMenuBtn");
+      const fontDropdownWrapper = document.getElementById("fontDropdownWrapper");
+
+      if (fontDropdownWrapper) {
+        fontDropdownWrapper.classList.add("hidden");
+      }
+
+      if (fontBtn && fontDropdownWrapper) {
+        fontBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          fontDropdownWrapper.classList.toggle("hidden");
+
+          const rect = fontBtn.getBoundingClientRect();
+          fontDropdownWrapper.style.position = "absolute";
+          fontDropdownWrapper.style.left = `${rect.left}px`;
+          fontDropdownWrapper.style.top = `${rect.bottom + 5}px`;
+        });
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", () => {
+        if (fontDropdownWrapper) {
+          fontDropdownWrapper.classList.add("hidden");
+        }
+      });
+
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
         badge.addEventListener("click", () => {
@@ -1750,27 +1776,6 @@
     function justifyText() {
       activeEditor.focus(); // ensure editor is active
       document.execCommand("justifyFull", false, null);
-    }
-
-    fontBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      fontDropdown.classList.toggle("hidden");
-
-      const rect = fontBtn.getBoundingClientRect();
-      fontDropdown.style.position = "absolute";
-      fontDropdown.style.left = `${rect.left}px`;
-      fontDropdown.style.top = `${rect.bottom + 5}px`;
-    });
-
-    fontDropdown.addEventListener("click", (e) => e.stopPropagation());
-
-    document.addEventListener("click", () => {
-      fontDropdown.classList.add("hidden");
-    });
-
-    function setFont(font) {
-      document.execCommand("fontName", false, font);
-      fontDropdown.classList.add("hidden");
     }
 
     textColorBtn.addEventListener("click", (e) => {
