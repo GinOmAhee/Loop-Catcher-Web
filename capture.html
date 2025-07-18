@@ -1378,6 +1378,7 @@
     }
 
     let activeEditor;
+    let savedRange = null;
 
     window.addEventListener("DOMContentLoaded", () => {
       console.log("fontSizeBtn:", document.getElementById("fontSizeBtn"));
@@ -1534,7 +1535,7 @@
         } else if (selectedValue) {
           fontSizeValue = selectedValue;
         }
-        
+
         console.log("Font size selected:", fontSizeValue);
 
         if (!fontSizeValue) {
@@ -1542,7 +1543,11 @@
           return;
         }
 
-        restoreSelection();
+        if (savedRange) {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(savedRange);
+        }
 
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
@@ -1553,6 +1558,9 @@
           const range = selection.getRangeAt(0);
           range.deleteContents();
           range.insertNode(span);
+
+          if (selection.rangeCount > 0) {
+            savedRange = selection.getRangeAt(0).cloneRange();
         }
 
         // ✅ Close the dropdown
