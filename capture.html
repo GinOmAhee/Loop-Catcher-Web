@@ -1498,7 +1498,7 @@
         console.log("fontSizeBtn clicked!");
         e.stopPropagation();
         saveSelection();
-        fontSizeDropdown.classList.remove("hidden");
+        fontSizeDropdown.classList.toggle("hidden");
 
         const rect = fontSizeBtn.getBoundingClientRect();
         fontSizeDropdown.style.left = `${rect.left}px`;
