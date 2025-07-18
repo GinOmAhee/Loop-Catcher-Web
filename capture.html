@@ -3110,9 +3110,23 @@
      }
     }
 
+    function toggleDropdown(btnId, dropdownId) {
+      console.log("🎯 Button clicked:", btnId);
+
+      const btn = document.getElementById(btnId);
+      const dropdown = document.getElementById(dropdownId);
+      if (!btn || !dropdown) return;
+
+      const isVisible = dropdown.style.display === "block";
+
+      // Hide all dropdowns first
+      document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
+
+    }
+
     document.addEventListener("mousedown", (e) => {
-      const isDropdown = e.target.closest("#highlightDropdown, #textColorDropdown");
-      const isTrigger = e.target.closest("#highlightBtn, #textColorBtn");
+      const isDropdown = e.target.closest("#highlightDropdown, #textColorDropdown, #fontSizeDropdown");
+      const isTrigger = e.target.closest("#highlightBtn, #textColorBtn, #fontSizeBtn" );
 
       if (!isDropdown && !isTrigger) {
         document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
