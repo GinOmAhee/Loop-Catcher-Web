@@ -1493,6 +1493,8 @@
       }
 
       fontSizeDropdown.addEventListener("mousedown", (e) => {
+        e.stopPropagation(); // 🛑 Stop it from bubbling up and instantly closing the dropdown
+
         const tag = e.target.tagName;
         if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
           e.preventDefault();
@@ -1546,13 +1548,14 @@
       });
 
       document.addEventListener("click", (e) => {
-      if (
-        !fontSizeDropdown.contains(e.target) &&
-        !fontSizeBtn.contains(e.target)
-      ) {
-        fontSizeDropdown.classList.add("hidden");
-      }
-    });
+        const clickedInsideDropdown = fontSizeDropdown.contains(e.target);
+        const clickedButton = fontSizeBtn.contains(e.target);
+
+        if (!clickedInsideDropdown && !clickedButton) {
+          fontSizeDropdown.classList.add("hidden");
+          fontSizeDropdown.style.display = "none";
+        }
+      });
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
