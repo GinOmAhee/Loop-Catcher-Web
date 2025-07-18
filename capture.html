@@ -1515,6 +1515,35 @@
         }
       });
 
+      applyBtn.addEventListener("click", () => {
+        restoreSelection();
+
+        const customValue = customInput.value.trim();
+        const selectedSize = dropdownSelect.value;
+        const fontSize = customValue !== "" ? `${customValue}pt` : selectedSize;
+
+        if (!fontSize) return;
+
+        const selection = window.getSelection();
+        if (!selection.rangeCount || selection.isCollapsed) return;
+
+        const range = selection.getRangeAt(0);
+        const span = document.createElement("span");
+        span.style.fontSize = fontSize;
+        span.textContent = range.toString();
+
+        range.deleteContents();
+        range.insertNode(span);
+
+        // ❗ Hides the dropdown — make sure this runs
+        fontSizeDropdown.classList.add("hidden");
+        fontSizeDropdown.style.display = "none";
+
+        // Clear inputs
+        customInput.value = "";
+        dropdownSelect.selectedIndex = 0;
+      });
+
       fontSizeBtn.addEventListener("click", () => {
         console.log("TOGGLE SHOW");
 
