@@ -1481,19 +1481,16 @@
         fontDropdown.classList.toggle("hidden");
 
         const btnRect = fontBtn.getBoundingClientRect();
-        fontSizeDropdown.style.top = `${btnRect.bottom + window.scrollY}px`;
-        fontSizeDropdown.style.left = `${btnRect.left}px`;
-        
         const containerRect = container.getBoundingClientRect();
 
         // Position relative to .main-only
         const left = btnRect.right - containerRect.left + 10; // tweak "+10" as needed for spacing
         const top = btnRect.top - containerRect.top;
 
-        fontSizeDropdown.style.display = "flex";
-        fontSizeDropdown.style.flexDirection = "column";
-        fontSizeDropdown.style.gap = "8px";
-
+        fontDropdown.style.position = "absolute";
+        fontDropdown.style.left = `${left}px`;
+        fontDropdown.style.top = `${top}px`;
+        fontDropdown.style.zIndex = "9999";
       });
 
       const fontSizeBtn = document.getElementById("fontSizeBtn");
@@ -1527,7 +1524,14 @@
 
         if (isCurrentlyHidden) {
           fontSizeDropdown.classList.remove("hidden");
-          fontSizeDropdown.style.display = "block"; // <-- add this line
+          fontSizeDropdown.style.display = "flex"; // stack input + select vertically
+          fontSizeDropdown.style.flexDirection = "column";
+          fontSizeDropdown.style.gap = "8px";
+
+          // 🔽 Dynamically position it below the button
+          const btnRect = fontSizeBtn.getBoundingClientRect();
+          fontSizeDropdown.style.top = `${btnRect.bottom + window.scrollY}px`;
+          fontSizeDropdown.style.left = `${btnRect.left}px`;
 
           setTimeout(() => {
             console.log("CHECK VISIBLE", getComputedStyle(fontSizeDropdown).display);
@@ -1535,33 +1539,8 @@
           }, 100);
         } else {
           fontSizeDropdown.classList.add("hidden");
-          fontSizeDropdown.style.display = "none"; // <-- and this line
+          fontSizeDropdown.style.display = "none";
         }
-      });
-
-      applyBtn.addEventListener("click", () => {
-        restoreSelection();
-
-        const customValue = customInput.value.trim();
-        const selectedSize = dropdownSelect.value;
-        const fontSize = customValue !== "" ? `${customValue}pt` : selectedSize;
-
-        if (!fontSize) return;
-
-        const selection = window.getSelection();
-        if (!selection.rangeCount || selection.isCollapsed) return;
-
-        const range = selection.getRangeAt(0);
-        const span = document.createElement("span");
-        span.style.fontSize = fontSize;
-        span.textContent = range.toString();
-
-        range.deleteContents();
-        range.insertNode(span);
-
-        fontSizeDropdown.classList.add("hidden");
-        customInput.value = "";
-        dropdownSelect.selectedIndex = 0;
       });
 
       document.addEventListener("click", (e) => {
