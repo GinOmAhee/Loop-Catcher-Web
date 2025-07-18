@@ -845,8 +845,7 @@
     display: none; /* toggled via JS */
   }
 
-  #fontDropdown,
-  #fontSizeDropdownPanel  {
+  #fontDropdown {
     position: absolute;
     top: 50px; /* tweak this based on your layout */
     left: 60px; /* enough to sit just beside the toolbar */
@@ -855,6 +854,13 @@
     padding: 0.5rem;
     z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  #fontSizeDropdownPanel {
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    gap: 4px; /* Optional: adds space between the input and select */
+    padding: 10px;
   }
 
   body.dark-theme #highlightDropdown,
