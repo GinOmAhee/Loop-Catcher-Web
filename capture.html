@@ -1498,13 +1498,21 @@
         console.log("fontSizeBtn clicked!");
         e.stopPropagation();
         saveSelection();
-        fontSizeDropdown.classList.toggle("hidden");
 
-        const rect = fontSizeBtn.getBoundingClientRect();
-        fontSizeDropdown.style.left = `${rect.left}px`;
-        fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
+        const isHidden = fontSizeDropdown.classList.contains("hidden");
 
-        setTimeout(() => customInput.focus(), 0);
+        // Toggle dropdown
+        if (isHidden) {
+          fontSizeDropdown.classList.remove("hidden");
+
+          const rect = fontSizeBtn.getBoundingClientRect();
+          fontSizeDropdown.style.left = `${rect.left}px`;
+          fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
+
+          setTimeout(() => customInput.focus(), 0);
+        } else {
+          fontSizeDropdown.classList.add("hidden");
+        }
       });
 
       applyBtn.addEventListener("click", () => {
