@@ -1456,31 +1456,30 @@
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
       
-      if (fontBtn && container) {
       const fontBtn = document.getElementById("fontMenuBtn");
       const fontDropdown = document.getElementById("fontDropdown");
-      const container = document.getElementById(".editor-layout");
+      const container = document.getElementById("editor-layout"); // no dot
 
-      fontBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        fontDropdown.classList.toggle("hidden");
+      if (fontBtn && container && fontDropdown) {
+        fontBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          fontDropdown.classList.toggle("hidden");
 
-        const btnRect = fontBtn.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
+          const btnRect = fontBtn.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
 
-        // Position relative to .editor-layout
-        const left = btnRect.right - containerRect.left + 10; // tweak "+10" as needed for spacing
-        const top = btnRect.top - containerRect.top;
+          // Position relative to .editor-layout
+          const left = btnRect.right - containerRect.left + 10;
+          const top = btnRect.top - containerRect.top;
 
-        fontDropdown.style.position = "absolute";
-        fontDropdown.style.left = `${left}px`;
-        fontDropdown.style.top = `${top}px`;
-        fontDropdown.style.zIndex = "9999";
-
-        } else {
-          console.warn("fontBtn or container is null:", { fontBtn, container });
-        }
-      });
+          fontDropdown.style.position = "absolute";
+          fontDropdown.style.left = `${left}px`;
+          fontDropdown.style.top = `${top}px`;
+          fontDropdown.style.zIndex = "9999";
+        });
+      } else {
+        console.warn("fontBtn, container, or fontDropdown is null:", { fontBtn, container, fontDropdown });
+      }
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
