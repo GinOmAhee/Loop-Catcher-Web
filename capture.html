@@ -1456,7 +1456,7 @@
 
       const fontBtn = document.getElementById("fontMenuBtn");
       const fontDropdown = document.getElementById("fontDropdown");
-      const container = document.getElementById(".editor-layout");
+      const container = document.getElementById("editor-layout");
 
       fontBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1465,7 +1465,7 @@
         const btnRect = fontBtn.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
 
-        // Position relative to .editor-layout
+        // Position relative to editor-layout
         const left = btnRect.right - containerRect.left + 10; // tweak "+10" as needed for spacing
         const top = btnRect.top - containerRect.top;
 
