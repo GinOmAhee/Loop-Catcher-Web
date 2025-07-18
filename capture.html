@@ -1484,6 +1484,8 @@
       const applyBtn = document.getElementById("applyFontSize");
       const dropdownSelect = document.getElementById("fontSizeSelect");
       const customInput = document.getElementById("customFontSize");
+      const isCurrentlyHidden = fontSizeDropdown.classList.contains("hidden");
+      const shouldShow = isCurrentlyHidden;
 
       if (!fontSizeBtn || !fontSizeDropdown) {
         console.warn("Missing elements!");
