@@ -1241,12 +1241,12 @@
             </div>
 
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
-            <select id="fontDropdown" onchange="setFont(this.value)">
+            <div id="fontDropdown" onchange="setFont(this.value)">
               <option value="'Arial', sans-serif">Arial</option>
               <option value="'Georgia', serif">Georgia</option>
               <option value="'Courier New', monospace">Courier New</option>
               <option value="'Times New Roman', serif">Times New Roman</option>
-            </select> 
+            </div>
 
             <button id="fontSizeBtn" title="Font Size">🔠</button>
             <div id="fontSizeDropdownPanel" class="dropdown hidden">
@@ -1431,19 +1431,6 @@
       document.getElementById("highlightBtn").addEventListener("click", () => {
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
-
-      const fontBtn = document.getElementById("fontMenuBtn");
-      const fontDropdown = document.getElementById("fontDropdown");
-
-      if (fontBtn && fontDropdown) {
-        fontBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          fontDropdown.classList.toggle("hidden");
-          const rect = fontBtn.getBoundingClientRect();
-          fontDropdown.style.left = `${rect.left}px`;
-          fontDropdown.style.top = `${rect.bottom + 5}px`;
-        });
-      }
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
@@ -1762,16 +1749,23 @@
       document.execCommand("justifyFull", false, null);
     }
 
+    const fontBtn = document.getElementById("fontMenuBtn");
+    const fontDropdown = document.getElementById("fontDropdown");
+
     fontBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       fontDropdown.classList.toggle("hidden");
+
       const rect = fontBtn.getBoundingClientRect();
+      fontDropdown.style.position = "absolute";
       fontDropdown.style.left = `${rect.left}px`;
       fontDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
-    fontDropdown.addEventListener("click", (e) => {
-    e.stopPropagation();
+    fontDropdown.addEventListener("click", (e) => e.stopPropagation());
+
+    document.addEventListener("click", () => {
+      fontDropdown.classList.add("hidden");
     });
 
     function setFont(font) {
