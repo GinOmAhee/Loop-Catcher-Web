@@ -1522,6 +1522,9 @@
 
       applyBtn.addEventListener("click", () => {
         console.log("📢 Apply Clicked!");
+        const fontSizeValue = document.getElementById("fontSize").value;
+        console.log("Font size selected:", fontSizeValue);
+        
         restoreSelection();
 
         const customValue = customInput.value.trim();
