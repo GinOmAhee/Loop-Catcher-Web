@@ -1523,17 +1523,17 @@
 
       applyBtn.addEventListener("click", () => {
         console.log("📢 Apply Clicked!");
-        const fontSizeInput = document.getElementById("customFontSize").value;
+
+        const fontSizeInput = document.getElementById("fontSize");
         const fontSizeValue = fontSizeInput ? fontSizeInput.value.trim() : "";
         console.log("Font size selected:", fontSizeValue);
 
+        if (!fontSizeValue) {
+          console.warn("⚠️ No font size selected");
+          return;
+        }
+
         restoreSelection();
-
-        const customValue = customInput.value.trim();
-        const selectedSize = dropdownSelect.value;
-        const fontSize = customValue !== "" ? `${customValue}pt` : selectedSize;
-
-        if (!fontSize) return;
 
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
@@ -1545,7 +1545,11 @@
           range.deleteContents();
           range.insertNode(span);
         }
-      }
+
+        // ✅ Close the dropdown
+        fontSizeDropdown.classList.add("hidden");
+      });
+
       document.addEventListener("click", (e) => {
         const clickedInsideDropdown = fontSizeDropdown.contains(e.target);
         const clickedButton = fontSizeBtn.contains(e.target);
@@ -1554,8 +1558,6 @@
           fontSizeDropdown.classList.add("hidden");
           fontSizeDropdown.style.display = "none";
         }
-
-        fontSizeDropdown.classList.add("hidden");
       });
 
       // 🧠 Badge toggle (SideThoughts popup)
