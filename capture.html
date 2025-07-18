@@ -1168,6 +1168,36 @@
     <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
   </div>
 
+  <div id="marginDropdown" class="dropdown hidden">
+    <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
+    <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
+    <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
+    <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
+    <button id="applyMarginBtn">✅ Apply</button>
+  </div>
+
+  <div id="fontDropdown" onchange="setFont(this.value)">
+    <option value="'Arial', sans-serif">Arial</option>
+    <option value="'Georgia', serif">Georgia</option>
+    <option value="'Courier New', monospace">Courier New</option>
+    <option value="'Times New Roman', serif">Times New Roman</option>
+  </div>
+
+  <div id="fontSizeDropdownPanel" class="dropdown hidden">
+    <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
+    <select id="fontSizeSelect">
+      <option value="" disabled selected>Select font size</option>
+      <option value="8pt">8</option>
+      <option value="10pt">10</option>
+      <option value="12pt" selected>12</option>
+      <option value="14pt">14</option>
+      <option value="16pt">16</option>
+      <option value="18pt">18</option>
+      <option value="24pt">24</option>
+      <option value="36pt">36</option>
+    </select>
+  </div>
+
   <!-- 📋 Preview Overlay (floats over everything, hidden by default) -->
   <div class="preview-overlay" id="preview">
     <div class="preview-top">
@@ -1241,37 +1271,6 @@
             <div id="attachedFilesList"></div>
             <button onclick="removeFormatting()">🚫</button>
           </div>
-
-          <div id="marginDropdown" class="dropdown hidden">
-            <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
-            <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
-            <label>Left: <input type="number" id="marginLeft" style="width: 60px" step="0.1"> in</label><br>
-            <label>Right: <input type="number" id="marginRight" style="width: 60px" step="0.1"> in</label><br>
-            <button id="applyMarginBtn">✅ Apply</button>
-          </div>
-
-          <div id="fontDropdown" onchange="setFont(this.value)">
-            <option value="'Arial', sans-serif">Arial</option>
-            <option value="'Georgia', serif">Georgia</option>
-            <option value="'Courier New', monospace">Courier New</option>
-            <option value="'Times New Roman', serif">Times New Roman</option>
-          </div>
-
-          <div id="fontSizeDropdownPanel" class="dropdown hidden">
-            <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
-            <select id="fontSizeSelect">
-              <option value="" disabled selected>Select font size</option>
-              <option value="8pt">8</option>
-              <option value="10pt">10</option>
-              <option value="12pt" selected>12</option>
-              <option value="14pt">14</option>
-              <option value="16pt">16</option>
-              <option value="18pt">18</option>
-              <option value="24pt">24</option>
-              <option value="36pt">36</option>
-            </select>
-          </div>
-
           <div class="editor-wrapper">
             <div id="mainEditor" class="editor" contenteditable="true">
                Start typing here...
@@ -1279,6 +1278,8 @@
           </div>  
         </div>     
       </div>
+
+
 
       <!-- 📝 Rich Text Editor -->
       <div id="coEditor" class="editor hidden" contenteditable="true"></div>
