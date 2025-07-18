@@ -827,7 +827,6 @@
   }
 
   #highlightDropdown,
-  #fontDropdown,
   #textColorDropdown {
     position: fixed; /* allows escape from parent containers */
     z-index: 9999;
@@ -1085,7 +1084,7 @@
   }
 
   .main-only {
-    position: relative; /* This is KEY */
+    position: relative;
     height: 100vh; /* or custom height */
     overflow-y: auto; /* Enables vertical scrolling */
   }
@@ -1447,16 +1446,15 @@
         const btnRect = fontBtn.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
 
-        // Calculate position relative to the container
-        const left = btnRect.left - containerRect.left;
-        const top = btnRect.bottom - containerRect.top + 5;
+        // Position relative to .main-only
+        const left = btnRect.right - containerRect.left + 10; // tweak "+10" as needed for spacing
+        const top = btnRect.top - containerRect.top;
 
         fontDropdown.style.position = "absolute";
         fontDropdown.style.left = `${left}px`;
         fontDropdown.style.top = `${top}px`;
         fontDropdown.style.zIndex = "9999";
       });
-
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
