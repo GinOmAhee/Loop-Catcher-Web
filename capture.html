@@ -1523,7 +1523,8 @@
 
       applyBtn.addEventListener("click", () => {
         console.log("📢 Apply Clicked!");
-        const fontSizeValue = document.getElementById("customFontSize").value;
+        const fontSizeInput = document.getElementById("customFontSize").value;
+        const fontSizeValue = fontSizeInput ? fontSizeInput.value.trim() : "";
         console.log("Font size selected:", fontSizeValue);
 
         restoreSelection();
@@ -1535,20 +1536,15 @@
         if (!fontSize) return;
 
         const selection = window.getSelection();
-        if (!selection.rangeCount || selection.isCollapsed) return;
+        if (selection.rangeCount > 0) {
+          const span = document.createElement("span");
+          span.style.fontSize = fontSizeValue;
+          span.textContent = selection.toString();
 
-        const range = selection.getRangeAt(0);
-        const span = document.createElement("span");
-        span.style.fontSize = fontSize;
-        span.textContent = range.toString();
-
-        range.deleteContents();
-        range.insertNode(span);
-
-        fontSizeDropdown.classList.add("hidden");
-        customInput.value = "";
-        dropdownSelect.selectedIndex = 0;
-      });
+          const range = selection.getRangeAt(0);
+          range.deleteContents();
+          range.insertNode(span);
+        }
 
       document.addEventListener("click", (e) => {
         const clickedInsideDropdown = fontSizeDropdown.contains(e.target);
@@ -1558,6 +1554,8 @@
           fontSizeDropdown.classList.add("hidden");
           fontSizeDropdown.style.display = "none";
         }
+
+      fontSizeDropdown.classList.add("hidden");
       });
 
       // 🧠 Badge toggle (SideThoughts popup)
