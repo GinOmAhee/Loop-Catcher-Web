@@ -1205,7 +1205,7 @@
     <div onclick="setFont('Times New Roman, serif')">Times New Roman</div>
   </div>
 
-  <div id="fontSizeDropdownPanel" class="dropdown hidden">
+  <div id="fontSizeDropdownPanel" class="hidden dropdown">
     <input type="number" id="customFontSize" placeholder="pt" min="6" max="72" style="width: 60px;" />
     <select id="fontSizeSelect">
       <option value="" disabled selected>Select font size</option>
@@ -1499,42 +1499,25 @@
         }
       });
 
-      fontSizeBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
+      fontSizeBtn.addEventListener("click", () => {
         console.log("TOGGLE SHOW");
 
-        const isHidden = fontSizeDropdown.classList.contains("hidden");
+        const isCurrentlyHidden =
+          fontSizeDropdown.classList.contains("hidden") ||
+          getComputedStyle(fontSizeDropdown).display === "none";
 
-        // First: hide other dropdowns
-        document.querySelectorAll(".dropdown").forEach(d => {
-          if (d !== fontSizeDropdown) d.classList.add("hidden");
-        });
-
-        if (isHidden) {
+        if (isCurrentlyHidden) {
           fontSizeDropdown.classList.remove("hidden");
+          fontSizeDropdown.style.display = "block"; // <-- add this line
 
-          // Position it safely
-          const btnRect = fontSizeBtn.getBoundingClientRect();
-          const containerRect = document.querySelector(".main-only").getBoundingClientRect();
-          const left = btnRect.right - containerRect.left + 10;
-          const top = btnRect.top - containerRect.top;
-
-          fontSizeDropdown.style.position = "absolute";
-          fontSizeDropdown.style.left = `${left}px`;
-          fontSizeDropdown.style.top = `${top}px`;
-          fontSizeDropdown.style.zIndex = "9999";
-
-          // Focus safely
-        
-          if (shouldShow) {
-            setTimeout(() => {
-              console.log("CHECK VISIBLE", getComputedStyle(fontSizeDropdown).display);
-              customInput?.focus(); // this stays INSIDE the setTimeout block
-            }, 100); // enough time for dropdown styles to apply
-          } else {
-            fontSizeDropdown.classList.add("hidden");
-          }
-        }  
+          setTimeout(() => {
+            console.log("CHECK VISIBLE", getComputedStyle(fontSizeDropdown).display);
+            customInput?.focus();
+          }, 100);
+        } else {
+          fontSizeDropdown.classList.add("hidden");
+          fontSizeDropdown.style.display = "none"; // <-- and this line
+        }
       });
 
       applyBtn.addEventListener("click", () => {
