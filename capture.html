@@ -1509,6 +1509,8 @@
 
       fontSizeDropdown.addEventListener("mousedown", (e) => {
         e.stopPropagation();
+        fontSizeDropdown.classList.toggle("hidden");
+
         const tag = e.target.tagName;
         if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
           e.preventDefault();
