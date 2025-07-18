@@ -1084,6 +1084,7 @@
   }
 
   .main-only {
+    position: relative; /* This is KEY */
     height: 100vh; /* or custom height */
     overflow-y: auto; /* Enables vertical scrolling */
   }
@@ -1436,27 +1437,25 @@
 
       const fontBtn = document.getElementById("fontMenuBtn");
       const fontDropdown = document.getElementById("fontDropdown");
+      const container = document.getElementById("main-only-container");
 
       fontBtn.addEventListener("click", (e) => {
-        console.log("clicked") 
         e.stopPropagation();
         fontDropdown.classList.toggle("hidden");
 
-        const rect = fontBtn.getBoundingClientRect();
-        fontDropdown.style.left = `${rect.left}px`;
-        fontDropdown.style.top = `${rect.bottom + window.scrollY}px`; // include scroll position
+        const btnRect = fontBtn.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        // Calculate position relative to the container
+        const left = btnRect.left - containerRect.left;
+        const top = btnRect.bottom - containerRect.top + 5;
+
+        fontDropdown.style.position = "absolute";
+        fontDropdown.style.left = `${left}px`;
+        fontDropdown.style.top = `${top}px`;
+        fontDropdown.style.zIndex = "9999";
       });
 
-      fontDropdown.addEventListener("click", (e) => e.stopPropagation());
-
-      document.addEventListener("click", () => {
-        fontDropdown.classList.add("hidden");
-      });
-
-      function setFont(font) {
-        document.execCommand("fontName", false, font);
-        fontDropdown.classList.add("hidden");
-      }
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
