@@ -1380,6 +1380,9 @@
     let activeEditor;
 
     window.addEventListener("DOMContentLoaded", () => {
+      console.log("fontSizeBtn:", document.getElementById("fontSizeBtn"));
+      console.log("fontSizeDropdown:", document.getElementById("fontSizeDropdownPanel"));
+    
       const mainEd = document.getElementById("mainEditor");
       const coEd = document.getElementById("coEditor");
       const badge = document.getElementById("sideThoughtsBadge");
