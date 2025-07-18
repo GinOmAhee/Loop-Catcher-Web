@@ -1458,7 +1458,7 @@
 
       const fontBtn = document.getElementById("fontMenuBtn");
       const fontDropdown = document.getElementById("fontDropdown");
-      const container = document.getElementById("main-only-container");
+      const container = document.getElementById(".main-only");
 
       fontBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1742,7 +1742,7 @@
     const mainEditor = document.getElementById("mainEditor");
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
-    const fontSizeBtn = document.getElementById("fontSizeBtn");
+    
     const sizeDropdown = document.getElementById("sizeDropdown");
     const textColorBtn = document.getElementById("textColorBtn");
     const textColorDropdown = document.getElementById("textColorDropdown");
@@ -2931,6 +2931,8 @@
         }
       });
 
+      const fontSizeBtn = document.getElementById("fontSizeBtn");
+
       fontSizeBtn.addEventListener("click", (e) => {
         console.log("clicked");
         e.stopPropagation();
@@ -2943,6 +2945,11 @@
 
         setTimeout(() => customInput.focus(), 0);
       });
+
+      console.log("Dropdown toggled");
+      console.log("Dropdown offsetLeft:", fontSizeDropdown.style.left);
+      console.log("Dropdown offsetTop:", fontSizeDropdown.style.top);
+      console.log("Dropdown is hidden?", fontSizeDropdown.classList.contains("hidden"));
 
       applyBtn.addEventListener("click", () => {
         restoreSelection();
