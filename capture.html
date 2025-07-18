@@ -1482,11 +1482,6 @@
       const dropdownSelect = document.getElementById("fontSizeSelect");
       const customInput = document.getElementById("customFontSize");
 
-      if (!fontSizeDropdown) {
-        console.warn("fontSizeDropdownPanel is null!");
-        return;
-      }
-
       if (!fontSizeBtn || !fontSizeDropdown) {
         console.warn("Missing elements!");
         return;
@@ -1495,7 +1490,7 @@
       fontSizeDropdown.addEventListener("mousedown", (e) => {
         const tag = e.target.tagName;
         if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
-          e.preventDefault(); // only block blur on non-interactive elements
+          e.preventDefault();
         }
       });
 
@@ -1525,7 +1520,7 @@
         const selectedSize = dropdownSelect.value;
         const fontSize = customValue !== "" ? `${customValue}pt` : selectedSize;
 
-        if (!fontSize) return; // Nothing selected or entered
+        if (!fontSize) return;
 
         const selection = window.getSelection();
         if (!selection.rangeCount || selection.isCollapsed) return;
@@ -1540,17 +1535,17 @@
 
         fontSizeDropdown.classList.add("hidden");
         customInput.value = "";
-        dropdownSelect.selectedIndex = 0; // reset dropdown
+        dropdownSelect.selectedIndex = 0;
       });
 
       document.addEventListener("click", (e) => {
-        if (
-          !fontSizeDropdown.contains(e.target) &&
-          !fontSizeBtn.contains(e.target)
-        ) {
-          fontSizeDropdown.classList.add("hidden");
-        }
-      });
+      if (
+        !fontSizeDropdown.contains(e.target) &&
+        !fontSizeBtn.contains(e.target)
+      ) {
+        fontSizeDropdown.classList.add("hidden");
+      }
+    });
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
