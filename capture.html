@@ -1493,8 +1493,6 @@
       }
 
       fontSizeDropdown.addEventListener("mousedown", (e) => {
-        e.stopPropagation(); // 🛑 Stop it from bubbling up and instantly closing the dropdown
-
         const tag = e.target.tagName;
         if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
           e.preventDefault();
@@ -1523,6 +1521,7 @@
       });
 
       applyBtn.addEventListener("click", () => {
+        console.log("📢 Apply Clicked!");
         restoreSelection();
 
         const customValue = customInput.value.trim();
