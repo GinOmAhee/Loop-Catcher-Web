@@ -1499,7 +1499,7 @@
 
       fontSizeBtn.addEventListener("click", (e) => {
         console.log("fontSizeBtn clicked");
-        e.stopPropagation();
+        e.stopImmediatePropagation();
 
         const isHidden = fontSizeDropdown.classList.contains("hidden");
 
@@ -1626,6 +1626,17 @@
       if (!preview.contains(e.target) && e.target.id !== 'previewToggle') {
         preview.style.display = 'none';
       }
+
+      if (
+        e.target.closest("#fontSizeDropdownPanel") ||
+        e.target.closest("#fontSizeBtn")
+      ) {
+        return; // do nothing if the click is on the dropdown or button
+      }
+
+      // otherwise close all dropdowns
+      document.getElementById("fontSizeDropdownPanel")?.classList.add("hidden");
+      // ... any other dropdowns you want to close
     }
 
     let tabs = [
