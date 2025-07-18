@@ -1498,19 +1498,34 @@
       });
 
       fontSizeBtn.addEventListener("click", (e) => {
-        console.log("fontSizeBtn clicked");
-        e.stopImmediatePropagation();
+        e.stopPropagation();
 
         const isHidden = fontSizeDropdown.classList.contains("hidden");
+
+        // First: hide other dropdowns
+        document.querySelectorAll(".dropdown").forEach(d => {
+          if (d !== fontSizeDropdown) d.classList.add("hidden");
+        });
 
         if (isHidden) {
           fontSizeDropdown.classList.remove("hidden");
 
-          const rect = fontSizeBtn.getBoundingClientRect();
-          fontSizeDropdown.style.left = `${rect.left}px`;
-          fontSizeDropdown.style.top = `${rect.bottom + 5}px`;
+          // Position it safely
+          const btnRect = fontSizeBtn.getBoundingClientRect();
+          const containerRect = document.querySelector(".main-only").getBoundingClientRect();
+          const left = btnRect.right - containerRect.left + 10;
+          const top = btnRect.top - containerRect.top;
 
-          setTimeout(() => customInput.focus(), 0);
+          fontSizeDropdown.style.position = "absolute";
+          fontSizeDropdown.style.left = `${left}px`;
+          fontSizeDropdown.style.top = `${top}px`;
+          fontSizeDropdown.style.zIndex = "9999";
+
+          // Focus safely
+        
+          setTimeout(() => {
+            customInput?.focus();
+          }, 50); // Give time for dropdown to fully open
         } else {
           fontSizeDropdown.classList.add("hidden");
         }
