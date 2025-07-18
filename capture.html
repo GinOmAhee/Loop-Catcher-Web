@@ -1176,13 +1176,12 @@
     <button id="applyMarginBtn">✅ Apply</button>
   </div>
   
-  <div id="fontDropdownWrapper" class="dropdown hidden"></div>
-    <select id="fontDropdown" onchange="setFont(this.value)">
-      <option value="'Arial', sans-serif">Arial</option>
-      <option value="'Georgia', serif">Georgia</option>
-      <option value="'Courier New', monospace">Courier New</option>
-      <option value="'Times New Roman', serif">Times New Roman</option>
-    </select>  
+  
+  <div id="fontDropdown" class="dropdown hidden" onchange="setFont(this.value)">
+    <div onclick="setFont('Arial, sans-serif')">Arial</div>
+    <div onclick="setFont('Georgia, serif')">Georgia</div>
+    <div onclick="setFont('Courier New, monospace')">Courier New</div>
+    <div onclick="setFont('Times New Roman, serif')">Times New Roman</div>
   </div>
 
   <div id="fontSizeDropdownPanel" class="dropdown hidden">
@@ -1436,30 +1435,28 @@
       });
 
       const fontBtn = document.getElementById("fontMenuBtn");
-      const fontDropdownWrapper = document.getElementById("fontDropdownWrapper");
+      const fontDropdown = document.getElementById("fontDropdown");
 
-      if (fontDropdownWrapper) {
-        fontDropdownWrapper.classList.add("hidden");
-      }
+      fontBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        fontDropdown.classList.toggle("hidden");
 
-      if (fontBtn && fontDropdownWrapper) {
-        fontBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          fontDropdownWrapper.classList.toggle("hidden");
-
-          const rect = fontBtn.getBoundingClientRect();
-          fontDropdownWrapper.style.position = "absolute";
-          fontDropdownWrapper.style.left = `${rect.left}px`;
-          fontDropdownWrapper.style.top = `${rect.bottom + 5}px`;
-        });
-      }
-
-      // Close dropdown when clicking outside
-      document.addEventListener("click", () => {
-        if (fontDropdownWrapper) {
-          fontDropdownWrapper.classList.add("hidden");
-        }
+        const rect = fontBtn.getBoundingClientRect();
+        fontDropdown.style.position = "absolute";
+        fontDropdown.style.left = `${rect.left}px`;
+        fontDropdown.style.top = `${rect.bottom + 5}px`;
       });
+
+      fontDropdown.addEventListener("click", (e) => e.stopPropagation());
+
+      document.addEventListener("click", () => {
+        fontDropdown.classList.add("hidden");
+      });
+
+      function setFont(font) {
+        document.execCommand("fontName", false, font);
+        fontDropdown.classList.add("hidden");
+      }
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
