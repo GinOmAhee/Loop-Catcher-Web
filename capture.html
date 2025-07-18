@@ -1493,12 +1493,13 @@
       }
 
       fontSizeDropdown.addEventListener("mousedown", (e) => {
+        e.stopPropagation();
         const tag = e.target.tagName;
         if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
           e.preventDefault();
         }
       });
-
+      
       fontSizeBtn.addEventListener("click", () => {
         console.log("TOGGLE SHOW");
 
@@ -1524,7 +1525,7 @@
         console.log("📢 Apply Clicked!");
         const fontSizeValue = document.getElementById("fontSize").value;
         console.log("Font size selected:", fontSizeValue);
-        
+
         restoreSelection();
 
         const customValue = customInput.value.trim();
