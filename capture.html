@@ -837,7 +837,7 @@
     position: fixed; /* allows escape from parent containers */
     z-index: 9999;
     background-color: var(--dropdown-bg, white);
-    border: 1px solid var(--dropdown-border, #ccc);
+    border: 1px solid var(--dropdown-border, #ccc;
     border-radius: 6px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     min-width: 140px;
@@ -1455,31 +1455,27 @@
       document.getElementById("highlightBtn").addEventListener("click", () => {
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
-      
+
       const fontBtn = document.getElementById("fontMenuBtn");
       const fontDropdown = document.getElementById("fontDropdown");
-      const container = document.getElementById(".editor-layout"); // no dot
+      const container = document.getElementById("main-only-container");
 
-      if (fontBtn && container && fontDropdown) {
-        fontBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          fontDropdown.classList.toggle("hidden");
+      fontBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        fontDropdown.classList.toggle("hidden");
 
-          const btnRect = fontBtn.getBoundingClientRect();
-          const containerRect = container.getBoundingClientRect();
+        const btnRect = fontBtn.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
 
-          // Position relative to .editor-layout
-          const left = btnRect.right - containerRect.left + 10;
-          const top = btnRect.top - containerRect.top;
+        // Position relative to .main-only
+        const left = btnRect.right - containerRect.left + 10; // tweak "+10" as needed for spacing
+        const top = btnRect.top - containerRect.top;
 
-          fontDropdown.style.position = "absolute";
-          fontDropdown.style.left = `${left}px`;
-          fontDropdown.style.top = `${top}px`;
-          fontDropdown.style.zIndex = "9999";
-        });
-      } else {
-        console.warn("fontBtn, container, or fontDropdown is null:", { fontBtn, container, fontDropdown });
-      }
+        fontDropdown.style.position = "absolute";
+        fontDropdown.style.left = `${left}px`;
+        fontDropdown.style.top = `${top}px`;
+        fontDropdown.style.zIndex = "9999";
+      });
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
@@ -1746,7 +1742,7 @@
     const mainEditor = document.getElementById("mainEditor");
     const attachedFilesList = document.getElementById('attachedFilesList');
     const groupedNotes = document.getElementById('groupedNotes');
-    
+    const fontSizeBtn = document.getElementById("fontSizeBtn");
     const sizeDropdown = document.getElementById("sizeDropdown");
     const textColorBtn = document.getElementById("textColorBtn");
     const textColorDropdown = document.getElementById("textColorDropdown");
@@ -2935,10 +2931,7 @@
         }
       });
 
-      const fontSizeBtn = document.getElementById("fontSizeBtn");
-
       fontSizeBtn.addEventListener("click", (e) => {
-        console.log("clicked");
         e.stopPropagation();
         saveSelection();
         fontSizeDropdown.classList.toggle("hidden");
@@ -2949,11 +2942,6 @@
 
         setTimeout(() => customInput.focus(), 0);
       });
-
-      console.log("Dropdown toggled");
-      console.log("Dropdown offsetLeft:", fontSizeDropdown.style.left);
-      console.log("Dropdown offsetTop:", fontSizeDropdown.style.top);
-      console.log("Dropdown is hidden?", fontSizeDropdown.classList.contains("hidden"));
 
       applyBtn.addEventListener("click", () => {
         restoreSelection();
