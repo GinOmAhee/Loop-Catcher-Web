@@ -1455,7 +1455,8 @@
       document.getElementById("highlightBtn").addEventListener("click", () => {
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
-
+      
+      if (fontBtn && container) {
       const fontBtn = document.getElementById("fontMenuBtn");
       const fontDropdown = document.getElementById("fontDropdown");
       const container = document.getElementById(".editor-layout");
@@ -1475,6 +1476,10 @@
         fontDropdown.style.left = `${left}px`;
         fontDropdown.style.top = `${top}px`;
         fontDropdown.style.zIndex = "9999";
+
+        } else {
+          console.warn("fontBtn or container is null:", { fontBtn, container });
+        }
       });
 
       // 🧠 Badge toggle (SideThoughts popup)
