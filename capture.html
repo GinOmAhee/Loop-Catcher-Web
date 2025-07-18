@@ -1524,8 +1524,17 @@
       applyBtn.addEventListener("click", () => {
         console.log("📢 Apply Clicked!");
 
-        const fontSizeInput = document.getElementById("fontSize");
-        const fontSizeValue = fontSizeInput ? fontSizeInput.value.trim() : "";
+        const selectedValue = dropdownSelect.value;
+        const customValue = customInput.value.trim();
+
+        let fontSizeValue = "";
+
+        if (customValue) {
+          fontSizeValue = `${customValue}pt`;
+        } else if (selectedValue) {
+          fontSizeValue = selectedValue;
+        }
+        
         console.log("Font size selected:", fontSizeValue);
 
         if (!fontSizeValue) {
