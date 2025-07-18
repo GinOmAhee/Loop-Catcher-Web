@@ -1525,12 +1525,14 @@
 
           // Focus safely
         
-          setTimeout(() => {
-            customInput?.focus();
-          }, 50); // Give time for dropdown to fully open
-        } else {
-          fontSizeDropdown.classList.add("hidden");
-        }
+          if (shouldShow) {
+            setTimeout(() => {
+              console.log("CHECK VISIBLE", getComputedStyle(fontSizeDropdown).display);
+              customInput?.focus(); // this stays INSIDE the setTimeout block
+            }, 100); // enough time for dropdown styles to apply
+          } else {
+            fontSizeDropdown.classList.add("hidden");
+          }
       });
 
       applyBtn.addEventListener("click", () => {
