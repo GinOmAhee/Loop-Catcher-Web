@@ -845,7 +845,8 @@
     display: none; /* toggled via JS */
   }
 
-  #fontDropdown {
+  #fontDropdown,
+  #fontSizeDropdownPanel  {
     position: absolute;
     top: 50px; /* tweak this based on your layout */
     left: 60px; /* enough to sit just beside the toolbar */
@@ -854,13 +855,6 @@
     padding: 0.5rem;
     z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-
-  #fontSizeDropdownPanel {
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
-    gap: 8px; /* Optional: adds space between the input and select */
-    padding: 10px;
   }
 
   body.dark-theme #highlightDropdown,
@@ -1516,6 +1510,7 @@
 
         if (isCurrentlyHidden) {
           fontSizeDropdown.classList.remove("hidden");
+          fontSizeDropdown.style.display = "block"; // <-- add this line
 
           setTimeout(() => {
             console.log("CHECK VISIBLE", getComputedStyle(fontSizeDropdown).display);
@@ -1523,6 +1518,7 @@
           }, 100);
         } else {
           fontSizeDropdown.classList.add("hidden");
+          fontSizeDropdown.style.display = "none"; // <-- and this line
         }
       });
 
@@ -3120,6 +3116,11 @@
       const btn = document.getElementById(btnId);
       const dropdown = document.getElementById(dropdownId);
       if (!btn || !dropdown) return;
+
+      const isVisible = dropdown.style.display === "block";
+
+      // Hide all dropdowns first
+      document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
 
     }
 
