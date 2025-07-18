@@ -858,7 +858,7 @@
 
   #fontSizeDropdownPanel {
     position: absolute;
-    top: 100%; /* this places it *right below* the trigger button */
+    top: 50%; /* this places it *right below* the trigger button */
     left: 0;
     background-color: white;
     border: 1px solid #ccc;
@@ -1481,16 +1481,19 @@
         fontDropdown.classList.toggle("hidden");
 
         const btnRect = fontBtn.getBoundingClientRect();
+        fontSizeDropdown.style.top = `${btnRect.bottom + window.scrollY}px`;
+        fontSizeDropdown.style.left = `${btnRect.left}px`;
+        
         const containerRect = container.getBoundingClientRect();
 
         // Position relative to .main-only
         const left = btnRect.right - containerRect.left + 10; // tweak "+10" as needed for spacing
         const top = btnRect.top - containerRect.top;
 
-        fontDropdown.style.position = "absolute";
-        fontDropdown.style.left = `${left}px`;
-        fontDropdown.style.top = `${top}px`;
-        fontDropdown.style.zIndex = "9999";
+        fontSizeDropdown.style.display = "flex";
+        fontSizeDropdown.style.flexDirection = "column";
+        fontSizeDropdown.style.gap = "8px";
+
       });
 
       const fontSizeBtn = document.getElementById("fontSizeBtn");
