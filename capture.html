@@ -1506,6 +1506,9 @@
         if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
           e.preventDefault();
         }
+
+        fontSizeDropdown.style.display = "block";
+        fontSizeDropdown.style.flexDirection = "column"; // Enforce layout if needed
         
       });
       
