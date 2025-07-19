@@ -1497,8 +1497,13 @@
         if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
           e.preventDefault();
         }
+
+        const btnRect = fontSizeBtn.getBoundingClientRect();
+        fontSizeDropdown.style.top = `${btnRect.bottom + window.scrollY}px`;
+        fontSizeDropdown.style.left = `${btnRect.left}px`;
       });
       
+    
       fontSizeBtn.addEventListener("click", () => {
         console.log("TOGGLE SHOW");
 
