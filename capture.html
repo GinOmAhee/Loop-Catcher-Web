@@ -584,8 +584,7 @@
     padding: 1rem 0.5rem;
     background-color: var(--toolbar-bg);
     border-right: 1px solid var(--tab-border);
-    max-width: 100%;
-    width: fit-content;
+    min-width: 50px;
   }
  
   .controls {
@@ -820,6 +819,16 @@
   }
 
   /* === DROPDOWN MENU === */
+  .dropdown {
+    position: absolute;
+    z-index: 999;
+    padding: 0.3rem 0;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    box-shadow: none;
+    font-size: 0.85rem;
+  }
 
   #highlightDropdown,
   #textColorDropdown {
@@ -852,7 +861,7 @@
     left: 60px; /* enough to sit just beside the toolbar */
     background-color: var(--dropdown-bg);
     border: 1px solid var(--dropdown-border)
-    padding: .9rem 3rem;
+    padding: 0.9rem;
     z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
@@ -1569,7 +1578,7 @@
           }
         }
         // ✅ Close the dropdown
-        fontSizeDropdown.classList.add("hidden");
+        fontSizeDropdown.classList.toggle("hidden");
       });
 
       document.addEventListener("click", (e) => {
