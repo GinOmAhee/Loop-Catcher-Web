@@ -843,14 +843,25 @@
     display: none; /* toggled via JS */
   }
 
-  #fontDropdown,
-  #fontSizeDropdownPanel  {
+  #fontDropdown {
+  
     position: absolute;
     top: 50px; /* tweak this based on your layout */
     left: 60px; /* enough to sit just beside the toolbar */
     background-color: var(--dropdown-bg);
     border: 1px solid var(--dropdown-border)
     padding: 0.5rem;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  #fontSizeDropdownPanel {
+    position: absolute;
+    top: 50px; /* tweak this based on your layout */
+    left: 60px; /* enough to sit just beside the toolbar */
+    background-color: var(--dropdown-bg);
+    border: 1px solid var(--dropdown-border)
+    padding: 0.9rem;
     z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
