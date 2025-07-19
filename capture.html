@@ -1472,6 +1472,19 @@
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
 
+      let savedRange;
+
+      function setFont(fontFamily) {
+        if (savedRange) {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(savedRange);
+        }
+
+        document.execCommand("fontName", false, fontFamily);
+        document.getElementById("fontDropdown").classList.add("hidden");
+      }
+
       const fontBtn = document.getElementById("fontMenuBtn");
       const fontDropdown = document.getElementById("fontDropdown");
       const container = document.querySelector(".main-only");
@@ -1483,14 +1496,19 @@
         const btnRect = fontBtn.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
 
-        // Position relative to .main-only
-        const left = btnRect.right - containerRect.left + 10; // tweak "+10" as needed for spacing
+        const left = btnRect.right - containerRect.left + 10;
         const top = btnRect.top - containerRect.top;
 
         fontDropdown.style.position = "absolute";
         fontDropdown.style.left = `${left}px`;
         fontDropdown.style.top = `${top}px`;
         fontDropdown.style.zIndex = "9999";
+
+        // Save selection
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+          savedRange = selection.getRangeAt(0);
+        }
       });
 
       const fontSizeBtn = document.getElementById("fontSizeBtn");
