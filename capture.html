@@ -846,8 +846,7 @@
     display: none; /* toggled via JS */
   }
 
-  #fontDropdown,
-  #fontSizeDropdownPanel  {
+  #fontDropdown  {
     position: absolute;
     top: 50px; /* tweak this based on your layout */
     left: 60px; /* enough to sit just beside the toolbar */
@@ -856,12 +855,19 @@
     padding: 0.5rem;
     z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-
-  #fontSizeDropdownPanel {
-    flex-direction: column;
-    display: flex;
-    gap: 8px;
+  } 
+  
+  #fontSizeDropdownPanel  {
+    position: absolute;
+    top: 75%; /* below the trigger button */
+    left: 0;   /* aligns with the left of the parent container or button */
+    margin-top: 4px;
+    background-color: var(--dropdown-bg);
+    border: 1px solid var(--dropdown-border);
+    padding: 0.5rem;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    display: none; /* hide by default */
   }
 
   body.dark-theme #highlightDropdown,
@@ -1507,8 +1513,7 @@
           e.preventDefault();
         }
 
-        fontSizeDropdown.style.display = "block";
-        fontSizeDropdown.style.flexDirection = "column"; // Enforce layout if needed
+        fontSizeDropdown.style.display = fontSizeDropdown.style.display === "block" ? "none" : "block";
         
       });
       
@@ -3198,7 +3203,6 @@
     document.addEventListener("click", () => {
       setTimeout(() => {
         fontDropdown?.classList.add("hidden");
-        fontSizeDropdownPanel?.classList.add("hidden");
         textColorDropdown?.classList.add("hidden");
         highlightDropdown?.classList.add("hidden");
       }, 100); // this gives time for clicks inside dropdowns to register
