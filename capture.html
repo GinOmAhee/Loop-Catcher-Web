@@ -1472,9 +1472,7 @@
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
 
-      let savedRange;
-
-      function setFont(fontFamily) {
+      window.setFont = function(fontFamily) {
         if (savedRange) {
           const selection = window.getSelection();
           selection.removeAllRanges();
@@ -1483,7 +1481,7 @@
 
         document.execCommand("fontName", false, fontFamily);
         document.getElementById("fontDropdown").classList.add("hidden");
-      }
+      };
 
       const fontBtn = document.getElementById("fontMenuBtn");
       const fontDropdown = document.getElementById("fontDropdown");
