@@ -584,7 +584,6 @@
     padding: 1rem 0.5rem;
     background-color: var(--toolbar-bg);
     border-right: 1px solid var(--tab-border);
-    min-width: 50px;
     max-width: 100%;
     width: fit-content;
   }
@@ -821,16 +820,6 @@
   }
 
   /* === DROPDOWN MENU === */
-  .dropdown {
-    position: absolute;
-    z-index: 999;
-    padding: 0.3rem 0;
-    background: transparent;
-    border: none;
-    border-radius: 5px;
-    box-shadow: none;
-    font-size: 0.85rem;
-  }
 
   #highlightDropdown,
   #textColorDropdown {
@@ -858,7 +847,7 @@
   }
 
   #fontSizeDropdownPanel {
-    position: absolute;
+    position: fixed;
     top: 50px; /* tweak this based on your layout */
     left: 60px; /* enough to sit just beside the toolbar */
     background-color: var(--dropdown-bg);
