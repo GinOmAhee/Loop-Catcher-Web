@@ -62,7 +62,7 @@
     --toolbar-border: #444;
     --hint-bg: #1f1f1f;
     --hint-text: #ddd;
-    --dropdown-bg: #C8C6C7;
+    --dropdown-bg: #1e1e1e;
     --dropdown-border: #444;
     --dropdown-text: #f0f0f0;
     background-color: #000;
@@ -843,25 +843,14 @@
     display: none; /* toggled via JS */
   }
 
-  #fontDropdown {
-  
+  #fontDropdown,
+  #fontSizeDropdownPanel  {
     position: absolute;
     top: 50px; /* tweak this based on your layout */
     left: 60px; /* enough to sit just beside the toolbar */
     background-color: var(--dropdown-bg);
     border: 1px solid var(--dropdown-border)
     padding: 0.5rem;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-
-  #fontSizeDropdownPanel {
-    position: absolute;
-    top: 50px; /* tweak this based on your layout */
-    left: 60px; /* enough to sit just beside the toolbar */
-    background-color: var(--dropdown-bg);
-    border: 1px solid var(--dropdown-border)
-    padding: 0.9rem;
     z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
@@ -1508,13 +1497,9 @@
         if (!["INPUT", "SELECT", "BUTTON"].includes(tag)) {
           e.preventDefault();
         }
-
-        const btnRect = fontSizeBtn.getBoundingClientRect();
-        fontSizeDropdown.style.top = `${btnRect.bottom + window.scrollY}px`;
-        fontSizeDropdown.style.left = `${btnRect.left}px`;
+        
       });
       
-    
       fontSizeBtn.addEventListener("click", () => {
         console.log("TOGGLE SHOW");
 
