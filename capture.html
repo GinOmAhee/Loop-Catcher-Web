@@ -2005,16 +2005,17 @@
         span.style.backgroundColor = color;
         span.appendChild(range.extractContents());
 
-        // Insert span and then a zero-width space after it
-        const space = document.createTextNode("\u200B"); // zero-width space
+        // Use a real space instead of zero-width
+        const space = document.createTextNode("\u00A0"); // non-breaking space
 
         const frag = document.createDocumentFragment();
         frag.appendChild(span);
         frag.appendChild(space);
 
+        range.deleteContents(); // just in case
         range.insertNode(frag);
 
-        // Move caret to after the span
+        // Move caret to after the space node
         range.setStartAfter(space);
         range.setEndAfter(space);
         sel.removeAllRanges();
