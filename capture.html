@@ -1936,6 +1936,7 @@
       if (selection.rangeCount > 0) {
         editorSelections[editorId] = selection.getRangeAt(0).cloneRange();
         activeEditor = document.getElementById(editorId);
+        console.log(activeEditor); // ✅ Log it here
       }
     }
 
@@ -1984,34 +1985,35 @@
 
     highlightBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      saveSelection();
+      const editorId = getActiveEditorIdSomehow(); // you need to pass the correct ID
+      saveSelection(editorId);
       highlightDropdown.classList.toggle("hidden");
+
       const rect = highlightBtn.getBoundingClientRect();
       highlightDropdown.style.left = `${rect.left}px`;
       highlightDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
     function setHighlightColor(color) {
-      if (!activeEditor || !saveRange) return;
+      if (!activeEditor || !editorSelections[activeEditor.id]) return;
 
       activeEditor.focus();
-      restoreSelection(); // only if saveRange exists
+      restoreSelection();
 
       document.execCommand("hiliteColor", false, color);
 
-      // Optional: collapse the selection to avoid sticky formatting
       const sel = window.getSelection();
       sel.removeAllRanges();
 
       closeAllDropdowns();
     }
 
-    document.addEventListener("mousedown", function (event) {
-      const isDropdown = event.target.closest(".dropdown-panel");
-      const isTrigger = event.target.closest(".dropdown-btn");
+    document.addEventListener("click", (e) => {
+      const isDropdown = e.target.closest(".highlightDropdown");
+      const isTrigger = e.target.closest("#highlightBtn");
 
       if (!isDropdown && !isTrigger) {
-        document.querySelectorAll(".dropdown-panel").forEach(drop => drop.classList.add("hidden"));
+        highlightDropdown.classList.add("hidden");
       }
     });
 
@@ -3180,8 +3182,8 @@
     }
 
     document.addEventListener("mousedown", (e) => {
-      const isDropdown = e.target.closest("#highlightDropdown, #textColorDropdown");
-      const isTrigger = e.target.closest("#highlightBtn, #textColorBtn");
+      const isDropdown = e.target.closest("#textColorDropdown");
+      const isTrigger = e.target.closest("#textColorBtn");
 
       if (!isDropdown && !isTrigger) {
         document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
