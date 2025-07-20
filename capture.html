@@ -1446,6 +1446,12 @@
         });
       }
 
+      document.querySelectorAll(".editor").forEach(editor => {
+        editor.addEventListener("focus", () => {
+          activeEditor = editor;
+        });
+      });
+
       const switchEl = document.getElementById('themeSwitch');
 
       function loadTheme() {
