@@ -1995,30 +1995,33 @@
       event.preventDefault();
       event.stopPropagation();
 
-      restoreSelection(); // restore the saved selection
+      restoreSelection();
 
       const sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0) return;
+      if (sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
 
-      const range = sel.getRangeAt(0);
+        const span = document.createElement("span");
+        span.style.backgroundColor = color;
+        span.appendChild(range.extractContents());
 
-      // wrap selected content
-      const span = document.createElement("span");
-      span.style.backgroundColor = color;
-      range.surroundContents(span);
+        // Insert span and then a zero-width space after it
+        const space = document.createTextNode("\u200B"); // zero-width space
 
-      // 💣 move caret AFTER the span to break the highlight
-      const newRange = document.createRange();
-      newRange.setStartAfter(span);
-      newRange.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(newRange); // 🧠 this is the key
+        const frag = document.createDocumentFragment();
+        frag.appendChild(span);
+        frag.appendChild(space);
 
-      // hide the dropdown
-      document.getElementById("highlightDropdown")?.classList.add("hidden");
+        range.insertNode(frag);
 
-      // clear saved selection
-      savedSelection = null;
+        // Move caret to after the span
+        range.setStartAfter(space);
+        range.setEndAfter(space);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+
+      document.getElementById("highlightDropdown").classList.add("hidden");
     }
 
     document.querySelector(".editor").addEventListener("mouseup", saveSelection);
