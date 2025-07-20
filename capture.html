@@ -1998,40 +1998,43 @@
       restoreSelection();
 
       const sel = window.getSelection();
-      if (!sel.rangeCount) return;
+      if (sel.rangeCount === 0) return;
 
       const range = sel.getRangeAt(0);
-      const selectedText = range.toString();
+      const contents = range.extractContents();
 
-      if (!selectedText) return;
+      // Create a span for highlight
+      const span = document.createElement("span");
+      span.style.backgroundColor = color;
+      span.appendChild(contents);
 
-      // Create the highlight span
-      const highlightSpan = document.createElement("span");
-      highlightSpan.style.backgroundColor = color;
-      highlightSpan.textContent = selectedText;
-
-      // Delete selected content
+      // Insert the span
       range.deleteContents();
+      range.insertNode(span);
 
-      // Insert the highlight span
-      range.insertNode(highlightSpan);
+      // ✅ Insert a temporary text node outside the span
+      const space = document.createTextNode(" "); // force the browser to break out
+      span.after(space);
 
-      // Create a new clean text node after it
-      const cleanNode = document.createTextNode("\u200B");
-      highlightSpan.parentNode.insertBefore(cleanNode, highlightSpan.nextSibling);
-
-      // Move the caret into the new text node (outside the span)
+      // ✅ Move caret after the space
       const newRange = document.createRange();
-      newRange.setStart(cleanNode, 1); // after the ZWS
-      newRange.collapse(true);
+      newRange.setStartAfter(space);
+      newRange.setEndAfter(space);
 
       sel.removeAllRanges();
       sel.addRange(newRange);
 
+      // Hide the dropdown
       document.getElementById("highlightDropdown").classList.add("hidden");
     }
 
-    document.querySelector(".editor").addEventListener("mouseup", saveSelection);
+    document.querySelector(".editor").addEventListener("mouseup", (e) => {
+      // If you're clicking on a dropdown or toolbar item, skip saving
+      if (e.target.closest("#highlightDropdown") || e.target.closest(".toolbar")) return;
+
+      saveSelection();
+    });
+
 
     // Optional: Hide dropdown on outside click
     document.addEventListener("click", (e) => {
