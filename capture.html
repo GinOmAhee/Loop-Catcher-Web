@@ -2003,7 +2003,14 @@
         const span = document.createElement("span");
         span.style.backgroundColor = color;
         range.surroundContents(span);
-        sel.removeAllRanges(); // clear highlight after applying
+
+        // 💡 Move cursor right after the span so new text isn't inside it
+        const newRange = document.createRange();
+        newRange.setStartAfter(span);
+        newRange.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(newRange); // move caret after highlight
+    
       }
 
       document.getElementById("highlightDropdown").classList.add("hidden");
