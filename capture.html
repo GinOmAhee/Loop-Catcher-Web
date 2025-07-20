@@ -1927,6 +1927,16 @@
       }
     }
 
+    document.addEventListener("click", (e) => {
+      // If the user clicks *outside* the editable editor area
+      if (!e.target.closest(".editor")) {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          sel.removeAllRanges(); // 👈 forcibly clears selection
+        }
+      }
+    });
+
     function justifyText() {
       activeEditor.focus(); // ensure editor is active
       document.execCommand("justifyFull", false, null);
@@ -1967,11 +1977,10 @@
       highlightDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
-    function setHighlightColor(color, e) {
-      if (e) e.preventDefault();
-      
+    function setHighlightColor(color) {
       activeEditor.focus();
       restoreSelection();
+
       const selection = window.getSelection();
       if (!selection.rangeCount || selection.isCollapsed) return;
 
@@ -1979,32 +1988,29 @@
       const selectedText = range.extractContents();
 
       const mark = document.createElement("mark");
-      requestAnimationFrame(() => {
-        mark.classList.add("highlight-glow");
-      });
+      mark.classList.add("highlight-glow");
+      mark.style.backgroundColor = color;
       mark.appendChild(selectedText);
 
+      range.deleteContents();
       range.insertNode(mark);
 
-      const newRange = document.createRange();
-      newRange.selectNodeContents(mark);
+      // ❗ Collapse selection after mark
+      const after = document.createRange();
+      after.setStartAfter(mark);
+      after.collapse(true);
       selection.removeAllRanges();
-      selection.addRange(newRange);
+      selection.addRange(after);
 
-      // Hide dropdown (if exists)
-      const highlightDropdown = document.getElementById("highlightDropdown");
-      highlightDropdown?.classList.add("hidden");
+      // 💣 Critical: Reset savedSelection after use
+      savedSelection = null;
 
-      // Update status
+      // Hide dropdown
+      document.getElementById("highlightDropdown")?.classList.add("hidden");
+
+      // Status update
       const saveStatus = document.getElementById("saveStatus");
       if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
-
-      // Optional fallback
-      try {
-        document.execCommand("hiliteColor", false, color);
-      } catch (e) {
-        console.warn("execCommand fallback failed", e);
-      }
     }
 
     async function saveText() {
