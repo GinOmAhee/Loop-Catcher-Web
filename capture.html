@@ -1625,14 +1625,15 @@
       });
 
       document.addEventListener("click", (e) => {
-        const clickedInsideDropdown = fontSizeDropdown.contains(e.target);
-        const clickedButton = fontSizeBtn.contains(e.target);
-
-        if (!clickedInsideDropdown && !clickedButton) {
-          fontSizeDropdown.classList.add("hidden");
-          fontSizeDropdown.style.display = "none";
+        // If the click is outside both editor *and* the highlight dropdown
+        if (!e.target.closest(".editor") && !e.target.closest("#highlightDropdown")) {
+          const sel = window.getSelection();
+          if (sel && sel.rangeCount > 0) {
+            sel.removeAllRanges();
+          }
         }
       });
+
 
       document.addEventListener("mouseup", saveSelection);
       document.addEventListener("keyup", saveSelection);
