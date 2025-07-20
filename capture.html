@@ -1995,38 +1995,30 @@
       event.preventDefault();
       event.stopPropagation();
 
-      restoreSelection();
+      restoreSelection(); // restore the saved selection
 
       const sel = window.getSelection();
-      if (!sel.rangeCount) return;
+      if (!sel || sel.rangeCount === 0) return;
 
       const range = sel.getRangeAt(0);
-      const selectedText = range.toString();
 
-      if (!selectedText) return;
-
-      // Create the span and add style
+      // wrap selected content
       const span = document.createElement("span");
       span.style.backgroundColor = color;
-      span.textContent = selectedText;
+      range.surroundContents(span);
 
-      // Replace selected content with the styled span
-      range.deleteContents();
-      range.insertNode(span);
-
-      // Add a space OUTSIDE the span to break the formatting
-      const breakNode = document.createTextNode(" ");
-      span.after(breakNode);
-
-      // Move the caret after the space
+      // 💣 move caret AFTER the span to break the highlight
       const newRange = document.createRange();
-      newRange.setStartAfter(breakNode);
+      newRange.setStartAfter(span);
       newRange.collapse(true);
       sel.removeAllRanges();
-      sel.addRange(newRange);
+      sel.addRange(newRange); // 🧠 this is the key
 
-      // Hide dropdown
-      document.getElementById("highlightDropdown").classList.add("hidden");
+      // hide the dropdown
+      document.getElementById("highlightDropdown")?.classList.add("hidden");
+
+      // clear saved selection
+      savedSelection = null;
     }
 
     document.querySelector(".editor").addEventListener("mouseup", saveSelection);
