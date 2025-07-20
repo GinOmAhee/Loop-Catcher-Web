@@ -1984,11 +1984,6 @@
 
       range.insertNode(mark);
 
-      const newRange = document.createRange();
-      newRange.selectNodeContents(mark);
-      selection.removeAllRanges();
-      selection.addRange(newRange);
-
       // Hide dropdown (if exists)
       const highlightDropdown = document.getElementById("highlightDropdown");
       highlightDropdown?.classList.add("hidden");
@@ -1996,6 +1991,8 @@
       // Update status
       const saveStatus = document.getElementById("saveStatus");
       if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
+
+      selection.removeAllRanges();
 
       // Optional fallback
       try {
