@@ -1998,45 +1998,38 @@
       restoreSelection();
 
       const sel = window.getSelection();
-      if (sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
+      if (!sel.rangeCount) return;
 
-        const content = range.extractContents();
-        const span = document.createElement("span");
-        span.style.backgroundColor = color;
-        span.appendChild(content);
+      const range = sel.getRangeAt(0);
+      const selectedText = range.toString();
 
-        // Inject span using innerHTML to kill formatting context
-        const html = `<span style="background-color: ${color};">${span.innerHTML}</span><span class="caret-guard">&#8203;</span>`;
+      if (!selectedText) return;
 
-        // Replace the range with HTML directly
-        range.deleteContents();
+      // Create the highlight span
+      const highlightSpan = document.createElement("span");
+      highlightSpan.style.backgroundColor = color;
+      highlightSpan.textContent = selectedText;
 
-        // Use execCommand to insert clean, parsed HTML
-        const div = document.createElement("div");
-        div.innerHTML = html;
+      // Delete selected content
+      range.deleteContents();
 
-        const frag = document.createDocumentFragment();
-        while (div.firstChild) {
-          frag.appendChild(div.firstChild);
-        }
+      // Insert the highlight span
+      range.insertNode(highlightSpan);
 
-        range.insertNode(frag);
+      // Create a new clean text node after it
+      const cleanNode = document.createTextNode("\u200B");
+      highlightSpan.parentNode.insertBefore(cleanNode, highlightSpan.nextSibling);
 
-        // Move caret outside styled span
-        const caretSpan = document.querySelector(".caret-guard");
-        if (caretSpan) {
-          const newRange = document.createRange();
-          newRange.setStart(caretSpan, 1);
-          newRange.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(newRange);
-        }
-      }
+      // Move the caret into the new text node (outside the span)
+      const newRange = document.createRange();
+      newRange.setStart(cleanNode, 1); // after the ZWS
+      newRange.collapse(true);
+
+      sel.removeAllRanges();
+      sel.addRange(newRange);
 
       document.getElementById("highlightDropdown").classList.add("hidden");
     }
-
 
     document.querySelector(".editor").addEventListener("mouseup", saveSelection);
 
