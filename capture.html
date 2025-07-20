@@ -1335,6 +1335,20 @@
     </div>
   </div>
 
+  <div
+    id="mainEditor"
+    contenteditable="true"
+    onmouseup="saveSelection('mainEditor')"
+    onkeyup="saveSelection('mainEditor')"
+  ></div>
+
+  <div
+    id="coEditor"
+    contenteditable="true"
+    onmouseup="saveSelection('coEditor')"
+    onkeyup="saveSelection('coEditor')"
+  ></div>
+
   <!-- Your main HTML content above -->
 
 </body>
@@ -1391,6 +1405,11 @@
     }
 
     let activeEditor;
+    let editorSelections = {
+      mainEditor: null,
+      coEditor: null
+    };
+
     let savedRange = null;
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -1912,18 +1931,23 @@
 
     let savedSelection = null;
 
-    function saveSelection() {
-      const sel = window.getSelection();
-      if (sel && sel.rangeCount > 0) {
-        savedSelection = sel.getRangeAt(0).cloneRange();
+    function saveSelection(editorId) {
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        editorSelections[editorId] = selection.getRangeAt(0).cloneRange();
+        activeEditor = document.getElementById(editorId);
       }
     }
 
     function restoreSelection() {
-      if (savedSelection) {
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(savedSelection);
+      if (!activeEditor) return;
+
+      const editorId = activeEditor.id;
+      const range = editorSelections[editorId];
+      if (range) {
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
     }
 
@@ -1968,19 +1992,31 @@
     });
 
     function setHighlightColor(color) {
-      if (!activeEditor) return;
+      if (!activeEditor || !saveRange) return;
 
       activeEditor.focus();
-      restoreSelection();
+      restoreSelection(); // only if saveRange exists
 
       document.execCommand("hiliteColor", false, color);
 
-      // Close dropdown
-      document.getElementById("highlightDropdown").classList.add("hidden");
+      // Optional: collapse the selection to avoid sticky formatting
+      const sel = window.getSelection();
+      sel.removeAllRanges();
 
-      // Optional status update
-      const saveStatus = document.getElementById("saveStatus");
-      if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
+      closeAllDropdowns();
+    }
+
+    document.addEventListener("mousedown", function (event) {
+      const isDropdown = event.target.closest(".dropdown-panel");
+      const isTrigger = event.target.closest(".dropdown-btn");
+
+      if (!isDropdown && !isTrigger) {
+        document.querySelectorAll(".dropdown-panel").forEach(drop => drop.classList.add("hidden"));
+      }
+    });
+
+    function closeAllDropdowns() {
+      document.querySelectorAll(".dropdown-panel").forEach(drop => drop.classList.add("hidden"));
     }
 
     async function saveText() {
@@ -3036,8 +3072,6 @@
         savedRange = selection.getRangeAt(0).cloneRange();
       }
     });
-
-      
 
     function printNote() {
       const printWindow = window.open('', '_blank');
