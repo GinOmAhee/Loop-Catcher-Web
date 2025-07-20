@@ -101,10 +101,10 @@
   body.dark-theme .tab-rename-input {
     background: #1e1e1e;
     color: #eee;
-    border: none
+    border: none;
     caret-color: hotpink;
     outline: none;
-    box-shadow: inset 0 -2px 0 hotpink
+    box-shadow: inset 0 -2px 0 hotpink;
     transition: all 0.2s ease-in-out;
 
     position: relative;
@@ -838,7 +838,7 @@
     position: fixed; /* allows escape from parent containers */
     z-index: 9999;
     background-color: var(--dropdown-bg);
-    border: 1px solid var(--dropdown-border)
+    border: 1px solid var(--dropdown-border);
     border-radius: 6px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     min-width: 140px;
@@ -1910,6 +1910,11 @@
     let debounceTimer;
 
     function attachInputListener(editor) {
+      if (!editor || !editor.addEventListener) {
+        console.warn("Invalid editor passed to attachInputListener:", editor);
+        return;
+      }
+
       editor.addEventListener("input", () => {
         if (editor !== activeEditor) return; // Only respond if it's the active one
 
