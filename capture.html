@@ -1995,22 +1995,20 @@
       event.preventDefault();
       event.stopPropagation();
 
-      restoreSelection(); // restore what the user selected
+      restoreSelection(); // restore selection from before dropdown
 
       const sel = window.getSelection();
       if (sel.rangeCount > 0) {
         const range = sel.getRangeAt(0);
-        const span = document.createElement("span");
-        span.style.backgroundColor = color;
-        range.surroundContents(span);
+        const selectedText = range.toString();
 
-        // 💡 Move cursor right after the span so new text isn't inside it
-        const newRange = document.createRange();
-        newRange.setStartAfter(span);
-        newRange.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(newRange); // move caret after highlight
-    
+        // Create colored span
+        const span = `<span style="background-color: ${color};">${selectedText}</span>`;
+
+        // Replace selected text with colored span
+        document.execCommand("insertHTML", false, span);
+
+        // Move cursor after the inserted span (execCommand does this automatically)
       }
 
       document.getElementById("highlightDropdown").classList.add("hidden");
