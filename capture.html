@@ -1977,32 +1977,24 @@
       const selectedText = range.extractContents();
 
       const mark = document.createElement("mark");
-      requestAnimationFrame(() => {
-        mark.classList.add("highlight-glow");
-      });
+      mark.style.backgroundColor = color; // 👈 Set color directly here
+      mark.classList.add("highlight-glow");
       mark.appendChild(selectedText);
 
       range.insertNode(mark);
 
+      // Reset selection
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
       selection.removeAllRanges();
       selection.addRange(newRange);
 
-      // Hide dropdown (if exists)
-      const highlightDropdown = document.getElementById("highlightDropdown");
+      // Hide dropdown
       highlightDropdown?.classList.add("hidden");
 
-      // Update status
+      // Status update
       const saveStatus = document.getElementById("saveStatus");
       if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
-
-      // Optional fallback
-      try {
-        document.execCommand("hiliteColor", false, color);
-      } catch (e) {
-        console.warn("execCommand fallback failed", e);
-      }
     }
 
     async function saveText() {
