@@ -1995,22 +1995,37 @@
       event.preventDefault();
       event.stopPropagation();
 
-      restoreSelection(); // restore selection from before dropdown
+      restoreSelection();
 
       const sel = window.getSelection();
-      if (sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
-        const selectedText = range.toString();
+      if (!sel.rangeCount) return;
 
-        // Create colored span
-        const span = `<span style="background-color: ${color};">${selectedText}</span>`;
+      const range = sel.getRangeAt(0);
+      const selectedText = range.toString();
 
-        // Replace selected text with colored span
-        document.execCommand("insertHTML", false, span);
+      if (!selectedText) return;
 
-        // Move cursor after the inserted span (execCommand does this automatically)
-      }
+      // Create a span manually
+      const span = document.createElement("span");
+      span.style.backgroundColor = color;
+      span.textContent = selectedText;
 
+      // Replace selected text with span
+      range.deleteContents();
+      range.insertNode(span);
+
+      // Create a zero-width space AFTER the span
+      const zwsp = document.createTextNode("\u200B");
+      span.after(zwsp);
+
+      // Move cursor after the zwsp
+      sel.removeAllRanges();
+      const newRange = document.createRange();
+      newRange.setStartAfter(zwsp);
+      newRange.collapse(true);
+      sel.addRange(newRange);
+
+      // Hide dropdown
       document.getElementById("highlightDropdown").classList.add("hidden");
     }
 
