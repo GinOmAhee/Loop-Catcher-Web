@@ -101,10 +101,10 @@
   body.dark-theme .tab-rename-input {
     background: #1e1e1e;
     color: #eee;
-    border: none;
+    border: none
     caret-color: hotpink;
     outline: none;
-    box-shadow: inset 0 -2px 0 hotpink;
+    box-shadow: inset 0 -2px 0 hotpink
     transition: all 0.2s ease-in-out;
 
     position: relative;
@@ -838,7 +838,7 @@
     position: fixed; /* allows escape from parent containers */
     z-index: 9999;
     background-color: var(--dropdown-bg);
-    border: 1px solid var(--dropdown-border);
+    border: 1px solid var(--dropdown-border)
     border-radius: 6px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     min-width: 140px;
@@ -1335,20 +1335,6 @@
     </div>
   </div>
 
-  <div
-    id="mainEditor"
-    contenteditable="true"
-    onmouseup="saveSelection('mainEditor')"
-    onkeyup="saveSelection('mainEditor')"
-  ></div>
-
-  <div
-    id="coEditor"
-    contenteditable="true"
-    onmouseup="saveSelection('coEditor')"
-    onkeyup="saveSelection('coEditor')"
-  ></div>
-
   <!-- Your main HTML content above -->
 
 </body>
@@ -1405,11 +1391,6 @@
     }
 
     let activeEditor;
-    let editorSelections = {
-      mainEditor: null,
-      coEditor: null
-    };
-
     let savedRange = null;
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -1445,12 +1426,6 @@
           activeEditor.focus();
         });
       }
-
-      document.querySelectorAll(".editor").forEach(editor => {
-        editor.addEventListener("focus", () => {
-          activeEditor = editor;
-        });
-      });
 
       const switchEl = document.getElementById('themeSwitch');
 
@@ -1916,11 +1891,6 @@
     let debounceTimer;
 
     function attachInputListener(editor) {
-      if (!editor || !editor.addEventListener) {
-        console.warn("Invalid editor passed to attachInputListener:", editor);
-        return;
-      }
-
       editor.addEventListener("input", () => {
         if (editor !== activeEditor) return; // Only respond if it's the active one
 
@@ -1942,24 +1912,18 @@
 
     let savedSelection = null;
 
-    function saveSelection(editorId) {
-      const selection = window.getSelection();
-      if (selection.rangeCount > 0) {
-        editorSelections[editorId] = selection.getRangeAt(0).cloneRange();
-        activeEditor = document.getElementById(editorId);
-        console.log(activeEditor); // ✅ Log it here
+    function saveSelection() {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        savedSelection = sel.getRangeAt(0).cloneRange();
       }
     }
 
     function restoreSelection() {
-      if (!activeEditor) return;
-
-      const editorId = activeEditor.id;
-      const range = editorSelections[editorId];
-      if (range) {
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
+      if (savedSelection) {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(savedSelection);
       }
     }
 
@@ -1996,44 +1960,49 @@
 
     highlightBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      const editorId = activeEditor?.id;
-      if (editorId) saveSelection(editorId);
+      saveSelection();
       highlightDropdown.classList.toggle("hidden");
-
       const rect = highlightBtn.getBoundingClientRect();
       highlightDropdown.style.left = `${rect.left}px`;
       highlightDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
-    function setActiveEditor(editorId) {
-      activeEditor = document.getElementById(editorId);
-    }
-
     function setHighlightColor(color) {
-      if (!activeEditor || !editorSelections[activeEditor.id]) return;
-
       activeEditor.focus();
       restoreSelection();
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
 
-      document.execCommand("hiliteColor", false, color);
+      const range = selection.getRangeAt(0);
+      const selectedText = range.extractContents();
 
-      const sel = window.getSelection();
-      sel.removeAllRanges();
+      const mark = document.createElement("mark");
+      requestAnimationFrame(() => {
+        mark.classList.add("highlight-glow");
+      });
+      mark.appendChild(selectedText);
 
-      closeAllDropdowns();
-    }
+      range.insertNode(mark);
 
-    document.addEventListener("click", (e) => {
-      const isDropdown = e.target.closest(".highlightDropdown");
-      const isTrigger = e.target.closest("#highlightBtn");
+      const newRange = document.createRange();
+      newRange.selectNodeContents(mark);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
 
-      if (!isDropdown && !isTrigger) {
-        highlightDropdown.classList.add("hidden");
+      // Hide dropdown (if exists)
+      const highlightDropdown = document.getElementById("highlightDropdown");
+      highlightDropdown?.classList.add("hidden");
+
+      // Update status
+      const saveStatus = document.getElementById("saveStatus");
+      if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
+
+      // Optional fallback
+      try {
+        document.execCommand("hiliteColor", false, color);
+      } catch (e) {
+        console.warn("execCommand fallback failed", e);
       }
-    });
-
-    function closeAllDropdowns() {
-      document.querySelectorAll(".dropdown-panel").forEach(drop => drop.classList.add("hidden"));
     }
 
     async function saveText() {
@@ -3090,6 +3059,8 @@
       }
     });
 
+      
+
     function printNote() {
       const printWindow = window.open('', '_blank');
       const noteContent = activeEditor.innerHTML;
@@ -3197,11 +3168,11 @@
     }
 
     document.addEventListener("mousedown", (e) => {
-      const isDropdown = e.target.closest("#textColorDropdown");
-      const isTrigger = e.target.closest("#textColorBtn");
+      const isDropdown = e.target.closest("#highlightDropdown, #textColorDropdown");
+      const isTrigger = e.target.closest("#highlightBtn, #textColorBtn");
 
       if (!isDropdown && !isTrigger) {
-        document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
+        document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
       }
     });
 
