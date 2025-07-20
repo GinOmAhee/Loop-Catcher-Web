@@ -1195,36 +1195,16 @@
   </div>
 
   <div id="highlightDropdown" class="dropdown hidden">
-    <div
-      style="background-color: yellow;"
-      onmousedown="event.preventDefault(); event.stopPropagation(); setHighlightColor('yellow')"
-    >
-      Yellow
-    </div>
-    <div
-      style="background-color: lightgreen;"
-      onmousedown="event.preventDefault(); event.stopPropagation(); setHighlightColor('lightgreen')"
-    >
-      Light Green
-    </div>
-    <div
-      style="background-color: lightblue;"
-      onmousedown="event.preventDefault(); event.stopPropagation(); setHighlightColor('lightblue')"
-    >
-      Light Blue
-    </div>
-    <div
-      style="background-color: lightpink;"
-      onmousedown="event.preventDefault(); event.stopPropagation(); setHighlightColor('lightpink')"
-    >
-      Light Pink
-    </div>
-    <div
-      style="background-color: lightgray;"
-      onmousedown="event.preventDefault(); event.stopPropagation(); setHighlightColor('lightgray')"
-    >
-      Light Gray
-    </div>
+    <div style="background-color: yellow;"
+         onmousedown="handleColorClick('yellow', event)">Yellow</div>
+    <div style="background-color: lightgreen;"
+         onmousedown="handleColorClick('lightgreen', event)">Light Green</div>
+    <div style="background-color: lightblue;"
+         onmousedown="handleColorClick('lightblue', event)">Light Blue</div>
+    <div style="background-color: lightpink;"
+         onmousedown="handleColorClick('lightpink', event)">Light Pink</div>
+    <div style="background-color: lightgray;"
+         onmousedown="handleColorClick('lightgray', event)">Light Gray</div>
   </div>
 
   <div id="marginDropdown" class="dropdown hidden">
@@ -1495,6 +1475,11 @@
 
       document.getElementById("highlightBtn").addEventListener("click", () => {
         toggleDropdown("highlightBtn", "highlightDropdown");
+      });
+
+      document.getElementById("highlightBtn").addEventListener("click", () => {
+        saveSelection(); // 💾 save before opening dropdown
+        document.getElementById("highlightDropdown").classList.remove("hidden");
       });
 
       window.setFont = function(fontFamily) {
@@ -2006,37 +1991,32 @@
       highlightDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
-    function setHighlightColor(color) {
-      if (!savedSelection) return;
+    function handleColorClick(color, event) {
+      event.preventDefault();
+      event.stopPropagation();
 
-      // clone the selection so we don't mutate it
-      const range = savedSelection.cloneRange();
-      const selectedText = range.extractContents();
-
-      const mark = document.createElement("mark");
-      mark.classList.add("highlight-glow");
-      mark.style.backgroundColor = color;
-      mark.appendChild(selectedText);
-
-      range.deleteContents(); // in case anything is left
-      range.insertNode(mark);
-
-      // move cursor after the new mark
-      const after = document.createRange();
-      after.setStartAfter(mark);
-      after.collapse(true);
+      restoreSelection(); // restore what the user selected
 
       const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(after);
+      if (sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        const span = document.createElement("span");
+        span.style.backgroundColor = color;
+        range.surroundContents(span);
+        sel.removeAllRanges(); // clear highlight after applying
+      }
 
-      // clear UI
-      savedSelection = null;
-      document.getElementById("highlightDropdown")?.classList.add("hidden");
-
-      const saveStatus = document.getElementById("saveStatus");
-      if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
+      document.getElementById("highlightDropdown").classList.add("hidden");
     }
+
+    document.querySelector(".editor").addEventListener("mouseup", saveSelection);
+
+    // Optional: Hide dropdown on outside click
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest("#highlightDropdown") && !e.target.closest(".editor")) {
+        document.getElementById("highlightDropdown").classList.add("hidden");
+      }
+    });
 
     async function saveText() {
       const activeEditor = document.querySelector(".editor:not(.hidden)");
