@@ -2005,24 +2005,24 @@
 
       if (!selectedText) return;
 
-      // Create a span manually
+      // Create the span and add style
       const span = document.createElement("span");
       span.style.backgroundColor = color;
       span.textContent = selectedText;
 
-      // Replace selected text with span
+      // Replace selected content with the styled span
       range.deleteContents();
       range.insertNode(span);
 
-      // Create a zero-width space AFTER the span
-      const zwsp = document.createTextNode("\u200B");
-      span.after(zwsp);
+      // Add a space OUTSIDE the span to break the formatting
+      const breakNode = document.createTextNode(" ");
+      span.after(breakNode);
 
-      // Move cursor after the zwsp
-      sel.removeAllRanges();
+      // Move the caret after the space
       const newRange = document.createRange();
-      newRange.setStartAfter(zwsp);
+      newRange.setStartAfter(breakNode);
       newRange.collapse(true);
+      sel.removeAllRanges();
       sel.addRange(newRange);
 
       // Hide dropdown
