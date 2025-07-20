@@ -1744,42 +1744,42 @@
         tabLabel.addEventListener("click", () => switchTab(index));
 
         // Handle rename flow on double-click
-        tabLabel.addEventListener("dblclick", (e) => {
-          e.stopPropagation();
-          isRenamingTab = true;
-          console.log("🖱️ Double-clicked on tab:", tab.title);
+      //  tabLabel.addEventListener("dblclick", (e) => {
+      //    e.stopPropagation();
+      //    isRenamingTab = true;
+      //    console.log("🖱️ Double-clicked on tab:", tab.title);
 
-          const input = document.createElement("input");
-          input.className = "tab-rename-input";
-          input.value = tab.title;
+     //     const input = document.createElement("input");
+     //     input.className = "tab-rename-input";
+     //     input.value = tab.title;
 
-          if (document.body.classList.contains("dark-theme")) {
-            input.style.background = "#1e1e1e";
-            input.style.color = "#eee";
-            input.style.border = "1px dashed hotpink";
-            input.style.caretColor = "hotpink";
-          }
+     //     if (document.body.classList.contains("dark-theme")) {
+     //       input.style.background = "#1e1e1e";
+     //       input.style.color = "#eee";
+     //       input.style.border = "1px dashed hotpink";
+     //       input.style.caretColor = "hotpink";
+     //     }
 
-          input.addEventListener("click", (e) => e.stopPropagation());
+     //     input.addEventListener("click", (e) => e.stopPropagation());
 
-          input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") input.blur();
-            if (e.key === "Escape") renderTabs();
-          });
+     //     input.addEventListener("keydown", (e) => {
+     //       if (e.key === "Enter") input.blur();
+     //       if (e.key === "Escape") renderTabs();
+     //     });
 
-          input.addEventListener("blur", (e) => {
-            const newTitle = e.target.value.trim();
-            if (newTitle && newTitle !== tab.title) {
-              tabs[index].title = newTitle;
-              localStorage.setItem("tabs", JSON.stringify(tabs));
-              console.log("✅ title saved:", newTitle);
-              hasUnsavedChanges = true; // <-- 🧠 this is the magic line
-            } else {
-              console.log("❌ title unchanged or empty");
-            }
-            isRenamingTab = false;
-            setTimeout(renderTabs, 100);
-          });
+     //     input.addEventListener("blur", (e) => {
+     //       const newTitle = e.target.value.trim();
+     //       if (newTitle && newTitle !== tab.title) {
+     //         tabs[index].title = newTitle;
+     //         localStorage.setItem("tabs", JSON.stringify(tabs));
+     //         console.log("✅ title saved:", newTitle);
+     //         hasUnsavedChanges = true; // <-- 🧠 this is the magic line
+      //      } else {
+     //         console.log("❌ title unchanged or empty");
+     //       }
+     //       isRenamingTab = false;
+     //       setTimeout(renderTabs, 100);
+    //      });
 
           const observer = new MutationObserver(() => {
             if (document.body.classList.contains("dark-theme")) {
