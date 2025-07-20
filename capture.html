@@ -1194,12 +1194,12 @@
     <div onclick="setTextColor('gray')" style="color: gray;">Gray</div>
   </div>
 
-  <div id="highlightDropdown" class="dropdown hidden">
-    <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
-    <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
-    <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
-    <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
-    <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
+  <div onmousedown id="highlightDropdown" class="dropdown hidden">
+    <div onmousedown onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+    <div onmousedown onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+    <div onmousedown onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+    <div onmousedown onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+    <div onmousedown onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
   </div>
 
   <div id="marginDropdown" class="dropdown hidden">
@@ -1967,38 +1967,44 @@
       highlightDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
-    function setHighlightColor(color) {
+    function setHighlightColor(color, e) {
+      if (e) e.preventDefault();
+      
+      activeEditor.focus();
       restoreSelection();
       const selection = window.getSelection();
-
       if (!selection.rangeCount || selection.isCollapsed) return;
 
       const range = selection.getRangeAt(0);
       const selectedText = range.extractContents();
 
       const mark = document.createElement("mark");
-      mark.classList.add("highlight-glow");
-      mark.style.backgroundColor = color;
+      requestAnimationFrame(() => {
+        mark.classList.add("highlight-glow");
+      });
       mark.appendChild(selectedText);
 
-      range.deleteContents(); // make sure we insert properly
       range.insertNode(mark);
 
-      // Move cursor after the highlight to break selection lock
-      const afterMark = document.createRange();
-      afterMark.setStartAfter(mark);
-      afterMark.collapse(true);
-
+      const newRange = document.createRange();
+      newRange.selectNodeContents(mark);
       selection.removeAllRanges();
-      selection.addRange(afterMark);
+      selection.addRange(newRange);
 
-      // Hide dropdown
+      // Hide dropdown (if exists)
       const highlightDropdown = document.getElementById("highlightDropdown");
-      if (highlightDropdown) highlightDropdown.classList.add("hidden");
+      highlightDropdown?.classList.add("hidden");
 
       // Update status
       const saveStatus = document.getElementById("saveStatus");
       if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
+
+      // Optional fallback
+      try {
+        document.execCommand("hiliteColor", false, color);
+      } catch (e) {
+        console.warn("execCommand fallback failed", e);
+      }
     }
 
     async function saveText() {
