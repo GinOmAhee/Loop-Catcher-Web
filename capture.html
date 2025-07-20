@@ -1970,6 +1970,7 @@
     function setHighlightColor(color) {
       activeEditor.focus();
       restoreSelection();
+
       const selection = window.getSelection();
       if (!selection.rangeCount || selection.isCollapsed) return;
 
@@ -1977,24 +1978,30 @@
       const selectedText = range.extractContents();
 
       const mark = document.createElement("mark");
-      mark.style.backgroundColor = color; // 👈 Set color directly here
-      mark.classList.add("highlight-glow");
+      mark.style.backgroundColor = color; // ✅ Set the chosen color
       mark.appendChild(selectedText);
 
       range.insertNode(mark);
 
-      // Reset selection
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
       selection.removeAllRanges();
       selection.addRange(newRange);
 
       // Hide dropdown
-      highlightDropdown?.classList.add("hidden");
+      const highlightDropdown = document.getElementById("highlightDropdown");
+      if (highlightDropdown) highlightDropdown.classList.add("hidden");
 
-      // Status update
+      // Update UI status
       const saveStatus = document.getElementById("saveStatus");
       if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
+
+      // Optional execCommand fallback (but we already handled it)
+      try {
+        document.execCommand("hiliteColor", false, color);
+      } catch (e) {
+        console.warn("execCommand fallback failed", e);
+      }
     }
 
     async function saveText() {
@@ -3164,7 +3171,7 @@
       const isTrigger = e.target.closest("#highlightBtn, #textColorBtn");
 
       if (!isDropdown && !isTrigger) {
-        document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
+        document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
       }
     });
 
