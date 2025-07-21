@@ -3422,12 +3422,13 @@
       });
     });
 
-    document.addEventListener("click", () => {
-      setTimeout(() => {
-        fontDropdown?.classList.add("hidden");
-        textColorDropdown?.classList.add("hidden");
-        highlightDropdown?.classList.add("hidden");
-      }, 100); // this gives time for clicks inside dropdowns to register
+    document.addEventListener("mousedown", (e) => {
+      const isDropdown = e.target.closest(".dropdown");
+      const isTrigger = e.target.closest("#fontSizeBtn, #textColorBtn, #highlightBtn");
+
+      if (!isDropdown && !isTrigger) {
+        document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
+      }
     });
 
     document.querySelector(".editor").addEventListener("keydown", (e) => {
