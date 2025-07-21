@@ -1685,21 +1685,21 @@
 
       const range = selection.getRangeAt(0);
 
-      // Create a break node to escape the styled element
-      const breaker = document.createElement("span");
-      breaker.appendChild(document.createTextNode("\u200B")); // zero-width space
-      breaker.style.display = "inline-block"; // makes it stand alone
-  
-      range.insertNode(breaker);
+      // Create a neutral wrapper with zero-width space
+      const neutral = document.createElement("span");
+      neutral.textContent = "\u200B"; // zero-width space
+      neutral.style.all = "unset"; // remove all inherited styling
 
-      // Move caret after the breaker
-      range.setStartAfter(breaker);
+      range.insertNode(neutral);
+
+      // Move caret after the neutral node
+      range.setStartAfter(neutral);
       range.collapse(true);
       selection.removeAllRanges();
       selection.addRange(range);
 
-      console.log("🚪 Styling exited and caret moved outside");
-    }  
+      console.log("🚪 Caret moved into clean space");
+    }
 
     function applyStyle(styleProp, value) {
       const selection = window.getSelection();
