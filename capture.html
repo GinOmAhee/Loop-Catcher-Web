@@ -1811,10 +1811,10 @@
 
       if (!parent) return;
 
-      // 🪄 Create the neutral span
-      const neutralSpan = document.createElement("span");
-      neutralSpan.textContent = "\u00A0"; // &nbsp;
-      neutralSpan.style.all = "unset";
+      // 🪄 Create a neutral span to exit styling zone
+      const neutral = document.createElement("span");
+      neutral.textContent = "\u00A0"; // &nbsp;
+      neutral.style.all = "unset";
 
       // ✅ Insert it *after* the current parent
       parent.after(neutralSpan);
@@ -3447,6 +3447,14 @@
       const focusNode = sel.focusNode;
       const isCollapsed = sel.isCollapsed;
 
+      console.log("👇 Key pressed:", e.key);
+      console.log("→ AnchorNode:", anchorNode);
+      console.log("→ FocusNode:", focusNode);
+      console.log("→ Anchor offset:", sel.anchorOffset);
+      console.log("→ Is collapsed:", isCollapsed);
+      console.log("→ Parent of anchorNode:", anchorNode?.parentNode);
+      console.log("→ Parent tag:", anchorNode?.parentNode?.tagName);
+      console.log("→ Parent styles:", anchorNode?.parentNode?.style?.cssText);
     });
 
   </script>
