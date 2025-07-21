@@ -1732,35 +1732,34 @@
       activeEditor.focus();
     }
 
-    function nukeStyledSpan() {
-      const sel = window.getSelection();
-      if (!sel.rangeCount || !sel.isCollapsed) return;
+    function nukeStyledSpan(anchorNode) {
+      const parent = anchorNode?.parentElement;
+      if (!parent || (parent.tagName !== "SPAN" && parent.tagName !== "MARK")) return;
 
-      const node = sel.anchorNode;
-      const parent = node?.parentElement;
+      const fullText = anchorNode.textContent || "";
 
-      if (parent && parent.tagName === "SPAN" && parent.style.color) {
-        const fullText = parent.textContent;
+      // Replace styled span with plain text
+      const cleanText = document.createTextNode(fullText);
 
-        // Replace styled span with plain text
-        const cleanText = document.createTextNode(fullText);
-        const neutralSpan = document.createElement("span");
-        neutralSpan.style.all = "unset";
-        neutralSpan.appendChild(document.createTextNode("\u200B")); // styling break
+      // Create a neutral escape span
+      const neutralSpan = document.createElement("span");
+      neutralSpan.style.all = "unset";
+      neutralSpan.textContent = "\u200B"; // styling break
 
-        const wrapper = parent.parentNode;
-        wrapper.replaceChild(cleanText, parent);
-        wrapper.insertBefore(neutralSpan, cleanText.nextSibling);
+      parent.replaceWith(cleanText);
+      cleanText.after(neutralSpan);
 
-        // Move caret into neutral span
+      // Move caret into neutral span
+      const selection = window.getSelection();
+      if (selection) {
         const range = document.createRange();
-        range.setStart(neutralSpan.firstChild, 1);
+        range.setStart(neutralSpan.firstChild, 1); // after zero-width space
         range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-
-        console.log("💥 Span nuked. Clean space ready.");
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
+
+      console.log("💥 Styled span nuked and caret reset");
     }
 
     function forceCaretOutOfStyledBlock() {
@@ -2214,6 +2213,8 @@
         console.log("🔎 Highlight check:", mark.textContent, computed);
       })
 
+      insertNeutralSpan(mark); // or styledSpan
+
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
       selection.removeAllRanges();
@@ -2223,6 +2224,7 @@
 
       const saveStatus = document.getElementById("saveStatus");
       if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
+
     }
 
     async function saveText() {
