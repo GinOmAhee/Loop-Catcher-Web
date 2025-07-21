@@ -2158,6 +2158,13 @@
 
       range.insertNode(mark);
 
+      // ⬇️ Insert this right here to inspect styling
+      const highlights = document.querySelectorAll("mark");
+      highlights.forEach((mark) => {
+        const computed = getComputedStyle(mark).backgroundColor;
+        console.log("🔎 Highlight check:", mark.textContent, computed);
+      })
+
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
       selection.removeAllRanges();
