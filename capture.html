@@ -1594,6 +1594,13 @@
           range.deleteContents();
           range.insertNode(span);
 
+          const spans = document.querySelectorAll("span[style*='color']");
+          spans.forEach(span => {
+            const computed = getComputedStyle(span).color;
+            console.log("🧪 Span styles:", span.getAttribute("style"));
+            console.log("🎨 Computed color:", computed);
+          });
+
           if (selection.rangeCount > 0) {
             savedRange = selection.getRangeAt(0).cloneRange();
           }
@@ -1823,10 +1830,11 @@
       span.appendChild(selectedText);
       range.insertNode(span);
 
-      // 👀 Inspect styles right after insertion
       const spans = document.querySelectorAll("span[style*='color']");
-      spans.forEach(span => {
-       console.log("🧪 Span styles:", span.getAttribute("style"));
+        spans.forEach(span => {
+        const computed = getComputedStyle(span).color;
+        console.log("🧪 Span styles:", span.getAttribute("style"));
+        console.log("🎨 Computed color:", computed);
       });
 
       selection.removeAllRanges();
