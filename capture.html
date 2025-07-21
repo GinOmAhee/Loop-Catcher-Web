@@ -2220,6 +2220,8 @@
       const selectedText = range.extractContents();
 
       const mark = document.createElement("mark");
+      console.log("🖍️ Applying highlight color:", color);
+      console.log("🎨 Computed style:", getComputedStyle(mark).backgroundColor);
       mark.classList.add("highlight-glow");
       mark.style.backgroundColor = color; // optional dynamic color
       mark.appendChild(selectedText);
@@ -2230,6 +2232,7 @@
       const highlights = document.querySelectorAll("mark");
       highlights.forEach((mark) => {
         const computed = getComputedStyle(mark).backgroundColor;
+        console.log("🎨 Post-insertion computed style:", computed);
         console.log("🔎 Highlight check:", mark.textContent, computed);
       })
 
