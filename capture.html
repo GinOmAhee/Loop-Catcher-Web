@@ -3216,7 +3216,15 @@
       });
     });
 
-     document.querySelector(".editor").addEventListener("keydown", (e) => {
+    document.addEventListener("click", () => {
+      setTimeout(() => {
+        fontDropdown?.classList.add("hidden");
+        textColorDropdown?.classList.add("hidden");
+        highlightDropdown?.classList.add("hidden");
+      }, 100); // this gives time for clicks inside dropdowns to register
+    });
+
+    document.querySelector(".editor").addEventListener("keydown", (e) => {
       const sel = window.getSelection();
       const range = sel.getRangeAt(0);
 
@@ -3232,14 +3240,6 @@
       console.log("→ Parent of anchorNode:", anchorNode?.parentNode);
       console.log("→ Parent tag:", anchorNode?.parentNode?.tagName);
       console.log("→ Parent styles:", anchorNode?.parentNode?.style?.cssText);
-    });
-
-    document.addEventListener("click", () => {
-      setTimeout(() => {
-        fontDropdown?.classList.add("hidden");
-        textColorDropdown?.classList.add("hidden");
-        highlightDropdown?.classList.add("hidden");
-      }, 100); // this gives time for clicks inside dropdowns to register
     });
 
   </script>
