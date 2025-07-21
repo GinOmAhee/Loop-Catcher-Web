@@ -1648,6 +1648,17 @@
       });
 
       document.querySelectorAll(".editor").forEach((editor) => {
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((m) => {
+            if (m.type === "childList") {
+              console.log("🧠 DOM mutation detected on Enter");
+              // Optional: check highlight integrity or sanitize new blocks
+            }
+          });
+        });
+
+        observer.observe(editor, { childList: true, subtree: true });
+        
         editor.addEventListener("keydown", (e) => {
           const isEnterOrSpace = e.key === " " || e.key === "Enter";
 
