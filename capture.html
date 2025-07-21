@@ -3216,6 +3216,24 @@
       });
     });
 
+     document.querySelector(".editor").addEventListener("keydown", (e) => {
+      const sel = window.getSelection();
+      const range = sel.getRangeAt(0);
+
+      const anchorNode = sel.anchorNode;
+      const focusNode = sel.focusNode;
+      const isCollapsed = sel.isCollapsed;
+
+      console.log("👇 Key pressed:", e.key);
+      console.log("→ AnchorNode:", anchorNode);
+      console.log("→ FocusNode:", focusNode);
+      console.log("→ Anchor offset:", sel.anchorOffset);
+      console.log("→ Is collapsed:", isCollapsed);
+      console.log("→ Parent of anchorNode:", anchorNode?.parentNode);
+      console.log("→ Parent tag:", anchorNode?.parentNode?.tagName);
+      console.log("→ Parent styles:", anchorNode?.parentNode?.style?.cssText);
+    });
+
     document.addEventListener("click", () => {
       setTimeout(() => {
         fontDropdown?.classList.add("hidden");
