@@ -2012,6 +2012,8 @@
       range.deleteContents();
       range.insertNode(span);
 
+      moveCaretAfter(mark); 
+
       // ✅ Insert a temporary text node outside the span
       const space = document.createTextNode(" "); // force the browser to break out
       span.after(space);
@@ -2024,8 +2026,19 @@
       sel.removeAllRanges();
       sel.addRange(newRange);
 
+      moveCaretAfter(span);
+
       // Hide the dropdown
       document.getElementById("highlightDropdown").classList.add("hidden");
+    }
+
+    function moveCaretAfter(node) {
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.setStartAfter(node);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
     }
 
     document.querySelector(".editor").addEventListener("mouseup", (e) => {
