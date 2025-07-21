@@ -1651,13 +1651,17 @@
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((m) => {
             if (m.type === "childList") {
-              console.log("🧠 DOM mutation detected on Enter");
-              // Optional: check highlight integrity or sanitize new blocks
-            }
-          });
+              m.addedNodes.forEach((node) => {
+                console.log("➕ Added:", node.outerHTML || node.textContent);
+              });
+              m.removedNodes.forEach((node) => {
+              console.log("➖ Removed:", node.outerHTML || node.textContent);
+            });
+          }
         });
+      });
 
-        observer.observe(editor, { childList: true, subtree: true });
+      observer.observe(editor, { childList: true, subtree: true });
 
         editor.addEventListener("keydown", (e) => {
           const isEnterOrSpace = e.key === " " || e.key === "Enter";
