@@ -1642,11 +1642,6 @@
         isStylingActive = true;
       });
 
-      document.getElementById("highlightBtn").addEventListener("click", () => {
-        currentStyle = { prop: "backgroundColor", value: "yellow" };
-        isStylingActive = true;
-      });
-
       document.querySelectorAll(".editor").forEach((editor) => {
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((m) => {
