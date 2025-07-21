@@ -1195,16 +1195,11 @@
   </div>
 
   <div id="highlightDropdown" class="dropdown hidden">
-    <div style="background-color: yellow;"
-         onmousedown="handleColorClick('yellow', event)">Yellow</div>
-    <div style="background-color: lightgreen;"
-         onmousedown="handleColorClick('lightgreen', event)">Light Green</div>
-    <div style="background-color: lightblue;"
-         onmousedown="handleColorClick('lightblue', event)">Light Blue</div>
-    <div style="background-color: lightpink;"
-         onmousedown="handleColorClick('lightpink', event)">Light Pink</div>
-    <div style="background-color: lightgray;"
-         onmousedown="handleColorClick('lightgray', event)">Light Gray</div>
+    <div onclick="setHighlightColor('yellow')" style="background-color: yellow;">Yellow</div>
+    <div onclick="setHighlightColor('lightgreen')" style="background-color: lightgreen;">Light Green</div>
+    <div onclick="setHighlightColor('lightblue')" style="background-color: lightblue;">Light Blue</div>
+    <div onclick="setHighlightColor('lightpink')" style="background-color: lightpink;">Light Pink</div>
+    <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
   </div>
 
   <div id="marginDropdown" class="dropdown hidden">
@@ -1477,11 +1472,6 @@
         toggleDropdown("highlightBtn", "highlightDropdown");
       });
 
-      document.getElementById("highlightBtn").addEventListener("click", () => {
-        saveSelection(); // 💾 save before opening dropdown
-        document.getElementById("highlightDropdown").classList.remove("hidden");
-      });
-
       window.setFont = function(fontFamily) {
         if (savedRange) {
           const selection = window.getSelection();
@@ -1610,18 +1600,14 @@
       });
 
       document.addEventListener("click", (e) => {
-        // If the click is outside both editor *and* the highlight dropdown
-        if (!e.target.closest(".editor") && !e.target.closest("#highlightDropdown")) {
-          const sel = window.getSelection();
-          if (sel && sel.rangeCount > 0) {
-            sel.removeAllRanges();
-          }
+        const clickedInsideDropdown = fontSizeDropdown.contains(e.target);
+        const clickedButton = fontSizeBtn.contains(e.target);
+
+        if (!clickedInsideDropdown && !clickedButton) {
+          fontSizeDropdown.classList.add("hidden");
+          fontSizeDropdown.style.display = "none";
         }
       });
-
-
-      document.addEventListener("mouseup", saveSelection);
-      document.addEventListener("keyup", saveSelection);
 
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
@@ -1941,16 +1927,6 @@
       }
     }
 
-    document.addEventListener("click", (e) => {
-      // If the user clicks *outside* the editable editor area
-      if (!e.target.closest(".editor")) {
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-          sel.removeAllRanges(); // 👈 forcibly clears selection
-        }
-      }
-    });
-
     function justifyText() {
       activeEditor.focus(); // ensure editor is active
       document.execCommand("justifyFull", false, null);
@@ -1991,66 +1967,43 @@
       highlightDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
-    function handleColorClick(color, event) {
-      event.preventDefault();
-      event.stopPropagation();
-
+    function setHighlightColor(color) {
+      activeEditor.focus();
       restoreSelection();
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
 
-      const sel = window.getSelection();
-      if (sel.rangeCount === 0) return;
+      const range = selection.getRangeAt(0);
+      const selectedText = range.extractContents();
 
-      const range = sel.getRangeAt(0);
-      const contents = range.extractContents();
-
-      // 🔁 Create a <mark> with custom background color
       const mark = document.createElement("mark");
-      mark.style.backgroundColor = color;
-      mark.appendChild(contents);
+      requestAnimationFrame(() => {
+        mark.classList.add("highlight-glow");
+      });
+      mark.appendChild(selectedText);
 
-      // Insert the <mark> element
-      range.deleteContents();
       range.insertNode(mark);
 
-      // ✅ Insert a temporary text node outside the mark
-      const space = document.createTextNode(" "); // force the caret to break out
-      mark.after(space);
-
-      // ✅ Move caret after the space
       const newRange = document.createRange();
-      newRange.setStartAfter(space);
-      newRange.collapse(true);
+      newRange.selectNodeContents(mark);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
 
-      sel.removeAllRanges();
-      sel.addRange(newRange);
+      // Hide dropdown (if exists)
+      const highlightDropdown = document.getElementById("highlightDropdown");
+      highlightDropdown?.classList.add("hidden");
 
-      // ✅ Hide the dropdown
-      document.getElementById("highlightDropdown").classList.add("hidden");
-    }
+      // Update status
+      const saveStatus = document.getElementById("saveStatus");
+      if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
 
-    function moveCaretAfter(node) {
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.setStartAfter(node);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-
-    document.querySelector(".editor").addEventListener("mouseup", (e) => {
-      // If you're clicking on a dropdown or toolbar item, skip saving
-      if (e.target.closest("#highlightDropdown") || e.target.closest(".toolbar")) return;
-
-      saveSelection();
-    });
-
-
-    // Optional: Hide dropdown on outside click
-    document.addEventListener("click", (e) => {
-      if (!e.target.closest("#highlightDropdown") && !e.target.closest(".editor")) {
-        document.getElementById("highlightDropdown").classList.add("hidden");
+      // Optional fallback
+      try {
+        document.execCommand("hiliteColor", false, color);
+      } catch (e) {
+        console.warn("execCommand fallback failed", e);
       }
-    });
+    }
 
     async function saveText() {
       const activeEditor = document.querySelector(".editor:not(.hidden)");
@@ -3269,24 +3222,6 @@
         textColorDropdown?.classList.add("hidden");
         highlightDropdown?.classList.add("hidden");
       }, 100); // this gives time for clicks inside dropdowns to register
-    });
-
-    document.querySelector(".editor").addEventListener("keydown", (e) => {
-      const sel = window.getSelection();
-      const range = sel.getRangeAt(0);
-
-      const anchorNode = sel.anchorNode;
-      const focusNode = sel.focusNode;
-      const isCollapsed = sel.isCollapsed;
-
-      console.log("👇 Key pressed:", e.key);
-      console.log("→ AnchorNode:", anchorNode);
-      console.log("→ FocusNode:", focusNode);
-      console.log("→ Anchor offset:", sel.anchorOffset);
-      console.log("→ Is collapsed:", isCollapsed);
-      console.log("→ Parent of anchorNode:", anchorNode?.parentNode);
-      console.log("→ Parent tag:", anchorNode?.parentNode?.tagName);
-      console.log("→ Parent styles:", anchorNode?.parentNode?.style?.cssText);
     });
 
   </script>
