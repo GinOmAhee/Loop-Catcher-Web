@@ -1649,17 +1649,29 @@
 
       document.querySelectorAll(".editor").forEach((editor) => {
         editor.addEventListener("keydown", (e) => {
-          if (!isStylingActive) return;
+          const isEnterOrSpace = e.key === " " || e.key === "Enter";
 
-          if (e.key === " " || e.key === "Enter") {
+          if (isStylingActive && isEnterOrSpace) {
             isStylingActive = false;
             console.log("👁 Caret parent:", window.getSelection().anchorNode.parentElement);
             forceCaretOutOfStyledBlock();
             cleanOutOfStyledBlock();
+            nukeStyledSpan();
             console.log("🧼 Styling stopped on space/enter");
-            nukeStyledSpan(); // final boss move
+
+            if (e.key === "Enter") {
+              e.preventDefault();
+              document.execCommand("insertHTML", false, "<br><br>");
+            }
+
             return;
           }
+
+          if (e.key === "Enter") {
+            requestAnimationFrame(() => {
+              forceCaretOutOfStyledBlock();
+            });
+          }    
 
           if (e.key.length === 1) {
             applyStyle(currentStyle.prop, currentStyle.value);
@@ -1667,7 +1679,6 @@
         });
       });
     });  
-    
 
     let isRecording = false;
     let recognition;
