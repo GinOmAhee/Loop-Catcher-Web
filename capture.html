@@ -1680,20 +1680,26 @@
     }
 
     function stopStyling(editor) {
-      const sel = window.getSelection();
-        if (!sel.rangeCount || !sel.isCollapsed) return;
+      const selection = window.getSelection();
+      if (!selection.rangeCount || !selection.isCollapsed) return;
 
-        const range = sel.getRangeAt(0);
-        const spacer = document.createTextNode("\u200B"); // zero-width space
-        range.insertNode(spacer);
+      const range = selection.getRangeAt(0);
 
-        range.setStartAfter(spacer);
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
+      // Create a break node to escape the styled element
+      const breaker = document.createElement("span");
+      breaker.appendChild(document.createTextNode("\u200B")); // zero-width space
+      breaker.style.display = "inline-block"; // makes it stand alone
+  
+      range.insertNode(breaker);
 
-        console.log("🚫 Styling cleared and caret moved outside");
-    }
+      // Move caret after the breaker
+      range.setStartAfter(breaker);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      console.log("🚪 Styling exited and caret moved outside");
+    }  
 
     function applyStyle(styleProp, value) {
       const selection = window.getSelection();
