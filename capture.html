@@ -1622,6 +1622,22 @@
         getMode: () => activeEditor?.id === "coEditor" ? "scribble" : "document"
       };
 
+      function stopStyling(editor) {
+        const sel = window.getSelection();
+          if (!sel.rangeCount || !sel.isCollapsed) return;
+
+          const range = sel.getRangeAt(0);
+          const spacer = document.createTextNode("\u200B"); // zero-width space
+          range.insertNode(spacer);
+
+          range.setStartAfter(spacer);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+
+          console.log("🚫 Styling cleared and caret moved outside");
+      }
+
       const editors = document.querySelectorAll(".editor");
 
       let isStylingActive = true;
@@ -1648,18 +1664,17 @@
       editor.addEventListener("keydown", (e) => {
         if (!isStylingActive) return;
 
-        if (e.key === " " || e.key === "Enter") {
-          isStylingActive = false;
-          console.log("⛔ Styling stopped on space or enter");
-          return;
-        }
+          if (e.key === " " || e.key === "Enter") {
+            isStylingActive = false;
+            stopStyling(editor);
+            return;
+          }
 
-        // Only apply styling for real character keys, not control keys
-        if (e.key.length === 1) {
-          applyStyle(currentStyle.prop, currentStyle.value);
-          console.log(`🎨 Styled "${e.key}" in ${editor.id}`);
-        }
+          if (e.key.length === 1) {
+            applyStyle(currentStyle.prop, currentStyle.value);
+          }
       });
+    
     });
 
     let isRecording = false;
