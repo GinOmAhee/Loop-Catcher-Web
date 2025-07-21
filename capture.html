@@ -1647,8 +1647,10 @@
           if (e.key === " " || e.key === "Enter") {
             isStylingActive = false;
             console.log("👁 Caret parent:", window.getSelection().anchorNode.parentElement);
+            forceCaretOutOfStyledBlock();
             cleanOutOfStyledBlock();
             console.log("🧼 Styling stopped on space/enter");
+            nukeStyledSpan(); // final boss move
             return;
           }
 
@@ -1693,6 +1695,37 @@
     function execOnActive(cmd, val=null){
       document.execCommand(cmd,false,val);
       activeEditor.focus();
+    }
+
+    function nukeStyledSpan() {
+      const sel = window.getSelection();
+      if (!sel.rangeCount || !sel.isCollapsed) return;
+
+      const node = sel.anchorNode;
+      const parent = node?.parentElement;
+
+      if (parent && parent.tagName === "SPAN" && parent.style.color) {
+        const fullText = parent.textContent;
+
+        // Replace styled span with plain text
+        const cleanText = document.createTextNode(fullText);
+        const neutralSpan = document.createElement("span");
+        neutralSpan.style.all = "unset";
+        neutralSpan.appendChild(document.createTextNode("\u200B")); // styling break
+
+        const wrapper = parent.parentNode;
+        wrapper.replaceChild(cleanText, parent);
+        wrapper.insertBefore(neutralSpan, cleanText.nextSibling);
+
+        // Move caret into neutral span
+        const range = document.createRange();
+        range.setStart(neutralSpan.firstChild, 1);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        console.log("💥 Span nuked. Clean space ready.");
+      }
     }
 
     function forceCaretOutOfStyledBlock() {
