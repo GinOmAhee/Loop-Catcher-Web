@@ -1811,10 +1811,10 @@
 
       if (!parent) return;
 
-      // 🪄 Create a neutral span to exit styling zone
-      const neutral = document.createElement("span");
-      neutral.textContent = "\u00A0"; // &nbsp;
-      neutral.style.all = "unset";
+      // 🪄 Create the neutral span
+      const neutralSpan = document.createElement("span");
+      neutralSpan.textContent = "\u00A0"; // &nbsp;
+      neutralSpan.style.all = "unset";
 
       // ✅ Insert it *after* the current parent
       parent.after(neutralSpan);
