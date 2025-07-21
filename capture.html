@@ -846,11 +846,6 @@
     display: none; /* toggled via JS */
   }
 
-  mark.highlight-glow {
-    background-color: inherit !important;
-  }
-
-
   #fontDropdown  {
     position: absolute;
     top: 50px; /* tweak this based on your layout */
@@ -2204,25 +2199,24 @@
 
       const mark = document.createElement("mark");
       mark.classList.add("highlight-glow");
-      mark.style.background = color; // Add this
-      mark.style.backgroundColor = color; // And this
+      mark.style.backgroundColor = color; // optional dynamic color
       mark.appendChild(selectedText);
 
       range.insertNode(mark);
+
+      // ⬇️ Insert this right here to inspect styling
+      const highlights = document.querySelectorAll("mark");
+      highlights.forEach((mark) => {
+        const computed = getComputedStyle(mark).backgroundColor;
+        console.log("🔎 Highlight check:", mark.textContent, computed);
+      })
 
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
       selection.removeAllRanges();
       selection.addRange(newRange);
 
-      highlightDropdown?.classList.add("hidden");
-
-      // For debugging:
-      const highlights = document.querySelectorAll("mark");
-      highlights.forEach((mark) => {
-        const computed = getComputedStyle(mark).backgroundColor;
-        console.log("🔎 Highlight check:", mark.textContent, computed);
-      });
+      document.getElementById("highlightDropdown")?.classList.add("hidden");
 
       const saveStatus = document.getElementById("saveStatus");
       if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
