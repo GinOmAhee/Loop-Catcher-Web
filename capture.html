@@ -1679,26 +1679,39 @@
       activeEditor.focus();
     }
 
+    function scrubSurroundingStyle() {
+      const sel = window.getSelection();
+      const node = sel.anchorNode?.parentElement;
+      if (node && (node.tagName === "SPAN" || node.tagName === "MARK")) {
+        const cleanText = node.textContent;
+        node.replaceWith(document.createTextNode(cleanText));
+        console.log("🧽 Style element scrubbed clean");
+      }
+    }
+
     function stopStyling(editor) {
       const selection = window.getSelection();
       if (!selection.rangeCount || !selection.isCollapsed) return;
 
       const range = selection.getRangeAt(0);
 
-      // Create a neutral wrapper with zero-width space
-      const neutral = document.createElement("span");
-      neutral.textContent = "\u200B"; // zero-width space
-      neutral.style.all = "unset"; // remove all inherited styling
+      // Create a fresh container OUTSIDE any styled tag
+      const paragraphBreak = document.createElement("div");
+      paragraphBreak.innerHTML = "<br>"; // fresh line
+      paragraphBreak.style.all = "unset"; // wipe inherited styles
+      paragraphBreak.style.display = "block";
 
-      range.insertNode(neutral);
+      // Insert and reposition caret
+      range.insertNode(paragraphBreak);
 
-      // Move caret after the neutral node
-      range.setStartAfter(neutral);
-      range.collapse(true);
+      const newRange = document.createRange();
+      newRange.setStart(paragraphBreak, 0);
+      newRange.collapse(true);
+
       selection.removeAllRanges();
-      selection.addRange(range);
+      selection.addRange(newRange);
 
-      console.log("🚪 Caret moved into clean space");
+      console.log("🧼 Cleared styling. Caret is now in fresh block.");
     }
 
     function applyStyle(styleProp, value) {
