@@ -1820,20 +1820,23 @@
 
       // 🪄 Create a neutral span to exit styling zone
       const neutralSpan = document.createElement("span");
-      neutralSpan.setAttribute("style", "all: unset");
-      neutralSpan.innerHTML = "<wbr>&nbsp;"; // caret anchor
+      neutralSpan.textContent = "\u00A0"; // &nbsp;
+      neutralSpan.style.all = "unset";
 
       // ✅ Insert it *after* the current parent
       parent.after(neutralSpan);
 
       // 🚀 Move caret into neutral zone
-      const newRange = document.createRange();
-      newRange.setStart(neutralSpan.firstChild, 1); // after &nbsp;
-      newRange.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(newRange);
+      const textNode = neutralSpan.firstChild;
+      if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+        const newRange = document.createRange();
+        newRange.setStart(textNode, 1); // after &nbsp;
+        newRange.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(newRange);
 
-      console.log("🧼 Caret safely moved into neutral span");
+        console.log("🧼 Caret safely moved into neutral span");
+      }  
     }
 
     function stopStyling(editor) {
