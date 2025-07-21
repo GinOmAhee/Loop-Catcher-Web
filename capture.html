@@ -1695,13 +1695,42 @@
       activeEditor.focus();
     }
 
-    function moveCaretAfter(node) {
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.setStartAfter(node);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
+    function forceCaretOutOfStyledBlock() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || !selection.isCollapsed) return;
+
+      const anchorNode = selection.anchorNode;
+      const parent = anchorNode?.parentElement;
+
+      // Only intervene if we're inside a styled span or mark
+      if (parent && (parent.tagName === "SPAN" || parent.tagName === "MARK")) {
+        const range = selection.getRangeAt(0);
+
+        // Clone content up to the caret
+        const offset = range.startOffset;
+        const fullText = anchorNode.textContent || "";
+        const preCaretText = fullText.slice(0, offset);
+        const postCaretText = fullText.slice(offset);
+
+        // Clean span from parent
+        const cleanNode = document.createTextNode(preCaretText);
+        const unstyledSpan = document.createElement("span");
+        unstyledSpan.style.all = "unset";
+        unstyledSpan.appendChild(document.createTextNode("\u200B")); // zero-width break
+
+        const parentContainer = parent.parentElement;
+        parent.replaceWith(cleanNode);
+        parentContainer.appendChild(unstyledSpan);
+
+        // Reposition caret outside
+        const newRange = document.createRange();
+        newRange.setStart(unstyledSpan, 1); // after zero-width char
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+
+        console.log("🚀 Caret forcefully moved out of styled block");
+      }
     }
 
     function cleanOutOfStyledBlock() {
