@@ -846,12 +846,6 @@
     display: none; /* toggled via JS */
   }
 
-  #highlightDropdown div.selected {
-    outline: 2px solid #333;
-    border-radius: 4px;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-  }
-
   #fontDropdown  {
     position: absolute;
     top: 50px; /* tweak this based on your layout */
@@ -1648,6 +1642,11 @@
         isStylingActive = true;
       });
 
+      document.getElementById("highlightBtn").addEventListener("click", () => {
+        currentStyle = { prop: "backgroundColor", value: "yellow" };
+        isStylingActive = true;
+      });
+
       document.querySelectorAll(".editor").forEach((editor) => {
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((m) => {
@@ -1771,7 +1770,6 @@
       const anchorNode = selection.anchorNode;
       const parent = anchorNode?.parentElement;
 
-      // Only intervene if we're inside a styled span or mark
       if (parent && (parent.tagName === "SPAN" || parent.tagName === "MARK")) {
         const fullText = anchorNode.textContent || "";
         const offset = range.startOffset;
@@ -1782,6 +1780,7 @@
         // 💡 Preserve styled node with pre-caret text
         parent.textContent = preText;
 
+        // 🪄 Create neutral span for future input
         const neutral = document.createElement("span");
         neutral.textContent = "\u00A0";
         neutral.style.all = "unset";
@@ -1812,9 +1811,9 @@
       if (!parent) return;
 
       // 🪄 Create a neutral span to exit styling zone
-      const neutral = document.createElement("span");
-      neutral.textContent = "\u00A0"; // &nbsp;
-      neutral.style.all = "unset";
+      const neutralSpan = document.createElement("span");
+      neutralSpan.textContent = "\u00A0"; // &nbsp;
+      neutralSpan.style.all = "unset";
 
       // ✅ Insert it *after* the current parent
       parent.after(neutralSpan);
@@ -2188,23 +2187,7 @@
       highlightDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
-    let currentStyle = null;
-    let isStylingActive = false;
-
     function setHighlightColor(color) {
-      console.log("🖍️ Applying highlight color:", color);
-      console.log("📦 Before:", currentStyle);
-      currentStyle = { prop: "backgroundColor", value: color };
-      console.log("📦 After:", currentStyle);
-      isStylingActive = true;
-
-      document.querySelectorAll("#highlightDropdown div").forEach(btn => {
-        btn.classList.remove("selected");
-        if (btn.style.backgroundColor === color) {
-          btn.classList.add("selected");
-        }
-      });
-
       activeEditor.focus();
       restoreSelection();
 
@@ -2216,23 +2199,24 @@
 
       const mark = document.createElement("mark");
       mark.classList.add("highlight-glow");
-      mark.style.backgroundColor = color;
+      mark.style.backgroundColor = color; // optional dynamic color
       mark.appendChild(selectedText);
 
       range.insertNode(mark);
 
+      // ⬇️ Insert this right here to inspect styling
       const highlights = document.querySelectorAll("mark");
       highlights.forEach((mark) => {
         const computed = getComputedStyle(mark).backgroundColor;
         console.log("🔎 Highlight check:", mark.textContent, computed);
-      });
+      })
 
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
       selection.removeAllRanges();
       selection.addRange(newRange);
 
-      highlightDropdown?.classList.add("hidden");
+      document.getElementById("highlightDropdown")?.classList.add("hidden");
 
       const saveStatus = document.getElementById("saveStatus");
       if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
