@@ -1642,10 +1642,11 @@
         isStylingActive = true;
       });
 
-      document.getElementById("highlightBtn").addEventListener("click", () => {
-        currentStyle = { prop: "backgroundColor", value: "yellow" };
-        isStylingActive = true;
-      });
+      // ❌ Don't assign styling here
+      // document.getElementById("highlightBtn").addEventListener("click", () => {
+      //  currentStyle = { prop: "backgroundColor", value: "yellow" };
+      //  isStylingActive = true;
+      //});
 
       document.querySelectorAll(".editor").forEach((editor) => {
         const observer = new MutationObserver((mutations) => {
@@ -2188,6 +2189,8 @@
     });
 
     function setHighlightColor(color) {
+      currentStyle = { prop: "backgroundColor", value: color };
+      isStylingActive = true;
       activeEditor.focus();
       restoreSelection();
 
