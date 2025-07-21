@@ -2003,32 +2003,28 @@
       const range = sel.getRangeAt(0);
       const contents = range.extractContents();
 
-      // Create a span for highlight
-      const span = document.createElement("span");
-      span.style.backgroundColor = color;
-      span.appendChild(contents);
+      // 🔁 Create a <mark> with custom background color
+      const mark = document.createElement("mark");
+      mark.style.backgroundColor = color;
+      mark.appendChild(contents);
 
-      // Insert the span
+      // Insert the <mark> element
       range.deleteContents();
-      range.insertNode(span);
+      range.insertNode(mark);
 
-      moveCaretAfter(mark); 
-
-      // ✅ Insert a temporary text node outside the span
-      const space = document.createTextNode(" "); // force the browser to break out
-      span.after(space);
+      // ✅ Insert a temporary text node outside the mark
+      const space = document.createTextNode(" "); // force the caret to break out
+      mark.after(space);
 
       // ✅ Move caret after the space
       const newRange = document.createRange();
       newRange.setStartAfter(space);
-      newRange.setEndAfter(space);
+      newRange.collapse(true);
 
       sel.removeAllRanges();
       sel.addRange(newRange);
 
-      moveCaretAfter(span);
-
-      // Hide the dropdown
+      // ✅ Hide the dropdown
       document.getElementById("highlightDropdown").classList.add("hidden");
     }
 
