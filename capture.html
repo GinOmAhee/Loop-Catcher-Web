@@ -1813,19 +1813,27 @@
       if (!sel.rangeCount || !sel.isCollapsed) return;
 
       const range = sel.getRangeAt(0);
-  
+      const anchorNode = sel.anchorNode;
+      const parent = anchorNode?.parentElement;
+
+      if (!parent) return;
+
       // 🪄 Create a neutral span to exit styling zone
       const neutralSpan = document.createElement("span");
-      neutralSpan.textContent = "\u200B"; // zero-width space
-      neutralSpan.style.all = "unset";
-      parent.after(neutral);
+      neutralSpan.setAttribute("style", "all: unset");
+      neutralSpan.innerHTML = "<wbr>&nbsp;"; // caret anchor
 
-      // Move the caret outside
+      // ✅ Insert it *after* the current parent
+      parent.after(neutralSpan);
+
+      // 🚀 Move caret into neutral zone
       const newRange = document.createRange();
-      newRange.setStartAfter(neutralSpan);
+      newRange.setStart(neutralSpan.firstChild, 1); // after &nbsp;
       newRange.collapse(true);
       sel.removeAllRanges();
       sel.addRange(newRange);
+
+      console.log("🧼 Caret safely moved into neutral span");
     }
 
     function stopStyling(editor) {
