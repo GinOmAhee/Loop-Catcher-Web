@@ -1818,7 +1818,7 @@
       const neutralSpan = document.createElement("span");
       neutralSpan.textContent = "\u200B"; // zero-width space
       neutralSpan.style.all = "unset";
-      range.insertNode(neutralSpan);
+      parent.after(neutral);
 
       // Move the caret outside
       const newRange = document.createRange();
