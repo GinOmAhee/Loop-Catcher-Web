@@ -2188,6 +2188,9 @@
       highlightDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
+    let currentStyle = null;
+    let isStylingActive = false;
+
     function setHighlightColor(color) {
       console.log("🖍️ Applying highlight color:", color);
       console.log("📦 Before:", currentStyle);
