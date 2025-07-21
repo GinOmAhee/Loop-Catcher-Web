@@ -2187,6 +2187,26 @@
       highlightDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
+    function insertNeutralSpan(afterNode) {
+      const neutral = document.createElement("span");
+      neutral.textContent = "\u00A0"; // non-breaking space
+      neutral.style.all = "unset";
+
+      afterNode.after(neutral); // ⬅️ Inserts it right next to the styled block
+ 
+      // 🧠 Move the caret into the neutral span
+      const selection = window.getSelection();
+      const range = document.createRange();
+      if (neutral.firstChild) {
+        range.setStart(neutral.firstChild, 1); // after &nbsp;
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      console.log("🧼 Caret safely escaped into neutral zone");
+    }   
+
     function setHighlightColor(color) {
       currentStyle = { prop: "backgroundColor", value: color };
       isStylingActive = true;
