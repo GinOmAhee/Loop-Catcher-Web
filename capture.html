@@ -2210,6 +2210,7 @@
     function setHighlightColor(color) {
       currentStyle = { prop: "backgroundColor", value: color };
       isStylingActive = true;
+
       activeEditor.focus();
       restoreSelection();
 
@@ -2228,26 +2229,14 @@
 
       range.insertNode(mark);
 
-      // ⬇️ Insert this right here to inspect styling
-      const highlights = document.querySelectorAll("mark");
-      highlights.forEach((mark) => {
+      insertNeutralSpan(mark); // Escape out of style zone
+
+      setTimeout(() => {
         const computed = getComputedStyle(mark).backgroundColor;
-        console.log("🎨 Post-insertion computed style:", computed);
-        console.log("🔎 Highlight check:", mark.textContent, computed);
-      })
+        console.log("🎨 Confirm highlight:", mark.textContent, computed);
+      }, 0);
 
-      insertNeutralSpan(mark); // or styledSpan
-
-      const newRange = document.createRange();
-      newRange.selectNodeContents(mark);
-      selection.removeAllRanges();
-      selection.addRange(newRange);
-
-      document.getElementById("highlightDropdown")?.classList.add("hidden");
-
-      const saveStatus = document.getElementById("saveStatus");
-      if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
-
+      highlightDropdown?.classList.add("hidden");
     }
 
     async function saveText() {
