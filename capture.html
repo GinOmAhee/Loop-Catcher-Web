@@ -1640,11 +1640,6 @@
         isStylingActive = true;
       });
 
-      colorSwatch.addEventListener("click", () => {
-        currentStyle = { prop: "color", value: "red" }; // or dynamically from swatch
-        isStylingActive = true;
-      });
-
       document.querySelectorAll(".editor").forEach((editor) => {
         editor.addEventListener("keydown", (e) => {
           if (!isStylingActive) return;
