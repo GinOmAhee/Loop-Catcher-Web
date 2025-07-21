@@ -1658,7 +1658,7 @@
         });
 
         observer.observe(editor, { childList: true, subtree: true });
-        
+
         editor.addEventListener("keydown", (e) => {
           const isEnterOrSpace = e.key === " " || e.key === "Enter";
 
@@ -1684,7 +1684,7 @@
             });
           }    
 
-          if (e.key.length === 1) {
+          if (e.key.length === 1 && currentStyle) {
             applyStyle(currentStyle.prop, currentStyle.value);
           }
         });
