@@ -1823,6 +1823,12 @@
       span.appendChild(selectedText);
       range.insertNode(span);
 
+      // 👀 Inspect styles right after insertion
+      const spans = document.querySelectorAll("span[style*='color']");
+      spans.forEach(span => {
+       console.log("🧪 Span styles:", span.getAttribute("style"));
+      });
+
       selection.removeAllRanges();
       const newRange = document.createRange();
       newRange.selectNodeContents(span);
