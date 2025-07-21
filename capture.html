@@ -1670,7 +1670,6 @@
             isStylingActive = false;
             console.log("👁 Caret parent:", window.getSelection().anchorNode.parentElement);
             forceCaretOutOfStyledBlock();
-            cleanOutOfStyledBlock();
             nukeStyledSpan();
             console.log("🧼 Styling stopped on space/enter");
 
@@ -1797,26 +1796,6 @@
 
         console.log("🚀 Caret forcefully moved out of styled block");
       }
-    }
-
-    function cleanOutOfStyledBlock() {
-      const sel = window.getSelection();
-      if (!sel.rangeCount || !sel.isCollapsed) return;
-
-      const range = sel.getRangeAt(0);
-  
-      // 🪄 Create a neutral span to exit styling zone
-      const neutralSpan = document.createElement("span");
-      neutralSpan.textContent = "\u200B"; // zero-width space
-      neutralSpan.style.all = "unset";
-      range.insertNode(neutralSpan);
-
-      // Move the caret outside
-      const newRange = document.createRange();
-      newRange.setStartAfter(neutralSpan);
-      newRange.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(newRange);
     }
 
     function stopStyling(editor) {
