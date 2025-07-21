@@ -1637,12 +1637,18 @@
         isStylingActive = true;
       });
 
+      colorSwatch.addEventListener("click", () => {
+        currentStyle = { prop: "color", value: "red" }; // or dynamically from swatch
+        isStylingActive = true;
+      });
+
       document.querySelectorAll(".editor").forEach((editor) => {
         editor.addEventListener("keydown", (e) => {
           if (!isStylingActive) return;
 
           if (e.key === " " || e.key === "Enter") {
             isStylingActive = false;
+            console.log("👁 Caret parent:", window.getSelection().anchorNode.parentElement);
             cleanOutOfStyledBlock();
             console.log("🧼 Styling stopped on space/enter");
             return;
@@ -2028,14 +2034,6 @@
         sel.removeAllRanges();
         sel.addRange(savedSelection);
       }
-    }
-
-    function handleColorClick(color, event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      // 🛑 Maybe DON'T restore selection here blindly
-      // Only restore if it makes sense (like when nothing's selected)
     }
 
     function justifyText() {
