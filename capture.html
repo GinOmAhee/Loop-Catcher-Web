@@ -846,6 +846,12 @@
     display: none; /* toggled via JS */
   }
 
+  #highlightDropdown div.selected {
+    outline: 2px solid #333;
+    border-radius: 4px;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  }
+
   #fontDropdown  {
     position: absolute;
     top: 50px; /* tweak this based on your layout */
@@ -1642,11 +1648,6 @@
         isStylingActive = true;
       });
 
-      document.getElementById("highlightBtn").addEventListener("click", () => {
-        currentStyle = { prop: "backgroundColor", value: "yellow" };
-        isStylingActive = true;
-      });
-
       document.querySelectorAll(".editor").forEach((editor) => {
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((m) => {
@@ -2188,6 +2189,19 @@
     });
 
     function setHighlightColor(color) {
+      console.log("🖍️ Applying highlight color:", color);
+      console.log("📦 Before:", currentStyle);
+      currentStyle = { prop: "backgroundColor", value: color };
+      console.log("📦 After:", currentStyle);
+      isStylingActive = true;
+
+      document.querySelectorAll("#highlightDropdown div").forEach(btn => {
+        btn.classList.remove("selected");
+        if (btn.style.backgroundColor === color) {
+          btn.classList.add("selected");
+        }
+      });
+
       activeEditor.focus();
       restoreSelection();
 
@@ -2199,24 +2213,23 @@
 
       const mark = document.createElement("mark");
       mark.classList.add("highlight-glow");
-      mark.style.backgroundColor = color; // optional dynamic color
+      mark.style.backgroundColor = color;
       mark.appendChild(selectedText);
 
       range.insertNode(mark);
 
-      // ⬇️ Insert this right here to inspect styling
       const highlights = document.querySelectorAll("mark");
       highlights.forEach((mark) => {
         const computed = getComputedStyle(mark).backgroundColor;
         console.log("🔎 Highlight check:", mark.textContent, computed);
-      })
+      });
 
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
       selection.removeAllRanges();
       selection.addRange(newRange);
 
-      document.getElementById("highlightDropdown")?.classList.add("hidden");
+      highlightDropdown?.classList.add("hidden");
 
       const saveStatus = document.getElementById("saveStatus");
       if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
@@ -3431,14 +3444,6 @@
       const focusNode = sel.focusNode;
       const isCollapsed = sel.isCollapsed;
 
-      console.log("👇 Key pressed:", e.key);
-      console.log("→ AnchorNode:", anchorNode);
-      console.log("→ FocusNode:", focusNode);
-      console.log("→ Anchor offset:", sel.anchorOffset);
-      console.log("→ Is collapsed:", isCollapsed);
-      console.log("→ Parent of anchorNode:", anchorNode?.parentNode);
-      console.log("→ Parent tag:", anchorNode?.parentNode?.tagName);
-      console.log("→ Parent styles:", anchorNode?.parentNode?.style?.cssText);
     });
 
   </script>
