@@ -1691,6 +1691,15 @@
       activeEditor.focus();
     }
 
+    function moveCaretAfter(node) {
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.setStartAfter(node);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
     function cleanOutOfStyledBlock() {
       const sel = window.getSelection();
       if (!sel.rangeCount || !sel.isCollapsed) return;
@@ -2019,6 +2028,14 @@
         sel.removeAllRanges();
         sel.addRange(savedSelection);
       }
+    }
+
+    function handleColorClick(color, event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // 🛑 Maybe DON'T restore selection here blindly
+      // Only restore if it makes sense (like when nothing's selected)
     }
 
     function justifyText() {
