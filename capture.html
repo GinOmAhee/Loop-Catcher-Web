@@ -2182,17 +2182,7 @@
       highlightDropdown.style.top = `${rect.bottom + 5}px`;
     });
 
-    let lastHighlightColor = null;
-    let currentStyle = null;
-    let isStylingActive = false;
-
     function setHighlightColor(color) {
-      console.log("🖍️ Applying highlight color:", color);
-      console.log("📦 Before:", currentStyle);
-      currentStyle = { prop: "backgroundColor", value: color };
-      console.log("📦 After:", currentStyle);
-      isStylingActive = true;
-
       activeEditor.focus();
       restoreSelection();
 
@@ -2204,23 +2194,24 @@
 
       const mark = document.createElement("mark");
       mark.classList.add("highlight-glow");
-      mark.style.backgroundColor = color;
+      mark.style.backgroundColor = color; // optional dynamic color
       mark.appendChild(selectedText);
 
       range.insertNode(mark);
 
+      // ⬇️ Insert this right here to inspect styling
       const highlights = document.querySelectorAll("mark");
       highlights.forEach((mark) => {
         const computed = getComputedStyle(mark).backgroundColor;
         console.log("🔎 Highlight check:", mark.textContent, computed);
-      });
+      })
 
       const newRange = document.createRange();
       newRange.selectNodeContents(mark);
       selection.removeAllRanges();
       selection.addRange(newRange);
 
-      highlightDropdown?.classList.add("hidden");
+      document.getElementById("highlightDropdown")?.classList.add("hidden");
 
       const saveStatus = document.getElementById("saveStatus");
       if (saveStatus) saveStatus.innerText = `🖍️ Highlighted in ${color}`;
