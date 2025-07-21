@@ -1625,22 +1625,23 @@
       const editors = document.querySelectorAll(".editor");
 
       let isStylingActive = true;
-      let currentStyle = { prop: "color", value: "red" }
+      let currentStyle = { prop: "color", value: "red" };
 
-      editor.addEventListener("keydown", (e) => {
-        if (!isStylingActive) return;
+      editors.forEach((editor) => {
+        editor.addEventListener("keydown", (e) => {
+          if (!isStylingActive) return;
 
           if (e.key === " " || e.key === "Enter") {
             isStylingActive = false;
-            stopStyling(editor);
+            stopStyling(editor); // now editor is in scope
             return;
           }
 
           if (e.key.length === 1) {
             applyStyle(currentStyle.prop, currentStyle.value);
           }
+        });
       });
-    
     });
 
     let isRecording = false;
