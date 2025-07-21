@@ -1662,8 +1662,7 @@
             } 
           });
         });
-        observer.observe(editor, { childList: true, subtree: true });
-      });  
+        observer.observe(editor, { childList: true, subtree: true });  
 
         editor.addEventListener("keydown", (e) => {
           const isEnterOrSpace = e.key === " " || e.key === "Enter";
@@ -1694,6 +1693,7 @@
             applyStyle(currentStyle.prop, currentStyle.value);
           }
         });
+      });  
     });  
 
     let isRecording = false;
