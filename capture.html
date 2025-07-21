@@ -1645,18 +1645,20 @@
         selection.addRange(newRange);
       }
 
-      editors.forEach((editor) => {
-        editor.addEventListener("keydown", (e) => {
-          if (!isStylingActive) return;
+      editor.addEventListener("keydown", (e) => {
+        if (!isStylingActive) return;
 
-          if (e.key === " ") {
-            isStylingActive = false;
-            console.log("⛔ Styling stopped at spacebar");
-          } else {
-            applyStyle(currentStyle.prop, currentStyle.value);
-            console.log(`🎨 Applied style to "${e.key}" in ${editor.id}`);
-          }
-        });
+        if (e.key === " " || e.key === "Enter") {
+          isStylingActive = false;
+          console.log("⛔ Styling stopped on space or enter");
+          return;
+        }
+
+        // Only apply styling for real character keys, not control keys
+        if (e.key.length === 1) {
+          applyStyle(currentStyle.prop, currentStyle.value);
+          console.log(`🎨 Styled "${e.key}" in ${editor.id}`);
+        }
       });
     });
 
