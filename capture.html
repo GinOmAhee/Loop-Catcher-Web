@@ -1725,19 +1725,21 @@
       const paperSizeDropdown = document.getElementById("paperSizeDropdown");
       
       paperSizeBtn.addEventListener("click", () => {
-        console.log("📂 Paper size dropdown toggled");
+        const isHidden = paperSizeDropdown.classList.contains("hidden");
+
+        if (isHidden) {
+          paperSizeDropdown.classList.remove("hidden");
+          paperSizeDropdown.style.display = "block";
+        } else {
+          paperSizeDropdown.classList.add("hidden");
+          paperSizeDropdown.style.display = "none";
+        }
+
         const rect = paperSizeBtn.getBoundingClientRect();
         paperSizeDropdown.style.top = `${rect.bottom + window.scrollY}px`;
         paperSizeDropdown.style.left = `${rect.left + window.scrollX}px`;
-        paperSizeDropdown.classList.toggle("hidden");
-      });
 
-      paperSizeDropdown.querySelectorAll("div").forEach(option => {
-        option.addEventListener("click", () => {
-          const size = option.dataset.size;
-          applyPaperSize(size);
-          paperSizeDropdown.classList.add("hidden");
-        });
+        console.log("📂 Paper size dropdown toggled");
       });
     }); 
 
