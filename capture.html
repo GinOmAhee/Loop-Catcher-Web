@@ -1165,6 +1165,11 @@
     border: none;
   }
 
+  .resize-flash {
+    outline: 2px dashed #00bcd4;
+    transition: outline 0.3s ease;
+  }
+
   </style>
 </head>
 <body data-mode="main-only">
@@ -1802,30 +1807,6 @@
       activeEditor.focus();
     }
 
-    function showTemporarySize(sizeKey) {
-      const sizeMap = {
-        letter: { width: "8.5in", height: "11in" },
-        legal:  { width: "8.5in", height: "14in" },
-        a3:     { width: "11.7in", height: "16.5in" },
-        a4:     { width: "8.27in", height: "11.69in" },
-        a5:     { width: "5.8in", height: "8.3in" }
-      };
-
-      const preview = sizeMap[sizeKey];
-      if (!preview) return;
-
-      const mainEditor = document.getElementById("mainEditor");
-      mainEditor.style.width = preview.width;
-      mainEditor.style.minHeight = preview.height;
-      mainEditor.style.border = "2px dashed #00bcd4"; // Optional preview effect
-    }
-
-    function resetEditorSize() {
-      applyPaperSize(currentSize); // Assuming currentSize holds the selected format
-      const mainEditor = document.getElementById("mainEditor");
-      mainEditor.style.border = ""; // Remove preview effect
-    }
-
     const sizeMap = {
       letter: { width: "8.5in", height: "11in" },
       legal:  { width: "8.5in", height: "14in" },
@@ -1847,6 +1828,10 @@
 
         document.getElementById("paperSizeStatus").textContent =
         `🧾 ${sizeKey.toUpperCase()} format`;
+
+        // 🔦 Visual resize feedback
+        mainEditor.classList.add("resize-flash");
+        setTimeout(() => mainEditor.classList.remove("resize-flash"), 300);
 
         console.log("📄 Applied paper size:", sizeKey, size);
       }
