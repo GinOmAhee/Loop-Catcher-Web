@@ -875,6 +875,18 @@
     background-color: var(--button-hover);
   }
 
+  #paperSizeDropdown {
+    position: absolute;
+    top: 50px; /* or calculate based on button position */
+    left: 60px; /* nudge it off the toolbar if needed */
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 0.5rem;
+    z-index: 1000;
+  }
+
   body.dark-theme #highlightDropdown,
   body.dark-theme #fontDropdown,
   body.dark-theme #paperSizeSelect,
@@ -1208,15 +1220,6 @@
     <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
   </div>
 
-  
-  <div id="paperSizeDropdown" class="dropdown hidden">
-    <div data-size="letter">Letter (8.5in × 11in)</div>
-    <div data-size="legal">Legal (8.5in × 14in)</div>
-    <div data-size="a3">A3 (11.7in × 16.5in)</div>
-    <div data-size="a4">A4 (8.27in × 11.69in)</div>
-    <div data-size="a5">A5 (5.8in × 8.3in)</div>
-  </div>
-
   <div id="marginDropdown" class="dropdown hidden">
     <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
     <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
@@ -1313,6 +1316,13 @@
 
           <div class="format-toolbar-vertical">
             <button id="paperSizeBtn" class="toolbar-btn">📄</button>
+            <div id="paperSizeDropdown" class="dropdown hidden">
+              <div data-size="letter">Letter (8.5in × 11in)</div>
+              <div data-size="legal">Legal (8.5in × 14in)</div>
+              <div data-size="a3">A3 (11.7in × 16.5in)</div>
+              <div data-size="a4">A4 (8.27in × 11.69in)</div>
+              <div data-size="a5">A5 (5.8in × 8.3in)</div>
+            </div>
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -1716,6 +1726,9 @@
       
       paperSizeBtn.addEventListener("click", () => {
         console.log("📂 Paper size dropdown toggled");
+        const rect = paperSizeBtn.getBoundingClientRect();
+        paperSizeDropdown.style.top = `${rect.bottom + window.scrollY}px`;
+        paperSizeDropdown.style.left = `${rect.left + window.scrollX}px`;
         paperSizeDropdown.classList.toggle("hidden");
       });
 
