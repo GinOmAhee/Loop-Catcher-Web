@@ -1857,13 +1857,10 @@
       }
 
       paperSizeDropdown.querySelectorAll("div").forEach(option => {
-        option.addEventListener("mouseenter", () => {
-          const previewSize = option.dataset.size;
-          showTemporarySize(previewSize);
-        });
-
-        option.addEventListener("mouseleave", () => {
-          resetEditorSize();
+        option.addEventListener("click", () => {
+          const size = option.dataset.size;
+          applyPaperSize(size);
+          paperSizeDropdown.classList.add("hidden");
         });
       });
     }
