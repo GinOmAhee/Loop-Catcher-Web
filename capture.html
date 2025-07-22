@@ -1135,16 +1135,18 @@
     margin-top: 6px;
     font-size: 0.95em;
     color: #444;
-    background-color: #f2f2f2;
-    padding: 4px 8px;
+    background-color: #f9f9f9;
+    padding: 6px 10px;
     border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 10;
     transition: opacity 0.3s ease;
     opacity: 0;
   }
 
   #paperFormatReference:not(.hidden) {
     opacity: 1;
-  }
 
   </style>
 </head>
@@ -1312,6 +1314,7 @@
               </select>
               <button id="paperInfoBtn" title="Show format details">ℹ️</button>
             </div>
+            <div id="paperFormatReference" class="hidden"></div>
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -1326,7 +1329,6 @@
             <div id="mainEditor" class="editor" contenteditable="true">
                Start typing here...
             </div>
-          <div id="paperFormatReference" class="hidden"></div>
           </div>  
         </div>     
       </div>
@@ -1732,6 +1734,7 @@
         formatRef.textContent = `🧾 ${selected.toUpperCase()} format: ${sizeLabels[selected]}`;
         formatRef.classList.remove("hidden");
 
+        // Optional: auto-hide after 3 seconds
         setTimeout(() => formatRef.classList.add("hidden"), 3000);
       });
     });  
