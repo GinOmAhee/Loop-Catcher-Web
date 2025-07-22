@@ -1130,38 +1130,7 @@
     overflow-y: auto;
     border: none;
   }
-  
-  .paper-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: relative;
-  }
 
-  /* Tooltip styling */
-  #paperFormatReference {
-    position: absolute;
-    top: 100%;
-    left: calc(100% + 8px); /* place beside button */
-    background-color: #fefefe;
-    color: #333;
-    padding: 6px 10px;
-    font-size: 0.85em;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-    z-index: 100;
-  }
-
-  /* Hover trigger */
-  #paperInfoBtn:hover + #paperFormatReference {
-    opacity: 1;
-  }
-  
   </style>
 </head>
 <body data-mode="main-only">
@@ -1319,16 +1288,14 @@
 
           <div class="format-toolbar-vertical">
             <div class="paper-controls">
-              <select id="paperSizeSelect" onchange="applyPaperSize(this.value)">
+              <select id="paperSizeSelect">
                 <option value="letter">📄 Letter</option>
                 <option value="legal">📄 Legal</option>
                 <option value="a3">📄 A3</option>
                 <option value="a4" selected>📄 A4</option>
                 <option value="a5">📄 A5</option>
               </select>
-              <button id="paperInfoBtn"></button>
-            </div>
-            <div id="paperFormatReference" class="tooltip-box">ℹ️</div>
+
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -1338,7 +1305,6 @@
             <div id="attachedFilesList"></div>
             <button onclick="removeFormatting()">🚫</button>
           </div>
-          
           <div class="editor-wrapper">
             <div id="mainEditor" class="editor" contenteditable="true">
                Start typing here...
@@ -1730,22 +1696,6 @@
       
       document.getElementById("paperSizeSelect").addEventListener("change", updatePaperSize);
       updatePaperSize();
-
-      const selector = document.getElementById("paperSizeSelect");
-      const tooltip = document.getElementById("paperInfoBtn");
-
-      const sizeLabels = {
-        letter: "(8.5in × 11in)",
-        legal: "(8.5in × 14in)",
-        a3: "(11.7in × 16.5in)",
-        a4: "(8.3in × 11.7in)",
-        a5: "(5.8in × 8.3in)"
-      };
-
-      selector.addEventListener("change", () => {
-        const selected = selector.value;
-        tooltip.textContent = `${sizeLabels[selected]}`;
-      });
     });  
 
     let isRecording = false;
