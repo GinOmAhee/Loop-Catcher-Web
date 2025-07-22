@@ -1142,7 +1142,7 @@
 
   .tooltip {
     position: absolute;
-    top: 100%;
+    top: 120%;
     left: 50%;
     transform: translateX(-50%);
     background-color: #f9f9f9;
@@ -1758,8 +1758,8 @@
         a5: "(5.8in × 8.3in)"
       };
 
-      const selector = document.getElementById("paperSizeSelector");
-      const formatRef = document.getElementById("paperFormatReference");
+      const selector = document.getElementById("paperSizeSelect");
+      const formatRef = document.getElementById(".tooltip-text");
 
       selector.addEventListener("change", () => {
         const selected = selector.value;
