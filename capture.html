@@ -1710,8 +1710,12 @@
           }
         });
       });
+
+      const paperSizeBtn = document.getElementById("paperSizeBtn");
+      const paperSizeDropdown = document.getElementById("paperSizeDropdown");
       
-      document.getElementById("paperSizeBtn").addEventListener("click", () => {
+      paperSizeBtn.addEventListener("click", () => {
+        console.log("📂 Paper size dropdown toggled");
         paperSizeDropdown.classList.toggle("hidden");
       });
 
@@ -1722,7 +1726,7 @@
           paperSizeDropdown.classList.add("hidden");
         });
       });
-    });  
+    }); 
 
     let isRecording = false;
     let recognition;
