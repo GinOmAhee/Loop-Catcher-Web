@@ -1132,30 +1132,35 @@
   }
 
   .select-group {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
+    margin-bottom: 8px; /* Add spacing if it's too tight */
+    flex-wrap: wrap; /* If you’re on small screens, prevent overflow */
   }
 
   .hint-btn {
     padding: 2px 8px;
-    background-color: #eee;
-    border: none;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 0.85rem;
+    height: 30px;
+    line-height: 1;
   }
 
   .hint-floating {
-    position: fixed; /* floats OUTSIDE */
-    top: 100px; /* you can position it dynamically */
+    position: fixed; /* floats OUTSIDE of containers */
+    top: 100px; /* adjust based on where you want it */
     right: 40px;
     background: #fff;
     border: 1px solid #ccc;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 12px 16px;
-    font-size: 0.9rem;
-    width: 220px;
+    font-size: 0.85rem;
+    width: 240px;
     z-index: 999;
     display: none;
     border-radius: 8px;
