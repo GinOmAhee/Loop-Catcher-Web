@@ -330,6 +330,7 @@
     box-sizing: border-box;
     overflow-y: auto;
     flex-grow: 1;
+    transition: width 0.3s ease, min-height 0.3s ease;
   }
 
   #coEditor {
@@ -887,6 +888,11 @@
     z-index: 1000;
   }
 
+  #paperSizeDropdown div.active {
+    background-color: var(--highlight, #e0f7ff);
+    font-weight: bold;
+  }
+
   body.dark-theme #highlightDropdown,
   body.dark-theme #fontDropdown,
   body.dark-theme #paperSizeSelect,
@@ -1302,6 +1308,8 @@
         <a href="profile.html">👤 Profile</a>
       </div>
 
+      <div id="paperSizeStatus" class="editor-status"></div>
+
     </div>
   </div>
 
@@ -1323,6 +1331,7 @@
               <div data-size="a4">A4 (8.27in × 11.69in)</div>
               <div data-size="a5">A5 (5.8in × 8.3in)</div>
             </div>
+            <button id="orientationToggle">↕️ Portrait</button>
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -1741,6 +1750,21 @@
 
         console.log("📂 Paper size dropdown toggled");
       });
+
+      let isPortrait = true;
+
+      document.getElementById("orientationToggle").addEventListener("click", () => {
+        isPortrait = !isPortrait;
+        const size = sizeMap[currentSize]; // save current selection
+
+        const width = isPortrait ? size.width : size.height;
+        const height = isPortrait ? size.height : size.width;
+
+        mainEditor.style.width = width;
+        mainEditor.style.minHeight = height;
+
+        orientationToggle.textContent = isPortrait ? "↕️ Portrait" : "↔️ Landscape";
+      });
     }); 
 
     let isRecording = false;
@@ -1778,6 +1802,32 @@
       activeEditor.focus();
     }
 
+    function showTemporarySize(sizeKey) {
+      const sizeMap = {
+        letter: { width: "8.5in", height: "11in" },
+        legal:  { width: "8.5in", height: "14in" },
+        a3:     { width: "11.7in", height: "16.5in" },
+        a4:     { width: "8.27in", height: "11.69in" },
+        a5:     { width: "5.8in", height: "8.3in" }
+      };
+
+      const preview = sizeMap[sizeKey];
+      if (!preview) return;
+
+      const mainEditor = document.getElementById("mainEditor");
+      mainEditor.style.width = preview.width;
+      mainEditor.style.minHeight = preview.height;
+      mainEditor.style.border = "2px dashed #00bcd4"; // Optional preview effect
+    }
+
+    function resetEditorSize() {
+      applyPaperSize(currentSize); // Assuming currentSize holds the selected format
+      const mainEditor = document.getElementById("mainEditor");
+      mainEditor.style.border = ""; // Remove preview effect
+    }
+
+    let currentSize = "a4"; // default
+
     function applyPaperSize(sizeKey) {
       const sizeMap = {
         letter: { width: "8.5in", height: "11in" },
@@ -1792,8 +1842,22 @@
       if (size && mainEditor) {
         mainEditor.style.width = size.width;
         mainEditor.style.minHeight = size.height;
+
+        document.getElementById("paperSizeStatus").textContent = `🧾 ${sizeKey.toUpperCase()} format`;
+        
         console.log("📄 Applied paper size:", sizeKey, size);
       }
+
+      paperSizeDropdown.querySelectorAll("div").forEach(option => {
+        option.addEventListener("mouseenter", () => {
+          const previewSize = option.dataset.size;
+          showTemporarySize(previewSize);
+        });
+
+        option.addEventListener("mouseleave", () => {
+          resetEditorSize();
+        });
+      });
     }
 
     function nukeStyledSpan(anchorNode) {
