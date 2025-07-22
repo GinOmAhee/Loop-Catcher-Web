@@ -37,6 +37,7 @@
     --dropdown-bg: #fff;
     --dropdown-border: #ccc;
     --dropdown-text: #000;
+    --paper-width: 800px; /* default fallback */
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px;
     color: #333;
@@ -1683,7 +1684,11 @@
             applyStyle(currentStyle.prop, currentStyle.value);
           }
         });
-      });  
+      });
+      
+      document.getElementById("paperSizeSelect").addEventListener("change", updatePaperSize);
+      updatePaperSize(); // Apply default paper size on load
+
     });  
 
     let isRecording = false;
@@ -1719,6 +1724,26 @@
     function execOnActive(cmd, val=null){
       document.execCommand(cmd,false,val);
       activeEditor.focus();
+    }
+
+    function updatePaperSize() {
+      const paperSizeMap = {
+        letter: { width: "8.5in", height: "11in" },
+        legal:  { width: "8.5in", height: "14in" },
+        a3:     { width: "11.7in", height: "16.5in" },
+        a4:     { width: "8.27in", height: "11.69in" },
+        a5:     { width: "5.8in", height: "8.3in" }
+      };
+
+      const selectedSize = document.getElementById("paperSizeSelect").value;
+      const size = paperSizeMap[selectedSize];
+      if (!size) return;
+
+      const mainEditor = document.getElementById("mainEditor");
+      mainEditor.style.width = size.width;
+      mainEditor.style.minHeight = size.height;
+
+      console.log("📄 Applied paper size to mainEditor:", selectedSize, size);
     }
 
     function nukeStyledSpan(anchorNode) {
