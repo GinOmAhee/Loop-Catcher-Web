@@ -1826,6 +1826,14 @@
       mainEditor.style.border = ""; // Remove preview effect
     }
 
+    const sizeMap = {
+      letter: { width: "8.5in", height: "11in" },
+      legal:  { width: "8.5in", height: "14in" },
+      a3:     { width: "11.7in", height: "16.5in" },
+      a4:     { width: "8.27in", height: "11.69in" },
+      a5:     { width: "5.8in", height: "8.3in" }
+    };
+
     let currentSize = "a4"; // default
 
     function applyPaperSize(sizeKey) {
