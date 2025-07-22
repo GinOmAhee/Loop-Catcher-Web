@@ -1827,8 +1827,10 @@
     let currentSize = "a4"; // default
 
     function applyPaperSize(sizeKey) {
+      console.log("🧩 applyPaperSize CALLED with:", sizeKey);
       const size = sizeMap[sizeKey];
       const mainEditor = document.getElementById("mainEditor");
+      console.log("🧠 Found mainEditor?", !!mainEditor);
 
       if (size && mainEditor) {
         mainEditor.style.width = size.width;
