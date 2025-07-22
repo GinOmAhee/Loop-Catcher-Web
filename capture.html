@@ -1155,12 +1155,8 @@
 
   .editor-layout {
     display: flex;
-    align-items: stretch;
-    width: auto;
-    flex-wrap: nowrap;
-    overflow: visible;
+    height: 100%; /* or set fixed height if needed */
   }
-
 
   .editor {
     flex: 1;
@@ -1840,7 +1836,7 @@
         // ✅ Override width and height forcibly
         mainEditor.style.setProperty("width", size.width, "important");
         mainEditor.style.setProperty("min-height", size.height, "important");
-
+        
         currentSize = sizeKey;
 
         document.getElementById("paperSizeStatus").textContent =
