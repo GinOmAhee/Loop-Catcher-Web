@@ -1131,6 +1131,38 @@
     border: none;
   }
 
+  .has-tooltip {
+    position: relative;
+    cursor: pointer;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 10px;
+  }
+
+  .tooltip {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f9f9f9;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 0.9em;
+    color: #333;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+  }
+
+  .has-tooltip:hover .tooltip {
+    opacity: 1;
+  }
+
   #paperFormatReference {
     margin-top: 6px;
     font-size: 0.95em;
@@ -1312,7 +1344,9 @@
                 <option value="a4" selected>📄 A4</option>
                 <option value="a5">📄 A5</option>
               </select>
-              <button id="paperInfoBtn" title="Show format details">ℹ️</button>
+              <button id="paperInfoBtn" class="has-tooltip">ℹ️
+                 <span class="tooltip" id="paperFormatReference">Format details</span>
+              </button>
             </div>
             <div id="paperFormatReference" class="hidden"></div>
             <button id="marginBtn" title="Set Margins">📏</button>
@@ -1725,17 +1759,12 @@
         a5: "(5.8in × 8.3in)"
       };
 
-      const selector = document.getElementById("paperSizeSelect");
-      const infoBtn = document.getElementById("paperInfoBtn");
+      const selector = document.getElementById("paperSizeSelector");
       const formatRef = document.getElementById("paperFormatReference");
 
-      infoBtn.addEventListener("click", () => {
+      selector.addEventListener("change", () => {
         const selected = selector.value;
-        formatRef.textContent = `🧾 ${selected.toUpperCase()} format: ${sizeLabels[selected]}`;
-        formatRef.classList.remove("hidden");
-
-        // Optional: auto-hide after 3 seconds
-        setTimeout(() => formatRef.classList.add("hidden"), 3000);
+        formatRef.textContent = `${sizeLabels[selected]}`;
       });
     });  
 
