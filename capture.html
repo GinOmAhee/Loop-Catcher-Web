@@ -1138,29 +1138,29 @@
     position: relative;
   }
 
-  .tooltip-box {
+  /* Tooltip styling */
+  #paperFormatReference {
     position: absolute;
-    top: 110%; /* just below the controls */
-    left: 0;
-    background-color: #fff;
+    top: 100%;
+    left: calc(100% + 8px); /* place beside button */
+    background-color: #fefefe;
     color: #333;
     padding: 6px 10px;
     font-size: 0.85em;
     border: 1px solid #bbb;
     border-radius: 4px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     white-space: nowrap;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
+    z-index: 100;
   }
 
-  #paperInfoBtn:hover + .tooltip-box {
+  /* Hover trigger */
+  #paperInfoBtn:hover + #paperFormatReference {
     opacity: 1;
   }
-
- 
-
   
   </style>
 </head>
