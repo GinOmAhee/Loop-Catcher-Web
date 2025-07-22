@@ -1131,6 +1131,22 @@
     border: none;
   }
 
+  #paperSizeDescriptions div {
+    display: none;
+    margin-top: 4px;
+    font-size: 0.9em;
+    color: #444;
+  }
+
+  #paperSizeSelector:hover + #paperSizeDescriptions div[data-size="letter"]:hover,
+  #paperSizeSelector option[value="letter"]:hover ~ #paperSizeDescriptions div[data-size="letter"],
+  #paperSizeSelector option[value="legal"]:hover ~ #paperSizeDescriptions div[data-size="legal"],
+  #paperSizeSelector option[value="a3"]:hover ~ #paperSizeDescriptions div[data-size="a3"],
+  #paperSizeSelector option[value="a4"]:hover ~ #paperSizeDescriptions div[data-size="a4"],
+  #paperSizeSelector option[value="a5"]:hover ~ #paperSizeDescriptions div[data-size="a5"] {
+    display: block;
+  }
+
   </style>
 </head>
 <body data-mode="main-only">
@@ -1288,12 +1304,21 @@
 
           <div class="format-toolbar-vertical">
             <select id="paperSizeSelect">
-              <option value="letter">📄 Letter (8.5in × 11in)</option>
-              <option value="legal">📄 Legal (8.5in × 14in)</option>
-              <option value="a3">📄 A3 (11.7in × 16.5in)</option>
-              <option value="a4" selected>📄 A4 (8.3in × 11.7in)</option>
-              <option value="a5">📄 A5 (5.8in × 8.3in)</option>
+              <option value="letter">📄 Letter</option>
+              <option value="legal">📄 Legal</option>
+              <option value="a3">📄 A3</option>
+              <option value="a4" selected>📄 A4</option>
+              <option value="a5">📄 A5</option>
             </select>
+
+            <!-- Hover descriptions -->
+            <div id="paperSizeDescriptions">
+              <div data-size="letter">(8.5in × 11in)</div>
+              <div data-size="legal">(8.5in × 14in)</div>
+              <div data-size="a3">(11.7in × 16.5in)</div>
+              <div data-size="a4">(8.3in × 11.7in)</div>
+              <div data-size="a5">(5.8in × 8.3in)</div>
+            </div>
 
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
