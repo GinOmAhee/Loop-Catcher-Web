@@ -1599,13 +1599,12 @@
         fontSizeDropdown.classList.add("hidden");
       });
 
-      document.addEventListener("click", (e) => {
-        const clickedInsideDropdown = fontSizeDropdown.contains(e.target);
-        const clickedButton = fontSizeBtn.contains(e.target);
+      document.addEventListener("mousedown", (e) => {
+        const isInsideDropdown = e.target.closest(".dropdown");
+        const isTriggerBtn = e.target.closest("#fontSizeBtn");
 
-        if (!clickedInsideDropdown && !clickedButton) {
-          fontSizeDropdown.classList.add("hidden");
-          fontSizeDropdown.style.display = "none";
+        if (!isInsideDropdown && !isTriggerBtn) {
+          document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
         }
       });
 
