@@ -37,7 +37,6 @@
     --dropdown-bg: #fff;
     --dropdown-border: #ccc;
     --dropdown-text: #000;
-    --paper-width: 800px; /* default fallback */
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px;
     color: #333;
@@ -330,7 +329,6 @@
     box-sizing: border-box;
     overflow-y: auto;
     flex-grow: 1;
-    transition: width 0.3s ease, min-height 0.3s ease;
   }
 
   #coEditor {
@@ -862,40 +860,8 @@
     display: none; /* hide by default */
   }
 
- .papersize-btn {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--tab-border);
-    background-color: var(--button-bg);
-    cursor: pointer;
-    font-size: 0.95rem;
-    transition: background-color 0.2s ease;
-  }
-
-  .papersize-btn:hover {
-    background-color: var(--button-hover);
-  }
-
-  #paperSizeDropdown {
-    position: absolute;
-    top: 50px; /* or calculate based on button position */
-    left: 60px; /* nudge it off the toolbar if needed */
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    padding: 0.5rem;
-    z-index: 1000;
-  }
-
-  #paperSizeDropdown div.active {
-    background-color: var(--highlight, #e0f7ff);
-    font-weight: bold;
-  }
-
   body.dark-theme #highlightDropdown,
   body.dark-theme #fontDropdown,
-  body.dark-theme #paperSizeSelect,
   body.dark-theme #textColorDropdown {
     background: #1e1e1e;
     border-color: #444;
@@ -1148,16 +1114,14 @@
 
   .editor-wrapper {
     display: flex;
+    flex: 1; /* takes up remaining space */
+    flex-grow: 1;
     flex-direction: column;
-    flex: 1;
-    width: 100%;
-    min-width: 0;
-    max-width: none;
   }
 
   .editor-layout {
-    display: block;
-    width: auto;
+    display: flex;
+    height: 100%; /* or set fixed height if needed */
   }
 
   .editor {
@@ -1165,11 +1129,6 @@
     padding: 10px;
     overflow-y: auto;
     border: none;
-  }
-
-  .resize-flash {
-    outline: 2px dashed #00bcd4;
-    transition: outline 0.3s ease;
   }
 
   </style>
@@ -1315,8 +1274,6 @@
         <a href="profile.html">👤 Profile</a>
       </div>
 
-      <div id="paperSizeStatus" class="editor-status"></div>
-
     </div>
   </div>
 
@@ -1330,15 +1287,14 @@
         <div class="editor-layout">
 
           <div class="format-toolbar-vertical">
-            <button id="paperSizeBtn" class="papersize-btn">📄</button>
-            <div id="paperSizeDropdown" class="dropdown hidden">
-              <div data-size="letter">Letter (8.5in × 11in)</div>
-              <div data-size="legal">Legal (8.5in × 14in)</div>
-              <div data-size="a3">A3 (11.7in × 16.5in)</div>
-              <div data-size="a4">A4 (8.27in × 11.69in)</div>
-              <div data-size="a5">A5 (5.8in × 8.3in)</div>
-            </div>
-            <button id="orientationToggle">↕️ Portrait</button>
+            <select id="paperSizeSelect">
+              <option value="letter">📄 Letter (8.5in × 11in)</option>
+              <option value="legal">📄 Legal (8.5in × 14in)</option>
+              <option value="a3">📄 A3 (11.7in × 16.5in)</option>
+              <option value="a4" selected>📄 A4 (8.3in × 11.7in)</option>
+              <option value="a5">📄 A5 (5.8in × 8.3in)</option>
+            </select>
+
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -1736,52 +1692,10 @@
           }
         });
       });
-
-      const paperSizeBtn = document.getElementById("paperSizeBtn");
-      const paperSizeDropdown = document.getElementById("paperSizeDropdown");
       
-      paperSizeBtn.addEventListener("click", () => {
-        const isHidden = paperSizeDropdown.classList.contains("hidden");
-
-        if (isHidden) {
-          paperSizeDropdown.classList.remove("hidden");
-          paperSizeDropdown.style.display = "block";
-        } else {
-          paperSizeDropdown.classList.add("hidden");
-          paperSizeDropdown.style.display = "none";
-        }
-
-        const rect = paperSizeBtn.getBoundingClientRect();
-        paperSizeDropdown.style.top = `${rect.bottom + window.scrollY}px`;
-        paperSizeDropdown.style.left = `${rect.left + window.scrollX}px`;
-
-        console.log("📂 Paper size dropdown toggled");
-      });
-
-      paperSizeDropdown.querySelectorAll("div").forEach(option => {
-        option.addEventListener("click", () => {
-          const sizeKey = option.dataset.size;
-          applyPaperSize(sizeKey); // 🎯 Apply the selected size
-          paperSizeDropdown.classList.add("hidden");
-          paperSizeDropdown.style.display = "none"; // Hide it visually
-        });
-      });
-
-      let isPortrait = true;
-
-      document.getElementById("orientationToggle").addEventListener("click", () => {
-        isPortrait = !isPortrait;
-        const size = sizeMap[currentSize]; // save current selection
-
-        const width = isPortrait ? size.width : size.height;
-        const height = isPortrait ? size.height : size.width;
-
-        mainEditor.style.width = width;
-        mainEditor.style.minHeight = height;
-
-        orientationToggle.textContent = isPortrait ? "↕️ Portrait" : "↔️ Landscape";
-      });
-    }); 
+      document.getElementById("paperSizeSelect").addEventListener("change", updatePaperSize);
+      updatePaperSize();
+    });  
 
     let isRecording = false;
     let recognition;
@@ -1816,44 +1730,6 @@
     function execOnActive(cmd, val=null){
       document.execCommand(cmd,false,val);
       activeEditor.focus();
-    }
-
-    const sizeMap = {
-      letter: { width: "816px", height: "1056px" },  // 8.5in × 11in
-      legal:  { width: "816px", height: "1344px" },  // 8.5in × 14in
-      a3:     { width: "1123px", height: "1584px" }, // 11.7in × 16.5in
-      a4:     { width: "794px",  height: "1123px" }, // 8.27in × 11.69in
-      a5:     { width: "557px",  height: "794px" }   // 5.8in × 8.3in
-    };
-
-    let currentSize = "a4"; // default
-
-    function applyPaperSize(sizeKey) {
-      console.log("🧩 applyPaperSize CALLED with:", sizeKey);
-      const size = sizeMap[sizeKey];
-      const mainEditor = document.getElementById("mainEditor");
-      console.log("🧠 Found mainEditor?", !!mainEditor);
-
-      if (size && mainEditor) {
-        // ✅ Override width and height forcibly
-        mainEditor.style.setProperty("width", size.width, "important");
-        mainEditor.style.setProperty("min-height", size.height, "important");
-        
-        currentSize = sizeKey;
-
-        document.getElementById("paperSizeStatus").textContent =
-        `🧾 ${sizeKey.toUpperCase()} format`;
-
-        // 🔦 Visual resize feedback
-        mainEditor.classList.add("resize-flash");
-        setTimeout(() => mainEditor.classList.remove("resize-flash"), 300);
-
-        console.log("📄 Applied paper size:", sizeKey, size);
-
-        // ✅ Inspect what was actually applied
-        const styles = window.getComputedStyle(mainEditor);
-        console.log("💡 Computed width:", styles.width);
-      }
     }
 
     function nukeStyledSpan(anchorNode) {
@@ -2004,6 +1880,26 @@
       newRange.selectNodeContents(span);
       selection.addRange(newRange);
 
+    }
+
+    function updatePaperSize() {
+      const paperSizeMap = {
+        letter: { width: "8.5in", height: "11in" },
+        legal:  { width: "8.5in", height: "14in" },
+        a3:     { width: "11.7in", height: "16.5in" },
+        a4:     { width: "8.27in", height: "11.69in" },
+        a5:     { width: "5.8in", height: "8.3in" }
+      };
+
+      const selectedSize = document.getElementById("paperSizeSelect").value;
+      const size = paperSizeMap[selectedSize];
+      if (!size) return;
+
+      const mainEditor = document.getElementById("mainEditor");
+      mainEditor.style.width = size.width;
+      mainEditor.style.minHeight = size.height;
+
+      console.log("📄 Applied paper size to mainEditor:", selectedSize, size);
     }
 
     function toggleEditorMode() {
