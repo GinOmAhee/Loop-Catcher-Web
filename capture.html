@@ -1837,32 +1837,19 @@
     let currentSize = "a4"; // default
 
     function applyPaperSize(sizeKey) {
-      const sizeMap = {
-        letter: { width: "8.5in", height: "11in" },
-        legal:  { width: "8.5in", height: "14in" },
-        a3:     { width: "11.7in", height: "16.5in" },
-        a4:     { width: "8.27in", height: "11.69in" },
-        a5:     { width: "5.8in", height: "8.3in" }
-      };
-  
       const size = sizeMap[sizeKey];
       const mainEditor = document.getElementById("mainEditor");
+
       if (size && mainEditor) {
         mainEditor.style.width = size.width;
         mainEditor.style.minHeight = size.height;
+        currentSize = sizeKey;
 
-        document.getElementById("paperSizeStatus").textContent = `🧾 ${sizeKey.toUpperCase()} format`;
-        
+        document.getElementById("paperSizeStatus").textContent =
+        `🧾 ${sizeKey.toUpperCase()} format`;
+
         console.log("📄 Applied paper size:", sizeKey, size);
       }
-
-      paperSizeDropdown.querySelectorAll("div").forEach(option => {
-        option.addEventListener("click", () => {
-          const size = option.dataset.size;
-          applyPaperSize(size);
-          paperSizeDropdown.classList.add("hidden");
-        });
-      });
     }
 
     function nukeStyledSpan(anchorNode) {
