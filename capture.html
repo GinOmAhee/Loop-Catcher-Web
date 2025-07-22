@@ -2228,6 +2228,15 @@
       highlightDropdown?.classList.add("hidden");
     }
 
+    function protectFontSizeDropdownInteractions() {
+      const dropdown = document.getElementById("fontSizeDropdownPanel");
+      dropdown.querySelectorAll("input, select, button").forEach(el => {
+        el.addEventListener("mousedown", e => e.stopPropagation());
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", protectFontSizeDropdownInteractions);
+
     async function saveText() {
       const activeEditor = document.querySelector(".editor:not(.hidden)");
       if (!activeEditor) {
@@ -3371,6 +3380,32 @@
         dropdown.style.visibility = 'visible';
       }
     }
+    document.getElementById("applyFontSize").addEventListener("click", () => {
+      const sizeInput = document.getElementById("customFontSize").value;
+      const sizeSelect = document.getElementById("fontSizeSelect").value;
+      const fontSize = sizeInput || sizeSelect;
+
+      if (!fontSize) return;
+
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const selectedText = range.extractContents();
+
+      const span = document.createElement("span");
+      span.style.fontSize = fontSize;
+      span.appendChild(selectedText);
+      range.insertNode(span);
+
+      const newRange = document.createRange();
+      newRange.selectNodeContents(span);
+      newRange.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
+
+      document.getElementById("fontSizeDropdownPanel").classList.add("hidden");
+    });
 
     document.addEventListener("mousedown", (e) => {
       const isDropdown = e.target.closest("#highlightDropdown, #textColorDropdown");
