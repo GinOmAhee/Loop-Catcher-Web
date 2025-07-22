@@ -861,20 +861,18 @@
     display: none; /* hide by default */
   }
 
-  #paperSizeSelect {
+ .papersize-btn {
     padding: 6px 12px;
-    border: 1px solid var(--tab-border);
     border-radius: 6px;
-    background-color: var(--button-bg, #f0f0f0);
-    font-size: 0.9rem;
-    font-family: inherit;
+    border: 1px solid var(--tab-border);
+    background-color: var(--button-bg);
     cursor: pointer;
-    appearance: none;
+    font-size: 0.95rem;
     transition: background-color 0.2s ease;
   }
 
-  #paperSizeSelect:hover {
-    background-color: var(--button-hover, #e0e0e0);
+  .papersize-btn:hover {
+    background-color: var(--button-hover);
   }
 
   body.dark-theme #highlightDropdown,
@@ -1211,14 +1209,13 @@
   </div>
 
   
-  <select id="paperSizeSelect">
-    <option value="letter">Letter (8.5in × 11in)</option>
-    <option value="legal">Legal (8.5in × 14in)</option>
-    <option value="a3">A3 (11.7in × 16.5in)</option>
-    <option value="a4" selected>A4 (8.3in × 11.7in)</option>
-    <option value="a5">A5 (5.8in × 8.3in)</option>
-  </select>
-
+  <div id="paperSizeDropdown" class="dropdown hidden">
+    <div data-size="letter">Letter (8.5in × 11in)</div>
+    <div data-size="legal">Legal (8.5in × 14in)</div>
+    <div data-size="a3">A3 (11.7in × 16.5in)</div>
+    <div data-size="a4">A4 (8.27in × 11.69in)</div>
+    <div data-size="a5">A5 (5.8in × 8.3in)</div>
+  </div>
 
   <div id="marginDropdown" class="dropdown hidden">
     <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
@@ -1315,7 +1312,7 @@
         <div class="editor-layout">
 
           <div class="format-toolbar-vertical">
-            <label for="paperSizeSelect">📄</label>
+            <button id="paperSizeBtn" class="toolbar-btn">📄</button>
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -1714,9 +1711,17 @@
         });
       });
       
-      document.getElementById("paperSizeSelect").addEventListener("change", updatePaperSize);
-      updatePaperSize(); // Apply default paper size on load
+      document.getElementById("paperSizeBtn").addEventListener("click", () => {
+        paperSizeDropdown.classList.toggle("hidden");
+      });
 
+      paperSizeDropdown.querySelectorAll("div").forEach(option => {
+        option.addEventListener("click", () => {
+          const size = option.dataset.size;
+          applyPaperSize(size);
+          paperSizeDropdown.classList.add("hidden");
+        });
+      });
     });  
 
     let isRecording = false;
@@ -1754,24 +1759,22 @@
       activeEditor.focus();
     }
 
-    function updatePaperSize() {
-      const paperSizeMap = {
+    function applyPaperSize(sizeKey) {
+      const sizeMap = {
         letter: { width: "8.5in", height: "11in" },
         legal:  { width: "8.5in", height: "14in" },
         a3:     { width: "11.7in", height: "16.5in" },
         a4:     { width: "8.27in", height: "11.69in" },
         a5:     { width: "5.8in", height: "8.3in" }
       };
-
-      const selectedSize = document.getElementById("paperSizeSelect").value;
-      const size = paperSizeMap[selectedSize];
-      if (!size) return;
-
+  
+      const size = sizeMap[sizeKey];
       const mainEditor = document.getElementById("mainEditor");
-      mainEditor.style.width = size.width;
-      mainEditor.style.minHeight = size.height;
-
-      console.log("📄 Applied paper size to mainEditor:", selectedSize, size);
+      if (size && mainEditor) {
+        mainEditor.style.width = size.width;
+        mainEditor.style.minHeight = size.height;
+        console.log("📄 Applied paper size:", sizeKey, size);
+      }
     }
 
     function nukeStyledSpan(anchorNode) {
