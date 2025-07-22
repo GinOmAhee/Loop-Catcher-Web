@@ -1131,6 +1131,25 @@
     border: none;
   }
 
+  .hint-ref {
+    font-size: 0.85rem;
+    color: #888;
+    margin-left: 6px;
+  }
+
+  .hint-box {
+    background: #f9f9f9;
+    border-left: 3px solid #ddd;
+    padding: 10px 15px;
+    font-size: 0.85rem;
+    color: #444;
+    margin-top: 10px;
+  }
+
+  .hint-box p {
+    margin: 4px 0;
+  }
+
   </style>
 </head>
 <body data-mode="main-only">
@@ -1287,15 +1306,24 @@
         <div class="editor-layout">
 
           <div class="format-toolbar-vertical">
-            <div class="paper-controls">
-              <select id="paperSizeSelect">
-                <option value="letter">📄 Letter</option>
-                <option value="legal">📄 Legal</option>
-                <option value="a3">📄 A3</option>
-                <option value="a4" selected>📄 A4</option>
-                <option value="a5">📄 A5</option>
-              </select>
+            <label for="paperSize">Paper Size 
+              <span class="hint-ref">(hover reference below)</span>
+            </label>
 
+            <select id="paperSize" name="paperSize">
+              <option value="letter">📄 Letter</option>
+              <option value="legal">📄 Legal</option>
+              <option value="a3">📄 A3</option>
+              <option value="a4" selected>📄 A4</option>
+              <option value="a5">📄 A5</option>
+            </select>
+            <div class="hint-box">
+              <p><strong>📄 Letter</strong> — 8.5 x 11 in (US)</p>
+              <p><strong>📄 Legal</strong> — 8.5 x 14 in (US)</p>
+              <p><strong>📄 A3</strong> — 11.7 x 16.5 in</p>
+              <p><strong>📄 A4</strong> — 8.27 x 11.69 in (Default)</p>
+              <p><strong>📄 A5</strong> — 5.83 x 8.27 in</p>
+            </div>
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
