@@ -1758,12 +1758,12 @@
 
       paperSizeDropdown.querySelectorAll("div").forEach(option => {
         option.addEventListener("click", () => {
-        const sizeKey = option.dataset.size;
-        applyPaperSize(sizeKey); // 🎯 Apply the selected size
-        paperSizeDropdown.classList.add("hidden");
-        paperSizeDropdown.style.display = "none"; // Hide it visually
+          const sizeKey = option.dataset.size;
+          applyPaperSize(sizeKey); // 🎯 Apply the selected size
+          paperSizeDropdown.classList.add("hidden");
+          paperSizeDropdown.style.display = "none"; // Hide it visually
+        });
       });
-    });
 
       let isPortrait = true;
 
