@@ -1845,6 +1845,10 @@
         setTimeout(() => mainEditor.classList.remove("resize-flash"), 300);
 
         console.log("📄 Applied paper size:", sizeKey, size);
+
+        // ✅ Inspect what was actually applied
+        const styles = window.getComputedStyle(mainEditor);
+        console.log("💡 Computed width:", styles.width);
       }
     }
 
