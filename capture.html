@@ -1148,14 +1148,16 @@
 
   .editor-wrapper {
     display: flex;
-    flex: 1; /* takes up remaining space */
-    flex-grow: 1;
     flex-direction: column;
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
   }
 
   .editor-layout {
-    display: flex;
-    height: 100%; /* or set fixed height if needed */
+    display: block;
+    width: auto;
   }
 
   .editor {
