@@ -1833,8 +1833,10 @@
       console.log("🧠 Found mainEditor?", !!mainEditor);
 
       if (size && mainEditor) {
-        mainEditor.style.width = size.width;
-        mainEditor.style.minHeight = size.height;
+        // ✅ Override width and height forcibly
+        mainEditor.style.setProperty("width", size.width, "important");
+        mainEditor.style.setProperty("min-height", size.height, "important");
+        
         currentSize = sizeKey;
 
         document.getElementById("paperSizeStatus").textContent =
