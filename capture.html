@@ -1131,22 +1131,6 @@
     border: none;
   }
 
-  #paperSizeDescriptions div {
-    display: none;
-    margin-top: 4px;
-    font-size: 0.9em;
-    color: #444;
-  }
-
-  #paperSizeSelector:hover + #paperSizeDescriptions div[data-size="letter"]:hover,
-  #paperSizeSelector option[value="letter"]:hover ~ #paperSizeDescriptions div[data-size="letter"],
-  #paperSizeSelector option[value="legal"]:hover ~ #paperSizeDescriptions div[data-size="legal"],
-  #paperSizeSelector option[value="a3"]:hover ~ #paperSizeDescriptions div[data-size="a3"],
-  #paperSizeSelector option[value="a4"]:hover ~ #paperSizeDescriptions div[data-size="a4"],
-  #paperSizeSelector option[value="a5"]:hover ~ #paperSizeDescriptions div[data-size="a5"] {
-    display: block;
-  }
-
   </style>
 </head>
 <body data-mode="main-only">
@@ -1310,16 +1294,7 @@
               <option value="a4" selected>📄 A4</option>
               <option value="a5">📄 A5</option>
             </select>
-
-            <!-- Hover descriptions -->
-            <div id="paperSizeDescriptions">
-              <div data-size="letter">(8.5in × 11in)</div>
-              <div data-size="legal">(8.5in × 14in)</div>
-              <div data-size="a3">(11.7in × 16.5in)</div>
-              <div data-size="a4">(8.3in × 11.7in)</div>
-              <div data-size="a5">(5.8in × 8.3in)</div>
-            </div>
-
+            <div id="paperSizeHint" style="opacity: 0; transition: opacity 0.3s;">ℹ️ Format details here</div>
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -1720,6 +1695,27 @@
       
       document.getElementById("paperSizeSelect").addEventListener("change", updatePaperSize);
       updatePaperSize();
+
+      const paperSizeSelector = document.getElementById("paperSizeSelector");
+      const hint = document.getElementById("paperSizeHint");
+
+      const sizeLabels = {
+        letter: "(8.5in × 11in)",
+        legal: "(8.5in × 14in)",
+        a3: "(11.7in × 16.5in)",
+        a4: "(8.3in × 11.7in)",
+        a5: "(5.8in × 8.3in)"
+      };
+
+      paperSizeSelector.addEventListener("mouseover", () => {
+        const selected = paperSizeSelector.value;
+        hint.textContent = `ℹ️ ${sizeLabels[selected]}`;
+        hint.style.opacity = 1;
+      });
+
+      paperSizeSelector.addEventListener("mouseout", () => {
+        hint.style.opacity = 0;
+      });
     });  
 
     let isRecording = false;
