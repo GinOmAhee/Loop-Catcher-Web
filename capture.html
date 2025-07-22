@@ -1131,6 +1131,21 @@
     border: none;
   }
 
+  #paperFormatReference {
+    margin-top: 6px;
+    font-size: 0.95em;
+    color: #444;
+    background-color: #f2f2f2;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  #paperFormatReference:not(.hidden) {
+    opacity: 1;
+  }
+
   </style>
 </head>
 <body data-mode="main-only">
@@ -1287,14 +1302,17 @@
         <div class="editor-layout">
 
           <div class="format-toolbar-vertical">
-            <select id="paperSizeSelect">
-              <option value="letter">📄 Letter</option>
-              <option value="legal">📄 Legal</option>
-              <option value="a3">📄 A3</option>
-              <option value="a4" selected>📄 A4</option>
-              <option value="a5">📄 A5</option>
-            </select>
-            <div id="paperSizeHint" style="opacity: 0; transition: opacity 0.3s;">ℹ️ Format details here</div>
+            <div class="paper-controls">
+              <select id="paperSizeSelect" onchange="applyPaperSize(this.value)">
+                <option value="letter">📄 Letter</option>
+                <option value="legal">📄 Legal</option>
+                <option value="a3">📄 A3</option>
+                <option value="a4" selected>📄 A4</option>
+                <option value="a5">📄 A5</option>
+              </select>
+              <button id="paperInfoBtn" title="Show format details">ℹ️</button>
+            </div>
+            <div id="paperFormatReference" class="hidden"></div>
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -1696,9 +1714,6 @@
       document.getElementById("paperSizeSelect").addEventListener("change", updatePaperSize);
       updatePaperSize();
 
-      const paperSizeSelector = document.getElementById("paperSizeSelector");
-      const hint = document.getElementById("paperSizeHint");
-
       const sizeLabels = {
         letter: "(8.5in × 11in)",
         legal: "(8.5in × 14in)",
@@ -1707,14 +1722,16 @@
         a5: "(5.8in × 8.3in)"
       };
 
-      paperSizeSelector.addEventListener("mouseover", () => {
-        const selected = paperSizeSelector.value;
-        hint.textContent = `ℹ️ ${sizeLabels[selected]}`;
-        hint.style.opacity = 1;
-      });
+      const selector = document.getElementById("paperSizeSelect");
+      const infoBtn = document.getElementById("paperInfoBtn");
+      const formatRef = document.getElementById("paperFormatReference");
 
-      paperSizeSelector.addEventListener("mouseout", () => {
-        hint.style.opacity = 0;
+      infoBtn.addEventListener("click", () => {
+        const selected = selector.value;
+        formatRef.textContent = `🧾 ${selected.toUpperCase()} format: ${sizeLabels[selected]}`;
+        formatRef.classList.remove("hidden");
+
+        setTimeout(() => formatRef.classList.add("hidden"), 3000);
       });
     });  
 
