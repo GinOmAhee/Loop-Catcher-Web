@@ -1386,10 +1386,6 @@
     window.addEventListener("DOMContentLoaded", () => {
       console.log("fontSizeBtn:", document.getElementById("fontSizeBtn"));
       console.log("fontSizeDropdown:", document.getElementById("fontSizeDropdownPanel"));
-
-      const fontSizeInput = document.getElementById("customFontSize");
-        fontSizeInput.addEventListener("mousedown", e => e.stopPropagation());
-      });
     
       const mainEd = document.getElementById("mainEditor");
       const coEd = document.getElementById("coEditor");
@@ -1603,12 +1599,13 @@
         fontSizeDropdown.classList.add("hidden");
       });
 
-      document.addEventListener("mousedown", (e) => {
-        const isInsideDropdown = e.target.closest(".dropdown");
-        const isTriggerBtn = e.target.closest("#fontSizeBtn, #textColorBtn, #highlightBtn");
+      document.addEventListener("click", (e) => {
+        const clickedInsideDropdown = fontSizeDropdown.contains(e.target);
+        const clickedButton = fontSizeBtn.contains(e.target);
 
-        if (!isInsideDropdown && !isTriggerBtn) {
-          document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
+        if (!clickedInsideDropdown && !clickedButton) {
+          fontSizeDropdown.classList.add("hidden");
+          fontSizeDropdown.style.display = "none";
         }
       });
 
@@ -3425,13 +3422,12 @@
       });
     });
 
-    document.addEventListener("mousedown", (e) => {
-      const isDropdown = e.target.closest(".dropdown");
-      const isTrigger = e.target.closest("#fontSizeBtn, #textColorBtn, #highlightBtn");
-
-      if (!isDropdown && !isTrigger) {
-        document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
-      }
+    document.addEventListener("click", () => {
+      setTimeout(() => {
+        fontDropdown?.classList.add("hidden");
+        textColorDropdown?.classList.add("hidden");
+        highlightDropdown?.classList.add("hidden");
+      }, 100); // this gives time for clicks inside dropdowns to register
     });
 
     document.querySelector(".editor").addEventListener("keydown", (e) => {
