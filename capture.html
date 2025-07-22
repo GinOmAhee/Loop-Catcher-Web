@@ -1131,6 +1131,36 @@
     border: none;
   }
 
+  .select-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hint-btn {
+    padding: 2px 8px;
+    background-color: #eee;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .hint-floating {
+    position: fixed; /* floats OUTSIDE */
+    top: 100px; /* you can position it dynamically */
+    right: 40px;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    width: 220px;
+    z-index: 999;
+    display: none;
+    border-radius: 8px;
+  }
+
   </style>
 </head>
 <body data-mode="main-only">
@@ -1626,6 +1656,21 @@
 
         if (!isInsideDropdown && !isTriggerBtn) {
           document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
+        }
+      });
+
+      const hintBtn = document.getElementById('hintToggle');
+      const hintBox = document.getElementById('hintBox');
+
+      hintBtn.addEventListener('click', () => {
+        const isVisible = hintBox.style.display === 'block';
+        hintBox.style.display = isVisible ? 'none' : 'block';
+      });
+
+      // Optional: hide when clicking outside
+      document.addEventListener('click', function (e) {
+        if (!hintBox.contains(e.target) && !hintBtn.contains(e.target)) {
+          hintBox.style.display = 'none';
         }
       });
 
