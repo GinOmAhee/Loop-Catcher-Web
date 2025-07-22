@@ -1193,6 +1193,16 @@
     <div onclick="setHighlightColor('lightgray')" style="background-color: lightgray;">Light Gray</div>
   </div>
 
+  
+  <select id="paperSizeSelect">
+    <option value="letter">Letter (8.5in × 11in)</option>
+    <option value="legal">Legal (8.5in × 14in)</option>
+    <option value="a3">A3 (11.7in × 16.5in)</option>
+    <option value="a4" selected>A4 (8.3in × 11.7in)</option>
+    <option value="a5">A5 (5.8in × 8.3in)</option>
+  </select>
+
+
   <div id="marginDropdown" class="dropdown hidden">
     <label>Top: <input type="number" id="marginTop" style="width: 60px" step="0.1"> in</label><br>
     <label>Bottom: <input type="number" id="marginBottom" style="width: 60px" step="0.1"> in</label><br>
@@ -1288,6 +1298,7 @@
         <div class="editor-layout">
 
           <div class="format-toolbar-vertical">
+            <label for="paperSizeSelect">📄 Paper Size:</label>
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
