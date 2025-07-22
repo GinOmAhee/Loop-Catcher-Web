@@ -1326,9 +1326,8 @@
                 <option value="a4" selected>📄 A4</option>
                 <option value="a5">📄 A5</option>
               </select>
-              <button id="paperInfoBtn">ℹ️</button>
+              <div id="paperFormatReference" class="tooltip-box">ℹ️</div>
             </div>
-            <div id="paperFormatReference" class="tooltip-box">Format details</div>
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -1731,7 +1730,7 @@
       document.getElementById("paperSizeSelect").addEventListener("change", updatePaperSize);
       updatePaperSize();
 
-      const selector = document.getElementById("paperSizeSelector");
+      const selector = document.getElementById("paperSizeSelect");
       const tooltip = document.getElementById("paperFormatReference");
 
       const sizeLabels = {
