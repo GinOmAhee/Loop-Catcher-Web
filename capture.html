@@ -354,12 +354,15 @@
     background-color: var(--editor-bg);
     color: var(--editor-text);
     overflow-y: auto;
+    outline: 2px dashed hotpink;
   }
 
   .co-pane {
+    outline: 2px dashed red;
     display: flex;
     flex-direction: column;
     flex: 1;
+    min-height: 300px;
   }
 
   .co-pane.hidden {
@@ -1133,6 +1136,7 @@
 
   .editor-layout {
     display: flex;
+    overflow: visible;
     height: 100%; /* or set fixed height if needed */
   }
 
