@@ -577,9 +577,11 @@
     min-width: unset;
   }
 
-  .format-toolbar-vertical {
-    display: inline-flex;
-    flex-direction: column;
+  .format-toolbar-horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
     gap: 0.5rem;
     padding: 1rem 0.5rem;
     background-color: var(--toolbar-bg);
@@ -1296,7 +1298,7 @@
 
         <div class="editor-layout">
 
-          <div class="format-toolbar-vertical">
+          <div class="format-toolbar-horizontal">
             <div class="paper-wrapper">            
               <div class="select-group">
                 <select id="paperSizeSelect" name="paperSize">
