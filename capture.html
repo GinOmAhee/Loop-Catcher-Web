@@ -415,9 +415,10 @@
     flex-direction: column;
     flex: 1;
     min-height: 100vh;
-    align-items: center;
+    align-items: stretch; /* allow children to stretch full width */
     justify-content: flex-start;
     padding: 2rem;
+    gap: 1rem;
     overflow-y: auto;
     box-sizing: border-box;
     overflow: visible;
@@ -920,7 +921,7 @@
   }
 
   .hidden {
-    display: none;
+    display: none !important;
   }
 
   /* === THEME TOGGLE SWITCH === */
@@ -1491,6 +1492,12 @@
             activeEditor = mainEd;
             document.body.classList.remove("co-mode");
           }
+
+          // 🧠 Diagnostic logs
+          console.log("🖊️ Active editor:", activeEditor.id);
+          console.log("mainEditor hidden?", mainEd.classList.contains("hidden"));
+          console.log("coEditor hidden?", coEd.classList.contains("hidden"));
+          
           activeEditor.focus();
         });
       }
