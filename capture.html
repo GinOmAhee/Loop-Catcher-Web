@@ -37,6 +37,8 @@
     --dropdown-bg: #fff;
     --dropdown-border: #ccc;
     --dropdown-text: #000;
+    --hint-border: #333;
+    --hint-shadow: rgba(0, 0, 0, 0.6);
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px;
     color: #333;
@@ -60,11 +62,17 @@
     --badge-text: #eee;
     --toolbar-bg: #1a1a1a;
     --toolbar-border: #444;
+
+    /* hint-specific vars */
     --hint-bg: #1f1f1f;
     --hint-text: #ddd;
+    --hint-border: #444;
+    --hint-shadow: rgba(0, 0, 0, 0.7);
+
     --dropdown-bg: #1e1e1e;
     --dropdown-border: #444;
     --dropdown-text: #f0f0f0;
+
     background-color: #000;
     color: #f1f1f1;
   }
@@ -1155,9 +1163,10 @@
     position: fixed; /* floats OUTSIDE of containers */
     top: 100px; /* adjust based on where you want it */
     right: 40px;
-    background: #fff;
-    border: 1px solid #ccc;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: var(--hint-bg);
+    color: var(--foreground-color);
+    border: 1px solid var(--hint-border);
+    box-shadow: 0 4px 12px var(--hint-shadow);
     padding: 12px 16px;
     font-size: 0.85rem;
     width: 240px;
