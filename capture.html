@@ -1668,23 +1668,18 @@
         }
       });
 
-      document.getElementById("hintToggle").addEventListener("click", function () {
-        const hint = document.getElementById("hintBox");
-        hint.style.display = (hint.style.display === "block") ? "none" : "block";
-      });
-
       const hintBtn = document.getElementById('hintToggle');
       const hintBox = document.getElementById('hintBox');
 
-      hintBtn.addEventListener('click', () => {
-        const isVisible = hintBox.style.display === 'block';
-        hintBox.style.display = isVisible ? 'none' : 'block';
+      hintBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // stop from triggering the document click
+        hintBox.classList.toggle('visible'); // use the class instead of direct style
       });
 
-      // Optional: hide when clicking outside
+      // Hide hint when clicking outside
       document.addEventListener('click', function (e) {
         if (!hintBox.contains(e.target) && !hintBtn.contains(e.target)) {
-          hintBox.style.display = 'none';
+          hintBox.classList.remove('visible');
         }
       });
 
