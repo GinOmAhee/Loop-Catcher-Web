@@ -577,10 +577,10 @@
     min-width: unset;
   }
 
-  .format-toolbar-vertical .paper-wrapper {
+  .format-toolbar-horizontal .paper-wrapper {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     gap: 0.5rem;
     padding: 1rem 0.5rem;
@@ -1136,6 +1136,7 @@
   .select-group {
     display: flex;
     align-items: center;
+    flex-direction: row;
     gap: 6px;
     margin-bottom: 8px; /* Add spacing if it's too tight */
     flex-wrap: wrap; /* If you’re on small screens, prevent overflow */
@@ -1328,7 +1329,7 @@
 
         <div class="editor-layout">
 
-          <div class="format-toolbar-vertical">
+          <div class="format-toolbar-horizontal">
             <div class="paper-wrapper">            
               <div class="select-group">
                 <select id="paperSizeSelect" name="paperSize">
