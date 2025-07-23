@@ -344,7 +344,6 @@
     flex-shrink: 0;
     border: 1px solid #ccc;
     position: relative; 
-    z-index: 1; /* BELOW your hintBox */
     font-family: "Courier New", monospace;
     font-size: 1rem;
     padding: 0.9rem;
@@ -355,15 +354,12 @@
     background-color: var(--editor-bg);
     color: var(--editor-text);
     overflow-y: auto;
-    outline: 2px dashed hotpink;
   }
 
   .co-pane {
-    outline: 2px dashed red;
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-height: 300px;
   }
 
   .co-pane.hidden {
@@ -407,7 +403,6 @@
     display: flex;
     flex: 1;
     min-height: 300px;
-    overflow: visible;
   } 
   
   .editor-area {
@@ -415,13 +410,11 @@
     flex-direction: column;
     flex: 1;
     min-height: 100vh;
-    align-items: stretch; /* allow children to stretch full width */
+    align-items: center;
     justify-content: flex-start;
     padding: 2rem;
-    gap: 1rem;
     overflow-y: auto;
     box-sizing: border-box;
-    overflow: visible;
   }
 
   /* === TABS === */
@@ -1140,7 +1133,6 @@
 
   .editor-layout {
     display: flex;
-    overflow: visible;
     height: 100%; /* or set fixed height if needed */
   }
 
@@ -1497,7 +1489,7 @@
           console.log("🖊️ Active editor:", activeEditor.id);
           console.log("mainEditor hidden?", mainEd.classList.contains("hidden"));
           console.log("coEditor hidden?", coEd.classList.contains("hidden"));
-          
+
           activeEditor.focus();
         });
       }
