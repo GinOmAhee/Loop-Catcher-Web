@@ -37,6 +37,8 @@
     --dropdown-bg: #fff;
     --dropdown-border: #ccc;
     --dropdown-text: #000;
+    --hint-border: #333;
+    --hint-shadow: rgba(0, 0, 0, 0.6);
     font-family: 'Inter', system-ui, sans-serif;
     font-size: 14px;
     color: #333;
@@ -60,11 +62,17 @@
     --badge-text: #eee;
     --toolbar-bg: #1a1a1a;
     --toolbar-border: #444;
+
+    /* hint-specific vars */
     --hint-bg: #1f1f1f;
     --hint-text: #ddd;
+    --hint-border: #444;
+    --hint-shadow: rgba(0, 0, 0, 0.7);
+
     --dropdown-bg: #1e1e1e;
     --dropdown-border: #444;
     --dropdown-text: #f0f0f0;
+
     background-color: #000;
     color: #f1f1f1;
   }
@@ -332,25 +340,29 @@
   }
 
   #coEditor {
+    display: block;
+    flex-shrink: 0;
     border: 1px solid #ccc;
     position: relative; 
     font-family: "Courier New", monospace;
     font-size: 1rem;
     padding: 0.9rem;
     width: 4.14in;
-    z-index: 1; /* BELOW your hintBox */
     height: 5.38in;
     border: 1px solid #ccc;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: var(--editor-bg);
     color: var(--editor-text);
     overflow-y: auto;
+    outline: 2px dashed hotpink;
   }
 
   .co-pane {
+    outline: 2px dashed red;
     display: flex;
     flex-direction: column;
     flex: 1;
+    min-height: 300px;
   }
 
   .co-pane.hidden {
@@ -364,7 +376,6 @@
     width: 100%;
     padding: 2rem;
     box-sizing: border-box;
-    overflow: visible;
   }
 
   .hidden-editor {
@@ -395,7 +406,6 @@
     display: flex;
     flex: 1;
     min-height: 300px;
-    overflow: visible;
   } 
   
   .editor-area {
@@ -408,7 +418,6 @@
     padding: 2rem;
     overflow-y: auto;
     box-sizing: border-box;
-    overflow: visible;
   }
 
   /* === TABS === */
@@ -581,14 +590,16 @@
     min-width: unset;
   }
 
-  .format-toolbar-vertical {
+  .format-toolbar-horizontal .paper-wrapper {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
     gap: 0.5rem;
     padding: 1rem 0.5rem;
     background-color: var(--toolbar-bg);
     border-right: 1px solid var(--tab-border);
-    min-width: 50px;
+    width: 100%;
   }
  
   .controls {
@@ -842,8 +853,8 @@
 
   #fontDropdown  {
     position: absolute;
-    top: 50px; /* tweak this based on your layout */
-    left: 60px; /* enough to sit just beside the toolbar */
+    top: 20%; /* tweak this based on your layout */
+    left: 70%; /* enough to sit just beside the toolbar */
     background-color: var(--dropdown-bg);
     border: 1px solid var(--dropdown-border);
     padding: 0.5rem;
@@ -853,8 +864,8 @@
   
   #fontSizeDropdownPanel  {
     position: absolute;
-    top: 27%; /* below the trigger button */
-    left: 2%;   /* aligns with the left of the parent container or button */
+    top: 20%; /* below the trigger button */
+    left: 40%;   /* aligns with the left of the parent container or button */
     margin-top: 4px;
     background-color: var(--dropdown-bg);
     border: 1px solid var(--dropdown-border);
@@ -922,7 +933,7 @@
 
   .dark-theme-switch {
     position: fixed;
-    top: 5rem;
+    top: 1rem;
     right: .3rem;
     z-index: 1000;
   }
@@ -1125,6 +1136,7 @@
 
   .editor-layout {
     display: flex;
+    overflow: visible;
     height: 100%; /* or set fixed height if needed */
   }
 
@@ -1133,6 +1145,44 @@
     padding: 10px;
     overflow-y: auto;
     border: none;
+  }
+
+  .select-group {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 6px;
+    margin-bottom: 8px; /* Add spacing if it's too tight */
+    flex-wrap: wrap; /* If you’re on small screens, prevent overflow */
+  }
+
+  .hint-btn {
+    padding: 2px 8px;
+    background-color: #eee;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .hint-floating {
+    position: fixed; /* floats OUTSIDE of containers */
+    top: 70px; /* adjust based on where you want it */
+    left: 70px;
+    background: var(--hint-bg);
+    color: var(--foreground-color);
+    border: 1px solid var(--hint-border);
+    box-shadow: 0 4px 12px var(--hint-shadow);
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    width: 240px;
+    z-index: 999;
+    display: none;
+    border-radius: 8px;
+  }  
+
+  .hint-floating.visible {
+    display: block;
   }
 
   </style>
@@ -1290,7 +1340,19 @@
 
         <div class="editor-layout">
 
-          <div class="format-toolbar-vertical">
+          <div class="format-toolbar-horizontal">
+            <div class="paper-wrapper">            
+              <div class="select-group">
+                <select id="paperSizeSelect" name="paperSize">
+                  <option value="letter">📄 Letter</option>
+                  <option value="legal">📄 Legal</option>
+                  <option value="a3">📄 A3</option>
+                  <option value="a4" selected>📄 A4</option>
+                  <option value="a5">📄 A5</option>
+                </select>
+              <button id="hintToggle" class="hint-btn" title="Show size reference">❔</button>
+            </div>
+
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
@@ -1305,10 +1367,19 @@
                Start typing here...
             </div>
           </div>  
-        </div>     
-      </div>
-
-
+        </div>
+        <!-- 👇 Place the hint floating box *after* everything else -->
+        <div id="hintBox" class="hint-floating">
+          <strong>Paper Size Guide:</strong>
+            <ul>
+            <li><strong>📄 Letter</strong>: 8.5 x 11 in</li>
+            <li><strong>📄 Legal</strong>: 8.5 x 14 in</li>
+            <li><strong>📄 A3</strong>: 11.7 x 16.5 in</li>
+            <li><strong>📄 A4</strong>: 8.27 x 11.69 in</li>
+            <li><strong>📄 A5</strong>: 5.83 x 8.27 in</li>
+           </ul>
+          </div>     
+        </div>
 
       <!-- 📝 Rich Text Editor -->
       <div id="coEditor" class="editor hidden" contenteditable="true"></div>
@@ -1494,11 +1565,6 @@
         const left = btnRect.right - containerRect.left + 10;
         const top = btnRect.top - containerRect.top;
 
-        fontDropdown.style.position = "absolute";
-        fontDropdown.style.left = `${left}px`;
-        fontDropdown.style.top = `${top}px`;
-        fontDropdown.style.zIndex = "9999";
-
         // Save selection
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
@@ -1612,6 +1678,21 @@
         }
       });
 
+      const hintBtn = document.getElementById('hintToggle');
+      const hintBox = document.getElementById('hintBox');
+
+      hintBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // stop from triggering the document click
+        hintBox.classList.toggle('visible'); // use the class instead of direct style
+      });
+
+      // Hide hint when clicking outside
+      document.addEventListener('click', function (e) {
+        if (!hintBox.contains(e.target) && !hintBtn.contains(e.target)) {
+          hintBox.classList.remove('visible');
+        }
+      });
+
       // 🧠 Badge toggle (SideThoughts popup)
       if (badge && popup) {
         badge.addEventListener("click", () => {
@@ -1687,7 +1768,10 @@
             applyStyle(currentStyle.prop, currentStyle.value);
           }
         });
-      });  
+      });
+      
+      document.getElementById("paperSizeSelect").addEventListener("change", updatePaperSize);
+      updatePaperSize();
     });  
 
     let isRecording = false;
@@ -1873,6 +1957,26 @@
       newRange.selectNodeContents(span);
       selection.addRange(newRange);
 
+    }
+
+    function updatePaperSize() {
+      const paperSizeMap = {
+        letter: { width: "8.5in", height: "11in" },
+        legal:  { width: "8.5in", height: "14in" },
+        a3:     { width: "11.7in", height: "16.5in" },
+        a4:     { width: "8.27in", height: "11.69in" },
+        a5:     { width: "5.8in", height: "8.3in" }
+      };
+
+      const selectedSize = document.getElementById("paperSizeSelect").value;
+      const size = paperSizeMap[selectedSize];
+      if (!size) return;
+
+      const mainEditor = document.getElementById("mainEditor");
+      mainEditor.style.width = size.width;
+      mainEditor.style.minHeight = size.height;
+
+      console.log("📄 Applied paper size to mainEditor:", selectedSize, size);
     }
 
     function toggleEditorMode() {
