@@ -577,8 +577,9 @@
     min-width: unset;
   }
 
-  .format-toolbar-vertical {
+  .format-toolbar-vertical .paper-wrapper {
     display: flex;
+    flex-wrap: wrap;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
@@ -1133,7 +1134,7 @@
   }
 
   .select-group {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 6px;
     margin-bottom: 8px; /* Add spacing if it's too tight */
@@ -1339,6 +1340,7 @@
                 </select>
               <button id="hintToggle" class="hint-btn" title="Show size reference">❔</button>
             </div>
+
             <button id="marginBtn" title="Set Margins">📏</button>
             <button id="fontMenuBtn" title="Choose Font">🅰️</button>
             <button id="fontSizeBtn" title="Font Size">🔠</button>
