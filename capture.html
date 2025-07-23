@@ -1559,11 +1559,6 @@
         const left = btnRect.right - containerRect.left + 10;
         const top = btnRect.top - containerRect.top;
 
-        fontDropdown.style.position = "absolute";
-        fontDropdown.style.left = `${left}px`;
-        fontDropdown.style.top = `${top}px`;
-        fontDropdown.style.zIndex = "9999";
-
         // Save selection
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
